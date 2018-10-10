@@ -10,12 +10,16 @@
 from setuptools import setup
 import versioneer
 
+with open('README.md', 'r') as infile:
+    longdesc = infile.read()
 
 setup(
     name='microhapulator',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description='Simulator for microhaplotype sequences',
+    long_description=longdesc,
+    long_description_content_type='text/markdown',
     url='https://github.com/bioforensics/microhapdb',
     author='Daniel Standage',
     author_email='daniel.standage@nbacc.dhs.gov',
@@ -24,7 +28,7 @@ setup(
     #     'microhapulator': ['microhapulator/data/*']
     # },
     include_package_data=True,
-    # install_requires=['microhapdb', 'happer'],
+    install_requires=['pyfaidx', 'microhapdb', 'happer'],
     # entry_points={
     #     'console_scripts': ['mhpl8r = microhapulator.cli:main']
     # },
