@@ -20,7 +20,11 @@ def get_parser():
     cli.add_argument('--panel', nargs='+', metavar='ID', help='list of '
                      'MicroHapDB locus IDs to simulate; by default, a panel '
                      'of 22 ALFRED microhaplotype loci is used')
-    cli.add_argument('-s', '--seed', type=int, default=42, metavar='SEED',
+    cli.add_argument('-r', '--relaxed', action='store_true', help='randomly '
+                     'draw an allele (from a uniform distribution) for locus '
+                     'where no allele frequency data is available for the '
+                     'requested population')
+    cli.add_argument('-s', '--seed', type=int, default=None, metavar='SEED',
                      help='seed for random number generator')
     cli.add_argument('refr', help='reference genome file')
     cli.add_argument('popid', nargs='+', help='population ID(s)')
@@ -47,13 +51,16 @@ def validate_populations(popids):
     return haplopops
 
 
-def validate_loci(popids, panel=None):
+def validate_loci(popids, panel=None, relaxed=False):
     if panel is None:
         loci = microhapdb.loci.query('Source == "ALFRED"').\
             sort_values('AvgAe', ascending=False).\
             drop_duplicates('Chrom')
     else:
         loci = microhapdb.loci[microhapdb.loci.ID.isin(panel)]
+    if relaxed:
+        return list(loci.ID)
+
     loci_to_keep = list()
     for locusid in list(loci.ID):
         keep = True
@@ -77,10 +84,19 @@ def sample_panel(popids, loci):
         for locusid in loci:
             f = microhapdb.frequencies
             allelefreqs = f[(f.Population == popid) & (f.Locus == locusid)]
-            alleles = list(allelefreqs.Allele)
-            freqs = list(allelefreqs.Frequency)
-            freqs = [x / sum(freqs) for x in freqs]
-            sampled_allele = numpy.random.choice(alleles, p=freqs)
+            if len(allelefreqs) == 0:
+                message = 'no allele frequencies available'
+                message += ' for population "{pop}"'.format(pop=popid)
+                message += ' at locus "{loc}"'.format(loc=locusid)
+                message += '; in "relaxed" mode, drawing an allele uniformly'
+                print('WARNING:', message, file=sys.stderr)
+                alleles = list(f[f.Locus == locusid].Allele.unique())
+                sampled_allele = numpy.random.choice(alleles)
+            else:
+                alleles = list(allelefreqs.Allele)
+                freqs = list(allelefreqs.Frequency)
+                freqs = [x / sum(freqs) for x in freqs]
+                sampled_allele = numpy.random.choice(alleles, p=freqs)
             yield haplotype, locusid, sampled_allele
 
 
@@ -89,7 +105,7 @@ def main(args=None):
         args = get_parser().parse_args()
 
     haplopops = validate_populations(args.popid)
-    loci = validate_loci(haplopops, panel=args.panel)
+    loci = validate_loci(haplopops, panel=args.panel, relaxed=args.relaxed)
     genotype = microhapulator.Genotype()
     if args.seed:
         numpy.random.seed(args.seed)
