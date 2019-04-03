@@ -29,9 +29,9 @@ setup(
     # },
     include_package_data=True,
     install_requires=['pyfaidx', 'microhapdb', 'happer'],
-    # entry_points={
-    #     'console_scripts': ['mhpl8r = microhapulator.cli:main']
-    # },
+    entry_points={
+        'console_scripts': ['mhpl8r = microhapulator.cli:main']
+    },
     classifiers=[
         'Environment :: Console',
         'Framework :: IPython',
