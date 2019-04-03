@@ -42,7 +42,7 @@ class Genotype(object):
         assert hapid in (0, 1)
         self._data[locusid][hapid] = allele
         if locusid not in self._contexts:
-            locus = microhapdb.loci[microhapdb.loci['Name'] == locusid].iloc[0]
+            locus = microhapdb.id_xref(locusid).iloc[0]
             context = microhapulator.LocusContext(locus)
             self._contexts[locusid] = context
 
@@ -58,11 +58,11 @@ class Genotype(object):
             alleles_1 = self._data[locusid][1].split(',')
             coords = microhapdb.allele_positions(locusid)
             for a0, a1, coord in zip(alleles_0, alleles_1, coords):
-                chrom, gstart, gend = coord
-                lstart = context.global_to_local(gstart)
-                lend = context.global_to_local(gend)
+                localcoord = context.global_to_local(coord)
                 allelestr = a0 + '|' + a1
-                yield '\t'.join((locusid, str(lstart), str(lend), allelestr))
+                yield '\t'.join(
+                    (locusid, str(localcoord), str(localcoord + 1), allelestr)
+                )
 
     def __str__(self):
         out = StringIO()
