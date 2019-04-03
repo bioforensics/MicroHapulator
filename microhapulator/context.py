@@ -64,7 +64,7 @@ class LocusContext(object):
         return seqindex[seqid][self.start:self.end].seq
 
     def defline(self):
-        return '{loc} {chrom}:{s}-{e}'.format(
-            loc=self._data['Name'], chrom=self.chrom, s=self.start,
+        return '{loc} GRCh38:{chrom}:{s}-{e}'.format(
+            loc=self._data['ID'], chrom=self.chrom, s=self.start,
             e=self.end
         )

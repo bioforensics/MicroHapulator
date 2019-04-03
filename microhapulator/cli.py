@@ -9,14 +9,22 @@
 
 
 import argparse
+import happer
+from happer.mutate import mutate
 import numpy
 import microhapulator
 import microhapdb
+import pyfaidx
 import sys
 
 
 def get_parser():
     cli = argparse.ArgumentParser()
+    cli.add_argument('--genotype', metavar='FILE', help='write genotype data '
+                     'to FILE')
+    cli.add_argument('-o', '--out', metavar='FILE', default='-', help='write '
+                     'output to FILE; by default, output is written to the '
+                     'terminal (standard error)')
     cli.add_argument('--panel', nargs='+', metavar='ID', help='list of '
                      'MicroHapDB locus IDs to simulate; by default, a panel '
                      'of 22 ALFRED microhaplotype loci is used')
@@ -111,5 +119,15 @@ def main(args=None):
         numpy.random.seed(args.seed)
     for haplotype, locus, allele in sample_panel(haplopops, loci):
         genotype.add(haplotype, locus, allele)
-    print(genotype)
-    print(len(args.popid), 'populations and', len(loci), 'microhap loci')
+    if args.genotype:
+        with open(args.genotype, 'w') as fh:
+            print(genotype, file=fh)
+
+    message = 'simulated microhaplotype variation at {loc:d} loci'.format(loc=len(loci))
+    print('[MicroHapulator]', message, file=sys.stderr)
+
+    seqindex = pyfaidx.Fasta(args.refr)
+    mutator = mutate(genotype.seqstream(seqindex), genotype.bedstream)
+    with open(args.out, 'w') as fh:
+        for defline, sequence in mutator:
+            print('>', defline, '\n', sequence, sep='', file=fh)
