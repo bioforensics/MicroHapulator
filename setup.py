@@ -28,7 +28,7 @@ setup(
     #     'microhapulator': ['microhapulator/data/*']
     # },
     include_package_data=True,
-    install_requires=['pyfaidx', 'microhapdb', 'happer'],
+    install_requires=['pyfaidx', 'numpy', 'microhapdb', 'happer'],
     entry_points={
         'console_scripts': ['mhpl8r = microhapulator.cli:main']
     },
