@@ -20,4 +20,4 @@ clean:
 
 ## style:     check code style against PEP8
 style:
-	pycodestyle microhapulator/*.py 
+	pycodestyle --max-line-length=99 microhapulator/*.py
