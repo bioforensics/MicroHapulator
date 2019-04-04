@@ -100,9 +100,6 @@ def test_main():
         args = cli.parse_args(arglist)
         microhapulator.cli.main(args)
 
-        with open(tempdir + '/haplo.fasta', 'r') as fh:
-            print('DEBUG\n', fh.read())
-
         assert filecmp.cmp(tempdir + '/genotype.bed', data_file('alpha.bed'), shallow=False)
         assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta'), shallow=False)
         assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq'), shallow=False)

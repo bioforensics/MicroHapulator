@@ -61,7 +61,7 @@ class LocusContext(object):
 
     def sequence(self, seqindex, prechr=False):
         seqid = 'chr' + self.chrom if prechr else self.chrom
-        return seqindex[seqid][self.start:self.end].seq
+        return str(seqindex[seqid][self.start:self.end].seq).upper()
 
     def defline(self):
         return '{loc} GRCh38:{chrom}:{s}-{e}'.format(
