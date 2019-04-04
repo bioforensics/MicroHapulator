@@ -49,9 +49,9 @@ def test_validate_loci():
     from microhapulator.locus import validate_loci as valloc
     assert valloc(['BogusId']) == []
     assert valloc(['MHDBL000114']) == ['MHDBL000114']
-    assert valloc(['MHDBL000079', 'MHDBL000146', 'MHDBL000192']) == ['MHDBL000079', 'MHDBL000146', 'MHDBL000192']
-    assert valloc(['mh09KK-034', 'mh07PK-38311', 'SI664723C', 'MHDBL000049']) == ['MHDBL000049', 'MHDBL000130', 'MHDBL000198', 'MHDBL000208']
-    assert valloc(['mh09KK-034', 'mh07PK-38311', 'NotARealId', 'SI664723C', 'MHDBL000049']) == ['MHDBL000049', 'MHDBL000130', 'MHDBL000198', 'MHDBL000208']
+    assert valloc(['MHDBL000079', 'MHDBL000146', 'MHDBL000192']) == ['MHDBL000079', 'MHDBL000146', 'MHDBL000192']  # noqa
+    assert valloc(['mh09KK-034', 'mh07PK-38311', 'SI664723C', 'MHDBL000049']) == ['MHDBL000049', 'MHDBL000130', 'MHDBL000198', 'MHDBL000208']  # noqa
+    assert valloc(['mh09KK-034', 'mh07PK-38311', 'NotARealId', 'SI664723C', 'MHDBL000049']) == ['MHDBL000049', 'MHDBL000130', 'MHDBL000198', 'MHDBL000208']  # noqa
 
 
 def test_check_loci_for_population():

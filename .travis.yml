@@ -13,5 +13,6 @@ install:
     - pip install git+https://github.com/bioforensics/MicroHapDB.git
     - pip install .
 script:
+    - make refr
     - make test
     - make style
