@@ -115,15 +115,17 @@ def main(args=None):
         fh.flush()
         fsync(fh.fileno())
         fqdir = mkdtemp()
-        isscmd = [
-            'iss', 'generate', '--n_reads', str(args.num_reads * 2), '--draft', fh.name,
-            '--model', 'MiSeq', '--output', fqdir + '/seq'
-        ]
-        if args.seq_seed:
-            isscmd.extend(['--seed', str(args.seq_seed)])
-        if args.seq_threads:
-            isscmd.extend(['--cpus', str(args.seq_threads)])
-        check_call(isscmd)
-        with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
-            copyfileobj(infh, outfh)
-        rmtree(fqdir)
+        try:
+            isscmd = [
+                'iss', 'generate', '--n_reads', str(args.num_reads * 2), '--draft', fh.name,
+                '--model', 'MiSeq', '--output', fqdir + '/seq'
+            ]
+            if args.seq_seed:
+                isscmd.extend(['--seed', str(args.seq_seed)])
+            if args.seq_threads:
+                isscmd.extend(['--cpus', str(args.seq_threads)])
+            check_call(isscmd)
+            with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
+                copyfileobj(infh, outfh)
+        finally:
+            rmtree(fqdir)
