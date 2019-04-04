@@ -26,4 +26,4 @@ style:
 refr:
 	wget -O hg38.fasta.gz http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
 	gunzip hg38.fasta.gz
-	faidx hg38.fasta
+	faidx hg38.fasta chr1:100-150 > /dev/null
