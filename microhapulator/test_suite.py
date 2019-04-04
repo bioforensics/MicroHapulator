@@ -92,14 +92,15 @@ def test_main():
     try:
         cli = microhapulator.cli.get_parser()
         arglist = [
-            '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq', '--num-reads', '500',
-            '--haploseq', tempdir + '/haplo.fasta', '--genotype', tempdir + '/genotype.bed',
-            '--hap-seed', '293847', '--seq-seed', '123454321', 'hg38.fasta', 'MHDBP000004'
+            '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
+            '--num-reads', '500', '--haploseq', tempdir + '/haplo.fasta',
+            '--genotype', tempdir + '/genotype.bed', '--hap-seed', '293847',
+            '--seq-seed', '123454321', 'hg38.fasta', 'MHDBP000004'
         ]
         args = cli.parse_args(arglist)
         microhapulator.cli.main(args)
-        assert filecmp.cmp(tempdir + '/genotype.bed', data_file('alpha.bed')) is True
-        assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta')) is True
-        assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq')) is True
+        assert filecmp.cmp(tempdir + '/genotype.bed', data_file('alpha.bed'), shallow=False)
+        assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta'), shallow=False)
+        assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq'), shallow=False)
     finally:
         shutil.rmtree(tempdir)
