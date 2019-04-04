@@ -13,25 +13,30 @@ import pytest
 
 
 def test_validate_populations():
-    from microhapulator.cli import validate_populations as valpop
+    from microhapulator.population import validate_populations as valpop
     assert valpop(['MHDBP000012']) == ['MHDBP000012', 'MHDBP000012']
-    assert valpop(['MHDBP000012', 'MHDBP000012']) == ['MHDBP000012', 'MHDBP000012']
     assert valpop(['SA000020C', 'SA000012D']) == ['MHDBP000023', 'MHDBP000063']
-    assert valpop(['SA000025H', 'MHDBP000063']) == ['MHDBP000075', 'MHDBP000063']
+    assert valpop(['SA000025H', 'MHDBP000063']) == ['MHDBP000063', 'MHDBP000075']
 
 
 def test_validate_populations_bad_ids():
-    from microhapulator.cli import validate_populations as valpop
+    from microhapulator.population import validate_populations as valpop
     with pytest.raises(ValueError) as ve:
         _ = valpop(['BogU$pOPiD'])
-    assert 'invalid population ID' in str(ve)
+    assert 'invalid or duplicated population ID(s)' in str(ve)
     with pytest.raises(ValueError) as ve:
         _ = valpop(['NotARealID', 'MHDBP000077'])
-    assert 'invalid population ID' in str(ve)
+    assert 'invalid or duplicated population ID(s)' in str(ve)
+    with pytest.raises(ValueError) as ve:
+        _ = valpop(['MHDBP000012', 'MHDBP000012'])
+    assert 'invalid or duplicated population ID(s)' in str(ve)
+    with pytest.raises(ValueError) as ve:
+        _ = valpop(['SA000020C', 'MHDBP000023'])
+    assert 'invalid or duplicated population ID(s)' in str(ve)
 
 
 def test_validate_populations_cardinality():
-    from microhapulator.cli import validate_populations as valpop
+    from microhapulator.population import validate_populations as valpop
     with pytest.raises(ValueError) as ve:
         _ = valpop([])
     assert 'please provide only 1 or 2 population IDs' in str(ve)
@@ -41,18 +46,35 @@ def test_validate_populations_cardinality():
 
 
 def test_validate_loci():
-    from microhapulator.cli import validate_loci as valloc
-    assert valloc(['MHDBP000003', 'MHDBP000003'], panel=['MHDBL000197']) == list()
-    assert valloc(['MHDBP000003', 'MHDBP000004'], panel=['MHDBL000197']) == list()
-    assert valloc(['MHDBP000004', 'MHDBP000004'], panel=['MHDBL000197']) == ['MHDBL000197']
-    assert valloc(['MHDBP000003', 'MHDBP000004'], panel=['MHDBL000066']) == list()
+    from microhapulator.locus import validate_loci as valloc
+    assert valloc(['BogusId']) == []
+    assert valloc(['MHDBL000114']) == ['MHDBL000114']
+    assert valloc(['MHDBL000079', 'MHDBL000146', 'MHDBL000192']) == ['MHDBL000079', 'MHDBL000146', 'MHDBL000192']
+    assert valloc(['mh09KK-034', 'mh07PK-38311', 'SI664723C', 'MHDBL000049']) == ['MHDBL000049', 'MHDBL000130', 'MHDBL000198', 'MHDBL000208']
+    assert valloc(['mh09KK-034', 'mh07PK-38311', 'NotARealId', 'SI664723C', 'MHDBL000049']) == ['MHDBL000049', 'MHDBL000130', 'MHDBL000198', 'MHDBL000208']
+
+
+def test_check_loci_for_population():
+    from microhapulator.population import check_loci_for_population as check
+    assert check(list(), 'MHDBP000003') == list()
+    assert check(['BogusLocus'], 'MHDBP000003') == list()
+    assert check(['MHDBL000197'], 'MHDBP000003') == list()
+    assert check(['MHDBL000197'], 'MHDBP000004') == ['MHDBL000197']
+
+
+def test_exclude_loci_missing_data():
+    from microhapulator.population import exclude_loci_missing_data as exclude
+    assert exclude(['MHDBL000197'], ['MHDBP000003', 'MHDBP000003']) == list()
+    assert exclude(['MHDBL000197'], ['MHDBP000003', 'MHDBP000004']) == list()
+    assert exclude(['MHDBL000197'], ['MHDBP000004', 'MHDBP000004']) == ['MHDBL000197']
+    assert exclude(['MHDBL000066'], ['MHDBP000003', 'MHDBP000004']) == list()
 
 
 def test_sample_panel():
     pops = ['MHDBP000004', 'MHDBP000004']
     panel = ['MHDBL000197', 'MHDBL000066']
     numpy.random.seed(112358)
-    sampler = microhapulator.cli.sample_panel(pops, panel)
+    sampler = microhapulator.locus.sample_panel(pops, panel)
     assert list(sampler) == [
         (0, 'MHDBL000197', 'A,A,T,A,T'),
         (0, 'MHDBL000066', 'G,G,G'),
