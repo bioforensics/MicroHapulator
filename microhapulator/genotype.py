@@ -26,13 +26,13 @@ class Genotype(object):
     >>> gt.add(0, 'mh21KK-316', 'A,C,G,T')
     >>> gt.add(1, 'mh21KK-316', 'A,T,G,C')
     >>> print(gt)
-    mh21KK-315	77	78	G|A
-    mh21KK-315	182	183	C|T
-    mh21KK-315	222	223	T|C
-    mh21KK-316	83	84	A|A
-    mh21KK-316	107	108	C|T
-    mh21KK-316	154	155	G|G
-    mh21KK-316	217	218	T|C
+    mh21KK-315 102     103     G|A
+    mh21KK-315 207     208     C|T
+    mh21KK-315 247     248     T|C
+    mh21KK-316 108     109     A|A
+    mh21KK-316 132     133     C|T
+    mh21KK-316 179     180     G|G
+    mh21KK-316 242     243     T|C
     """
     def __init__(self):
         self._data = defaultdict(lambda: [None] * 2)

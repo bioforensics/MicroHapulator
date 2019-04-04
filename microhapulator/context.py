@@ -17,15 +17,15 @@ class LocusContext(object):
     >>> row = microhapulator.bogus_loci[0]
     >>> context = LocusContext(row)
     >>> len(context)
-    301
+    351
     >>> context.offset
-    983
+    958
     >>> context.global_to_local(1111)
-    128
+    153
     >>> context.local_to_global(101)
-    1084
+    1059
     """
-    def __init__(self, rowdata, mindelta=30, minlen=300):
+    def __init__(self, rowdata, mindelta=30, minlen=350):
         self._data = rowdata
         start = rowdata['Start'] - mindelta
         end = rowdata['End'] + mindelta

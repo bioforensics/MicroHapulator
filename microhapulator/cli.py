@@ -14,28 +14,67 @@ from happer.mutate import mutate
 import numpy
 import microhapulator
 import microhapdb
+import os
 import pyfaidx
+import shutil
+import subprocess
 import sys
+import tempfile
 
 
 def get_parser():
     cli = argparse.ArgumentParser()
-    cli.add_argument('--genotype', metavar='FILE', help='write genotype data '
-                     'to FILE')
-    cli.add_argument('-o', '--out', metavar='FILE', default='-', help='write '
-                     'output to FILE; by default, output is written to the '
-                     'terminal (standard error)')
-    cli.add_argument('--panel', nargs='+', metavar='ID', help='list of '
-                     'MicroHapDB locus IDs to simulate; by default, a panel '
-                     'of 22 ALFRED microhaplotype loci is used')
-    cli.add_argument('-r', '--relaxed', action='store_true', help='randomly '
-                     'draw an allele (from a uniform distribution) for locus '
-                     'where no allele frequency data is available for the '
-                     'requested population')
-    cli.add_argument('-s', '--seed', type=int, default=None, metavar='SEED',
-                     help='seed for random number generator')
+    cli._positionals.title = 'Input configuration'
+    cli._optionals.title = 'Miscellaneous'
+
+    hapargs = cli.add_argument_group('Haplotype simulation')
+    hapargs.add_argument(
+        '--panel', nargs='+', metavar='ID', help='list of MicroHapDB locus '
+        'IDs for which to simulate data; by default, a panel of 22 ALFRED '
+        'microhaplotype loci is used'
+    )
+    hapargs.add_argument(
+        '-r', '--relaxed', action='store_true', help='if a locus in the panel '
+        'has no frequency data for a requested population, randomly draw an '
+        'allele (from a uniform distribution) from all possible alleles; by '
+        'default, these loci are exluded from simulation'
+    )
+    hapargs.add_argument(
+        '--hap-seed', type=int, default=None, metavar='INT', help='random '
+        'seed for simulating haplotypes'
+    )
+
+    seqargs = cli.add_argument_group('Targeted sequencing')
+    seqargs.add_argument(
+        '-n', '--num-reads', type=int, default=500000, metavar='N',
+        help='number of reads to simulate; default is 500000'
+    )
+    seqargs.add_argument(
+        '--seq-seed', type=int, default=None, metavar='INT', help='random '
+        'seed for simulated sequencing'
+    )
+    seqargs.add_argument(
+        '--seq-threads', type=int, default=None, metavar='INT', help='number '
+        'of threads to use when simulating targeted amplicon sequencing'
+    )
+    outargs = cli.add_argument_group('Output configuration')
+    outargs.add_argument(
+        '-o', '--out', metavar='FILE', default='-', required=True,
+        help='write simulated MiSeq reads in FASTQ format to FILE; use '
+        '`/dev/stdout` to write reads to standard output'
+    )
+    outargs.add_argument(
+        '--genotype', metavar='FILE', help='write simulated genotype data in '
+        'BED format to FILE'
+    )
+    outargs.add_argument(
+        '--haploseq', metavar='FILE', help='write simulated haplotype '
+        'sequences in FASTA format to FILE'
+    )
+
     cli.add_argument('refr', help='reference genome file')
     cli.add_argument('popid', nargs='+', help='population ID(s)')
+    cli._action_groups[1], cli._action_groups[-1] = cli._action_groups[-1], cli._action_groups[1]
     return cli
 
 
@@ -108,6 +147,13 @@ def sample_panel(popids, loci):
             yield haplotype, locusid, sampled_allele
 
 
+def optional_outfile(outfile):
+    if outfile:
+        return open(outfile, 'w')
+    else:
+        return tempfile.NamedTemporaryFile(suffix='.fasta')
+
+
 def main(args=None):
     if args is None:  # pragma: no cover
         args = get_parser().parse_args()
@@ -115,8 +161,8 @@ def main(args=None):
     haplopops = validate_populations(args.popid)
     loci = validate_loci(haplopops, panel=args.panel, relaxed=args.relaxed)
     genotype = microhapulator.Genotype()
-    if args.seed:
-        numpy.random.seed(args.seed)
+    if args.hap_seed:
+        numpy.random.seed(args.hap_seed)
     for haplotype, locus, allele in sample_panel(haplopops, loci):
         genotype.add(haplotype, locus, allele)
     if args.genotype:
@@ -128,6 +174,21 @@ def main(args=None):
 
     seqindex = pyfaidx.Fasta(args.refr)
     mutator = mutate(genotype.seqstream(seqindex), genotype.bedstream)
-    with open(args.out, 'w') as fh:
+    with optional_outfile(args.haploseq) as fh:
         for defline, sequence in mutator:
             print('>', defline, '\n', sequence, sep='', file=fh)
+        fh.flush()
+        os.fsync(fh.fileno())
+        fqdir = tempfile.mkdtemp()
+        isscmd = [
+            'iss', 'generate', '--n_reads', str(args.num_reads * 2), '--draft', fh.name,
+            '--model', 'MiSeq', '--output', fqdir + '/seq'
+        ]
+        if args.seq_seed:
+            isscmd.extend(['--seed', str(args.seq_seed)])
+        if args.seq_threads:
+            isscmd.extend(['--cpus', str(args.seq_threads)])
+        subprocess.check_call(isscmd)
+        with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
+            shutil.copyfileobj(infh, outfh)
+        shutil.rmtree(fqdir)
