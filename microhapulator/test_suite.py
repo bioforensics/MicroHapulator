@@ -8,6 +8,7 @@
 # -----------------------------------------------------------------------------
 
 import filecmp
+import microhapdb
 import microhapulator
 from microhapulator import data_file
 import numpy
@@ -130,3 +131,16 @@ def test_main():
         assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq'), shallow=False)
     finally:
         shutil.rmtree(tempdir)
+
+
+def test_context():
+    i, locus = next(microhapdb.loci[microhapdb.loci.ID == 'MHDBL000172'].iterrows())
+    c = microhapulator.LocusContext(locus)
+    assert c.chrom == 'chr5'
+    assert c.global_to_local(1000) is None
+    assert c.local_to_global(1000) is None
+
+    c = microhapulator.LocusContext(locus, minlen=100)
+    assert len(c) == 197
+    c = microhapulator.LocusContext(locus, minlen=100, mindelta=10)
+    assert len(c) == 157
