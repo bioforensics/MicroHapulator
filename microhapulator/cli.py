@@ -11,6 +11,7 @@
 from argparse import ArgumentParser
 from happer.mutate import mutate
 from numpy.random import seed
+import microhapulator
 from microhapulator.genotype import Genotype
 from microhapulator.locus import default_panel, validate_loci, sample_panel
 from microhapulator.population import validate_populations, check_loci_for_population
@@ -28,6 +29,7 @@ def get_parser():
     cli = ArgumentParser()
     cli._positionals.title = 'Input configuration'
     cli._optionals.title = 'Miscellaneous'
+    cli.add_argument('-v', '--version', action='version', version='MicroHapulator version ' + microhapulator.__version__)
 
     hapargs = cli.add_argument_group('Haplotype simulation')
     hapargs.add_argument(
