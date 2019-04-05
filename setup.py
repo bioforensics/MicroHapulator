@@ -28,10 +28,10 @@ setup(
     #     'microhapulator': ['microhapulator/data/*']
     # },
     include_package_data=True,
-    install_requires=['pyfaidx', 'microhapdb', 'happer'],
-    # entry_points={
-    #     'console_scripts': ['mhpl8r = microhapulator.cli:main']
-    # },
+    install_requires=['pyfaidx', 'insilicoseq', 'numpy', 'microhapdb', 'happer'],
+    entry_points={
+        'console_scripts': ['mhpl8r = microhapulator.cli:main']
+    },
     classifiers=[
         'Environment :: Console',
         'Framework :: IPython',

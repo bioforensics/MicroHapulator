@@ -15,17 +15,17 @@ class LocusContext(object):
     """A class for resolving the context around a microhaplotype locus.
 
     >>> row = microhapulator.bogus_loci[0]
-    >>> context = LocusContext(row, microhapulator.bogus_index)
+    >>> context = LocusContext(row)
     >>> len(context)
-    301
+    351
     >>> context.offset
-    983
+    958
     >>> context.global_to_local(1111)
-    128
+    153
     >>> context.local_to_global(101)
-    1084
+    1059
     """
-    def __init__(self, rowdata, seqindex, mindelta=30, minlen=300):
+    def __init__(self, rowdata, mindelta=30, minlen=350):
         self._data = rowdata
         start = rowdata['Start'] - mindelta
         end = rowdata['End'] + mindelta
@@ -35,15 +35,15 @@ class LocusContext(object):
             bpextend = ceil(lendiff / 2)
             start -= bpextend
             end += bpextend
-        self.subseq = seqindex[str(rowdata['Chrom'])][start:end]
-        self.defline = '{loc} {chrom}:{s}-{e}'.format(
-            loc=rowdata['ID'], chrom=rowdata['Chrom'], s=start, e=end
-        )
         self.start = start
         self.end = end
 
     def __len__(self):
         return self.end - self.start
+
+    @property
+    def chrom(self):
+        return str(self._data['Chrom'])
 
     @property
     def offset(self):
@@ -58,3 +58,13 @@ class LocusContext(object):
         if coord >= len(self):
             return None
         return coord + self.start
+
+    def sequence(self, seqindex, prechr=False):
+        seqid = 'chr' + self.chrom if prechr else self.chrom
+        return str(seqindex[seqid][self.start:self.end].seq).upper()
+
+    def defline(self):
+        return '{loc} GRCh38:{chrom}:{s}-{e}'.format(
+            loc=self._data['ID'], chrom=self.chrom, s=self.start,
+            e=self.end
+        )
