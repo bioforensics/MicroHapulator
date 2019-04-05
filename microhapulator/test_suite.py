@@ -126,9 +126,66 @@ def test_main():
         args = cli.parse_args(arglist)
         microhapulator.cli.main(args)
 
-        assert filecmp.cmp(tempdir + '/genotype.bed', data_file('alpha.bed'), shallow=False)
-        assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta'), shallow=False)
-        assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq'), shallow=False)
+        assert filecmp.cmp(tempdir + '/genotype.bed', data_file('alpha.bed'))
+        assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta'))
+        assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq'))
+    finally:
+        shutil.rmtree(tempdir)
+
+
+def test_main_no_haploseq():
+    tempdir = tempfile.mkdtemp()
+    try:
+        cli = microhapulator.cli.get_parser()
+        arglist = [
+            '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
+            '--num-reads', '250', '--hap-seed', '1234', '--seq-seed', '5678',
+            '--seq-threads', '2', 'hg38.fasta', 'MHDBP000004',
+        ]
+        args = cli.parse_args(arglist)
+        microhapulator.cli.main(args)
+        assert filecmp.cmp(tempdir + '/reads.fastq', data_file('beta.fastq'))
+    finally:
+        shutil.rmtree(tempdir)
+
+
+@pytest.mark.parametrize('relaxed,testfile', [
+    (False, 'gamma-strict.fastq'),
+    (True, 'gamma-relaxed.fastq'),
+])
+def test_main_relaxed(relaxed, testfile, capfd):
+    tempdir = tempfile.mkdtemp()
+    try:
+        cli = microhapulator.cli.get_parser()
+        arglist = [
+            '--panel', 'MHDBL000013', 'MHDBL000212', 'MHDBL000197', '--num-reads', '100',
+            '--hap-seed', '54321', '--seq-seed', '24680', '--out', tempdir + '/reads.fastq',
+            'hg38.fasta', 'MHDBP000003',
+        ]
+        args = cli.parse_args(arglist)
+        args.relaxed = relaxed
+        microhapulator.cli.main(args)
+        assert filecmp.cmp(tempdir + '/reads.fastq', data_file(testfile))
+        if relaxed:
+            out, err = capfd.readouterr()
+            assert 'for population "MHDBP000003" at locus "MHDBL000197"' in err
+    finally:
+        shutil.rmtree(tempdir)
+
+
+def test_main_no_seeds():
+    tempdir = tempfile.mkdtemp()
+    try:
+        cli = microhapulator.cli.get_parser()
+        arglist = [
+            '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
+            '--num-reads', '200', '--seq-threads', '1', 'hg38.fasta', 'MHDBP000004',
+        ]
+        args = cli.parse_args(arglist)
+        microhapulator.cli.main(args)
+        with open(tempdir + '/reads.fastq', 'r') as fh:
+            filelines = fh.read().strip().split('\n')
+            assert len(filelines) == 800  # 200 reads * 4 lines per read = 800 lines
     finally:
         shutil.rmtree(tempdir)
 
