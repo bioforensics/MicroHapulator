@@ -29,7 +29,10 @@ def get_parser():
     cli = ArgumentParser()
     cli._positionals.title = 'Input configuration'
     cli._optionals.title = 'Miscellaneous'
-    cli.add_argument('-v', '--version', action='version', version='MicroHapulator version ' + microhapulator.__version__)
+    cli.add_argument(
+        '-v', '--version', action='version',
+        version='MicroHapulator version ' + microhapulator.__version__
+    )
 
     hapargs = cli.add_argument_group('Haplotype simulation')
     hapargs.add_argument(
