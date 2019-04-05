@@ -6,7 +6,7 @@ help: Makefile
 
 ## test:      execute the automated test suite
 test:
-	py.test --cov=microhapulator --doctest-modules microhapulator/*.py
+	pytest --cov=microhapulator --doctest-modules microhapulator/*.py
 
 ## devdeps:   install development dependencies
 devdeps:

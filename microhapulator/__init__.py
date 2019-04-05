@@ -8,6 +8,8 @@
 # -----------------------------------------------------------------------------
 
 
+from . import locus
+from . import population
 from microhapulator.util import data_file, bogus_loci, bogus_index
 from microhapulator.context import LocusContext
 from microhapulator.genotype import Genotype

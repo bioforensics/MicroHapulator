@@ -16,6 +16,13 @@ import shutil
 import tempfile
 
 
+def test_default_panel():
+    dp = microhapulator.locus.default_panel()
+    assert len(dp) == 22
+    assert 'MHDBL000017' in dp
+    assert 'MHDBL000018' not in dp
+
+
 def test_validate_populations():
     from microhapulator.population import validate_populations as valpop
     assert valpop(['MHDBP000012']) == ['MHDBP000012', 'MHDBP000012']
@@ -85,6 +92,24 @@ def test_sample_panel():
         (1, 'MHDBL000197', 'T,T,A,T,C'),
         (1, 'MHDBL000066', 'G,G,G')
     ]
+
+
+def test_sample_panel_relaxed(capfd):
+    import sys
+    pops = ['MHDBP000003', 'MHDBP000004']
+    panel = ['MHDBL000172', 'MHDBL000105']
+    numpy.random.seed(1776)
+    sampler = microhapulator.locus.sample_panel(pops, panel)
+    assert list(sampler) == [
+        (0, 'MHDBL000172', 'C,A,G,A'),
+        (0, 'MHDBL000105', 'A,T,A,C'),
+        (1, 'MHDBL000172', 'C,A,A,G'),
+        (1, 'MHDBL000105', 'A,C,A,T')
+    ]
+    out, err = capfd.readouterr()
+    assert 'no allele frequencies available' in err
+    assert 'for population "MHDBP000003" at locus "MHDBL000105"' in err
+    assert 'in "relaxed" mode, drawing an allele uniformly' in err
 
 
 def test_main():

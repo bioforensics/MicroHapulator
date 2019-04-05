@@ -84,7 +84,7 @@ def optional_outfile(outfile):
     if outfile:
         return open(outfile, 'w')
     else:
-        return NamedTemporaryFile(suffix='.fasta')
+        return NamedTemporaryFile(mode='wt', suffix='.fasta')
 
 
 def main(args=None):
@@ -92,7 +92,8 @@ def main(args=None):
         args = get_parser().parse_args()
 
     haplopops = validate_populations(args.popid)
-    loci = validate_loci(args.panel)
+    loci = args.panel if args.panel else default_panel()
+    loci = validate_loci(loci)
     if not args.relaxed:
         loci = exclude_loci_missing_data(loci, haplopops)
     genotype = Genotype()
