@@ -153,7 +153,7 @@ def test_main_no_haploseq():
     (False, 'gamma-strict.fastq'),
     (True, 'gamma-relaxed.fastq'),
 ])
-def test_main_relaxed(relaxed, testfile, capfd):
+def test_main_relaxed(relaxed, testfile):
     tempdir = tempfile.mkdtemp()
     try:
         cli = microhapulator.cli.get_parser()
@@ -166,9 +166,6 @@ def test_main_relaxed(relaxed, testfile, capfd):
         args.relaxed = relaxed
         microhapulator.cli.main(args)
         assert filecmp.cmp(tempdir + '/reads.fastq', data_file(testfile))
-        if relaxed:
-            out, err = capfd.readouterr()
-            assert 'for population "MHDBP000003" at locus "MHDBL000197"' in err
     finally:
         shutil.rmtree(tempdir)
 
