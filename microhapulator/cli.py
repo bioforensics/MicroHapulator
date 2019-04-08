@@ -19,7 +19,7 @@ from microhapulator.population import exclude_loci_missing_data
 import microhapdb
 from os import fsync
 from pyfaidx import Fasta as Fastaidx
-from shutil import copyfileobj, rmtree
+from shutil import rmtree
 from subprocess import check_call
 from sys import stderr
 from tempfile import NamedTemporaryFile, mkdtemp
@@ -132,6 +132,12 @@ def main(args=None):
                 isscmd.extend(['--cpus', str(args.seq_threads)])
             check_call(isscmd)
             with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
-                copyfileobj(infh, outfh)
+                nreads = 0
+                for line in infh:
+                    if line.startswith('@MHDBL'):
+                        nreads += 1
+                        prefix = '@read{:d} MHDBL'.format(nreads)
+                        line = line.replace('@MHDBL', prefix, 1)
+                    print(line, end='', file=outfh)
         finally:
             rmtree(fqdir)
