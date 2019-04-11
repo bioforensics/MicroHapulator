@@ -8,9 +8,6 @@
 # -----------------------------------------------------------------------------
 
 
-from argparse import ArgumentParser
-
-
 def subparser(subparsers):
     cli = subparsers.add_parser('sim')
     cli._positionals.title = 'Input configuration'

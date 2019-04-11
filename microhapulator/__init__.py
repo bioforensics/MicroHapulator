@@ -18,6 +18,7 @@ from microhapulator.context import LocusContext
 from microhapulator.genotype import Genotype
 
 # Subcommands and command-line interface
+from microhapulator import refr
 from microhapulator import sim
 from microhapulator import cli
 
