@@ -8,22 +8,23 @@
 # -----------------------------------------------------------------------------
 
 from math import ceil
+import microhapdb
 import microhapulator
 
 
 class LocusContext(object):
     """A class for resolving the context around a microhaplotype locus.
 
-    >>> row = microhapulator.bogus_loci[0]
-    >>> context = LocusContext(row)
+    >>> row = microhapdb.id_xref('mh01KK-172').iloc[0]
+    >>> context = microhapulator.LocusContext(row)
     >>> len(context)
-    351
+    350
     >>> context.offset
-    958
-    >>> context.global_to_local(1111)
-    153
-    >>> context.local_to_global(101)
-    1059
+    1551391
+    >>> context.global_to_local(1551522)
+    131
+    >>> context.local_to_global(287)
+    1551678
     """
     def __init__(self, rowdata, mindelta=30, minlen=350):
         self._data = rowdata

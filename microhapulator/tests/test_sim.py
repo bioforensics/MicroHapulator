@@ -10,7 +10,7 @@
 import filecmp
 import microhapdb
 import microhapulator
-from microhapulator import data_file
+from microhapulator.tests import data_file
 import numpy
 import pytest
 import shutil
@@ -116,15 +116,14 @@ def test_sample_panel_relaxed(capfd):
 def test_main():
     tempdir = tempfile.mkdtemp()
     try:
-        cli = microhapulator.cli.get_parser()
         arglist = [
-            '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
+            'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
             '--num-reads', '500', '--haploseq', tempdir + '/haplo.fasta',
             '--genotype', tempdir + '/genotype.bed', '--hap-seed', '293847',
             '--seq-seed', '123454321', 'hg38.fasta', 'MHDBP000004'
         ]
-        args = cli.parse_args(arglist)
-        microhapulator.cli.main(args)
+        args = microhapulator.cli.parse_args(arglist)
+        microhapulator.sim.main(args)
 
         assert filecmp.cmp(tempdir + '/genotype.bed', data_file('alpha.bed'))
         assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta'))
@@ -136,14 +135,13 @@ def test_main():
 def test_main_no_haploseq():
     tempdir = tempfile.mkdtemp()
     try:
-        cli = microhapulator.cli.get_parser()
         arglist = [
-            '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
+            'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
             '--num-reads', '250', '--hap-seed', '1234', '--seq-seed', '5678',
             '--seq-threads', '2', 'hg38.fasta', 'MHDBP000004',
         ]
-        args = cli.parse_args(arglist)
-        microhapulator.cli.main(args)
+        args = microhapulator.cli.parse_args(arglist)
+        microhapulator.sim.main(args)
         assert filecmp.cmp(tempdir + '/reads.fastq', data_file('beta.fastq'))
     finally:
         shutil.rmtree(tempdir)
@@ -156,15 +154,14 @@ def test_main_no_haploseq():
 def test_main_relaxed(relaxed, testfile):
     tempdir = tempfile.mkdtemp()
     try:
-        cli = microhapulator.cli.get_parser()
         arglist = [
-            '--panel', 'MHDBL000013', 'MHDBL000212', 'MHDBL000197', '--num-reads', '100',
+            'sim', '--panel', 'MHDBL000013', 'MHDBL000212', 'MHDBL000197', '--num-reads', '100',
             '--hap-seed', '54321', '--seq-seed', '24680', '--out', tempdir + '/reads.fastq',
             'hg38.fasta', 'MHDBP000003',
         ]
-        args = cli.parse_args(arglist)
+        args = microhapulator.cli.parse_args(arglist)
         args.relaxed = relaxed
-        microhapulator.cli.main(args)
+        microhapulator.sim.main(args)
         assert filecmp.cmp(tempdir + '/reads.fastq', data_file(testfile))
     finally:
         shutil.rmtree(tempdir)
@@ -173,13 +170,12 @@ def test_main_relaxed(relaxed, testfile):
 def test_main_no_seeds():
     tempdir = tempfile.mkdtemp()
     try:
-        cli = microhapulator.cli.get_parser()
         arglist = [
-            '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
+            'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
             '--num-reads', '200', '--seq-threads', '1', 'hg38.fasta', 'MHDBP000004',
         ]
-        args = cli.parse_args(arglist)
-        microhapulator.cli.main(args)
+        args = microhapulator.cli.parse_args(arglist)
+        microhapulator.sim.main(args)
         with open(tempdir + '/reads.fastq', 'r') as fh:
             filelines = fh.read().strip().split('\n')
             assert len(filelines) == 800  # 200 reads * 4 lines per read = 800 lines

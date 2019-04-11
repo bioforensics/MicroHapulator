@@ -13,7 +13,6 @@ from sys import stderr
 # Internal modules
 from microhapulator import locus
 from microhapulator import population
-from microhapulator.util import data_file, bogus_loci, bogus_index
 from microhapulator.context import LocusContext
 from microhapulator.genotype import Genotype
 
