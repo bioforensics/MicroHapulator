@@ -8,7 +8,9 @@
 # -----------------------------------------------------------------------------
 
 # Core libraries
-from sys import stderr
+import builtins
+from gzip import open as gzopen
+from sys import stdin, stdout, stderr
 
 # Internal modules
 from microhapulator import locus
@@ -29,6 +31,19 @@ del get_versions
 
 logstream = None
 teelog = False
+
+
+def open(filename, mode):
+    if mode not in ('r', 'w'):
+        raise ValueError('invalid mode "{}"'.format(mode))
+    if filename in ['-', None]:
+        filehandle = stdin if mode == 'r' else stdout
+        return filehandle
+    openfunc = builtins.open
+    if filename.endswith('.gz'):
+        openfunc = gzopen
+        mode += 't'
+    return openfunc(filename, mode)
 
 
 def plog(*args, **kwargs):

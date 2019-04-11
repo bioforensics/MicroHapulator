@@ -11,9 +11,8 @@
 def subparser(subparsers):
     cli = subparsers.add_parser('refr')
     cli.add_argument(
-        '-o', '--out', metavar='FILE', default='-',
-        help='write output to "FILE"; by default, output is written to the '
-        'terminal (standard output)'
+        '-o', '--out', metavar='FILE', help='write output to "FILE"; by '
+        'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
         '-d', '--delta', type=int, default=30, metavar='Δ',

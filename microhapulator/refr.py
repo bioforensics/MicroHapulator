@@ -16,6 +16,7 @@ from pyfaidx import Fasta as Fastaidx
 
 
 def get_seqs(locusids, seqindex, delta=30, minlength=350):
+    locusids = microhapdb.standardize_ids(locusids)
     loci = microhapdb.loci[microhapdb.loci.ID.isin(locusids)]
     for i, rowdata in loci.iterrows():
         context = LocusContext(rowdata, mindelta=delta, minlen=minlength)
@@ -27,7 +28,7 @@ def main(args=None):
         args = get_parser().parse_args()
     locusids = args.panel if args.panel else default_panel()
     seqindex = Fastaidx(args.refrfasta)
-    with open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, 'w') as fh:
         seqiter = get_seqs(locusids, seqindex, delta=args.delta, minlength=args.min_length)
         for defline, sequence in seqiter:
             print('>', defline, '\n', sequence, sep='', file=fh)

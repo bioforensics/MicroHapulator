@@ -45,7 +45,7 @@ def subparser(subparsers):
     )
     outargs = cli.add_argument_group('Output configuration')
     outargs.add_argument(
-        '-o', '--out', metavar='FILE', default='-', required=True,
+        '-o', '--out', metavar='FILE', required=True,
         help='write simulated MiSeq reads in FASTQ format to FILE; use '
         '`/dev/stdout` to write reads to standard output'
     )
