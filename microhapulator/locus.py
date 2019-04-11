@@ -10,7 +10,6 @@
 
 from numpy.random import choice
 import microhapdb
-from sys import stderr
 
 
 def default_panel():
@@ -24,7 +23,7 @@ def validate_loci(panel):
     valid_loci = microhapdb.standardize_ids(panel)
     if len(valid_loci) < len(panel):
         message = 'panel includes duplicate and/or invalid locus IDs'
-        print('[MicroHapulator::loci] WARNING', message, file=stderr)
+        microhapdb.plog('[MicroHapulator::loci] WARNING', message)
     return valid_loci
 
 
@@ -38,7 +37,7 @@ def sample_panel(popids, loci):
                 message += ' for population "{pop}"'.format(pop=popid)
                 message += ' at locus "{loc}"'.format(loc=locusid)
                 message += '; in "relaxed" mode, drawing an allele uniformly'
-                print('[MicroHapulator::loci] WARNING:', message, file=stderr)
+                microhapdb.plog('[MicroHapulator::loci] WARNING:', message)
                 alleles = list(f[f.Locus == locusid].Allele.unique())
                 sampled_allele = choice(alleles)
             else:

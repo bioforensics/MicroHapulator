@@ -7,16 +7,19 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+# Core libraries
 from sys import stderr
 
+# Internal modules
 from microhapulator import locus
 from microhapulator import population
-
-from microhapulator import sim
-from microhapulator import cli
 from microhapulator.util import data_file, bogus_loci, bogus_index
 from microhapulator.context import LocusContext
 from microhapulator.genotype import Genotype
+
+# Subcommands and command-line interface
+from microhapulator import sim
+from microhapulator import cli
 
 
 from ._version import get_versions

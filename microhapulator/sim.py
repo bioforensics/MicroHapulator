@@ -20,7 +20,6 @@ from os import fsync
 from pyfaidx import Fasta as Fastaidx
 from shutil import rmtree
 from subprocess import check_call
-from sys import stderr
 from tempfile import NamedTemporaryFile, mkdtemp
 
 
@@ -50,7 +49,7 @@ def main(args=None):
             print(genotype, file=fh)
 
     message = 'simulated microhaplotype variation at {loc:d} loci'.format(loc=len(loci))
-    print('[MicroHapulator]', message, file=stderr)
+    microhapulator.plog('[MicroHapulator::sim]', message)
 
     seqindex = Fastaidx(args.refr)
     mutator = mutate(genotype.seqstream(seqindex), genotype.bedstream)
@@ -69,7 +68,9 @@ def main(args=None):
                 isscmd.extend(['--seed', str(args.seq_seed)])
             if args.seq_threads:
                 isscmd.extend(['--cpus', str(args.seq_threads)])
-            check_call(isscmd)
+            microhapulator.logstream.flush()
+            fsync(microhapulator.logstream.fileno())
+            check_call(isscmd, stderr=microhapulator.logstream)
             with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
                 nreads = 0
                 for line in infh:
