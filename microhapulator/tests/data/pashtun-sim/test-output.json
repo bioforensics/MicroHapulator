@@ -1,0 +1,28 @@
+{
+    "MHDBL000060": {
+        "allele_counts": {
+            "C,C,C,T": 106,
+            "C,T,C,T": 107
+        },
+        "genotype": [
+            "C,C,C,T",
+            "C,T,C,T"
+        ],
+        "max_coverage": 250,
+        "mean_coverage": 215.4,
+        "min_coverage": 4,
+        "num_discarded_reads": 37
+    },
+    "MHDBL000138": {
+        "allele_counts": {
+            "G,A,C,A": 190
+        },
+        "genotype": [
+            "G,A,C,A"
+        ],
+        "max_coverage": 250,
+        "mean_coverage": 215.4,
+        "min_coverage": 3,
+        "num_discarded_reads": 60
+    }
+}
