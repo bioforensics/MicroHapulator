@@ -15,8 +15,6 @@ from sys import stdin, stdout, stderr
 # Internal modules
 from microhapulator import locus
 from microhapulator import population
-from microhapulator.context import LocusContext
-from microhapulator.genotype import Genotype
 
 # Subcommands and command-line interface
 from microhapulator import refr

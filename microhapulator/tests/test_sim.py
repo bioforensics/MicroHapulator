@@ -10,6 +10,7 @@
 import filecmp
 import microhapdb
 import microhapulator
+from microhapulator.locus import LocusContext
 from microhapulator.tests import data_file
 import numpy
 import pytest
@@ -185,12 +186,12 @@ def test_main_no_seeds():
 
 def test_context():
     i, locus = next(microhapdb.loci[microhapdb.loci.ID == 'MHDBL000172'].iterrows())
-    c = microhapulator.LocusContext(locus)
+    c = LocusContext(locus)
     assert c.chrom == 'chr5'
     assert c.global_to_local(1000) is None
     assert c.local_to_global(1000) is None
 
-    c = microhapulator.LocusContext(locus, minlen=100)
+    c = LocusContext(locus, minlen=100)
     assert len(c) == 197
-    c = microhapulator.LocusContext(locus, minlen=100, mindelta=10)
+    c = LocusContext(locus, minlen=100, mindelta=10)
     assert len(c) == 157
