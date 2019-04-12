@@ -13,22 +13,30 @@ import microhapulator
 from sys import stderr
 from . import refr
 from . import sim
+from . import type
 
 mains = {
     'refr': microhapulator.refr.main,
     'sim': microhapulator.sim.main,
+    'type': microhapulator.type.main,
 }
 
 subparser_funcs = {
     'refr': refr.subparser,
     'sim': sim.subparser,
+    'type': type.subparser,
 }
 
 
 def get_parser():
+    # https://patorjk.com/software/taag/, "Small" font
     bubbletext = r'''
 ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
-MicroHapulator
+  __  __ _            _  _                _      _
+ |  \/  (_)__ _ _ ___| || |__ _ _ __ _  _| |__ _| |_ ___ _ _
+ | |\/| | / _| '_/ _ \ __ / _` | '_ \ || | / _` |  _/ _ \ '_|
+ |_|  |_|_\__|_| \___/_||_\__,_| .__/\_,_|_\__,_|\__\___/_|
+                               |_|
 ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
 '''
     subcommandstr = '", "'.join(sorted(list(mains.keys())))

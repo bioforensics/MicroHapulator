@@ -17,12 +17,12 @@ from tempfile import NamedTemporaryFile
 
 def test_refr_simple():
     seqindex = pyfaidx.Fasta('hg38.fasta')
-    seqiter = microhapulator.refr.get_seqs(['MHDBL000146'], seqindex)
+    seqiter = microhapulator.refr.get_seqs(['MHDBL000185'], seqindex)
     seqs = list(seqiter)
     assert len(seqs) == 1
-    assert seqs[0][0] == 'MHDBL000146 GRCh38:chr22:44857743-44858094'
-    assert seqs[0][1].startswith('CCAGCCTCCCACATGCAAGCTGTGTGACCTCGGGC')
-    assert seqs[0][1].endswith('TTTCAAGGGAATTCCTTGTCCATTCAAATGACTGA')
+    assert seqs[0][0] == 'MHDBL000185 GRCh38:chr5:38881266-38881617 variants=91:169:234:259'
+    assert seqs[0][1].startswith('CTGGCACAGTGAGCACCTTCTGTCTCTGATCTGTT')
+    assert seqs[0][1].endswith('TTGCTTTTAGGGGAATTACAGCACCACTGTGAAGT')
 
 
 def test_refr_cli_simple():
