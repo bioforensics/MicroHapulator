@@ -19,9 +19,9 @@ def test_type_simple():
     fasta = data_file('pashtun-sim/tiny-panel.fasta.gz')
     gt = microhapulator.type.genotype(bam, fasta)
     testgtfile = data_file('pashtun-sim/test-output.json')
-    with microhapulator.open(testgtfile, 'r') as fh:
-        testgtdata = json.load(fh)
-        assert gt.data == testgtdata
+    testgt = microhapulator.type.Genotype(filename=testgtfile)
+    assert gt.data == testgt.data
+    assert gt.dump() == testgt.dump()
 
 
 def test_type_cli_simple():

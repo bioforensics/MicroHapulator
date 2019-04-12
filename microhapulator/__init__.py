@@ -20,6 +20,7 @@ from microhapulator import population
 from microhapulator import refr
 from microhapulator import sim
 from microhapulator import type
+from microhapulator import __main__
 from microhapulator import cli
 
 
