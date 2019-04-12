@@ -39,7 +39,7 @@ MicroHapulator
     parser._positionals.title = 'Subcommands'
     parser._optionals.title = 'Global arguments'
     parser.add_argument('-v', '--version', action='version',
-                        version='kevlar v{}'.format(microhapulator.__version__))
+                        version='MicroHapulator v{}'.format(microhapulator.__version__))
     parser.add_argument('-l', '--logfile', metavar='F', help='log file for '
                         'diagnostic messages, warnings, and errors')
     parser.add_argument('--tee', action='store_true', help='write diagnostic '
