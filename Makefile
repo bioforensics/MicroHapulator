@@ -6,13 +6,13 @@ help: Makefile
 
 ## test:      execute the automated test suite
 test:
-	pytest --cov=microhapulator --doctest-modules microhapulator/*.py
+	pytest --cov=microhapulator --doctest-modules microhapulator/*.py microhapulator/*/test_*.py
 
 ## devdeps:   install development dependencies
 devdeps:
-	pip3 install --upgrade pip setuptools
-	pip3 install wheel twine
-	pip3 install pycodestyle pytest-cov pytest-sugar
+	pip install --upgrade pip setuptools
+	pip install wheel twine
+	pip install pycodestyle pytest-cov pytest-sugar
 
 ## clean:     remove development artifacts
 clean:
@@ -20,7 +20,7 @@ clean:
 
 ## style:     check code style against PEP8
 style:
-	pycodestyle --max-line-length=99 microhapulator/*.py
+	pycodestyle --max-line-length=99 microhapulator/*.py microhapulator/*/*.py
 
 ## refr:      download GRCh38 reference genome to current directory and index
 refr:

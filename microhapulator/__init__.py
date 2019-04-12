@@ -7,15 +7,46 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+# Core libraries
+import builtins
+from gzip import open as gzopen
+from sys import stdin, stdout, stderr
 
-from . import cli
-from . import locus
-from . import population
-from microhapulator.util import data_file, bogus_loci, bogus_index
-from microhapulator.context import LocusContext
-from microhapulator.genotype import Genotype
+# Internal modules
+from microhapulator import locus
+from microhapulator import population
+
+# Subcommands and command-line interface
+from microhapulator import refr
+from microhapulator import sim
+from microhapulator import cli
 
 
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
+
+
+logstream = None
+teelog = False
+
+
+def open(filename, mode):
+    if mode not in ('r', 'w'):
+        raise ValueError('invalid mode "{}"'.format(mode))
+    if filename in ['-', None]:
+        filehandle = stdin if mode == 'r' else stdout
+        return filehandle
+    openfunc = builtins.open
+    if filename.endswith('.gz'):
+        openfunc = gzopen
+        mode += 't'
+    return openfunc(filename, mode)
+
+
+def plog(*args, **kwargs):
+    """Print logging output."""
+    if logstream is not None:
+        print(*args, **kwargs, file=logstream)
+    if logstream is None or teelog:
+        print(*args, **kwargs, file=stderr)
