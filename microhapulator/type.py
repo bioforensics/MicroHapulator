@@ -9,6 +9,7 @@
 
 from collections import defaultdict
 import json
+import microhapulator
 import pysam
 import sys
 
@@ -20,11 +21,12 @@ class Genotype(object):
             with microhapulator.open(filename, 'r') as fh:
                 self.data = json.load(fh)
 
-    def record_coverage(self, locusid, cov_by_pos):
+    def record_coverage(self, locusid, cov_by_pos, ndiscarded=0):
         self.data[locusid] = {
-            'mean_coverage': sum(cov_by_pos) / len(cov_by_pos),
+            'mean_coverage': round(sum(cov_by_pos) / len(cov_by_pos), 1),
             'min_coverage': min(cov_by_pos),
             'max_coverage': max(cov_by_pos),
+            'num_discarded_reads': ndiscarded,
             'allele_counts': dict(),
         }
 
@@ -33,13 +35,14 @@ class Genotype(object):
 
     def infer(self):
         for locusid, locusdata in self.data.items():
-            allelecounts = locusdata['alleles']
+            allelecounts = locusdata['allele_counts']
             avgcount = sum(allelecounts.values()) / len(allelecounts.values())
             gt = set()
             for allele, count in allelecounts.items():
-                if count > avgcount:
-                    gt.add(allele)
-                self.data[locusid]['genotype'] = sorted(gt)
+                if count * 2 < avgcount:
+                    continue
+                gt.add(allele)
+            self.data[locusid]['genotype'] = sorted(gt)
 
     def dump(self, file=None):
         if file is None:
@@ -61,11 +64,12 @@ def parse_variant_offsets_from_fasta_headers(fasta):
 
 
 def observe_genotypes(bamfile, refrfasta):
-    discarded = 0
+    totaldiscarded = 0
     with microhapulator.open(refrfasta, 'r') as fh:
         offsets = parse_variant_offsets_from_fasta_headers(fh)
     bam = pysam.AlignmentFile(bamfile, 'rb')
     for locusid in sorted(offsets):
+        discarded = 0
         genotypes = defaultdict(int)
         gt = defaultdict(dict)
         varloc = set(offsets[locusid])
@@ -87,9 +91,10 @@ def observe_genotypes(bamfile, refrfasta):
                 continue
             gtstr = ','.join(gtlist)
             genotypes[gtstr] += 1
-        yield locusid, cov_pos, genotypes
+        yield locusid, cov_pos, genotypes, discarded
+        totaldiscarded += discarded
     microhapulator.plog(
-        '[MicroHapulator::type] Discarded', discarded,
+        '[MicroHapulator::type] discarded', totaldiscarded,
         'reads with gaps or missing data at positions of interest'
     )
 
@@ -97,9 +102,9 @@ def observe_genotypes(bamfile, refrfasta):
 def genotype(bamfile, refrfasta):
     genotyper = observe_genotypes(bamfile, refrfasta)
     gt = Genotype()
-    for locusid, cov_by_pos, gtcounts in genotyper:
-        gt.record_coverage(locusid, cov_by_pos)
-        for allele, count in gtcounts:
+    for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
+        gt.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
+        for allele, count in gtcounts.items():
             gt.record_allele(locusid, allele, count)
     gt.infer()
     return gt

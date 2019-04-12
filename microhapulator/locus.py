@@ -66,9 +66,10 @@ class LocusContext(object):
         return str(seqindex[seqid][self.start:self.end].seq).upper()
 
     def defline(self):
-        return '{loc} GRCh38:{chrom}:{s}-{e}'.format(
+        coords = [self.global_to_local(x) for x in microhapdb.allele_positions(self._data['ID'])]
+        return '{loc} GRCh38:{chrom}:{s}-{e} variants={var}'.format(
             loc=self._data['ID'], chrom=self.chrom, s=self.start,
-            e=self.end
+            e=self.end, var=':'.join(map(str, coords))
         )
 
 
