@@ -17,6 +17,7 @@ from microhapulator import locus
 from microhapulator import population
 
 # Subcommands and command-line interface
+from microhapulator import contrib
 from microhapulator import refr
 from microhapulator import sim
 from microhapulator import type

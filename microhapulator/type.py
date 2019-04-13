@@ -39,7 +39,7 @@ class Genotype(object):
             avgcount = sum(allelecounts.values()) / len(allelecounts.values())
             gt = set()
             for allele, count in allelecounts.items():
-                if count * 2 < avgcount:
+                if count * 4 < avgcount:
                     continue
                 gt.add(allele)
             self.data[locusid]['genotype'] = sorted(gt)
