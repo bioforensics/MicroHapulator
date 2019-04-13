@@ -12,6 +12,7 @@ from collections import defaultdict
 from io import StringIO
 from os import fsync
 from shutil import rmtree
+from string import ascii_letters, digits
 from subprocess import check_call
 from tempfile import NamedTemporaryFile, mkdtemp
 
@@ -19,7 +20,7 @@ from tempfile import NamedTemporaryFile, mkdtemp
 from happer.mutate import mutate
 import microhapdb
 from pyfaidx import Fasta as Fastaidx
-from numpy.random import seed
+from numpy.random import seed, choice
 
 # Internal imports
 import microhapulator
@@ -135,11 +136,12 @@ def main(args=None):
             fsync(microhapulator.logstream.fileno())
             check_call(isscmd, stderr=microhapulator.logstream)
             with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
+                signature = ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
                 nreads = 0
                 for line in infh:
                     if line.startswith('@MHDBL'):
                         nreads += 1
-                        prefix = '@read{:d} MHDBL'.format(nreads)
+                        prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=signature, n=nreads)
                         line = line.replace('@MHDBL', prefix, 1)
                     print(line, end='', file=outfh)
         finally:
