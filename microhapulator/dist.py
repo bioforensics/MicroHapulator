@@ -11,9 +11,7 @@ import json
 import microhapulator
 
 
-def dist(gtfile1, gtfile2):
-    gt1 = microhapulator.type.Genotype(filename=gtfile1)
-    gt2 = microhapulator.type.Genotype(filename=gtfile2)
+def dist(gt1, gt2):
     allloci = set(gt1.alleles()).union(gt2.alleles())
     hammdist = 0
     for locus in allloci:
@@ -28,7 +26,9 @@ def dist(gtfile1, gtfile2):
 
 
 def main(args):
-    d = dist(args.gt1, args.gt2)
+    gt1 = microhapulator.type.Genotype(filename=args.gt1)
+    gt2 = microhapulator.type.Genotype(filename=args.gt2)
+    d = dist(gt1, gt2)
     data = {
         'hamming_distance': d,
     }
