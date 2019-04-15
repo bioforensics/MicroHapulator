@@ -1,0 +1,4 @@
+ ./gen-sim-params.py --seed 1149247345 --num-reads 100000 bigger-panel.tsv demographics.tsv 1000 > sim-cmds-1.txt
+ ./gen-sim-params.py --seed 447163344 --num-reads 100000 bigger-panel.tsv demographics.tsv 1000 > sim-cmds-2.txt
+ ./gen-sim-params.py --seed 135491242 --num-reads 100000 bigger-panel.tsv demographics.tsv 1000 > sim-cmds-3.txt
+ ./gen-sim-params.py --seed 727185351 --num-reads 100000 bigger-panel.tsv demographics.tsv 1000 > sim-cmds-4.txt
