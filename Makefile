@@ -8,6 +8,10 @@ help: Makefile
 test:
 	pytest --cov=microhapulator --doctest-modules microhapulator/*.py microhapulator/*/test_*.py
 
+## test4:     execute the automated test suite in multithreaded mode
+test4:
+	pytest -n 4 --cov=microhapulator --doctest-modules microhapulator/*.py microhapulator/*/test_*.py
+
 ## devdeps:   install development dependencies
 devdeps:
 	pip install --upgrade pip setuptools
