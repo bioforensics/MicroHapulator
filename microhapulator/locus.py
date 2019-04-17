@@ -7,6 +7,7 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+from itertools import combinations
 from math import ceil
 import microhapdb
 import microhapulator
@@ -78,6 +79,52 @@ def default_panel():
         sort_values('AvgAe', ascending=False).\
         drop_duplicates('Chrom')
     return list(loci.ID)
+
+
+def panel_alpha():
+    '''First attempt at optimizing panel design.
+
+    There are many factors to consider when designing a panel. This method
+    ignores many of those considerations and focuses on a few simple
+    filters and simple operations.
+    - discard any microhap not present in ALFRED
+    - discard any microhap with an average Ae of less than 2.0
+    - for each chromosome, grab the 3 microhaps with the highest combined
+      average Ae such that no 2 microhaps occur within 25 Mb; if this criterion
+      is too strict, reduce the distance and then the number of desired
+      microhaps from 3 to 2 until a compatible set is selected
+    - combine microhaps from all chromosomes and select the top 50 by AvgAe
+    '''
+    l = microhapdb.loci
+    locusids = set()
+    for chromid in l.Chrom.unique():
+        def trycombos(n=3, dist=25e6):
+            opt_ae, opt_loci = None, None
+            chromloci = l[(l.Source == 'ALFRED') & (l.Chrom == chromid) & (l.AvgAe > 2.0)]
+            for testlocusids in combinations(chromloci.ID, n):
+                testloci = l[l.ID.isin(testlocusids)]
+                for coord1, coord2 in combinations(testloci.Start, 2):
+                    if abs(coord1 - coord2) < dist:
+                        break
+                else:
+                    ae = sum(testloci.AvgAe) / len(testloci.AvgAe)
+                    if opt_ae is None or ae > opt_ae:
+                        opt_ae = ae
+                        opt_loci = testlocusids
+            return opt_loci
+        params = (
+            (3, 25e6), (3, 20e6), (2, 25e6), (2, 20e6),
+            (3, 15e6), (2, 15e6),
+            (3, 10e6), (2, 10e6), (2, 7.5e6),
+        )
+        for n, dist in params:
+            loci = trycombos(n=n, dist=dist)
+            if loci:
+                break
+        assert loci, chromid
+        locusids.update(loci)
+    panel = l[l.ID.isin(locusids)].sort_values('AvgAe').head(50)
+    return list(panel.ID)
 
 
 def validate_loci(panel):

@@ -24,7 +24,7 @@ from numpy.random import seed, choice
 
 # Internal imports
 import microhapulator
-from microhapulator.locus import LocusContext, default_panel, validate_loci, sample_panel
+from microhapulator.locus import LocusContext, default_panel, panel_alpha, validate_loci, sample_panel
 from microhapulator.population import validate_populations, check_loci_for_population
 from microhapulator.population import exclude_loci_missing_data
 
@@ -99,7 +99,12 @@ def main(args=None):
         args = get_parser().parse_args()
 
     haplopops = validate_populations(args.popid)
-    loci = args.panel if args.panel else default_panel()
+    if args.panel in (None, ['default']):
+        loci = default_panel()
+    elif args.panel == ['alpha']:
+        loci = panel_alpha()
+    else:
+        loci = args.panel
     loci = validate_loci(loci)
     if not args.relaxed:
         loci = exclude_loci_missing_data(loci, haplopops)
@@ -133,7 +138,10 @@ def main(args=None):
             if args.seq_threads:
                 isscmd.extend(['--cpus', str(args.seq_threads)])
             microhapulator.logstream.flush()
-            fsync(microhapulator.logstream.fileno())
+            try:
+                fsync(microhapulator.logstream.fileno())
+            except OSError:
+                pass
             check_call(isscmd, stderr=microhapulator.logstream)
             with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
                 signature = ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
