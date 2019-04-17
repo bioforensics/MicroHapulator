@@ -11,7 +11,6 @@ from collections import defaultdict
 import json
 import microhapulator
 import pysam
-import sys
 
 
 class Genotype(object):
@@ -49,6 +48,12 @@ class Genotype(object):
             return json.dumps(self.data, indent=4, sort_keys=True)
         else:
             return json.dump(self.data, file, indent=4, sort_keys=True)
+
+    def alleles(self):
+        a = dict()
+        for locusid in sorted(self.data):
+            a[locusid] = ':'.join(self.data[locusid]['genotype'])
+        return a
 
 
 def parse_variant_offsets_from_fasta_headers(fasta):
