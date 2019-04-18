@@ -13,6 +13,7 @@ from gzip import open as gzopen
 from sys import stdin, stdout, stderr
 
 # Internal modules
+from microhapulator import genotype
 from microhapulator import locus
 from microhapulator import population
 
