@@ -43,7 +43,7 @@ class SimulatedGenotype(object):
         self._data[locusid][hapid] = allele
         if locusid not in self._contexts:
             locus = microhapdb.id_xref(locusid).iloc[0]
-            context = microhapulator.locus.LocusContext(locus)
+            context = microhapulator.panel.LocusContext(locus)
             self._contexts[locusid] = context
 
     def seqstream(self, seqindex, prechr=False):
