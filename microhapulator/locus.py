@@ -89,18 +89,20 @@ def panel_alpha():
     filters and simple operations.
     - discard any microhap not present in ALFRED
     - discard any microhap with an average Ae of less than 2.0
+    - discard any microhap that spans more than 250 bp
     - for each chromosome, grab the 3 microhaps with the highest combined
       average Ae such that no 2 microhaps occur within 25 Mb; if this criterion
       is too strict, reduce the distance and then the number of desired
       microhaps from 3 to 2 until a compatible set is selected
     - combine microhaps from all chromosomes and select the top 50 by AvgAe
     '''
-    l = microhapdb.loci
+    l = microhapdb.loci.copy()
+    l['Length'] = l['End'] - l['Start']
     locusids = set()
     for chromid in l.Chrom.unique():
         def trycombos(n=3, dist=25e6):
             opt_ae, opt_loci = None, None
-            chromloci = l[(l.Source == 'ALFRED') & (l.Chrom == chromid) & (l.AvgAe > 2.0)]
+            chromloci = l[(l.Source == 'ALFRED') & (l.Chrom == chromid) & (l.AvgAe > 2.0) & (l.Length <= 250)]
             for testlocusids in combinations(chromloci.ID, n):
                 testloci = l[l.ID.isin(testlocusids)]
                 for coord1, coord2 in combinations(testloci.Start, 2):

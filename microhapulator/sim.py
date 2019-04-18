@@ -108,6 +108,8 @@ def main(args=None):
     loci = validate_loci(loci)
     if not args.relaxed:
         loci = exclude_loci_missing_data(loci, haplopops)
+    if loci in (None, list()):
+        raise ValueError('invalid panel: {}'.format(args.panel))
     genotype = Genotype()
     if args.hap_seed:
         seed(args.hap_seed)
