@@ -24,9 +24,10 @@ from numpy.random import seed, choice
 
 # Internal imports
 import microhapulator
-from microhapulator.locus import LocusContext, default_panel, validate_loci, sample_panel
-from microhapulator.population import validate_populations, check_loci_for_population
-from microhapulator.population import exclude_loci_missing_data
+from microhapulator.panel import LocusContext
+from microhapulator.panel import panel_loci, sample_panel
+from microhapulator.panel import validate_populations, check_loci_for_population
+from microhapulator.panel import exclude_loci_missing_data
 
 
 class Genotype(object):
@@ -99,10 +100,11 @@ def main(args=None):
         args = get_parser().parse_args()
 
     haplopops = validate_populations(args.popid)
-    loci = args.panel if args.panel else default_panel()
-    loci = validate_loci(loci)
+    loci = panel_loci(args.panel)
     if not args.relaxed:
         loci = exclude_loci_missing_data(loci, haplopops)
+    if loci in (None, list()):
+        raise ValueError('invalid panel: {}'.format(args.panel))
     genotype = Genotype()
     if args.hap_seed:
         seed(args.hap_seed)
@@ -133,7 +135,10 @@ def main(args=None):
             if args.seq_threads:
                 isscmd.extend(['--cpus', str(args.seq_threads)])
             microhapulator.logstream.flush()
-            fsync(microhapulator.logstream.fileno())
+            try:
+                fsync(microhapulator.logstream.fileno())
+            except OSError:  # pragma: no cover
+                pass
             check_call(isscmd, stderr=microhapulator.logstream)
             with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
                 signature = ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
