@@ -24,8 +24,8 @@ from tempfile import NamedTemporaryFile
     ('gujarati-ind3-gt.json', 'gujarati-ind4-gt.json', 2),
 ])
 def test_dist_gujarati(gt1, gt2, dist):
-    g1 = microhapulator.type.Genotype(data_file(gt1))
-    g2 = microhapulator.type.Genotype(data_file(gt2))
+    g1 = microhapulator.genotype.ObservedGenotype(data_file(gt1))
+    g2 = microhapulator.genotype.ObservedGenotype(data_file(gt2))
     assert microhapulator.dist.dist(g1, g2) == dist
 
 
