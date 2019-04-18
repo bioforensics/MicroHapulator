@@ -124,6 +124,7 @@ def panel_beta():
             (loci.AvgAe > 2.0) &
             (loci.Length <= 250)
         ]
+
         def trycombos(n=3, dist=25e6):
             opt_ae, opt_loci = None, None
             for testlocusids in combinations(chromloci.ID, n):
