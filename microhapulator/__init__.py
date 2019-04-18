@@ -13,6 +13,7 @@ from gzip import open as gzopen
 import sys
 
 # Internal modules
+from microhapulator import genotype
 from microhapulator import panel
 
 # Subcommands and command-line interface

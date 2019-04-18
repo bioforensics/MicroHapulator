@@ -17,9 +17,9 @@ from tempfile import NamedTemporaryFile
 def test_type_simple():
     bam = data_file('pashtun-sim/aligned-reads.bam')
     fasta = data_file('pashtun-sim/tiny-panel.fasta.gz')
-    gt = microhapulator.type.genotype(bam, fasta)
+    gt = microhapulator.type.type(bam, fasta)
     testgtfile = data_file('pashtun-sim/test-output.json')
-    testgt = microhapulator.type.Genotype(filename=testgtfile)
+    testgt = microhapulator.genotype.ObservedGenotype(filename=testgtfile)
     assert gt.data == testgt.data
     assert gt.dump() == testgt.dump()
 
