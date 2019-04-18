@@ -96,15 +96,20 @@ def panel_alpha():
       microhaps from 3 to 2 until a compatible set is selected
     - combine microhaps from all chromosomes and select the top 50 by AvgAe
     '''
-    l = microhapdb.loci.copy()
-    l['Length'] = l['End'] - l['Start']
+    loci = microhapdb.loci.copy()
+    loci['Length'] = loci['End'] - loci['Start']
     locusids = set()
     for chromid in l.Chrom.unique():
         def trycombos(n=3, dist=25e6):
             opt_ae, opt_loci = None, None
-            chromloci = l[(l.Source == 'ALFRED') & (l.Chrom == chromid) & (l.AvgAe > 2.0) & (l.Length <= 250)]
+            chromloci = loci[
+                (loci.Source == 'ALFRED') &
+                (loci.Chrom == chromid) &
+                (loci.AvgAe > 2.0) &
+                (loci.Length <= 250)
+            ]
             for testlocusids in combinations(chromloci.ID, n):
-                testloci = l[l.ID.isin(testlocusids)]
+                testloci = loci[loci.ID.isin(testlocusids)]
                 for coord1, coord2 in combinations(testloci.Start, 2):
                     if abs(coord1 - coord2) < dist:
                         break
@@ -120,12 +125,12 @@ def panel_alpha():
             (3, 10e6), (2, 10e6), (2, 7.5e6),
         )
         for n, dist in params:
-            loci = trycombos(n=n, dist=dist)
+            testloci = trycombos(n=n, dist=dist)
             if loci:
                 break
-        assert loci, chromid
-        locusids.update(loci)
-    panel = l[l.ID.isin(locusids)].sort_values('AvgAe').head(50)
+        assert testloci, chromid
+        locusids.update(testloci)
+    panel = loci[loci.ID.isin(locusids)].sort_values('AvgAe').head(50)
     return list(panel.ID)
 
 
