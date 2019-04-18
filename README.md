@@ -53,6 +53,27 @@ Global arguments:
 <!-- replaceme.end -->
 
 
+## Demo
+
+```
+# Grab sequences of microhap panel "beta"
+mhpl8r refr --out panel.fasta hg38.fasta beta
+
+# Simulate 100000 reads from a European American individual
+mhpl8r sim --panel beta --num-reads 100000 --out myreads.fastq hg38.fasta SA004250L
+
+# Align reads to reference genome
+bwa mem hg38.fasta myreads.fastq | samtools view -bS | samtools sort -o myreads.bam -
+samtools index myreads.bam
+
+# Make genotype calls
+mhpl8r type --out genotype.json panel.fasta myreads.bam
+
+# Estimate number of contributors in the sample
+mhpl8r --json genotype.json
+```
+
+
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg
 [codecovbadge]: https://img.shields.io/codecov/c/github/bioforensics/MicroHapulator.svg
 [licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
