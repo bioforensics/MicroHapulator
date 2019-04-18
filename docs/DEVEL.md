@@ -28,3 +28,11 @@ make devenv
 - **other modules**: Code needed by multiple subcommands is organized into additional package modules, such as `microhapulator/panel.py` and `microhapulator/genotype.py`
 - **tests**: Aside from doctests, all test functions reside in `microhapulator/tests/test_*.py`.
   Test data files are in `microhapulator/tests/data` and can be accessed programmatically using the `microhapulator.tests.data_file()` function.
+
+
+## Subcommand conventions
+
+- each subcommand has a dedicated module and CLI with the same name
+- in its dedicated module, each subcommand has a primary function matching the name of that subcommand
+- in its dedicated module, each subcommand has a function named `main` whose only purpose is to call the primary function and, if necessary, do file I/O
+- the intent of the previous two points is to maintain a Python API that closely matches the command-line interface; if someone invokes a command on the command line, it should be very easy for them to translate that into a Python API call
