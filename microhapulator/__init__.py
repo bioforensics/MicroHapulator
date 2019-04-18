@@ -13,8 +13,7 @@ from gzip import open as gzopen
 from sys import stdin, stdout, stderr
 
 # Internal modules
-from microhapulator import locus
-from microhapulator import population
+from microhapulator import panel
 
 # Subcommands and command-line interface
 from microhapulator import contrib

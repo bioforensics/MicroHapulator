@@ -161,3 +161,42 @@ def sample_panel(popids, loci):
                 freqs = [x / sum(freqs) for x in freqs]
                 sampled_allele = choice(alleles, p=freqs)
             yield haplotype, locusid, sampled_allele
+
+
+def validate_populations(popids):
+    if len(popids) not in (1, 2):
+        message = 'please provide only 1 or 2 population IDs'
+        raise ValueError(message)
+    haplopops = microhapdb.standardize_ids(popids)
+    if len(haplopops) < len(popids):
+        raise ValueError('invalid or duplicated population ID(s)')
+    if len(haplopops) == 1:
+        haplopops = haplopops * 2
+    return haplopops
+
+
+def check_loci_for_population(loci, popid):
+    loci = validate_loci(loci)
+    if len(loci) == 0:
+        return list()
+    freq = microhapdb.frequencies
+    allelefreqs = freq[(freq.Population == popid) & (freq.Locus.isin(loci))]
+    idsfound = list(allelefreqs.Locus.unique())
+    nodata = set(loci) - set(idsfound)
+    if len(nodata) > 0:
+        message = 'no allele frequency data available'
+        message += ' for population "{pop:s}"'.format(pop=popid)
+        message += ' at the following microhap loci: {loc:s}'.format(loc=','.join(nodata))
+        microhapulator.plog('[MicroHapulator::loci] WARNING:', message)
+    return sorted(set(loci) & set(idsfound))
+
+
+def exclude_loci_missing_data(loci, popids):
+    loci_to_keep = None
+    for popid in popids:
+        temp_loci = check_loci_for_population(loci, popid)
+        if loci_to_keep is None:
+            loci_to_keep = set(temp_loci)
+        else:
+            loci_to_keep = set(loci_to_keep) & set(temp_loci)
+    return sorted(loci_to_keep)

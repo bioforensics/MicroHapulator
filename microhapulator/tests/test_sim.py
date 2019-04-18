@@ -10,7 +10,7 @@
 import filecmp
 import microhapdb
 import microhapulator
-from microhapulator.locus import LocusContext
+from microhapulator.panel import LocusContext, default_panel
 from microhapulator.tests import data_file
 import numpy
 import pytest
@@ -19,21 +19,21 @@ import tempfile
 
 
 def test_default_panel():
-    dp = microhapulator.locus.default_panel()
+    dp = default_panel()
     assert len(dp) == 22
     assert 'MHDBL000017' in dp
     assert 'MHDBL000018' not in dp
 
 
 def test_validate_populations():
-    from microhapulator.population import validate_populations as valpop
+    from microhapulator.panel import validate_populations as valpop
     assert valpop(['MHDBP000012']) == ['MHDBP000012', 'MHDBP000012']
     assert valpop(['SA000020C', 'SA000012D']) == ['MHDBP000023', 'MHDBP000063']
     assert valpop(['SA000025H', 'MHDBP000063']) == ['MHDBP000063', 'MHDBP000075']
 
 
 def test_validate_populations_bad_ids():
-    from microhapulator.population import validate_populations as valpop
+    from microhapulator.panel import validate_populations as valpop
     with pytest.raises(ValueError) as ve:
         _ = valpop(['BogU$pOPiD'])
     assert 'invalid or duplicated population ID(s)' in str(ve)
@@ -49,7 +49,7 @@ def test_validate_populations_bad_ids():
 
 
 def test_validate_populations_cardinality():
-    from microhapulator.population import validate_populations as valpop
+    from microhapulator.panel import validate_populations as valpop
     with pytest.raises(ValueError) as ve:
         _ = valpop([])
     assert 'please provide only 1 or 2 population IDs' in str(ve)
@@ -59,7 +59,7 @@ def test_validate_populations_cardinality():
 
 
 def test_validate_loci():
-    from microhapulator.locus import validate_loci as valloc
+    from microhapulator.panel import validate_loci as valloc
     assert valloc(['BogusId']) == []
     assert valloc(['MHDBL000114']) == ['MHDBL000114']
     assert valloc(['MHDBL000079', 'MHDBL000146', 'MHDBL000192']) == ['MHDBL000079', 'MHDBL000146', 'MHDBL000192']  # noqa
@@ -68,7 +68,7 @@ def test_validate_loci():
 
 
 def test_check_loci_for_population():
-    from microhapulator.population import check_loci_for_population as check
+    from microhapulator.panel import check_loci_for_population as check
     assert check(list(), 'MHDBP000003') == list()
     assert check(['BogusLocus'], 'MHDBP000003') == list()
     assert check(['MHDBL000197'], 'MHDBP000003') == list()
@@ -76,7 +76,7 @@ def test_check_loci_for_population():
 
 
 def test_exclude_loci_missing_data():
-    from microhapulator.population import exclude_loci_missing_data as exclude
+    from microhapulator.panel import exclude_loci_missing_data as exclude
     assert exclude(['MHDBL000197'], ['MHDBP000003', 'MHDBP000003']) == list()
     assert exclude(['MHDBL000197'], ['MHDBP000003', 'MHDBP000004']) == list()
     assert exclude(['MHDBL000197'], ['MHDBP000004', 'MHDBP000004']) == ['MHDBL000197']
@@ -87,7 +87,7 @@ def test_sample_panel():
     pops = ['MHDBP000004', 'MHDBP000004']
     panel = ['MHDBL000197', 'MHDBL000066']
     numpy.random.seed(112358)
-    sampler = microhapulator.locus.sample_panel(pops, panel)
+    sampler = microhapulator.panel.sample_panel(pops, panel)
     assert list(sampler) == [
         (0, 'MHDBL000197', 'A,A,T,A,T'),
         (0, 'MHDBL000066', 'G,G,G'),
@@ -101,7 +101,7 @@ def test_sample_panel_relaxed(capfd):
     pops = ['MHDBP000003', 'MHDBP000004']
     panel = ['MHDBL000172', 'MHDBL000105']
     numpy.random.seed(1776)
-    sampler = microhapulator.locus.sample_panel(pops, panel)
+    sampler = microhapulator.panel.sample_panel(pops, panel)
     assert list(sampler) == [
         (0, 'MHDBL000172', 'C,A,G,A'),
         (0, 'MHDBL000105', 'A,T,A,C'),

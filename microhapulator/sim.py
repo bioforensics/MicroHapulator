@@ -24,10 +24,10 @@ from numpy.random import seed, choice
 
 # Internal imports
 import microhapulator
-from microhapulator.locus import LocusContext
-from microhapulator.locus import default_panel, panel_alpha, validate_loci, sample_panel
-from microhapulator.population import validate_populations, check_loci_for_population
-from microhapulator.population import exclude_loci_missing_data
+from microhapulator.panel import LocusContext
+from microhapulator.panel import default_panel, panel_alpha, validate_loci, sample_panel
+from microhapulator.panel import validate_populations, check_loci_for_population
+from microhapulator.panel import exclude_loci_missing_data
 
 
 class Genotype(object):

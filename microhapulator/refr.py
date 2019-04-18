@@ -9,7 +9,7 @@
 
 
 import microhapulator
-from microhapulator.locus import LocusContext, default_panel
+from microhapulator.panel import LocusContext, default_panel
 import microhapdb
 from pyfaidx import Fasta as Fastaidx
 
