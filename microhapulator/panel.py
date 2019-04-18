@@ -74,19 +74,37 @@ class LocusContext(object):
         )
 
 
-def default_panel():
+def panel_loci(panellist):
+    print('DEBUG', panellist)
+    if panellist is None or panellist == ['alpha']:
+        loci = panel_alpha()
+    elif panellist == ['beta']:
+        loci = panel_beta()
+    else:
+        loci = panellist
+    return validate_loci(loci)
+
+
+def panel_alpha():
+    '''Initial minimum-effort panel selection.
+
+    There are many factors to consider when designing a panel. This method
+    ignores most of those considerations and simply grabs the microhap locus
+    from each autosome with the largest effective number of alleles (Ae)
+    averaged across all populations.
+    '''
     loci = microhapdb.loci.query('Source == "ALFRED"').\
         sort_values('AvgAe', ascending=False).\
         drop_duplicates('Chrom')
     return list(loci.ID)
 
 
-def panel_alpha():
+def panel_beta():
     '''First attempt at optimizing panel design.
 
-    There are many factors to consider when designing a panel. This method
-    ignores many of those considerations and focuses on a few simple
-    filters and simple operations.
+    Slightly less unsophisticated approach to panel selection than panel_alpha,
+    but still ignoring some important considerations. This method focuses on a
+    few simple filters and simple operations.
     - discard any microhap not present in ALFRED
     - discard any microhap with an average Ae of less than 2.0
     - discard any microhap that spans more than 250 bp
@@ -99,15 +117,15 @@ def panel_alpha():
     loci = microhapdb.loci.copy()
     loci['Length'] = loci['End'] - loci['Start']
     locusids = set()
-    for chromid in l.Chrom.unique():
+    for chromid in loci.Chrom.unique():
+        chromloci = loci[
+            (loci.Source == 'ALFRED') &
+            (loci.Chrom == chromid) &
+            (loci.AvgAe > 2.0) &
+            (loci.Length <= 250)
+        ]
         def trycombos(n=3, dist=25e6):
             opt_ae, opt_loci = None, None
-            chromloci = loci[
-                (loci.Source == 'ALFRED') &
-                (loci.Chrom == chromid) &
-                (loci.AvgAe > 2.0) &
-                (loci.Length <= 250)
-            ]
             for testlocusids in combinations(chromloci.ID, n):
                 testloci = loci[loci.ID.isin(testlocusids)]
                 for coord1, coord2 in combinations(testloci.Start, 2):
@@ -126,9 +144,9 @@ def panel_alpha():
         )
         for n, dist in params:
             testloci = trycombos(n=n, dist=dist)
-            if loci:
+            if testloci is not None:
                 break
-        assert testloci, chromid
+        assert testloci is not None, chromid
         locusids.update(testloci)
     panel = loci[loci.ID.isin(locusids)].sort_values('AvgAe').head(50)
     return list(panel.ID)

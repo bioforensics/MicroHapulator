@@ -9,7 +9,7 @@
 
 
 import microhapulator
-from microhapulator.panel import LocusContext, default_panel
+from microhapulator.panel import LocusContext, panel_loci
 import microhapdb
 from pyfaidx import Fasta as Fastaidx
 
@@ -25,7 +25,7 @@ def get_seqs(locusids, seqindex, delta=30, minlength=350):
 def main(args=None):
     if args is None:  # pragma: no cover
         args = get_parser().parse_args()
-    locusids = args.panel if args.panel else default_panel()
+    locusids = panel_loci(args.panel)
     seqindex = Fastaidx(args.refrfasta)
     with microhapulator.open(args.out, 'w') as fh:
         seqiter = get_seqs(locusids, seqindex, delta=args.delta, minlength=args.min_length)
