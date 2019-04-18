@@ -1,4 +1,5 @@
 [![MicroHapulator build status][travisbadge]](https://travis-ci.org/bioforensics/MicroHapulator)
+[![Test coverage][codecovbadge]](https://codecov.io/github/kevlar-dev/kevlar)
 [![BSD licensed][licensebadge]](https://github.com/bioforensics/MicroHapDB/blob/master/LICENSE.txt)
 
 # MicroHapulator
@@ -22,4 +23,5 @@ For now, check out `.travis.yml` for hints about installation.
 
 
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg
+[codecovbadge]: https://img.shields.io/codecov/c/github/bioforensics/MicroHapulator.svg
 [licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
