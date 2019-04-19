@@ -21,7 +21,8 @@ devdeps:
 
 ## devhooks:  install development hooks
 devhooks:
-	echo 'make style' > .git/hooks/pre-commit
+	echo 'set -eo pipefail' > .git/hooks/pre-commit
+	echo 'make style' >> .git/hooks/pre-commit
 	echo 'aux/fix-readme.py && git add README.md' >> .git/hooks/pre-commit
 	chmod 755 .git/hooks/pre-commit
 

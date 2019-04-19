@@ -57,7 +57,7 @@ def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
 
 
 def sim(popids, panel, refrfile, relaxed=False, hapseed=None, gtfile=None, hapfile=None,
-        seqseed=None, seqthreads=2, numreads=500000):
+        seqseed=None, seqthreads=2, numreads=500000, readsignature=None, debug=False):
     genotype = simulate_genotype(
         popids, panel, hapseed=hapseed, relaxed=relaxed, outfile=gtfile
     )
@@ -83,15 +83,21 @@ def sim(popids, panel, refrfile, relaxed=False, hapseed=None, gtfile=None, hapfi
                 fsync(microhapulator.logstream.fileno())
             except OSError:  # pragma: no cover
                 pass
-            check_call(isscmd, stderr=microhapulator.logstream)
+            if debug:
+                check_call(isscmd, stderr=microhapulator.logstream)
+            else:
+                check_call(isscmd)
             with open(fqdir + '/seq_R1.fastq', 'r') as infh:
-                signature = ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
+                if readsignature is None:
+                    readsignature = ''.join(
+                        [choice(list(ascii_letters + digits)) for _ in range(7)]
+                    )
                 nreads = 0
                 linebuffer = list()
                 for line in infh:
                     if line.startswith('@MHDBL'):
                         nreads += 1
-                        prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=signature, n=nreads)
+                        prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=readsignature, n=nreads)
                         line = line.replace('@MHDBL', prefix, 1)
                     linebuffer.append(line)
                     if len(linebuffer) == 4:

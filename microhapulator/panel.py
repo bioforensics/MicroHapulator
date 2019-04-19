@@ -170,7 +170,7 @@ def sample_panel(popids, loci):
                 message += ' for population "{pop}"'.format(pop=popid)
                 message += ' at locus "{loc}"'.format(loc=locusid)
                 message += '; in "relaxed" mode, drawing an allele uniformly'
-                microhapulator.plog('[MicroHapulator::loci] WARNING:', message)
+                microhapulator.plog('[MicroHapulator::panel] WARNING:', message)
                 alleles = list(f[f.Locus == locusid].Allele.unique())
                 sampled_allele = choice(alleles)
             else:
@@ -205,7 +205,7 @@ def check_loci_for_population(loci, popid):
         message = 'no allele frequency data available'
         message += ' for population "{pop:s}"'.format(pop=popid)
         message += ' at the following microhap loci: {loc:s}'.format(loc=','.join(nodata))
-        microhapulator.plog('[MicroHapulator::loci] WARNING:', message)
+        microhapulator.plog('[MicroHapulator::panel] WARNING:', message)
     return sorted(set(loci) & set(idsfound))
 
 
