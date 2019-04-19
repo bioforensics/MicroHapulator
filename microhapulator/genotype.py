@@ -35,9 +35,26 @@ class SimulatedGenotype(object):
     mh21KK-316 179     180     G|G
     mh21KK-316 242     243     T|C
     """
-    def __init__(self):
+    def __init__(self, frombed=None):
         self._data = defaultdict(lambda: [None] * 2)
         self._contexts = dict()
+        if frombed:
+            _populate(frombed)
+
+    def _frombed(self, bedstream):
+        locus_alleles = defaultdict(lambda: list(list(), list()))
+        for line in bedstream:
+            line = line.strip()
+            if line == '':
+                continue
+            locusid, start, end, allelestr = line.split('\t')
+            alleles = allelestr.split('|')
+            assert len(alleles) == 2
+            for i, a in enumerate(alleles):
+                locus_alleles[locusid][i].append(a)
+        for locusid, allele_list in locus_alleles.items():
+            for i, allele in enumerate(allele_list):
+                self.add(i, locusid, allele)
 
     def add(self, hapid, locusid, allele):
         assert hapid in (0, 1)
