@@ -8,8 +8,8 @@ out, err = proc.communicate()
 with open('README.md', 'r') as fh:
     text = fh.read().strip()
 text = re.sub(
-    r'..-- replaceme:start --..*..-- replaceme.end --.',
-    '<!-- replaceme:start -->\n```\n' + out +'\n```\n<!-- replaceme.end -->',
+    r'## Usage\n.*\n## Demo',
+    '## Usage\n\n```\n' + out +'\n```\n\n\n## Demo',
     text,
     flags=re.DOTALL
 )

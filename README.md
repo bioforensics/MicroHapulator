@@ -26,7 +26,6 @@ pip install git+https://github.com/bioforensics/MicroHapulator.git
 
 ## Usage
 
-<!-- replaceme:start -->
 ```
 usage: mhpl8r [-h] [-v] [-l F] [--tee] subcmd ...
 
@@ -50,7 +49,6 @@ Global arguments:
   --tee              write diagnostic output to logfile AND terminal (stderr)
 
 ```
-<!-- replaceme.end -->
 
 
 ## Demo
