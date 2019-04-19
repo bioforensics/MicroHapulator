@@ -86,11 +86,12 @@ def test_main_no_seeds():
 
 
 def test_main_bad_panel():
-    arglist = [
-        'sim', '--panel', 'DUUUUDE', 'SWEEEET', '--num-reads', '10',
-        '-o', '/r', 'hg38.fasta', 'MHDBP000004'
-    ]
-    args = microhapulator.cli.parse_args(arglist)
-    with pytest.raises(ValueError) as ve:
-        microhapulator.sim.main(args)
-    assert 'invalid panel' in str(ve)
+    with tempfile.NamedTemporaryFile(suffix='fq.gz') as outfile:
+        arglist = [
+            'sim', '--panel', 'DUUUUDE', 'SWEEEET', '--num-reads', '10',
+            '-o', outfile.name, 'hg38.fasta', 'MHDBP000004'
+        ]
+        args = microhapulator.cli.parse_args(arglist)
+        with pytest.raises(ValueError) as ve:
+            microhapulator.sim.main(args)
+        assert 'invalid panel' in str(ve)

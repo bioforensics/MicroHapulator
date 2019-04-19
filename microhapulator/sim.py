@@ -56,17 +56,14 @@ def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
     return genotype
 
 
-def main(args=None):
-    if args is None:  # pragma: no cover
-        args = get_parser().parse_args()
-
+def sim(popids, panel, refrfile, relaxed=False, hapseed=None, gtfile=None, hapfile=None,
+        seqseed=None, seqthreads=2, numreads=500000):
     genotype = simulate_genotype(
-        args.popid, args.panel, hapseed=args.hap_seed, relaxed=args.relaxed,
-        outfile=args.genotype
+        popids, panel, hapseed=hapseed, relaxed=relaxed, outfile=gtfile
     )
-    seqindex = Fastaidx(args.refr)
+    seqindex = Fastaidx(refrfile)
     mutator = mutate(genotype.seqstream(seqindex), genotype.bedstream)
-    with optional_outfile(args.haploseq) as fh:
+    with optional_outfile(hapfile) as fh:
         for defline, sequence in mutator:
             print('>', defline, '\n', sequence, sep='', file=fh)
         fh.flush()
@@ -74,27 +71,44 @@ def main(args=None):
         fqdir = mkdtemp()
         try:
             isscmd = [
-                'iss', 'generate', '--n_reads', str(args.num_reads * 2), '--draft', fh.name,
+                'iss', 'generate', '--n_reads', str(numreads * 2), '--draft', fh.name,
                 '--model', 'MiSeq', '--output', fqdir + '/seq'
             ]
-            if args.seq_seed:
-                isscmd.extend(['--seed', str(args.seq_seed)])
-            if args.seq_threads:
-                isscmd.extend(['--cpus', str(args.seq_threads)])
+            if seqseed:
+                isscmd.extend(['--seed', str(seqseed)])
+            if seqthreads:
+                isscmd.extend(['--cpus', str(seqthreads)])
             microhapulator.logstream.flush()
             try:
                 fsync(microhapulator.logstream.fileno())
             except OSError:  # pragma: no cover
                 pass
             check_call(isscmd, stderr=microhapulator.logstream)
-            with open(fqdir + '/seq_R1.fastq', 'r') as infh, open(args.out, 'w') as outfh:
+            with open(fqdir + '/seq_R1.fastq', 'r') as infh:
                 signature = ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
                 nreads = 0
+                linebuffer = list()
                 for line in infh:
                     if line.startswith('@MHDBL'):
                         nreads += 1
                         prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=signature, n=nreads)
                         line = line.replace('@MHDBL', prefix, 1)
-                    print(line, end='', file=outfh)
+                    linebuffer.append(line)
+                    if len(linebuffer) == 4:
+                        yield linebuffer[0], linebuffer[1], linebuffer[3]
+                        linebuffer = list()
         finally:
             rmtree(fqdir)
+
+
+def main(args=None):
+    if args is None:  # pragma: no cover
+        args = get_parser().parse_args()
+    simulator = sim(
+        args.popid, args.panel, args.refr, relaxed=args.relaxed, hapseed=args.hap_seed,
+        gtfile=args.genotype, hapfile=args.haploseq, seqseed=args.seq_seed,
+        seqthreads=args.seq_threads, numreads=args.num_reads,
+    )
+    with microhapulator.open(args.out, 'w') as fh:
+        for defline, sequence, qualities in simulator:
+            print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)
