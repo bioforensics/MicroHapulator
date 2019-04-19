@@ -44,8 +44,10 @@ def get_parser():
  |_|  |_|_\__|_| \___/_||_\__,_| .__/\_,_|_\__,_|\__\___/_|
                                |_|
 ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
+Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
+subcommands listed below to see instructions for that operation.
 '''
-    subcommandstr = '", "'.join(sorted(list(mains.keys())))
+    subcommandstr = ', '.join(sorted(list(mains.keys())))
     parser = ArgumentParser(
         description=bubbletext,
         formatter_class=RawDescriptionHelpFormatter,
@@ -58,8 +60,8 @@ def get_parser():
                         'diagnostic messages, warnings, and errors')
     parser.add_argument('--tee', action='store_true', help='write diagnostic '
                         'output to logfile AND terminal (stderr)')
-    subparsers = parser.add_subparsers(dest='cmd', metavar='cmd',
-                                       help='"' + subcommandstr + '"')
+    subparsers = parser.add_subparsers(dest='subcmd', metavar='subcmd',
+                                       help=subcommandstr)
     for func in subparser_funcs.values():
         func(subparsers)
     return parser

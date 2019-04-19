@@ -18,6 +18,13 @@ devdeps:
 	pip install wheel twine
 	pip install pycodestyle pytest-cov pytest-sugar
 
+
+## devhooks:  install development hooks
+devhooks:
+	echo 'make style' > .git/hooks/pre-commit
+	echo 'aux/fix-readme.py && git add README.md' >> .git/hooks/pre-commit
+	chmod 755 .git/hooks/pre-commit
+
 ## clean:     remove development artifacts
 clean:
 	rm -rf __pycache__/ microhapulator/__pycache__/ microhapulator/*/__pycache__ build/ dist/ *.egg-info/
