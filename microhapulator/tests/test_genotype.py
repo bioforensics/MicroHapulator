@@ -33,13 +33,25 @@ def test_sim_genotype_roundtrip():
     assert testgenotype == genotype
 
 
-@pytest.mark.parametrize('simgtfile,obsgtfile,same', [
-    ('gttest.bed.gz', 'gttest.json', True),
-    ('gttest-mismatch.bed.gz', 'gttest.json', False),
-])
-def test_sim_obs_genotype_compare(simgtfile, obsgtfile, same):
-    with microhapulator.open(data_file(simgtfile), 'r') as fh:
+def test_sim_obs_genotype_equal():
+    with microhapulator.open(data_file('gttest.bed.gz'), 'r') as fh:
         simgt = SimulatedGenotype(frombed=fh)
-    obsgt = ObservedGenotype(filename=data_file(obsgtfile))
-    assert (simgt == obsgt) is same
-    assert (obsgt == simgt) is same
+    obsgt = ObservedGenotype(filename=data_file('gttest.json'))
+    assert simgt == obsgt
+    assert obsgt == simgt
+
+
+def test_sim_obs_genotype_not_equal():
+    with microhapulator.open(data_file('gttest-mismatch1.bed.gz'), 'r') as fh:
+        simgt = SimulatedGenotype(frombed=fh)
+    assert simgt is not None
+    assert simgt != 42
+    assert simgt != 3.14159
+    assert simgt != 'A,C,C,T'
+
+    obsgt = ObservedGenotype(filename=data_file('gttest.json'))
+    assert simgt != obsgt
+    assert obsgt != simgt
+
+    with microhapulator.open(data_file('gttest-mismatch2.bed.gz'), 'r') as fh:
+        simgt = SimulatedGenotype(frombed=fh)
