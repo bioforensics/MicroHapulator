@@ -35,9 +35,26 @@ class SimulatedGenotype(object):
     mh21KK-316 179     180     G|G
     mh21KK-316 242     243     T|C
     """
-    def __init__(self):
+    def __init__(self, frombed=None):
         self._data = defaultdict(lambda: [None] * 2)
         self._contexts = dict()
+        if frombed:
+            self._populate(frombed)
+
+    def _populate(self, bedstream):
+        locus_alleles = defaultdict(lambda: [list(), list()])
+        for line in bedstream:
+            line = line.strip()
+            if line == '':
+                continue
+            locusid, start, end, allelestr = line.split('\t')
+            alleles = allelestr.split('|')
+            assert len(alleles) == 2
+            for i, a in enumerate(alleles):
+                locus_alleles[locusid][i].append(a)
+        for locusid, allele_list in locus_alleles.items():
+            for i, allele in enumerate(allele_list):
+                self.add(i, locusid, ','.join(allele))
 
     def add(self, hapid, locusid, allele):
         assert hapid in (0, 1)
@@ -70,6 +87,19 @@ class SimulatedGenotype(object):
         for line in self.bedstream:
             print(line, file=out)
         return out.getvalue()
+
+    def __eq__(self, other):
+        if type(other) != type(self) and type(other) != ObservedGenotype:
+            return False
+        if type(other) == ObservedGenotype:
+            if self._data.keys() != other.data.keys():
+                return False
+            for locusid in self._data:
+                if set(self._data[locusid]) != set(other.data[locusid]['genotype']):
+                    return False
+            return True
+        else:
+            return self._data == other._data
 
 
 class ObservedGenotype(object):
@@ -113,3 +143,11 @@ class ObservedGenotype(object):
         for locusid in sorted(self.data):
             a[locusid] = ':'.join(self.data[locusid]['genotype'])
         return a
+
+    def __eq__(self, other):
+        if type(other) != type(self) and type(other) != SimulatedGenotype:
+            return False
+        if type(other) == SimulatedGenotype:
+            return other == self
+        else:
+            return microhapulator.dist.dist(self, other) == 0
