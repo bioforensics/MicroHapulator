@@ -39,10 +39,10 @@ class SimulatedGenotype(object):
         self._data = defaultdict(lambda: [None] * 2)
         self._contexts = dict()
         if frombed:
-            _populate(frombed)
+            self._populate(frombed)
 
-    def _frombed(self, bedstream):
-        locus_alleles = defaultdict(lambda: list(list(), list()))
+    def _populate(self, bedstream):
+        locus_alleles = defaultdict(lambda: [list(), list()])
         for line in bedstream:
             line = line.strip()
             if line == '':
@@ -54,7 +54,7 @@ class SimulatedGenotype(object):
                 locus_alleles[locusid][i].append(a)
         for locusid, allele_list in locus_alleles.items():
             for i, allele in enumerate(allele_list):
-                self.add(i, locusid, allele)
+                self.add(i, locusid, ','.join(allele))
 
     def add(self, hapid, locusid, allele):
         assert hapid in (0, 1)
