@@ -52,6 +52,8 @@ def test_sim_obs_genotype_not_equal():
     obsgt1 = ObservedGenotype(filename=data_file('gttest.json'))
     assert simgt1 != obsgt1
     assert obsgt1 != simgt1
+    assert obsgt1 != 1985
+    assert obsgt1 != 98.6
 
     with microhapulator.open(data_file('gttest-mismatch2.bed.gz'), 'r') as fh:
         simgt2 = SimulatedGenotype(frombed=fh)
