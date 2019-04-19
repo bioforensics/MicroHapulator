@@ -143,3 +143,12 @@ class ObservedGenotype(object):
         for locusid in sorted(self.data):
             a[locusid] = ':'.join(self.data[locusid]['genotype'])
         return a
+
+
+    def __eq__(self, other):
+        if type(other) != type(self) and type(other) != SimulatedGenotype:
+            return False
+        if type(other) == SimulatedGenotype:
+            return other == self
+        else:
+            return microhapulator.dist.dist(self, other) == 0
