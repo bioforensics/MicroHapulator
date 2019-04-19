@@ -9,6 +9,7 @@
 
 import json
 import microhapulator
+from microhapulator.genotype import ObservedGenotype
 
 
 def dist(gt1, gt2):
@@ -26,8 +27,8 @@ def dist(gt1, gt2):
 
 
 def main(args):
-    gt1 = microhapulator.genotype.ObservedGenotype(filename=args.gt1)
-    gt2 = microhapulator.genotype.ObservedGenotype(filename=args.gt2)
+    gt1 = ObservedGenotype(filename=args.gt1)
+    gt2 = ObservedGenotype(filename=args.gt2)
     d = dist(gt1, gt2)
     data = {
         'hamming_distance': d,
