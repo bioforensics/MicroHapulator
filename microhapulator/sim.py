@@ -36,28 +36,34 @@ def optional_outfile(outfile):
         return NamedTemporaryFile(mode='wt', suffix='.fasta')
 
 
+def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
+    haplopops = validate_populations(popids)
+    loci = panel_loci(panel)
+    if not relaxed:
+        loci = exclude_loci_missing_data(loci, haplopops)
+    if loci in (None, list()):
+        raise ValueError('invalid panel: {}'.format(panel))
+    genotype = SimulatedGenotype()
+    if hapseed:
+        seed(hapseed)
+    for haplotype, locus, allele in sample_panel(haplopops, loci):
+        genotype.add(haplotype, locus, allele)
+    if outfile:
+        with microhapulator.open(outfile, 'w') as fh:
+            print(genotype, file=fh)
+    message = 'simulated microhaplotype variation at {loc:d} loci'.format(loc=len(loci))
+    microhapulator.plog('[MicroHapulator::sim]', message)
+    return genotype
+
+
 def main(args=None):
     if args is None:  # pragma: no cover
         args = get_parser().parse_args()
 
-    haplopops = validate_populations(args.popid)
-    loci = panel_loci(args.panel)
-    if not args.relaxed:
-        loci = exclude_loci_missing_data(loci, haplopops)
-    if loci in (None, list()):
-        raise ValueError('invalid panel: {}'.format(args.panel))
-    genotype = SimulatedGenotype()
-    if args.hap_seed:
-        seed(args.hap_seed)
-    for haplotype, locus, allele in sample_panel(haplopops, loci):
-        genotype.add(haplotype, locus, allele)
-    if args.genotype:
-        with open(args.genotype, 'w') as fh:
-            print(genotype, file=fh)
-
-    message = 'simulated microhaplotype variation at {loc:d} loci'.format(loc=len(loci))
-    microhapulator.plog('[MicroHapulator::sim]', message)
-
+    genotype = simulate_genotype(
+        args.popid, args.panel, hapseed=args.hap_seed, relaxed=args.relaxed,
+        outfile=args.genotype
+    )
     seqindex = Fastaidx(args.refr)
     mutator = mutate(genotype.seqstream(seqindex), genotype.bedstream)
     with optional_outfile(args.haploseq) as fh:
