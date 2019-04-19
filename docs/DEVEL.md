@@ -11,6 +11,7 @@ git clone https://github.com/bioforensics/MicroHapulator.git
 cd MicroHapulator
 pip install -e .
 make devenv
+make devhooks
 ```
 
 
