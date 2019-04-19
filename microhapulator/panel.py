@@ -75,7 +75,6 @@ class LocusContext(object):
 
 
 def panel_loci(panellist):
-    print('DEBUG', panellist)
     if panellist is None or panellist == ['alpha']:
         loci = panel_alpha()
     elif panellist == ['beta']:

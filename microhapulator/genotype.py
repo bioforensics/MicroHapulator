@@ -89,9 +89,17 @@ class SimulatedGenotype(object):
         return out.getvalue()
 
     def __eq__(self, other):
-        if type(other) != type(self):
+        if type(other) != type(self) and type(other) != ObservedGenotype:
             return False
-        return self._data == other._data
+        if type(other) == ObservedGenotype:
+            if self._data.keys() != other.data.keys():
+                return False
+            for locusid in self._data:
+                if set(self._data[locusid]) != set(other.data[locusid]['genotype']):
+                    return False
+            return True
+        else:
+            return self._data == other._data
 
 
 class ObservedGenotype(object):
