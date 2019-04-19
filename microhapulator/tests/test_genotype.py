@@ -25,4 +25,4 @@ def test_sim_genotype_roundtrip():
     print(genotype, file=output)
     bedlines = output.getvalue().split('\n')
     testgenotype = microhapulator.genotype.SimulatedGenotype(frombed=bedlines)
-    assert str(testgenotype) == str(genotype)
+    assert testgenotype == genotype

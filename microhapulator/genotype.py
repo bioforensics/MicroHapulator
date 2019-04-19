@@ -88,6 +88,11 @@ class SimulatedGenotype(object):
             print(line, file=out)
         return out.getvalue()
 
+    def __eq__(self, other):
+        if type(other) != type(self):
+            return False
+        return self._data == other._data
+
 
 class ObservedGenotype(object):
     def __init__(self, filename=None):
