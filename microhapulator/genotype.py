@@ -144,7 +144,6 @@ class ObservedGenotype(object):
             a[locusid] = ':'.join(self.data[locusid]['genotype'])
         return a
 
-
     def __eq__(self, other):
         if type(other) != type(self) and type(other) != SimulatedGenotype:
             return False
