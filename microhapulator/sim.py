@@ -36,6 +36,10 @@ def optional_outfile(outfile):
         return NamedTemporaryFile(mode='wt', suffix='.fasta')
 
 
+def new_signature():
+    return ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
+
+
 def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
     haplopops = validate_populations(popids)
     loci = panel_loci(panel)
@@ -57,7 +61,7 @@ def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
 
 
 def sim(popids, panel, refrfile, relaxed=False, hapseed=None, gtfile=None, hapfile=None,
-        seqseed=None, seqthreads=2, numreads=500000, readsignature=None, debug=False):
+        seqseed=None, seqthreads=2, numreads=500000, readsignature=None, readindex=0, debug=False):
     genotype = simulate_genotype(
         popids, panel, hapseed=hapseed, relaxed=relaxed, outfile=gtfile
     )
@@ -89,19 +93,16 @@ def sim(popids, panel, refrfile, relaxed=False, hapseed=None, gtfile=None, hapfi
                 check_call(isscmd)
             with open(fqdir + '/seq_R1.fastq', 'r') as infh:
                 if readsignature is None:
-                    readsignature = ''.join(
-                        [choice(list(ascii_letters + digits)) for _ in range(7)]
-                    )
-                nreads = 0
+                    readsignature = new_signature()
                 linebuffer = list()
                 for line in infh:
                     if line.startswith('@MHDBL'):
-                        nreads += 1
-                        prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=readsignature, n=nreads)
+                        readindex += 1
+                        prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=readsignature, n=readindex)
                         line = line.replace('@MHDBL', prefix, 1)
                     linebuffer.append(line)
                     if len(linebuffer) == 4:
-                        yield linebuffer[0], linebuffer[1], linebuffer[3]
+                        yield readindex, linebuffer[0], linebuffer[1], linebuffer[3]
                         linebuffer = list()
         finally:
             rmtree(fqdir)
@@ -116,5 +117,5 @@ def main(args=None):
         seqthreads=args.seq_threads, numreads=args.num_reads,
     )
     with microhapulator.open(args.out, 'w') as fh:
-        for defline, sequence, qualities in simulator:
+        for n, defline, sequence, qualities in simulator:
             print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)

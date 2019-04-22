@@ -30,16 +30,19 @@ def mixture(individuals, panel, refr, relaxed=False, hapseeds=None, seqseeds=Non
         msg = 'number of individuals must match number of "--hap-seeds" and "--seq-seeds"'
         raise ValueError(msg)
     numreads = calc_n_reads_from_proportions(n, totalreads, proportions)
-    readsignature = ''.join([numpy.random.choice(list(ascii_letters + digits)) for _ in range(7)])
+    readsignature = microhapulator.sim.new_signature()
+    reads_sequenced = 0
     for indiv, hapseed, seqseed, nreads in zip(individuals, hapseeds, seqseeds, numreads):
         message = 'Individual population={pop} numreads={n}'.format(pop=','.join(indiv), n=nreads)
         microhapulator.plog('[MicroHapulator::mixture]', message)
         simulator = microhapulator.sim.sim(
             indiv, panel, refr, relaxed=relaxed, hapseed=hapseed, seqseed=seqseed,
             seqthreads=seqthreads, numreads=nreads, readsignature=readsignature,
+            readindex=reads_sequenced,
         )
         for data in simulator:
             yield data
+        reads_sequenced = data[0]
 
 
 def main(args=None):
