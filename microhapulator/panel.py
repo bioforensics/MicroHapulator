@@ -79,6 +79,8 @@ def panel_loci(panellist):
         loci = panel_alpha()
     elif panellist == ['beta']:
         loci = panel_beta()
+    elif panellist == ['allpops']:
+        loci = panel_allpops()
     else:
         loci = panellist
     return validate_loci(loci)
@@ -150,6 +152,20 @@ def panel_beta():
         locusids.update(testloci)
     panel = loci[loci.ID.isin(locusids)].sort_values('AvgAe').head(50)
     return list(panel.ID)
+
+
+def panel_allpops():
+    '''Loci with frequency data for all ALFRED populations.
+
+    Panel containing only loci for which population allele frequency data is
+    available for all 96 ALFRED populations.
+    '''
+    panel = set()
+    for locusid in microhapdb.loci[microhapdb.loci.Source == "ALFRED"].ID.unique():
+        pops = microhapdb.frequencies[microhapdb.frequencies.Locus == locusid].Population.unique()
+        if len(pops) == 96:
+            panel.add(locusid)
+    return sorted(panel)
 
 
 def validate_loci(panel):

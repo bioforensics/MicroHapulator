@@ -54,5 +54,5 @@ def main(args=None):
         proportions=args.proportions,
     )
     with microhapulator.open(args.out, 'w') as fh:
-        for defline, sequence, qualities in simulator:
+        for n, defline, sequence, qualities in simulator:
             print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)

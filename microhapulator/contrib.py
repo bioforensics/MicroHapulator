@@ -25,7 +25,7 @@ def contrib(bamfile=None, refrfasta=None, gtjson=None):
         gt = microhapulator.type.type(bamfile, refrfasta)
     num_alleles_per_locus = [len(gt.data[locusid]['genotype']) for locusid in gt.data]
     max_num_alleles = max(num_alleles_per_locus)
-    max_thresh = int(max_num_alleles / 2) * 2  # Decrements by one if odd number
+    max_thresh = max_num_alleles - 1 if max_num_alleles % 2 == 0 else max_num_alleles
     max_loci = sum([1 for n in num_alleles_per_locus if n >= max_thresh])
     max_perc = round(max_loci / len(num_alleles_per_locus), 4)
     return ceil(max_num_alleles / 2), max_loci, max_perc
