@@ -79,6 +79,8 @@ def panel_loci(panellist):
         loci = panel_alpha()
     elif panellist == ['beta']:
         loci = panel_beta()
+    elif panellist == ['allpops']:
+        loci = panel_allpops()
     else:
         loci = panellist
     return validate_loci(loci)
@@ -152,6 +154,20 @@ def panel_beta():
     return list(panel.ID)
 
 
+def panel_allpops():
+    '''Loci with frequency data for all ALFRED populations.
+
+    Panel containing only loci for which population allele frequency data is
+    available for all 96 ALFRED populations.
+    '''
+    panel = set()
+    for locusid in microhapdb.loci[microhapdb.loci.Source == "ALFRED"].ID.unique():
+        pops = microhapdb.frequencies[microhapdb.frequencies.Locus == locusid].Population.unique()
+        if len(pops) == 96:
+            panel.add(locusid)
+    return sorted(panel)
+
+
 def validate_loci(panel):
     valid_loci = microhapdb.standardize_ids(panel)
     if len(valid_loci) < len(panel):
@@ -170,7 +186,7 @@ def sample_panel(popids, loci):
                 message += ' for population "{pop}"'.format(pop=popid)
                 message += ' at locus "{loc}"'.format(loc=locusid)
                 message += '; in "relaxed" mode, drawing an allele uniformly'
-                microhapulator.plog('[MicroHapulator::loci] WARNING:', message)
+                microhapulator.plog('[MicroHapulator::panel] WARNING:', message)
                 alleles = list(f[f.Locus == locusid].Allele.unique())
                 sampled_allele = choice(alleles)
             else:
@@ -205,7 +221,7 @@ def check_loci_for_population(loci, popid):
         message = 'no allele frequency data available'
         message += ' for population "{pop:s}"'.format(pop=popid)
         message += ' at the following microhap loci: {loc:s}'.format(loc=','.join(nodata))
-        microhapulator.plog('[MicroHapulator::loci] WARNING:', message)
+        microhapulator.plog('[MicroHapulator::panel] WARNING:', message)
     return sorted(set(loci) & set(idsfound))
 
 

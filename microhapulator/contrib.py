@@ -7,11 +7,9 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-from collections import defaultdict
 import json
 from math import ceil
 import microhapulator
-import pysam
 import sys
 
 
@@ -25,7 +23,8 @@ def contrib(bamfile=None, refrfasta=None, gtjson=None):
         gt = microhapulator.type.type(bamfile, refrfasta)
     num_alleles_per_locus = [len(gt.data[locusid]['genotype']) for locusid in gt.data]
     max_num_alleles = max(num_alleles_per_locus)
-    max_loci = sum([1 for n in num_alleles_per_locus if n == max_num_alleles])
+    max_thresh = max_num_alleles - 1 if max_num_alleles % 2 == 0 else max_num_alleles
+    max_loci = sum([1 for n in num_alleles_per_locus if n >= max_thresh])
     max_perc = round(max_loci / len(num_alleles_per_locus), 4)
     return ceil(max_num_alleles / 2), max_loci, max_perc
 
@@ -37,5 +36,7 @@ def main(args):
         'num_loci_max_alleles': nloci,
         'perc_loci_max_alleles': ploci,
     }
-    with microhapulator.open(args.out, 'w') as fh:
-        json.dump(data, fh, indent=4)
+    fh = microhapulator.open(args.out, 'w')
+    json.dump(data, fh, indent=4)
+    if fh != sys.stdout:
+        fh.close()

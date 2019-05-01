@@ -40,7 +40,7 @@ Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
 subcommands listed below to see instructions for that operation.
 
 Subcommands:
-  subcmd             contrib, dist, refr, sim, type
+  subcmd             contrib, dist, mixture, refr, sim, type
 
 Global arguments:
   -h, --help         show this help message and exit
