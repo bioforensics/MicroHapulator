@@ -8,47 +8,8 @@
 # -----------------------------------------------------------------------------
 
 from collections import defaultdict
-import json
 import microhapulator
 import pysam
-import sys
-
-
-class Genotype(object):
-    def __init__(self, filename=None):
-        self.data = dict()
-        if filename:
-            with microhapulator.open(filename, 'r') as fh:
-                self.data = json.load(fh)
-
-    def record_coverage(self, locusid, cov_by_pos, ndiscarded=0):
-        self.data[locusid] = {
-            'mean_coverage': round(sum(cov_by_pos) / len(cov_by_pos), 1),
-            'min_coverage': min(cov_by_pos),
-            'max_coverage': max(cov_by_pos),
-            'num_discarded_reads': ndiscarded,
-            'allele_counts': dict(),
-        }
-
-    def record_allele(self, locusid, allele, count):
-        self.data[locusid]['allele_counts'][allele] = count
-
-    def infer(self):
-        for locusid, locusdata in self.data.items():
-            allelecounts = locusdata['allele_counts']
-            avgcount = sum(allelecounts.values()) / len(allelecounts.values())
-            gt = set()
-            for allele, count in allelecounts.items():
-                if count * 4 < avgcount:
-                    continue
-                gt.add(allele)
-            self.data[locusid]['genotype'] = sorted(gt)
-
-    def dump(self, file=None):
-        if file is None:
-            return json.dumps(self.data, indent=4, sort_keys=True)
-        else:
-            return json.dump(self.data, file, indent=4, sort_keys=True)
 
 
 def parse_variant_offsets_from_fasta_headers(fasta):
@@ -99,9 +60,9 @@ def observe_genotypes(bamfile, refrfasta):
     )
 
 
-def genotype(bamfile, refrfasta):
+def type(bamfile, refrfasta):
     genotyper = observe_genotypes(bamfile, refrfasta)
-    gt = Genotype()
+    gt = microhapulator.genotype.ObservedGenotype()
     for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
         gt.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for allele, count in gtcounts.items():
@@ -111,6 +72,6 @@ def genotype(bamfile, refrfasta):
 
 
 def main(args):
-    gt = genotype(args.bam, args.refr)
+    gt = type(args.bam, args.refr)
     with microhapulator.open(args.out, 'w') as fh:
         gt.dump(file=fh)

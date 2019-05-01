@@ -16,3 +16,5 @@ script:
     - make refr
     - make test
     - make style
+after_success:
+    - bash <(curl -s https://codecov.io/bash)

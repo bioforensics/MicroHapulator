@@ -10,14 +10,16 @@
 # Core libraries
 import builtins
 from gzip import open as gzopen
-from sys import stdin, stdout, stderr
+import sys
 
 # Internal modules
-from microhapulator import locus
-from microhapulator import population
+from microhapulator import genotype
+from microhapulator import panel
 
 # Subcommands and command-line interface
 from microhapulator import contrib
+from microhapulator import dist
+from microhapulator import mixture
 from microhapulator import refr
 from microhapulator import sim
 from microhapulator import type
@@ -38,7 +40,7 @@ def open(filename, mode):
     if mode not in ('r', 'w'):
         raise ValueError('invalid mode "{}"'.format(mode))
     if filename in ['-', None]:
-        filehandle = stdin if mode == 'r' else stdout
+        filehandle = sys.stdin if mode == 'r' else sys.stdout
         return filehandle
     openfunc = builtins.open
     if filename.endswith('.gz'):
@@ -52,4 +54,4 @@ def plog(*args, **kwargs):
     if logstream is not None:
         print(*args, **kwargs, file=logstream)
     if logstream is None or teelog:
-        print(*args, **kwargs, file=stderr)
+        print(*args, **kwargs, file=sys.stderr)
