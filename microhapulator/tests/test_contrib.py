@@ -30,3 +30,19 @@ def test_contrib_bam():
     refr = data_file('default-panel.fasta.gz')
     n, *data = microhapulator.contrib.contrib(bamfile=bam, refrfasta=refr)
     assert n == 3
+
+
+def test_contrib_main(capsys):
+    bam = data_file('three-contrib-log.bam')
+    refr = data_file('default-panel.fasta.gz')
+    arglist = ['contrib', '-b', bam, '-r', refr]
+    args = microhapulator.cli.parse_args(arglist)
+    microhapulator.contrib.main(args)
+    out, err = capsys.readouterr()
+    assert '"min_num_contrib": 3' in out
+
+
+def test_no_op():
+    with pytest.raises(ValueError) as ve:
+        microhapulator.contrib.contrib()
+    assert 'must provide either genotype JSON or BAM and refr FASTA' in str(ve)

@@ -7,11 +7,9 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-from collections import defaultdict
 import json
 from math import ceil
 import microhapulator
-import pysam
 import sys
 
 
@@ -38,5 +36,7 @@ def main(args):
         'num_loci_max_alleles': nloci,
         'perc_loci_max_alleles': ploci,
     }
-    with microhapulator.open(args.out, 'w') as fh:
-        json.dump(data, fh, indent=4)
+    fh = microhapulator.open(args.out, 'w')
+    json.dump(data, fh, indent=4)
+    if fh != sys.stdout:
+        fh.close()
