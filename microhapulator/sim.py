@@ -82,10 +82,10 @@ def sim(popids, panel, refrfile, relaxed=False, hapseed=None, gtfile=None, hapfi
                 isscmd.extend(['--seed', str(seqseed)])
             if seqthreads:
                 isscmd.extend(['--cpus', str(seqthreads)])
-            microhapulator.logstream.flush()
             try:
+                microhapulator.logstream.flush()
                 fsync(microhapulator.logstream.fileno())
-            except OSError:  # pragma: no cover
+            except (AttributeError, OSError):  # pragma: no cover
                 pass
             if debug:
                 check_call(isscmd, stderr=microhapulator.logstream)

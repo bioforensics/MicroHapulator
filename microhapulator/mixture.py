@@ -10,11 +10,15 @@
 import microhapulator
 import numpy
 from string import ascii_letters, digits
+import sys
 
 
 def calc_n_reads_from_proportions(n, totalreads, prop):
     if prop is None:
         prop = [1.0 / n for _ in range(n)]
+    else:
+        if len(prop) != n:
+            raise ValueError('mismatch between contributor number and proportions')
     normprop = [x / sum(prop) for x in prop]
     return [int(totalreads * x) for x in normprop]
 
@@ -30,6 +34,8 @@ def mixture(individuals, panel, refr, relaxed=False, hapseeds=None, seqseeds=Non
         msg = 'number of individuals must match number of "--hap-seeds" and "--seq-seeds"'
         raise ValueError(msg)
     numreads = calc_n_reads_from_proportions(n, totalreads, proportions)
+    if 0 in numreads:
+        raise ValueError('specified proportions result in 0 reads for 1 or more individuals')
     readsignature = microhapulator.sim.new_signature()
     reads_sequenced = 0
     for indiv, hapseed, seqseed, nreads in zip(individuals, hapseeds, seqseeds, numreads):
@@ -53,6 +59,8 @@ def main(args=None):
         seqseeds=args.seq_seeds, seqthreads=args.seq_threads, totalreads=args.num_reads,
         proportions=args.proportions,
     )
-    with microhapulator.open(args.out, 'w') as fh:
-        for n, defline, sequence, qualities in simulator:
-            print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)
+    fh = microhapulator.open(args.out, 'w')
+    for n, defline, sequence, qualities in simulator:
+        print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)
+    if fh != sys.stdout:
+        fh.close()
