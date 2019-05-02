@@ -9,6 +9,7 @@
 
 # Core libraries
 import builtins
+from contextlib import contextmanager
 from gzip import open as gzopen
 import sys
 
@@ -36,17 +37,20 @@ logstream = None
 teelog = False
 
 
+@contextmanager
 def open(filename, mode):
     if mode not in ('r', 'w'):
         raise ValueError('invalid mode "{}"'.format(mode))
     if filename in ['-', None]:
         filehandle = sys.stdin if mode == 'r' else sys.stdout
-        return filehandle
-    openfunc = builtins.open
-    if filename.endswith('.gz'):
-        openfunc = gzopen
-        mode += 't'
-    return openfunc(filename, mode)
+        yield filehandle
+    else:
+        openfunc = builtins.open
+        if filename.endswith('.gz'):
+            openfunc = gzopen
+            mode += 't'
+        with openfunc(filename, mode) as filehandle:
+            yield filehandle
 
 
 def plog(*args, **kwargs):

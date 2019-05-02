@@ -47,7 +47,7 @@ def test_even_mixture(capsys):
     assert m == pytest.approx(500, abs=25)
 
 
-def test_uneven_mixture(capsys):
+def test_uneven_mixture(capfd):
     simulator = microhapulator.mixture.mixture(
         [['MHDBP000021'], ['MHDBP000009'], ['MHDBP000081']],
         ['MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017'],
@@ -55,7 +55,7 @@ def test_uneven_mixture(capsys):
     )
     for read in simulator:
         pass
-    terminal = capsys.readouterr()
+    terminal = capfd.readouterr()
     assert 'numreads=250' in terminal.err
     assert 'numreads=150' in terminal.err
     assert 'numreads=100' in terminal.err
