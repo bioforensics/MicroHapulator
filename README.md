@@ -51,9 +51,9 @@ Global arguments:
 ```
 
 
-## Demo
+## Demo: single-contributor sample
 
-```
+```bash
 # Grab sequences of microhap panel "beta"
 mhpl8r refr --out panel.fasta hg38.fasta beta
 
@@ -66,9 +66,23 @@ samtools index myreads.bam
 
 # Make genotype calls
 mhpl8r type --out genotype.json panel.fasta myreads.bam
+```
+
+
+## Demo: multiple-contributor sample
+
+```bash
+# Simulate 750000 reads from a mixture of 3 individuals (Finn, Mexican, and Punjabi) with uneven contribution
+mhpl8r mixture --indiv SA004049R --indiv SA004110G --indiv SA004240K --proportions 0.7 0.2 0.1 \
+    --num-reads 750000 --out mixture.fastq.gz hg38.fasta
+
+# Align reads and make genotype calls
+bwa mem hg38.fasta mixture.fastq.gz | samtools view -bS | samtools sort -o mixture.bam -
+samtools index mixture.bam
+mhpl8r type --out mix-genotype.json panel.fasta mixture.bam
 
 # Estimate number of contributors in the sample
-mhpl8r --json genotype.json
+mhpl8r contrib --json mix-genotype.json
 ```
 
 
