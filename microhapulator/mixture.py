@@ -59,8 +59,6 @@ def main(args=None):
         seqseeds=args.seq_seeds, seqthreads=args.seq_threads, totalreads=args.num_reads,
         proportions=args.proportions,
     )
-    fh = microhapulator.open(args.out, 'w')
-    for n, defline, sequence, qualities in simulator:
-        print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)
-    if fh != sys.stdout:
-        fh.close()
+    with microhapulator.open(args.out, 'w') as fh:
+        for n, defline, sequence, qualities in simulator:
+            print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)
