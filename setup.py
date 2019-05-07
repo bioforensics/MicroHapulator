@@ -23,10 +23,12 @@ setup(
     url='https://github.com/bioforensics/microhapdb',
     author='Daniel Standage',
     author_email='daniel.standage@nbacc.dhs.gov',
-    packages=['microhapulator'],
-    # package_data={
-    #     'microhapulator': ['microhapulator/data/*']
-    # },
+    packages=['microhapulator', 'microhapulator.cli', 'microhapulator.tests'],
+    package_data={
+        'microhapulator': [
+            'microhapulator/tests/data/*', 'microhapulator/tests/data/*/*'
+        ]
+    },
     include_package_data=True,
     install_requires=['pyfaidx', 'insilicoseq', 'numpy', 'microhapdb', 'happer'],
     entry_points={
