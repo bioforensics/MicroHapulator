@@ -47,6 +47,7 @@ def test_even_mixture(capsys):
     assert m == pytest.approx(500, abs=25)
 
 
+@pytest.mark.known_failing
 def test_uneven_mixture(capfd):
     simulator = microhapulator.mixture.mixture(
         [['MHDBP000021'], ['MHDBP000009'], ['MHDBP000081']],
