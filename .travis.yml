@@ -12,8 +12,8 @@ install:
     - pip install git+https://github.com/bioforensics/happer.git
     - pip install git+https://github.com/bioforensics/MicroHapDB.git
     - pip install .
-script:
     - mhpl8r getrefr --debug
+script:
     - make test
     - make style
 after_success:
