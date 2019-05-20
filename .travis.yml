@@ -13,7 +13,7 @@ install:
     - pip install git+https://github.com/bioforensics/MicroHapDB.git
     - pip install .
 script:
-    - mhpl8r getrefr
+    - mhpl8r getrefr --debug
     - make test
     - make style
 after_success:

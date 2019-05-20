@@ -47,7 +47,7 @@ def compute_refr_hash():
     return sha.hexdigest()
 
 
-def getrefr(infile=None):
+def getrefr(infile=None, debug=False):
     if infile is None:
         download_refr()
     else:
@@ -60,7 +60,12 @@ def getrefr(infile=None):
         raise ValueError('checksum failure')
     microhapulator.plog('[MicroHapulator::getrefr] Indexing reference')
     refr = pyfaidx.Fasta(microhapulator.package_file('hg38.fasta'))
+    if debug:
+        microhapulator.plog(
+            '[MicroHapulator::getrefr] Reference genome now in place at',
+            microhapulator.package_file('hg38.fasta')
+        )
 
 
 def main(args):
-    getrefr(args.filepath)
+    getrefr(args.filepath, debug=args.debug)
