@@ -1,6 +1,7 @@
 [![MicroHapulator build status][travisbadge]](https://travis-ci.org/bioforensics/MicroHapulator)
 [![Test coverage][codecovbadge]](https://codecov.io/github/bioforensics/MicroHapulator)
 [![BSD licensed][licensebadge]](https://github.com/bioforensics/MicroHapDB/blob/master/LICENSE.txt)
+[![install with bioconda][biocondabadge]](http://bioconda.github.io/recipes/microhapulator/README.html)
 
 # MicroHapulator
 
@@ -14,14 +15,13 @@ MicroHapulator relies on microhap annotations and population allele frequencies 
 
 ## Installation
 
-Installation with bioconda is pending.
-For now, install the following installation procedure is recommended.
+Installation with bioconda is recommended.
 
 ```
-pip install git+https://github.com/bioforensics/happer.git
-pip install git+https://github.com/bioforensics/MicroHapDB.git
-pip install git+https://github.com/bioforensics/MicroHapulator.git
+conda install -c bioconda microhapulator
 ```
+
+If you'd prefer to install with pip, see [.travis.yml](.travis.yml) and [setup.py](setup.py) for hints.
 
 
 ## Usage
@@ -89,3 +89,4 @@ mhpl8r contrib --json mix-genotype.json
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg
 [codecovbadge]: https://img.shields.io/codecov/c/github/bioforensics/MicroHapulator.svg
 [licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
+[biocondabadge]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
