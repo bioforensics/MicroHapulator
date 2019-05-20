@@ -10,7 +10,6 @@
 
 def subparser(subparsers):
     cli = subparsers.add_parser('getrefr')
-    cli.add_argument('--debug', action='store_true', help='debugging output')
     cli.add_argument('--path', action='store_true', help='print reference '
                      'file path and exit')
     cli.add_argument('filepath', nargs='?', help='path to a local copy of the '

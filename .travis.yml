@@ -13,6 +13,7 @@ install:
     - pip install git+https://github.com/bioforensics/MicroHapDB.git
     - pip install .
     - mhpl8r getrefr
+#     For some reason, on TravisCI there's some confusion between the installed package data path and the working package data path
     - bash -c 'ln -s $(mhpl8r getrefr --path)* microhapulator/data/'
 script:
     - make test
