@@ -58,6 +58,5 @@ def subparser(subparsers):
         'sequences in FASTA format to FILE'
     )
 
-    cli.add_argument('refr', help='reference genome file')
     cli.add_argument('popid', nargs='+', help='population ID(s)')
     cli._action_groups[1], cli._action_groups[-1] = cli._action_groups[-1], cli._action_groups[1]
