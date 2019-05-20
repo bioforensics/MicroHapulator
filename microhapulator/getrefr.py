@@ -68,4 +68,7 @@ def getrefr(infile=None, debug=False):
 
 
 def main(args):
+    if args.path:
+        print(microhapulator.package_file('hg38.fasta'))
+        return
     getrefr(args.filepath, debug=args.debug)
