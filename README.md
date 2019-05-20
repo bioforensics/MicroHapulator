@@ -21,7 +21,18 @@ Installation with bioconda is recommended.
 conda install -c bioconda microhapulator
 ```
 
-If you'd prefer to install with pip, see [.travis.yml](.travis.yml) and [setup.py](setup.py) for hints.
+> ***NOTE**: If you'd prefer to install with pip, see [.travis.yml](.travis.yml) and [setup.py](setup.py) for hints.*
+
+You must also "install" the GRCh38 human reference genome into a dedicated "package data" directory.
+
+```
+mhpl8r getrefr
+```
+
+By default, this grabs the reference genome directly from UCSC.
+If you have downloaded the reference genome previously, you can provide the file path to the `mhpl8r getrefr` command.
+
+
 
 
 ## Usage
@@ -40,7 +51,7 @@ Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
 subcommands listed below to see instructions for that operation.
 
 Subcommands:
-  subcmd             contrib, dist, mixture, refr, sim, type
+  subcmd             contrib, dist, getrefr, mixture, refr, sim, type
 
 Global arguments:
   -h, --help         show this help message and exit

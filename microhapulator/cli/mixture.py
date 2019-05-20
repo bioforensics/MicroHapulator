@@ -52,4 +52,3 @@ def subparser(subparsers):
         'FASTQ format to FILE; by default, reads are written to terminal '
         '(standard output)'
     )
-    cli.add_argument('refr', help='reference genome file')

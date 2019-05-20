@@ -16,7 +16,7 @@ from tempfile import NamedTemporaryFile
 
 
 def test_refr_simple():
-    seqindex = pyfaidx.Fasta('hg38.fasta')
+    seqindex = pyfaidx.Fasta(microhapulator.package_file('hg38.fasta'))
     seqiter = microhapulator.refr.get_seqs(['MHDBL000185'], seqindex)
     seqs = list(seqiter)
     assert len(seqs) == 1
@@ -28,7 +28,7 @@ def test_refr_simple():
 def test_refr_cli_simple():
     with NamedTemporaryFile() as outfile:
         arglist = [
-            'refr', '--min-length', '250', '--out', outfile.name, 'hg38.fasta',
+            'refr', '--min-length', '250', '--out', outfile.name,
             'mh06KK-008', 'SI664615C', 'MHDBL000031'
         ]
         microhapulator.__main__.main(arglist)

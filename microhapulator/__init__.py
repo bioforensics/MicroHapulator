@@ -11,6 +11,8 @@
 import builtins
 from contextlib import contextmanager
 from gzip import open as gzopen
+import os
+from pkg_resources import resource_filename
 import sys
 
 # Internal modules
@@ -20,6 +22,7 @@ from microhapulator import panel
 # Subcommands and command-line interface
 from microhapulator import contrib
 from microhapulator import dist
+from microhapulator import getrefr
 from microhapulator import mixture
 from microhapulator import refr
 from microhapulator import sim
@@ -35,6 +38,12 @@ del get_versions
 
 logstream = None
 teelog = False
+
+
+def package_file(path):
+    pathparts = path.split('/')
+    relpath = os.path.join('data', *pathparts)
+    return resource_filename('microhapulator', relpath)
 
 
 @contextmanager

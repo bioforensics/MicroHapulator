@@ -22,7 +22,7 @@ def test_main():
             'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
             '--num-reads', '500', '--haploseq', tempdir + '/haplo.fasta',
             '--genotype', tempdir + '/genotype.bed', '--hap-seed', '293847',
-            '--seq-seed', '123454321', 'hg38.fasta', 'MHDBP000004'
+            '--seq-seed', '123454321', 'MHDBP000004'
         ]
         args = microhapulator.cli.parse_args(arglist)
         microhapulator.sim.main(args)
@@ -40,7 +40,7 @@ def test_main_no_haploseq():
         arglist = [
             'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
             '--num-reads', '250', '--hap-seed', '1234', '--seq-seed', '5678',
-            '--seq-threads', '2', 'hg38.fasta', 'MHDBP000004',
+            '--seq-threads', '2', 'MHDBP000004',
         ]
         args = microhapulator.cli.parse_args(arglist)
         microhapulator.sim.main(args)
@@ -59,7 +59,7 @@ def test_main_relaxed(relaxed, testfile):
         arglist = [
             'sim', '--panel', 'MHDBL000013', 'MHDBL000212', 'MHDBL000197', '--num-reads', '100',
             '--hap-seed', '54321', '--seq-seed', '24680', '--out', tempdir + '/reads.fastq',
-            'hg38.fasta', 'MHDBP000003',
+            'MHDBP000003',
         ]
         args = microhapulator.cli.parse_args(arglist)
         args.relaxed = relaxed
@@ -74,7 +74,7 @@ def test_main_no_seeds():
     try:
         arglist = [
             'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
-            '--num-reads', '200', '--seq-threads', '1', 'hg38.fasta', 'MHDBP000004',
+            '--num-reads', '200', '--seq-threads', '1', 'MHDBP000004',
         ]
         args = microhapulator.cli.parse_args(arglist)
         microhapulator.sim.main(args)
@@ -89,7 +89,7 @@ def test_main_bad_panel():
     with tempfile.NamedTemporaryFile(suffix='fq.gz') as outfile:
         arglist = [
             'sim', '--panel', 'DUUUUDE', 'SWEEEET', '--num-reads', '10',
-            '-o', outfile.name, 'hg38.fasta', 'MHDBP000004'
+            '-o', outfile.name, 'MHDBP000004'
         ]
         args = microhapulator.cli.parse_args(arglist)
         with pytest.raises(ValueError) as ve:

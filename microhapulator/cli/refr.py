@@ -25,9 +25,6 @@ def subparser(subparsers):
         'in length'
     )
     cli.add_argument(
-        'refrfasta', help='reference genome file'
-    )
-    cli.add_argument(
         'panel', nargs='*', help='list of MicroHapDB locus IDs; by default, a '
         'panel of 22 ALFRED microhaplotype loci is used'
     )
