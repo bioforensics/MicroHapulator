@@ -9,7 +9,13 @@
 
 from collections import defaultdict
 import microhapulator
+import os.path
 import pysam
+import re
+
+
+class MissingBAMIndexError(ValueError):
+    pass
 
 
 def parse_variant_offsets_from_fasta_headers(fasta):
@@ -24,10 +30,22 @@ def parse_variant_offsets_from_fasta_headers(fasta):
     return offsets
 
 
+def check_index(bamfile):
+    index1 = bamfile + '.bai'
+    index2 = re.sub(r'.bam$', '.bai', bamfile)
+    for testfile in (index1, index2):
+        if os.path.isfile(testfile):
+            break
+    else:
+        message = 'Please index "{bam:s}" with "samtools index"'.format(bam=bamfile)
+        raise MissingBAMIndexError(message)
+
+
 def observe_genotypes(bamfile, refrfasta):
     totaldiscarded = 0
     with microhapulator.open(refrfasta, 'r') as fh:
         offsets = parse_variant_offsets_from_fasta_headers(fh)
+    check_index(bamfile)
     bam = pysam.AlignmentFile(bamfile, 'rb')
     for locusid in sorted(offsets):
         discarded = 0
