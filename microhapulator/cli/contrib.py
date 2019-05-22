@@ -20,8 +20,8 @@ def subparser(subparsers):
         ' and `--bam` flags'
     )
     cli.add_argument(
-        '-r', '--refr', metavar='FILE', help='reference genome file in FASTA '
-        'format'
+        '-r', '--refr', metavar='FILE', help='microhap locus sequences in '
+        'Fasta format'
     )
     cli.add_argument(
         '-b', '--bam', metavar='FILE', help='aligned and sorted reads in BAM '

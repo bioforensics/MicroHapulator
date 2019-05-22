@@ -60,12 +60,12 @@ def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
     return genotype
 
 
-def sim(popids, panel, refrfile, relaxed=False, hapseed=None, gtfile=None, hapfile=None,
+def sim(popids, panel, relaxed=False, hapseed=None, gtfile=None, hapfile=None,
         seqseed=None, seqthreads=2, numreads=500000, readsignature=None, readindex=0, debug=False):
     genotype = simulate_genotype(
         popids, panel, hapseed=hapseed, relaxed=relaxed, outfile=gtfile
     )
-    seqindex = Fastaidx(refrfile)
+    seqindex = Fastaidx(microhapulator.package_file('hg38.fasta'))
     mutator = mutate(genotype.seqstream(seqindex), genotype.bedstream)
     with optional_outfile(hapfile) as fh:
         for defline, sequence in mutator:
@@ -112,7 +112,7 @@ def main(args=None):
     if args is None:  # pragma: no cover
         args = get_parser().parse_args()
     simulator = sim(
-        args.popid, args.panel, args.refr, relaxed=args.relaxed, hapseed=args.hap_seed,
+        args.popid, args.panel, relaxed=args.relaxed, hapseed=args.hap_seed,
         gtfile=args.genotype, hapfile=args.haploseq, seqseed=args.seq_seed,
         seqthreads=args.seq_threads, numreads=args.num_reads,
     )

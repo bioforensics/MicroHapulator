@@ -40,7 +40,7 @@ def test_even_mixture(capsys):
     indiv_pops = [(numpy.random.choice(popids), numpy.random.choice(popids)) for _ in range(n)]
     panel = microhapulator.panel.panel_allpops()[:5]
     simulator = microhapulator.mixture.mixture(
-        indiv_pops, panel, 'hg38.fasta', totalreads=500, seqthreads=2,
+        indiv_pops, panel, totalreads=500, seqthreads=2,
     )
     for m, read in enumerate(simulator):
         pass
@@ -52,7 +52,7 @@ def test_uneven_mixture(capfd):
     simulator = microhapulator.mixture.mixture(
         [['MHDBP000021'], ['MHDBP000009'], ['MHDBP000081']],
         ['MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017'],
-        'hg38.fasta', seqthreads=2, totalreads=500, proportions=[0.5, 0.3, 0.2]
+        seqthreads=2, totalreads=500, proportions=[0.5, 0.3, 0.2]
     )
     for read in simulator:
         pass
@@ -68,21 +68,21 @@ def test_mixture_failure_modes():
 
     with pytest.raises(ValueError) as ve:
         simulator = microhapulator.mixture.mixture(
-            indivs, panel, 'hg38.fasta', totalreads=500, hapseeds=[42, 1776]
+            indivs, panel, totalreads=500, hapseeds=[42, 1776]
         )
         list(simulator)
     assert 'individuals must match number of "--hap-seeds" and "--seq-seeds"' in str(ve)
 
     with pytest.raises(ValueError) as ve:
         simulator = microhapulator.mixture.mixture(
-            indivs, panel, 'hg38.fasta', totalreads=500, proportions=[0.5, 0.3, 0.1, 0.1]
+            indivs, panel, totalreads=500, proportions=[0.5, 0.3, 0.1, 0.1]
         )
         list(simulator)
     assert 'mismatch between contributor number and proportions' in str(ve)
 
     with pytest.raises(ValueError) as ve:
         simulator = microhapulator.mixture.mixture(
-            indivs, panel, 'hg38.fasta', totalreads=500, proportions=[1, 100, 10000]
+            indivs, panel, totalreads=500, proportions=[1, 100, 10000]
         )
         list(simulator)
     assert 'specified proportions result in 0 reads for 1 or more individuals' in str(ve)
@@ -93,7 +93,7 @@ def test_mixture_main(capsys):
         'mixture', '--indiv', 'MHDBP000052', '--indiv', 'MHDBP000052',
         '--panel', 'MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017',
         '--proportions', '0.8', '0.2', '--num-reads', '500', '--seq-threads', '2',
-        '--hap-seeds', '3579', '2468', '--seq-seeds', '42', '1776', '--', 'hg38.fasta'
+        '--hap-seeds', '3579', '2468', '--seq-seeds', '42', '1776',
     ]
     args = microhapulator.cli.parse_args(arglist)
     microhapulator.mixture.main(args)
