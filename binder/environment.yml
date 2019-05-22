@@ -1,0 +1,8 @@
+name: microhapulator-demo
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - microhapulator
+  - bwa
+  - samtools

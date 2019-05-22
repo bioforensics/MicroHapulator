@@ -33,6 +33,11 @@ By default, this grabs the reference genome directly from UCSC.
 If you have downloaded the reference genome previously, you can provide the file path to the `mhpl8r getrefr` command.
 
 
+## Interactive demo
+
+Click the badge below to launch a quick interactive demo of MicroHapulator.
+
+[![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo.ipynb)
 
 
 ## Usage
@@ -62,42 +67,8 @@ Global arguments:
 ```
 
 
-## Demo: single-contributor sample
-
-```bash
-# Grab sequences of microhap panel "beta"
-mhpl8r refr --out panel.fasta hg38.fasta beta
-
-# Simulate 100000 reads from a European American individual
-mhpl8r sim --panel beta --num-reads 100000 --out myreads.fastq hg38.fasta SA004250L
-
-# Align reads to reference genome
-bwa mem hg38.fasta myreads.fastq | samtools view -bS | samtools sort -o myreads.bam -
-samtools index myreads.bam
-
-# Make genotype calls
-mhpl8r type --out genotype.json panel.fasta myreads.bam
-```
-
-
-## Demo: multiple-contributor sample
-
-```bash
-# Simulate 750000 reads from a mixture of 3 individuals (Finn, Mexican, and Punjabi) with uneven contribution
-mhpl8r mixture --indiv SA004049R --indiv SA004110G --indiv SA004240K --proportions 0.7 0.2 0.1 \
-    --num-reads 750000 --out mixture.fastq.gz hg38.fasta
-
-# Align reads and make genotype calls
-bwa mem hg38.fasta mixture.fastq.gz | samtools view -bS | samtools sort -o mixture.bam -
-samtools index mixture.bam
-mhpl8r type --out mix-genotype.json panel.fasta mixture.bam
-
-# Estimate number of contributors in the sample
-mhpl8r contrib --json mix-genotype.json
-```
-
-
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg
 [codecovbadge]: https://img.shields.io/codecov/c/github/bioforensics/MicroHapulator.svg
 [licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
 [biocondabadge]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
+[binderbadge]: https://mybinder.org/badge_logo.svg
