@@ -71,6 +71,12 @@ class SimulatedGenotype(object):
         for locusid, context in sorted(self._contexts.items()):
             yield context.defline(), context.sequence(seqindex, prechr=prechr)
 
+    def loci(self):
+        return set(list(self._data))
+
+    def alleles(self, locusid):
+        return set([self._data[locusid][i] for i in range(self.ploidy)])
+
     @property
     def bedstream(self):
         for locusid in sorted(self._data):
@@ -152,7 +158,13 @@ class ObservedGenotype(object):
         else:
             return json.dump(self.data, file, indent=4, sort_keys=True)
 
-    def alleles(self):
+    def loci(self):
+        return set(list(self.data))
+
+    def alleles(self, locusid):
+        return set(self.data[locusid]['genotype'])
+
+    def all_alleles(self):
         a = dict()
         for locusid in sorted(self.data):
             a[locusid] = ':'.join(self.data[locusid]['genotype'])

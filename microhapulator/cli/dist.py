@@ -15,8 +15,8 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
-        'gt1', help='genotype data (in JSON format) for individual 1'
+        '--bed', nargs='*', default=[], help='simulated genotype data in BED format'
     )
     cli.add_argument(
-        'gt2', help='genotype data (in JSON format) for individual 2'
+        '--json', nargs='*', default=[], help='observed genotype data in JSON format'
     )
