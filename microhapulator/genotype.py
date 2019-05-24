@@ -104,6 +104,18 @@ class SimulatedGenotype(object):
             return self._data == other._data
 
 
+def merge_simulated_genotypes(genotypes):
+    ploidy = 2 * len(genotypes)
+    gt = SimulatedGenotype(ploidy=ploidy)
+    offset = 0
+    for genotype in genotypes:
+        for locusid, allele_list in sorted(genotype._data.items()):
+            gt.add(offset + 0, locusid, allele_list[0])
+            gt.add(offset + 1, locusid, allele_list[1])
+        offset += 2
+    return gt
+
+
 class ObservedGenotype(object):
     def __init__(self, filename=None):
         self.data = dict()
