@@ -18,8 +18,10 @@ class SimulatedGenotype(object):
     """Genotype represented by phased alleles at a number of specified loci.
 
     Alleles are stored in a dictionary, with microhap locus ID/name as the key
-    and a list as the value. Each list contains 2 items, the haplotype/phase 0
-    allele and the hap/phase 1 allele.
+    and a list as the value. Typically each list contains 2 items, the
+    haplotype/phase 0 allele and the hap/phase 1 allele. However, if the
+    genotype represents a mixture there may be more than 2 haplotypes, as
+    indicated by the `ploidy` parameter.
 
     >>> gt = SimulatedGenotype()
     >>> gt.add(0, 'mh21KK-315', 'G,C,T')
@@ -35,21 +37,22 @@ class SimulatedGenotype(object):
     mh21KK-316 179     180     G|G
     mh21KK-316 242     243     T|C
     """
-    def __init__(self, frombed=None):
-        self._data = defaultdict(lambda: [None] * 2)
+    def __init__(self, frombed=None, ploidy=2):
+        self.ploidy = ploidy
+        self._data = defaultdict(lambda: [None] * ploidy)
         self._contexts = dict()
         if frombed:
             self._populate(frombed)
 
     def _populate(self, bedstream):
-        locus_alleles = defaultdict(lambda: [list(), list()])
+        locus_alleles = defaultdict(lambda: [list() for _ in range(self.ploidy)])
         for line in bedstream:
             line = line.strip()
             if line == '':
                 continue
             locusid, start, end, allelestr = line.split('\t')
             alleles = allelestr.split('|')
-            assert len(alleles) == 2
+            assert len(alleles) == self.ploidy
             for i, a in enumerate(alleles):
                 locus_alleles[locusid][i].append(a)
         for locusid, allele_list in locus_alleles.items():
@@ -57,7 +60,7 @@ class SimulatedGenotype(object):
                 self.add(i, locusid, ','.join(allele))
 
     def add(self, hapid, locusid, allele):
-        assert hapid in (0, 1)
+        assert hapid in range(self.ploidy)
         self._data[locusid][hapid] = allele
         if locusid not in self._contexts:
             locus = microhapdb.id_xref(locusid).iloc[0]
@@ -72,12 +75,11 @@ class SimulatedGenotype(object):
     def bedstream(self):
         for locusid in sorted(self._data):
             context = self._contexts[locusid]
-            alleles_0 = self._data[locusid][0].split(',')
-            alleles_1 = self._data[locusid][1].split(',')
+            allele_lists = [self._data[locusid][i].split(',') for i in range(self.ploidy)]
             coords = microhapdb.allele_positions(locusid)
-            for a0, a1, coord in zip(alleles_0, alleles_1, coords):
+            for coord, *alleles in zip(coords, *allele_lists):
                 localcoord = context.global_to_local(coord)
-                allelestr = a0 + '|' + a1
+                allelestr = '|'.join(alleles)
                 yield '\t'.join(
                     (locusid, str(localcoord), str(localcoord + 1), allelestr)
                 )
