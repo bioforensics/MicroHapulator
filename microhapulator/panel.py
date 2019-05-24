@@ -12,6 +12,7 @@ from math import ceil
 import microhapdb
 import microhapulator
 from numpy.random import choice
+import pandas
 
 
 class LocusContext(object):
@@ -79,6 +80,8 @@ def panel_loci(panellist):
         loci = panel_alpha()
     elif panellist == ['beta']:
         loci = panel_beta()
+    elif panellist == ['usa']:
+        loci = panel_usa()
     elif panellist == ['allpops']:
         loci = panel_allpops()
     else:
@@ -152,6 +155,31 @@ def panel_beta():
         locusids.update(testloci)
     panel = loci[loci.ID.isin(locusids)].sort_values('AvgAe').head(50)
     return list(panel.ID)
+
+
+def panel_usa():
+    '''Loci with frequency data for populations in a sample USA demographic.
+
+    Panel containing the top 100 loci (ranked by average Ae) for which
+    population allele frequency data is available for all 19 ALFRED populations
+    in a rough simulation of USA demographics.
+    '''
+    demo_file = microhapulator.package_file('usa-demographics.tsv')
+    usa_demo = pandas.read_csv(demo_file, sep='\t')
+
+    prelim_panel = set()
+    pops = set(usa_demo.Population)
+    for locusid in microhapdb.loci[microhapdb.loci.Source == "ALFRED"].ID.unique():
+        testpops = microhapdb.frequencies[
+            microhapdb.frequencies.Locus == locusid
+        ].Population.unique()
+        if pops < set(testpops):
+            prelim_panel.add(locusid)
+
+    final_panel = microhapdb.loci[
+        microhapdb.loci.ID.isin(prelim_panel)
+    ].sort_values('AvgAe', ascending=False).head(100)
+    return list(final_panel.ID)
 
 
 def panel_allpops():
