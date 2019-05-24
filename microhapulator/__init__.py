@@ -9,7 +9,10 @@
 
 # Core libraries
 import builtins
+from contextlib import contextmanager
 from gzip import open as gzopen
+import os
+from pkg_resources import resource_filename
 import sys
 
 # Internal modules
@@ -19,6 +22,7 @@ from microhapulator import panel
 # Subcommands and command-line interface
 from microhapulator import contrib
 from microhapulator import dist
+from microhapulator import getrefr
 from microhapulator import mixture
 from microhapulator import refr
 from microhapulator import sim
@@ -36,17 +40,26 @@ logstream = None
 teelog = False
 
 
+def package_file(path):
+    pathparts = path.split('/')
+    relpath = os.path.join('data', *pathparts)
+    return resource_filename('microhapulator', relpath)
+
+
+@contextmanager
 def open(filename, mode):
     if mode not in ('r', 'w'):
         raise ValueError('invalid mode "{}"'.format(mode))
     if filename in ['-', None]:
         filehandle = sys.stdin if mode == 'r' else sys.stdout
-        return filehandle
-    openfunc = builtins.open
-    if filename.endswith('.gz'):
-        openfunc = gzopen
-        mode += 't'
-    return openfunc(filename, mode)
+        yield filehandle
+    else:
+        openfunc = builtins.open
+        if filename.endswith('.gz'):
+            openfunc = gzopen
+            mode += 't'
+        with openfunc(filename, mode) as filehandle:
+            yield filehandle
 
 
 def plog(*args, **kwargs):

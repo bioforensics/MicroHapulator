@@ -23,7 +23,7 @@ def calc_n_reads_from_proportions(n, totalreads, prop):
     return [int(totalreads * x) for x in normprop]
 
 
-def mixture(individuals, panel, refr, relaxed=False, hapseeds=None, seqseeds=None,
+def mixture(individuals, panel, relaxed=False, hapseeds=None, seqseeds=None,
             seqthreads=1, totalreads=1000000, proportions=None):
     n = len(individuals)
     if hapseeds is None:
@@ -42,7 +42,7 @@ def mixture(individuals, panel, refr, relaxed=False, hapseeds=None, seqseeds=Non
         message = 'Individual population={pop} numreads={n}'.format(pop=','.join(indiv), n=nreads)
         microhapulator.plog('[MicroHapulator::mixture]', message)
         simulator = microhapulator.sim.sim(
-            indiv, panel, refr, relaxed=relaxed, hapseed=hapseed, seqseed=seqseed,
+            indiv, panel, relaxed=relaxed, hapseed=hapseed, seqseed=seqseed,
             seqthreads=seqthreads, numreads=nreads, readsignature=readsignature,
             readindex=reads_sequenced,
         )
@@ -55,12 +55,10 @@ def main(args=None):
     if args is None:  # pragma: no cover
         args = get_parser().parse_args()
     simulator = mixture(
-        args.indiv, args.panel, args.refr, relaxed=args.relaxed, hapseeds=args.hap_seeds,
+        args.indiv, args.panel, relaxed=args.relaxed, hapseeds=args.hap_seeds,
         seqseeds=args.seq_seeds, seqthreads=args.seq_threads, totalreads=args.num_reads,
         proportions=args.proportions,
     )
-    fh = microhapulator.open(args.out, 'w')
-    for n, defline, sequence, qualities in simulator:
-        print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)
-    if fh != sys.stdout:
-        fh.close()
+    with microhapulator.open(args.out, 'w') as fh:
+        for n, defline, sequence, qualities in simulator:
+            print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)

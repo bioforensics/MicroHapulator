@@ -15,10 +15,11 @@ import pytest
 
 def test_microhapulator_open():
     thefile = data_file('three-loci-refr.fasta')
-    filehandle = microhapulator.open(thefile, 'r')
-    filecontents = filehandle.read()
-    assert len(filecontents.strip().split('\n')) == 6
+    with microhapulator.open(thefile, 'r') as filehandle:
+        filecontents = filehandle.read()
+        assert len(filecontents.strip().split('\n')) == 6
 
     with pytest.raises(ValueError) as ve:
-        filehandle = microhapulator.open(thefile, 'p')
+        with microhapulator.open(thefile, 'p') as filehandle:
+            pass
     assert 'invalid mode "p"' in str(ve)

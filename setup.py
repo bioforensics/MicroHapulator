@@ -17,16 +17,19 @@ setup(
     name='microhapulator',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description='Simulator for microhaplotype sequences',
+    description='Software package for simulating and analyzing microhaplotype sequence data',
     long_description=longdesc,
     long_description_content_type='text/markdown',
-    url='https://github.com/bioforensics/microhapdb',
+    url='https://github.com/bioforensics/microhapulator',
     author='Daniel Standage',
     author_email='daniel.standage@nbacc.dhs.gov',
-    packages=['microhapulator'],
-    # package_data={
-    #     'microhapulator': ['microhapulator/data/*']
-    # },
+    packages=['microhapulator', 'microhapulator.cli', 'microhapulator.tests'],
+    package_data={
+        'microhapulator': [
+            'microhapulator/data/*', 'microhapulator/tests/data/*',
+            'microhapulator/tests/data/*/*'
+        ]
+    },
     include_package_data=True,
     install_requires=['pyfaidx', 'insilicoseq', 'numpy', 'microhapdb', 'happer'],
     entry_points={
@@ -37,6 +40,7 @@ setup(
         'Framework :: IPython',
         'Framework :: Jupyter',
         'Intended Audience :: Science/Research',
+        'Intended Audience :: Legal Industry',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 3',
         'Topic : Scientific/Engineering :: Bio-Informatics',

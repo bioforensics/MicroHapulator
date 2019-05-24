@@ -36,7 +36,5 @@ def main(args):
         'num_loci_max_alleles': nloci,
         'perc_loci_max_alleles': ploci,
     }
-    fh = microhapulator.open(args.out, 'w')
-    json.dump(data, fh, indent=4)
-    if fh != sys.stdout:
-        fh.close()
+    with microhapulator.open(args.out, 'w') as fh:
+        json.dump(data, fh, indent=4)

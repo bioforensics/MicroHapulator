@@ -1,6 +1,7 @@
 [![MicroHapulator build status][travisbadge]](https://travis-ci.org/bioforensics/MicroHapulator)
 [![Test coverage][codecovbadge]](https://codecov.io/github/bioforensics/MicroHapulator)
 [![BSD licensed][licensebadge]](https://github.com/bioforensics/MicroHapDB/blob/master/LICENSE.txt)
+[![install with bioconda][biocondabadge]](http://bioconda.github.io/recipes/microhapulator/README.html)
 
 # MicroHapulator
 
@@ -14,14 +15,29 @@ MicroHapulator relies on microhap annotations and population allele frequencies 
 
 ## Installation
 
-Installation with bioconda is pending.
-For now, install the following installation procedure is recommended.
+Installation with bioconda is recommended.
 
 ```
-pip install git+https://github.com/bioforensics/happer.git
-pip install git+https://github.com/bioforensics/MicroHapDB.git
-pip install git+https://github.com/bioforensics/MicroHapulator.git
+conda install -c bioconda microhapulator
 ```
+
+> ***NOTE**: If you'd prefer to install with pip, see [.travis.yml](.travis.yml) and [setup.py](setup.py) for hints.*
+
+You must also "install" the GRCh38 human reference genome into a dedicated "package data" directory.
+
+```
+mhpl8r getrefr
+```
+
+By default, this grabs the reference genome directly from UCSC.
+If you have downloaded the reference genome previously, you can provide the file path to the `mhpl8r getrefr` command.
+
+
+## Interactive demo
+
+Click the badge below to launch a quick interactive demo of MicroHapulator.
+
+[![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo.ipynb)
 
 
 ## Usage
@@ -40,7 +56,7 @@ Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
 subcommands listed below to see instructions for that operation.
 
 Subcommands:
-  subcmd             contrib, dist, mixture, refr, sim, type
+  subcmd             contrib, dist, getrefr, mixture, refr, sim, type
 
 Global arguments:
   -h, --help         show this help message and exit
@@ -51,27 +67,8 @@ Global arguments:
 ```
 
 
-## Demo
-
-```
-# Grab sequences of microhap panel "beta"
-mhpl8r refr --out panel.fasta hg38.fasta beta
-
-# Simulate 100000 reads from a European American individual
-mhpl8r sim --panel beta --num-reads 100000 --out myreads.fastq hg38.fasta SA004250L
-
-# Align reads to reference genome
-bwa mem hg38.fasta myreads.fastq | samtools view -bS | samtools sort -o myreads.bam -
-samtools index myreads.bam
-
-# Make genotype calls
-mhpl8r type --out genotype.json panel.fasta myreads.bam
-
-# Estimate number of contributors in the sample
-mhpl8r --json genotype.json
-```
-
-
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg
 [codecovbadge]: https://img.shields.io/codecov/c/github/bioforensics/MicroHapulator.svg
 [licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
+[biocondabadge]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
+[binderbadge]: https://mybinder.org/badge_logo.svg

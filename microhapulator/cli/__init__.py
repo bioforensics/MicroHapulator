@@ -13,6 +13,7 @@ import microhapulator
 from sys import stderr
 from . import contrib
 from . import dist
+from . import getrefr
 from . import mixture
 from . import refr
 from . import sim
@@ -21,6 +22,7 @@ from . import type
 mains = {
     'contrib': microhapulator.contrib.main,
     'dist': microhapulator.dist.main,
+    'getrefr': microhapulator.getrefr.main,
     'mixture': microhapulator.mixture.main,
     'refr': microhapulator.refr.main,
     'sim': microhapulator.sim.main,
@@ -30,6 +32,7 @@ mains = {
 subparser_funcs = {
     'contrib': contrib.subparser,
     'dist': dist.subparser,
+    'getrefr': getrefr.subparser,
     'mixture': mixture.subparser,
     'refr': refr.subparser,
     'sim': sim.subparser,

@@ -10,6 +10,7 @@
 import json
 import microhapulator
 from microhapulator.tests import data_file
+from microhapulator.type import MissingBAMIndexError
 import pytest
 from tempfile import NamedTemporaryFile
 
@@ -22,6 +23,14 @@ def test_type_simple():
     testgt = microhapulator.genotype.ObservedGenotype(filename=testgtfile)
     assert gt.data == testgt.data
     assert gt.dump() == testgt.dump()
+
+
+def test_type_missing_bam_index():
+    bam = data_file('three-contrib-log-link.bam')
+    fasta = data_file('default-panel.fasta.gz')
+    with pytest.raises(MissingBAMIndexError) as ie:
+        gt = microhapulator.type.type(bam, fasta)
+    assert 'Please index' in str(ie)
 
 
 def test_type_cli_simple():
