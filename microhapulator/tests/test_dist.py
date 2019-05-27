@@ -32,7 +32,7 @@ def test_dist_gujarati(gt1, gt2, dist):
 def test_dist_cli():
     with NamedTemporaryFile() as outfile:
         arglist = [
-            'dist', '--out', outfile.name, '--json', data_file('gujarati-ind2-gt.json'),
+            'dist', '--out', outfile.name, '--obs', data_file('gujarati-ind2-gt.json'),
             data_file('gujarati-ind3-gt.json')
         ]
         args = microhapulator.cli.parse_args(arglist)
