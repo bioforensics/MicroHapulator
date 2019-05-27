@@ -33,6 +33,14 @@ def test_sim_genotype_roundtrip():
     assert testgenotype == genotype
 
 
+def test_alleles():
+    with microhapulator.open(data_file('gttest.bed.gz'), 'r') as fh:
+        simgt = SimulatedGenotype(frombed=fh)
+    obsgt = ObservedGenotype(filename=data_file('gttest.json'))
+    assert simgt.alleles('BoGuSlOcUs') is None
+    assert obsgt.alleles('BoGuSlOcUs') is None
+
+
 def test_sim_obs_genotype_equal():
     with microhapulator.open(data_file('gttest.bed.gz'), 'r') as fh:
         simgt = SimulatedGenotype(frombed=fh)

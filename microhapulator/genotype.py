@@ -168,12 +168,6 @@ class ObservedGenotype(object):
             return None
         return set(self.data[locusid]['genotype'])
 
-    def all_alleles(self):
-        a = dict()
-        for locusid in sorted(self.data):
-            a[locusid] = ':'.join(self.data[locusid]['genotype'])
-        return a
-
     def __eq__(self, other):
         if type(other) != type(self) and type(other) != SimulatedGenotype:
             return False

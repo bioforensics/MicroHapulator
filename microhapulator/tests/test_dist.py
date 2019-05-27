@@ -73,3 +73,12 @@ def test_dist_cli():
         microhapulator.dist.main(args)
         with open(outfile.name, 'r') as fh:
             assert json.load(fh) == {"hamming_distance": 3}
+
+
+@pytest.mark.parametrize('nargs', [1, 3, 4])
+def test_dist_cli_bad(nargs):
+    arglist = ['dist', '--obs'] + [data_file('gujarati-ind2-gt.json')] * nargs
+    args = microhapulator.cli.parse_args(arglist)
+    with pytest.raises(ValueError) as ve:
+        microhapulator.dist.main(args)
+    assert 'the number of BED and/or JSON files must be 2!' in str(ve)
