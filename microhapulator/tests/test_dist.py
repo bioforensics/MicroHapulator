@@ -29,6 +29,21 @@ def test_dist_gujarati(gt1, gt2, dist):
     assert microhapulator.dist.dist(g1, g2) == dist
 
 
+@pytest.mark.parametrize('hdist', [0, 1, 2])
+def test_dist_bed_vs_json(hdist):
+    with NamedTemporaryFile() as outfile:
+        filename = 'murica/z-obs-genotype-dist{:d}.json'.format(hdist)
+        arglist = [
+            'dist', '--out', outfile.name, '--obs', data_file(filename),
+            '--sim', data_file('murica/z-sim-genotype.bed')
+        ]
+        args = microhapulator.cli.parse_args(arglist)
+        microhapulator.dist.main(args)
+        with open(outfile.name, 'r') as fh:
+            assert json.load(fh) == {"hamming_distance": hdist}
+
+
+
 def test_dist_cli():
     with NamedTemporaryFile() as outfile:
         arglist = [

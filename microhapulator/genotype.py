@@ -75,6 +75,8 @@ class SimulatedGenotype(object):
         return set(list(self._data))
 
     def alleles(self, locusid):
+        if locusid not in self._data:
+            return None
         return set([self._data[locusid][i] for i in range(self.ploidy)])
 
     @property
@@ -162,6 +164,8 @@ class ObservedGenotype(object):
         return set(list(self.data))
 
     def alleles(self, locusid):
+        if locusid not in self.data:
+            return None
         return set(self.data[locusid]['genotype'])
 
     def all_alleles(self):

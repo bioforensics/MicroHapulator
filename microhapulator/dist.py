@@ -16,11 +16,8 @@ def dist(gt1, gt2):
     allloci = set(gt1.loci()).union(gt2.loci())
     hammdist = 0
     for locus in allloci:
-        allele1, allele2 = None, None
-        if locus in gt1.data:
-            allele1 = gt1.alleles(locus)
-        if locus in gt2.data:
-            allele2 = gt2.alleles(locus)
+        allele1 = gt1.alleles(locus)
+        allele2 = gt2.alleles(locus)
         if allele1 != allele2:
             hammdist += 1
     return hammdist
