@@ -38,7 +38,7 @@ class SimulatedGenotype(object):
     mh21KK-316 242     243     T|C
     """
     def __init__(self, frombed=None, ploidy=2):
-        self.ploidy = ploidy
+        self.ploidy = int(ploidy)
         self._data = defaultdict(lambda: [None] * ploidy)
         self._contexts = dict()
         if frombed:
@@ -52,7 +52,7 @@ class SimulatedGenotype(object):
                 continue
             locusid, start, end, allelestr = line.split('\t')
             alleles = allelestr.split('|')
-            assert len(alleles) == self.ploidy
+            assert len(alleles) == self.ploidy, (len(alleles), self.ploidy)
             for i, a in enumerate(alleles):
                 locus_alleles[locusid][i].append(a)
         for locusid, allele_list in locus_alleles.items():

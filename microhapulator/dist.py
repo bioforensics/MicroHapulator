@@ -29,7 +29,7 @@ def main(args):
     genotypes = list()
     for bedfile in args.sim:
         with microhapulator.open(bedfile, 'r') as fh:
-            gt = SimulatedGenotype(frombed=fh)
+            gt = SimulatedGenotype(frombed=fh, ploidy=args.ploidy)
         genotypes.append(gt)
     for jsonfile in args.obs:
         gt = ObservedGenotype(filename=jsonfile)

@@ -29,6 +29,26 @@ def test_dist_gujarati(gt1, gt2, dist):
     assert microhapulator.dist.dist(g1, g2) == dist
 
 
+def test_dist_log_mixture():
+    f1 = data_file('murica/y-obs-genotype.json')
+    g1 = microhapulator.genotype.ObservedGenotype(f1)
+    f2 = data_file('murica/y-sim-genotype.bed')
+    with microhapulator.open(f2, 'r') as fh:
+        g2 = microhapulator.genotype.SimulatedGenotype(frombed=fh, ploidy=6)
+    assert microhapulator.dist.dist(g1, g2) == 19
+    assert g1 != g2
+
+
+def test_dist_even_mixture():
+    f1 = data_file('murica/x-obs-genotype.json')
+    g1 = microhapulator.genotype.ObservedGenotype(f1)
+    f2 = data_file('murica/x-sim-genotype.bed')
+    with microhapulator.open(f2, 'r') as fh:
+        g2 = microhapulator.genotype.SimulatedGenotype(frombed=fh, ploidy=6)
+    assert microhapulator.dist.dist(g1, g2) == 0
+    assert g1 == g2
+
+
 @pytest.mark.parametrize('hdist', [0, 1, 2])
 def test_dist_bed_vs_json(hdist):
     with NamedTemporaryFile() as outfile:
