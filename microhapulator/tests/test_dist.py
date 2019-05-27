@@ -63,7 +63,6 @@ def test_dist_bed_vs_json(hdist):
             assert json.load(fh) == {"hamming_distance": hdist}
 
 
-
 def test_dist_cli():
     with NamedTemporaryFile() as outfile:
         arglist = [
