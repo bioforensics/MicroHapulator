@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - New interactive demo using Jupyter notebook and mybinder.org (see #32).
+- Scripts for simulating 8k individuals with demographics roughly matching those of the U.S.A. (see #13).
 
 ### Changed
 - Updated `dist` and `genotype` modules to better support equality and distance comparisons between simulated and observed genotypes (see #34).
