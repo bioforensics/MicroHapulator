@@ -19,12 +19,11 @@ def haplotype_pair(popdata):
     return pop1, pop2
 
 
-def simulate(popdata, labelpfx, serial):
+def simulate(popdata):
     pop1, pop2 = haplotype_pair(popdata)
     haploseed = numpy.random.randint(2**32-1)
     seqseed = numpy.random.randint(2**32-1)
-    label = '{pfx:s}{serial:04d}'.format(pfx=labelpfx, serial=serial)
-    return label, pop1, pop2, haploseed, seqseed
+    return pop1, pop2, haploseed, seqseed
 
 
 def proportion(ncontrib, even=False):
@@ -45,10 +44,10 @@ def proportion(ncontrib, even=False):
 
 def get_parser():
     cli = argparse.ArgumentParser()
+    cli.add_argument('--label', default='usa8k', help='label prefix for samples')
     cli.add_argument('--ncontrib', type=int, default=1, metavar='NCONTRIB', help='number of contributors in each sample; default is 1')
     cli.add_argument('--even', action='store_true', help='enforce even contribution when there are multiple contributors')
     cli.add_argument('--seed', type=int, help='seed for random number generator')
-    cli.add_argument('label', help='label prefix for samples')
     cli.add_argument('n', type=int, help='number of samples to simulate')
     return cli
 
@@ -62,10 +61,19 @@ def gen_params(nsamples, label, ncontrib=1, even=False, seed=None):
     print('Using random seed', seed, file=sys.stderr)
     numpy.random.seed(seed)
     for x in range(nsamples):
-        sampleid = 'usa8k-sample-' + ''.join([numpy.random.choice(list(ascii_letters + digits)) for _ in range(7)])
+        sampleid = label + '-sample-' + ''.join([numpy.random.choice(list(ascii_letters + digits)) for _ in range(7)])
         for y, p in zip(range(ncontrib), proportion(ncontrib, even)):
-            data = simulate(demo, label, x+1)
-            yield [sampleid, *data, '{:.4f}'.format(p)]
+            if ncontrib == 1:
+                kind = 'simple'
+                prop = ''
+            else:
+                kind = 'mixture-' + str(ncontrib)
+                prop = '-even' if even else '-uneven'
+            samplelabel = '{lbl:s}-{knd:s}{evn:s}-{srl:04d}'.format(
+                lbl=label, knd=kind, evn=prop, srl=x+1
+            )
+            data = simulate(demo)
+            yield [sampleid, samplelabel, *data, '{:.4f}'.format(p)]
 
 
 def main(args):
