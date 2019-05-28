@@ -15,8 +15,13 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
-        'gt1', help='genotype data (in JSON format) for individual 1'
+        '-p', '--ploidy', type=int, metavar='PLD', default=2,
+        help='for simulated genotypes, the number of distinct haplotypes '
+        'present in the sample; default is 2 (for a single diploid genotype)'
     )
     cli.add_argument(
-        'gt2', help='genotype data (in JSON format) for individual 2'
+        '--sim', nargs='*', default=[], help='simulated genotype data in BED format'
+    )
+    cli.add_argument(
+        '--obs', nargs='*', default=[], help='observed genotype data in JSON format'
     )
