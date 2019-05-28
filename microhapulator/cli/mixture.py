@@ -36,6 +36,10 @@ def subparser(subparsers):
         help='random seeds for simulating haplotypes'
     )
     cli.add_argument(
+        '--genotype', metavar='FILE', help='write simulated genotype data in '
+        'BED format to FILE'
+    )
+    cli.add_argument(
         '-n', '--num-reads', type=int, default=500000, metavar='N',
         help='number of reads to simulate; default is 500000'
     )

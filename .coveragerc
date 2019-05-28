@@ -3,4 +3,4 @@ show_missing = True
 
 [run]
 branch = True
-omit = microhapulator/_version.py, microhapulator/tests/*.py
+omit = microhapulator/getrefr.py, microhapulator/_version.py, microhapulator/tests/*.py

@@ -7,6 +7,7 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+import filecmp
 import microhapdb
 import microhapulator
 from microhapulator.mixture import calc_n_reads_from_proportions
@@ -45,6 +46,21 @@ def test_even_mixture(capsys):
     for m, read in enumerate(simulator):
         pass
     assert m == pytest.approx(500, abs=25)
+
+
+def test_mixture_genotype_file(capsys):
+    indiv_pops = [
+        ['MHDBP000022'],
+        ['MHDBP000022'],
+        ['MHDBP000022', 'MHDBP000004'],
+    ]
+    with NamedTemporaryFile(suffix='.bed') as outfile:
+        simulator = microhapulator.mixture.mixture(
+            indiv_pops, ['alpha'], totalreads=200, hapseeds=[22, 44, 88], gtfile=outfile.name
+        )
+        for m, read in enumerate(simulator):
+            pass
+        assert filecmp.cmp(outfile.name, data_file('mixture-genotype.bed'))
 
 
 @pytest.mark.known_failing
