@@ -10,7 +10,7 @@
 import filecmp
 import microhapdb
 import microhapulator
-from microhapulator.panel import LocusContext, panel_alpha
+from microhapulator.panel import LocusContext, panel_alpha, panel_usa
 import numpy
 import pytest
 
@@ -136,3 +136,15 @@ def test_context():
     assert len(c) == 197
     c = LocusContext(locus, minlen=100, mindelta=10)
     assert len(c) == 157
+
+
+def test_panel_usa():
+    panel = panel_usa()
+    print(sorted(panel))
+    assert len(panel) == 100
+    assert 'MHDBL000004' not in panel
+    assert 'MHDBL000005' not in panel
+    assert 'MHDBL000006' not in panel
+    assert 'MHDBL000007' in panel
+    assert 'MHDBL000008' in panel
+    assert 'MHDBL000012' in panel

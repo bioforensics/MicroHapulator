@@ -1,0 +1,2 @@
+./driver.py | gzip -c > sim-params.tsv
+gunzip -c sim-params.tsv.gz | ./runner.py
