@@ -1,4 +1,0 @@
- ./gen-sim-params.py --seed 148208620 --num-reads 100000 25 > global-sim-cmds-1.txt
- ./gen-sim-params.py --seed 3298914690 --num-reads 100000 25 > global-sim-cmds-2.txt
- ./gen-sim-params.py --seed 1752065636 --num-reads 100000 25 > global-sim-cmds-3.txt
- ./gen-sim-params.py --seed 2412337459 --num-reads 100000 25 > global-sim-cmds-4.txt
