@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Added
+- New interactive demo using Jupyter notebook and mybinder.org (see #32).
+
+### Changed
+- Updated `dist` and `genotype` modules to better support equality and distance comparisons between simulated and observed genotypes (see #34).
+
+
 ## [0.2] 2019-05-21
 
 ### Added
