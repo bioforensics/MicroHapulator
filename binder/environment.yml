@@ -3,6 +3,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - microhapulator
+  - microhapulator >=0.3
   - bwa
   - samtools
