@@ -974,6 +974,6 @@
             "num_discarded_reads": 113
         }
     },
-    "ploidy": 0,
+    "ploidy": null,
     "type": "ObservedGenotype"
 }

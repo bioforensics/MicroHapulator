@@ -1,42 +1,86 @@
 {
     "type": "object",
-    "patternProperties": {
-        "^MHDBL\\d+$": {
-            "type": "object",
-            "properties": {
-                "LocusID": {
-                    "type": "string"
-                },
-                "alleles": {
-                    "type": "object",
-                    "patternProperties": {
-                        "^[ACGT,]+$": {
-                            "type": "integer",
-                            "minimum": 1
-                        }
-                    }
-                },
-                "genotype": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "max_coverage": {
+    "properties": {
+        "ploidy": {
+            "anyOf": [
+                {
                     "type": "integer",
                     "minimum": 1
                 },
-                "mean_coverage": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "min_coverage": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "num_discarded_reads": {
-                    "type": "integer",
-                    "minimum": 0
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "version": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "base",
+                "SimulatedGenotype",
+                "ObservedGenotype"
+            ]
+        },
+        "loci": {
+            "patternProperties": {
+                "^MHDBL\\d+$": {
+                    "type": "object",
+                    "properties": {
+                        "LocusID": {
+                            "type": "string"
+                        },
+                        "alleles": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[ACGT,]+$": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        },
+                        "genotype": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "allele"
+                                ],
+                                "properties": {
+                                    "allele": {
+                                        "type": "string"
+                                    },
+                                    "haplotype": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "max_coverage": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "mean_coverage": {
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "min_coverage": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "num_discarded_reads": {
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
                 }
             }
         }

@@ -15,19 +15,26 @@ import microhapdb
 import microhapulator
 
 
-# with microhapulator.open(microhapulator.package_file('genotype-schema.json'), 'r') as fh:
-#     schema = json.load(fh)
+def load_schema():
+    with microhapulator.open(microhapulator.package_file('genotype-schema.json'), 'r') as fh:
+        return json.load(fh)
+
+
+schema = None
 
 
 class Genotype(object):
     def __init__(self, fromfile=None):
+        global schema
         if fromfile:
             if isinstance(fromfile, str):
                 with microhapulator.open(fromfile, 'r') as fh:
                     self.data = json.load(fh)
             else:
                 self.data = json.load(fromfile)
-#            jsonschema.validate(instance=self.data, schema=schema)
+            if schema is None:
+                schema = load_schema()
+            jsonschema.validate(instance=self.data, schema=schema)
         else:
             self.data = self.initialize()
 
@@ -45,7 +52,7 @@ class Genotype(object):
         data = {
             'version': microhapulator.__version__,
             'type': self.gttype,
-            'ploidy': 0,
+            'ploidy': None,
             'loci': dict(),
         }
         return data
@@ -150,7 +157,7 @@ class SimulatedGenotype(Genotype):
             self.data['ploidy'] = ploidy
 
     def add(self, hapid, locusid, allele):
-        if self.data['ploidy'] > 0:
+        if self.data['ploidy'] is not None and self.data['ploidy'] > 0:
             assert hapid in range(self.data['ploidy'])
         if locusid not in self.data['loci']:
             self.data['loci'][locusid] = {'genotype': list()}
