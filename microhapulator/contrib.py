@@ -18,10 +18,10 @@ def contrib(bamfile=None, refrfasta=None, gtjson=None):
         message = 'must provide either genotype JSON or BAM and refr FASTA'
         raise ValueError(message)
     if gtjson:
-        gt = microhapulator.genotype.ObservedGenotype(filename=gtjson)
+        gt = microhapulator.genotype.Genotype(fromfile=gtjson)
     else:
         gt = microhapulator.type.type(bamfile, refrfasta)
-    num_alleles_per_locus = [len(gt.data[locusid]['genotype']) for locusid in gt.data]
+    num_alleles_per_locus = [len(gt.alleles(locusid)) for locusid in gt.loci()]
     max_num_alleles = max(num_alleles_per_locus)
     max_thresh = max_num_alleles - 1 if max_num_alleles % 2 == 0 else max_num_alleles
     max_loci = sum([1 for n in num_alleles_per_locus if n >= max_thresh])

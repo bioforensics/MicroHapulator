@@ -40,11 +40,8 @@ def mixture(individuals, panel, relaxed=False, hapseeds=None, seqseeds=None,
                 popids, panel, hapseed=hapseed, relaxed=relaxed,
             )
             genotypes.append(genotype)
-        merged_genotype = microhapulator.genotype.merge_simulated_genotypes(
-            genotypes
-        )
-        with microhapulator.open(gtfile, 'w') as fh:
-            print(merged_genotype, file=fh)
+        merged_genotype = microhapulator.genotype.SimulatedGenotype.merge(genotypes)
+        merged_genotype.dump(gtfile)
     numreads = calc_n_reads_from_proportions(n, totalreads, proportions)
     if 0 in numreads:
         raise ValueError('specified proportions result in 0 reads for 1 or more individuals')

@@ -9,7 +9,7 @@
 
 import json
 import microhapulator
-from microhapulator.genotype import ObservedGenotype, SimulatedGenotype
+from microhapulator.genotype import Genotype
 
 
 def dist(gt1, gt2):
@@ -24,17 +24,7 @@ def dist(gt1, gt2):
 
 
 def main(args):
-    if len(args.sim) + len(args.obs) != 2:
-        raise ValueError('the number of BED and/or JSON files must be 2!')
-    genotypes = list()
-    for bedfile in args.sim:
-        with microhapulator.open(bedfile, 'r') as fh:
-            gt = SimulatedGenotype(frombed=fh, ploidy=args.ploidy)
-        genotypes.append(gt)
-    for jsonfile in args.obs:
-        gt = ObservedGenotype(filename=jsonfile)
-        genotypes.append(gt)
-    d = dist(*genotypes)
+    d = dist(Genotype(fromfile=args.genotype1), Genotype(fromfile=args.genotype2))
     data = {
         'hamming_distance': d,
     }

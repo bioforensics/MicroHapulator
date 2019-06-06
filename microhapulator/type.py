@@ -91,5 +91,4 @@ def type(bamfile, refrfasta):
 
 def main(args):
     gt = type(args.bam, args.refr)
-    with microhapulator.open(args.out, 'w') as fh:
-        gt.dump(file=fh)
+    gt.dump(args.out)

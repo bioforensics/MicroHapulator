@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "patternProperties": {
+        "^MHDBL\\d+$": {
+            "type": "object",
+            "properties": {
+                "LocusID": {
+                    "type": "string"
+                },
+                "alleles": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^[ACGT,]+$": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                },
+                "genotype": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "max_coverage": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "mean_coverage": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "min_coverage": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "num_discarded_reads": {
+                    "type": "integer",
+                    "minimum": 0
+                }
+            }
+        }
+    }
+}
