@@ -37,7 +37,7 @@ def subparser(subparsers):
     )
     cli.add_argument(
         '--genotype', metavar='FILE', help='write simulated genotype data in '
-        'BED format to FILE'
+        'JSON format to FILE'
     )
     cli.add_argument(
         '-n', '--num-reads', type=int, default=500000, metavar='N',

@@ -51,7 +51,7 @@ def subparser(subparsers):
     )
     outargs.add_argument(
         '--genotype', metavar='FILE', help='write simulated genotype data in '
-        'BED format to FILE'
+        'JSON format to FILE'
     )
     outargs.add_argument(
         '--haploseq', metavar='FILE', help='write simulated haplotype '

@@ -53,8 +53,7 @@ def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
     for haplotype, locus, allele in sample_panel(haplopops, loci):
         genotype.add(haplotype, locus, allele)
     if outfile:
-        with microhapulator.open(outfile, 'w') as fh:
-            print(genotype, file=fh)
+        genotype.dump(outfile)
     message = 'simulated microhaplotype variation at {loc:d} loci'.format(loc=len(loci))
     microhapulator.plog('[MicroHapulator::sim]', message)
     return genotype

@@ -1,0 +1,99 @@
+{
+    "type": "object",
+    "properties": {
+        "ploidy": {
+            "description": "The number of haplotypes present in the sample. Should be 2 times the number of each diploid individual. For simulated genotypes, the ploidy is known, but it is usually unknown for observed genotypes.",
+            "anyOf": [
+                {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "version": {
+            "description": "The version of the MicroHapulator software used to create the genotype file. Important to track when breaking changes are made to the API.",
+            "type": "string"
+        },
+        "type": {
+            "description": "Whether the genotype is simulated directly, observed (inferred from read mappings) or undetermined.",
+            "type": "string",
+            "enum": [
+                "base",
+                "SimulatedGenotype",
+                "ObservedGenotype"
+            ]
+        },
+        "loci": {
+            "patternProperties": {
+                "^MHDBL\\d+$": {
+                    "type": "object",
+                    "required": [
+                        "genotype"
+                    ],
+                    "properties": {
+                        "LocusID": {
+                            "description": "A MicroHapDB locus identifier.",
+                            "type": "string"
+                        },
+                        "allele_counts": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[ACGT,]+$": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                }
+                            }
+                        },
+                        "genotype": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "allele"
+                                ],
+                                "properties": {
+                                    "allele": {
+                                        "type": "string"
+                                    },
+                                    "haplotype": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "max_coverage": {
+                            "description": "Max per-base coverage",
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "mean_coverage": {
+                            "description": "Average per-base coverage",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "min_coverage": {
+                            "description": "Min per-base coverage",
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "num_discarded_reads": {
+                            "description": "Number of reads discarded due to missing information: either they did not span all variants in the microhap, or they had gaps at one or more variants.",
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

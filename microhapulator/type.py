@@ -78,18 +78,17 @@ def observe_genotypes(bamfile, refrfasta):
     )
 
 
-def type(bamfile, refrfasta):
+def type(bamfile, refrfasta, threshold=None):
     genotyper = observe_genotypes(bamfile, refrfasta)
     gt = microhapulator.genotype.ObservedGenotype()
     for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
         gt.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for allele, count in gtcounts.items():
             gt.record_allele(locusid, allele, count)
-    gt.infer()
+    gt.infer(threshold=threshold)
     return gt
 
 
 def main(args):
-    gt = type(args.bam, args.refr)
-    with microhapulator.open(args.out, 'w') as fh:
-        gt.dump(file=fh)
+    gt = type(args.bam, args.refr, threshold=args.threshold)
+    gt.dump(args.out)

@@ -1,0 +1,30 @@
+{
+    "loci": {
+        "MHDBL000066": {
+            "genotype": [
+                {
+                    "allele": "G,G,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,G,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000197": {
+            "genotype": [
+                {
+                    "allele": "A,A,T,T,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,A,T,T,C",
+                    "haplotype": 1
+                }
+            ]
+        }
+    },
+    "ploidy": 2,
+    "type": "SimulatedGenotype"
+}

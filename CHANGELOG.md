@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Updated `dist` and `genotype` modules to better support equality and distance comparisons between simulated and observed genotypes (see #34).
+- Simulated and observed genotype data now use a single unified JSON representation, enforced by JSON schema validation (see #38).
 
 
 ## [0.2] 2019-05-21

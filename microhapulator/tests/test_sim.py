@@ -27,7 +27,9 @@ def test_main():
         args = microhapulator.cli.parse_args(arglist)
         microhapulator.sim.main(args)
 
-        assert filecmp.cmp(tempdir + '/genotype.bed', data_file('alpha.bed'))
+        gt = microhapulator.genotype.SimulatedGenotype(fromfile=tempdir + '/genotype.bed')
+        testgt = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('alpha.sim.json'))
+        assert gt == testgt
         assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta'))
         assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq'))
     finally:

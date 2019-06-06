@@ -31,7 +31,7 @@ setup(
         ]
     },
     include_package_data=True,
-    install_requires=['pyfaidx', 'insilicoseq', 'numpy', 'microhapdb', 'happer'],
+    install_requires=['pyfaidx', 'insilicoseq', 'numpy', 'microhapdb', 'happer', 'jsonschema'],
     entry_points={
         'console_scripts': ['mhpl8r = microhapulator.__main__:main']
     },

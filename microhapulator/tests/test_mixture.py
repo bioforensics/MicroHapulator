@@ -7,7 +7,6 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-import filecmp
 import microhapdb
 import microhapulator
 from microhapulator.mixture import calc_n_reads_from_proportions
@@ -60,7 +59,11 @@ def test_mixture_genotype_file(capsys):
         )
         for m, read in enumerate(simulator):
             pass
-        assert filecmp.cmp(outfile.name, data_file('mixture-genotype.bed'))
+        gt = microhapulator.genotype.SimulatedGenotype(fromfile=outfile.name)
+        testgt = microhapulator.genotype.SimulatedGenotype.populate_from_bed(
+            data_file('mixture-genotype.bed')
+        )
+        assert gt == testgt
 
 
 @pytest.mark.known_failing
