@@ -15,12 +15,10 @@
             },
             "genotype": [
                 {
-                    "allele": "T,T,C,T",
-                    "haplotype": null
+                    "allele": "T,T,C,T"
                 },
                 {
-                    "allele": "T,T,T,T",
-                    "haplotype": null
+                    "allele": "T,T,T,T"
                 }
             ],
             "max_coverage": 2500,
@@ -43,12 +41,10 @@
             },
             "genotype": [
                 {
-                    "allele": "G,A,T,A",
-                    "haplotype": null
+                    "allele": "G,A,T,A"
                 },
                 {
-                    "allele": "G,G,C,A",
-                    "haplotype": null
+                    "allele": "G,G,C,A"
                 }
             ],
             "max_coverage": 2500,

@@ -21,7 +21,6 @@ def test_sim_genotype_roundtrip():
     seed = numpy.random.randint(1, 2**32 - 1)
     print('DEBUG seed:', seed)
     numpy.random.seed(seed)
-    output = StringIO()
     panel = ['MHDBL000011', 'MHDBL000091', 'MHDBL000171', 'MHDBL000159', 'MHDBL000069']
     populations = ['MHDBP000004', 'MHDBP000022']
     simulator = microhapulator.panel.sample_panel(populations, panel)
@@ -34,6 +33,10 @@ def test_sim_genotype_roundtrip():
         testgenotype = SimulatedGenotype(fromfile=outfile.name)
         assert testgenotype == genotype
 
+    output = StringIO()
+    genotype.dump(output)
+    assert output.getvalue() == str(genotype)
+
 
 def test_alleles():
     simgt = SimulatedGenotype.populate_from_bed(data_file('gttest.bed.gz'))
@@ -45,6 +48,13 @@ def test_alleles():
     assert simgt.alleles('MHDBL000135', haplotype=0) == set(['G,C,T'])
     assert simgt.alleles('MHDBL000135', haplotype=1) == set(['G,T,C'])
     assert obsgt.alleles('MHDBL000135', haplotype=0) == set()
+
+
+def test_haplotypes():
+    simgt = SimulatedGenotype.populate_from_bed(data_file('gttest-mismatch1.bed.gz'))
+    assert simgt.haplotypes() == set([0, 1])
+    obsgt = ObservedGenotype(data_file('pashtun-sim/test-output.json'))
+    assert obsgt.haplotypes() == set()
 
 
 def test_sim_obs_genotype_equality():

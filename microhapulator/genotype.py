@@ -42,12 +42,6 @@ class Genotype(object):
     def gttype(self):
         return 'base'
 
-    def seqstream(self, seqindex, prechr=False):
-        for locusid in sorted(self.loci()):
-            canonid = microhapdb.id_xref(locusid).iloc[0]
-            context = microhapulator.panel.LocusContext(canonid)
-            yield context.defline(), context.sequence(seqindex, prechr=prechr)
-
     def initialize(self):
         data = {
             'version': microhapulator.__version__,
@@ -79,9 +73,12 @@ class Genotype(object):
             )
         return set([a['allele'] for a in self.data['loci'][locusid]['genotype']])
 
-    def dump(self, filename):
-        with microhapulator.open(filename, 'w') as fh:
-            json.dump(self.data, fh, indent=4, sort_keys=True)
+    def dump(self, outfile):
+        if isinstance(outfile, str):
+            with microhapulator.open(outfile, 'w') as fh:
+                json.dump(self.data, fh, indent=4, sort_keys=True)
+        else:
+            json.dump(self.data, outfile, indent=4, sort_keys=True)
 
     def __eq__(self, other):
         if not isinstance(other, Genotype):
@@ -162,6 +159,12 @@ class SimulatedGenotype(Genotype):
         if locusid not in self.data['loci']:
             self.data['loci'][locusid] = {'genotype': list()}
         self.data['loci'][locusid]['genotype'].append({'allele': allele, 'haplotype': hapid})
+
+    def seqstream(self, seqindex, prechr=False):
+        for locusid in sorted(self.loci()):
+            canonid = microhapdb.id_xref(locusid).iloc[0]
+            context = microhapulator.panel.LocusContext(canonid)
+            yield context.defline(), context.sequence(seqindex, prechr=prechr)
 
     @property
     def gttype(self):

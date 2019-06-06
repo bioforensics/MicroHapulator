@@ -15,6 +15,11 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
+        '-t', '--threshold', type=int, default=None, help='coverage threshold '
+        'below which alleles will be ignored; by default, threshold is '
+        'computed automatically'
+    )
+    cli.add_argument(
         'refr', help='microhap locus sequences in Fasta format'
     )
     cli.add_argument(

@@ -39,8 +39,8 @@ def test_dist_log_mixture():
 
 
 def test_dist_even_mixture():
-    f1 = data_file('murica/x-obs-genotype.json')
-    g1 = microhapulator.genotype.ObservedGenotype(f1)
+    with microhapulator.open(data_file('murica/x-obs-genotype.json'), 'r') as fh:
+        g1 = microhapulator.genotype.ObservedGenotype(fh)
     f2 = data_file('murica/x-sim-genotype.bed')
     g2 = microhapulator.genotype.SimulatedGenotype.populate_from_bed(f2)
     assert microhapulator.dist.dist(g1, g2) == 0
