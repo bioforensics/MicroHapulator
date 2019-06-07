@@ -56,7 +56,7 @@ Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
 subcommands listed below to see instructions for that operation.
 
 Subcommands:
-  subcmd             contrib, dist, getrefr, mixture, refr, sim, type
+  subcmd             contain, contrib, dist, getrefr, mixture, refr, sim, type
 
 Global arguments:
   -h, --help         show this help message and exit
@@ -65,6 +65,12 @@ Global arguments:
   --tee              write diagnostic output to logfile AND terminal (stderr)
 
 ```
+
+
+## Contributing
+
+We welcome contributions from the community!
+See [docs/DEVEL.md](docs/DEVEL.md) for a few sparse notes about the development setup.
 
 
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg

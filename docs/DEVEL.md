@@ -1,6 +1,6 @@
 # MicroHapulator Development
 
-## Setup
+## Set up a dedicated development environment
 
 ```
 conda create --new microhapulator python=3.6
