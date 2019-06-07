@@ -73,6 +73,22 @@ class Genotype(object):
             )
         return set([a['allele'] for a in self.data['loci'][locusid]['genotype']])
 
+    def probability(self, popid):
+        """Compute the random match probability of this genotype."""
+        prob = 1.0
+        for locus in self.loci():
+            for allele in self.alleles(locus):
+                result = microhapdb.frequencies[
+                    (microhapdb.frequencies.Population == popid) &
+                    (microhapdb.frequencies.Locus == locus) &
+                    (microhapdb.frequencies.Allele == allele)
+                ]
+                if len(result) > 0:
+                    prob *= result.Frequency
+                else:
+                    prob *= 0.001  # No allele frequency data for this pop/allele combo
+        return prob
+
     def dump(self, outfile):
         if isinstance(outfile, str):
             with microhapulator.open(outfile, 'w') as fh:
