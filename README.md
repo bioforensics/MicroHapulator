@@ -70,7 +70,9 @@ Global arguments:
 ## Contributing
 
 We welcome contributions from the community!
-See [docs/DEVEL.md](docs/DEVEL.md) for a few sparse notes about the development setup.
+Feel free to ask questions, make suggestions, or report bugs using the [issue tracker](https://github.com/bioforensics/MicroHapulator/issues).
+If you are interested in submitting patches, [docs/DEVEL.md](docs/DEVEL.md) contains a few suggestions for a development setup.
+All contributors are expected to abide by the project's [Code of Conduct](docs/CONDUCT.md).
 
 
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg
