@@ -20,6 +20,7 @@ from microhapulator import genotype
 from microhapulator import panel
 
 # Subcommands and command-line interface
+from microhapulator import contain
 from microhapulator import contrib
 from microhapulator import dist
 from microhapulator import getrefr

@@ -45,6 +45,11 @@ def subparser(subparsers):
     )
     outargs = cli.add_argument_group('Output configuration')
     outargs.add_argument(
+        '-y', '--dry-run', action='store_true', help='simulate genotype and '
+        'produce any requested outputs, but terminate prior to simulating '
+        'reads'
+    )
+    outargs.add_argument(
         '-o', '--out', metavar='FILE', help='write simulated MiSeq reads in '
         'FASTQ format to FILE; by default, reads are written to terminal '
         '(standard output)'

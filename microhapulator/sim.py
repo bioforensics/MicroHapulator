@@ -59,7 +59,7 @@ def simulate_genotype(popids, panel, hapseed=None, relaxed=False, outfile=None):
     return genotype
 
 
-def sim(popids, panel, relaxed=False, hapseed=None, gtfile=None, hapfile=None,
+def sim(popids, panel, relaxed=False, hapseed=None, gtfile=None, hapfile=None, dryrun=False,
         seqseed=None, seqthreads=2, numreads=500000, readsignature=None, readindex=0, debug=False):
     genotype = simulate_genotype(
         popids, panel, hapseed=hapseed, relaxed=relaxed, outfile=gtfile
@@ -71,6 +71,9 @@ def sim(popids, panel, relaxed=False, hapseed=None, gtfile=None, hapfile=None,
             print('>', defline, '\n', sequence, sep='', file=fh)
         fh.flush()
         fsync(fh.fileno())
+        if dryrun:
+            microhapulator.plog('[MicroHapulator::sim] dry run requested, ditching out')
+            return
         fqdir = mkdtemp()
         try:
             isscmd = [
@@ -112,8 +115,8 @@ def main(args=None):
         args = get_parser().parse_args()
     simulator = sim(
         args.popid, args.panel, relaxed=args.relaxed, hapseed=args.hap_seed,
-        gtfile=args.genotype, hapfile=args.haploseq, seqseed=args.seq_seed,
-        seqthreads=args.seq_threads, numreads=args.num_reads,
+        gtfile=args.genotype, hapfile=args.haploseq, dryrun=args.dry_run,
+        seqseed=args.seq_seed, seqthreads=args.seq_threads, numreads=args.num_reads,
     )
     with microhapulator.open(args.out, 'w') as fh:
         for n, defline, sequence, qualities in simulator:

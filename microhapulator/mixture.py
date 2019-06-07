@@ -23,7 +23,7 @@ def calc_n_reads_from_proportions(n, totalreads, prop):
     return [int(totalreads * x) for x in normprop]
 
 
-def mixture(individuals, panel, relaxed=False, hapseeds=None, seqseeds=None,
+def mixture(individuals, panel, relaxed=False, hapseeds=None, dryrun=False, seqseeds=None,
             seqthreads=1, totalreads=1000000, proportions=None, gtfile=None):
     n = len(individuals)
     if hapseeds is None:
@@ -42,6 +42,9 @@ def mixture(individuals, panel, relaxed=False, hapseeds=None, seqseeds=None,
             genotypes.append(genotype)
         merged_genotype = microhapulator.genotype.SimulatedGenotype.merge(genotypes)
         merged_genotype.dump(gtfile)
+    if dryrun:
+        microhapulator.plog('[MicroHapulator::mixture] dry run requested, ditching out')
+        return
     numreads = calc_n_reads_from_proportions(n, totalreads, proportions)
     if 0 in numreads:
         raise ValueError('specified proportions result in 0 reads for 1 or more individuals')
@@ -65,8 +68,8 @@ def main(args=None):
         args = get_parser().parse_args()
     simulator = mixture(
         args.indiv, args.panel, relaxed=args.relaxed, hapseeds=args.hap_seeds,
-        seqseeds=args.seq_seeds, seqthreads=args.seq_threads, totalreads=args.num_reads,
-        proportions=args.proportions, gtfile=args.genotype,
+        dryrun=args.dry_run, seqseeds=args.seq_seeds, seqthreads=args.seq_threads,
+        totalreads=args.num_reads, proportions=args.proportions, gtfile=args.genotype,
     )
     with microhapulator.open(args.out, 'w') as fh:
         for n, defline, sequence, qualities in simulator:

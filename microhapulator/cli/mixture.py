@@ -52,6 +52,11 @@ def subparser(subparsers):
         'of threads to use when simulating targeted amplicon sequencing'
     )
     cli.add_argument(
+        '-y', '--dry-run', action='store_true', help='simulate genotype and '
+        'produce any requested outputs, but terminate prior to simulating '
+        'reads'
+    )
+    cli.add_argument(
         '-o', '--out', metavar='FILE', help='write simulated MiSeq reads in '
         'FASTQ format to FILE; by default, reads are written to terminal '
         '(standard output)'

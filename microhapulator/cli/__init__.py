@@ -11,6 +11,7 @@
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import microhapulator
 from sys import stderr
+from . import contain
 from . import contrib
 from . import dist
 from . import getrefr
@@ -20,6 +21,7 @@ from . import sim
 from . import type
 
 mains = {
+    'contain': microhapulator.contain.main,
     'contrib': microhapulator.contrib.main,
     'dist': microhapulator.dist.main,
     'getrefr': microhapulator.getrefr.main,
@@ -30,6 +32,7 @@ mains = {
 }
 
 subparser_funcs = {
+    'contain': contain.subparser,
     'contrib': contrib.subparser,
     'dist': dist.subparser,
     'getrefr': getrefr.subparser,

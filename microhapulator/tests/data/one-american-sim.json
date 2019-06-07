@@ -1,0 +1,271 @@
+{
+    "loci": {
+        "MHDBL000013": {
+            "genotype": [
+                {
+                    "allele": "C,A,C,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,G,C,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000017": {
+            "genotype": [
+                {
+                    "allele": "T,G,G,C,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,G,G,C,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000030": {
+            "genotype": [
+                {
+                    "allele": "A,C,T,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,C,T,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000048": {
+            "genotype": [
+                {
+                    "allele": "A,C,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,A,T",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000060": {
+            "genotype": [
+                {
+                    "allele": "T,C,C,T",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "C,C,C,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000066": {
+            "genotype": [
+                {
+                    "allele": "G,A,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "G,A,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000074": {
+            "genotype": [
+                {
+                    "allele": "T,T,T",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,T,T",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000081": {
+            "genotype": [
+                {
+                    "allele": "A,C,G,G,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,C,A,A,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000092": {
+            "genotype": [
+                {
+                    "allele": "C,A,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "G,G,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000105": {
+            "genotype": [
+                {
+                    "allele": "A,C,A,T",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,C,G,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000111": {
+            "genotype": [
+                {
+                    "allele": "G,C,G,T,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,T,G,A,A",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000128": {
+            "genotype": [
+                {
+                    "allele": "T,T,T,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,C,T,A",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000131": {
+            "genotype": [
+                {
+                    "allele": "C,T,G,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,T,G,A",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000138": {
+            "genotype": [
+                {
+                    "allele": "G,A,C,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "G,G,C,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000145": {
+            "genotype": [
+                {
+                    "allele": "A,A,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "G,A,A",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000147": {
+            "genotype": [
+                {
+                    "allele": "A,T,A,T",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,A,A,T",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000156": {
+            "genotype": [
+                {
+                    "allele": "T,C,G,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,C,G,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000172": {
+            "genotype": [
+                {
+                    "allele": "C,G,A,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "C,G,G,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000195": {
+            "genotype": [
+                {
+                    "allele": "T,G,G,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,G,G,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000197": {
+            "genotype": [
+                {
+                    "allele": "T,T,A,T,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,A,T,T,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000204": {
+            "genotype": [
+                {
+                    "allele": "C,C,A,G,T,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "C,C,A,G,T,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000212": {
+            "genotype": [
+                {
+                    "allele": "G,C,C,C,T",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,C,C,A,T",
+                    "haplotype": 1
+                }
+            ]
+        }
+    },
+    "ploidy": null,
+    "type": "SimulatedGenotype",
+    "version": "0.3+0.g16e7f39.dirty"
+}

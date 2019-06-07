@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Added
+- New `contain` module for calculating the proportion of alleles from one sample present in another sample (see #41).
+- New `--dry-run` mode for `sim` and `mixture` modules (see #41).
+
+
 ## [0.3] 2019-06-06
 
 ### Added
