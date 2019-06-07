@@ -25,3 +25,13 @@ def test_contain(f1, f2, total, contained):
     c, t = microhapulator.contain.contain(gt1, gt2)
     assert t == total
     assert c == contained
+
+
+def test_contain_cli(capsys):
+    arglist = [
+        'contain', data_file('one-brit-sim.json'), data_file('one-italian-sim.json')
+    ]
+    args = microhapulator.cli.parse_args(arglist)
+    microhapulator.contain.main(args)
+    terminal = capsys.readouterr()
+    assert '"containment": 0.4444' in terminal.out
