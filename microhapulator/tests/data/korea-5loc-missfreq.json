@@ -1,0 +1,66 @@
+{
+    "loci": {
+        "MHDBL000017": {
+            "genotype": [
+                {
+                    "allele": "T,A,G,C,T",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,G,G,T,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000018": {
+            "genotype": [
+                {
+                    "allele": "T,G,C,T,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,G,C,T,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000060": {
+            "genotype": [
+                {
+                    "allele": "C,T,T,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "C,T,C,T",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000138": {
+            "genotype": [
+                {
+                    "allele": "G,G,C,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,A,C,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000172": {
+            "genotype": [
+                {
+                    "allele": "C,G,G,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,A,T,A",
+                    "haplotype": 1
+                }
+            ]
+        }
+    },
+    "ploidy": 2,
+    "type": "SimulatedGenotype"
+}

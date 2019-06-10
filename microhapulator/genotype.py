@@ -73,6 +73,67 @@ class Genotype(object):
             )
         return set([a['allele'] for a in self.data['loci'][locusid]['genotype']])
 
+    def rand_match_prob(self, popid):
+        """Compute the random match probability of this genotype.
+
+        Given a set of population allele frequencies, the random match
+        probability is the product of the allele frequencies of each allele
+        observed in the genotype.
+        """
+        prob = 1.0
+        for locus in sorted(self.loci()):
+            alleles = self.alleles(locus)
+            alleles = [*alleles] * 2 if len(alleles) == 1 else alleles
+            for allele in sorted(alleles):
+                result = microhapdb.frequencies[
+                    (microhapdb.frequencies.Population == popid) &
+                    (microhapdb.frequencies.Locus == locus) &
+                    (microhapdb.frequencies.Allele == allele)
+                ]
+                frequency = None
+                if len(result) > 0:
+                    assert len(result) == 1
+                    frequency = list(result.Frequency)[0]
+                if frequency is None or frequency == 0.0:
+                    if frequency is None:
+                        message = 'No population allele frequency data for '
+                    else:
+                        message = 'Frequency=0.0 for '
+                    message += 'allele "{:s}" at locus "{:s}" '.format(allele, locus)
+                    message += 'for population "{:s}"; '.format(popid)
+                    message += 'using RMP=0.001 for this allele'
+                    microhapulator.plog('[MicroHapulator::genotype] WARNING:', message)
+                    prob *= 0.001
+                else:
+                    prob *= frequency
+        return prob
+
+    def rmp_lr_test(self, other, popid, erate=0.001):
+        """Compute a likelihood ratio test for the random match probability.
+
+        The likelihood ratio test compares the probability that the two samples
+        come from the same source to the probability that the samples come from
+        two unrelated sources. The first probability (numerator) should be 1.0,
+        with any missing or incongruent alleles treated as genotyping error.
+        The second probability (denominator) is the random match probability.
+        The test only makes sense when the two genotypes being compared are
+        identical or nearly identical.
+        """
+        assert self.data['ploidy'] == 2 and other.data['ploidy'] == 2
+        mismatches = 0
+        for locus in self.loci():
+            selfalleles = self.alleles(locus)
+            otheralleles = other.alleles(locus)
+            if selfalleles == otheralleles:
+                pass
+            elif len(selfalleles & otheralleles) == 1:
+                mismatches += 1
+            else:
+                mismatches += 2
+        numerator = erate ** mismatches
+        denominator = self.rand_match_prob(popid)
+        return numerator / denominator
+
     def dump(self, outfile):
         if isinstance(outfile, str):
             with microhapulator.open(outfile, 'w') as fh:
