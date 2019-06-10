@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+#
+# -----------------------------------------------------------------------------
+# Copyright (c) 2019, Battelle National Biodefense Institute.
+#
+# This file is part of MicroHapulator (github.com/bioforensics/microhapulator)
+# and is licensed under the BSD license: see LICENSE.txt.
+# -----------------------------------------------------------------------------
+
+
+def subparser(subparsers):
+    desc = (
+        'If a single genotype is provided, the random match probability of '
+        'the genotype is computed. If a pair of genotypes are provided, a '
+        'likelihood ratio test is performed comparing the likelihood that the '
+        'two genotypes are from the same individual versus the likelihood '
+        'that the two genotypes are from random unrelated individuals. The '
+        'genotype profiles are assumed to be identical, and differences '
+        'between the two profiles are assumed to be the result of genotyping '
+        'error. The test does not make sense for profiles with many allele '
+        'differences.'
+    )
+    cli = subparsers.add_parser('prob', description=desc)
+    cli.add_argument(
+        '-o', '--out', metavar='FILE', help='write output to "FILE"; by '
+        'default, output is written to the terminal (standard output)'
+    )
+    cli.add_argument(
+        'population', help='indicate which allele frequencies to use'
+    )
+    cli.add_argument(
+        'genotype1', help='genotype in JSON format'
+    )
+    cli.add_argument(
+        'genotype2', nargs='?', default=None, help='genotype in JSON format'
+    )
