@@ -93,12 +93,15 @@ class Genotype(object):
                     assert len(result) == 1
                     frequency = list(result.Frequency)[0]
                 if frequency is None or frequency == 0.0:
-                    message = 'No population allele frequency data for '
+                    if frequency is None:
+                        message = 'No population allele frequency data for '
+                    else:
+                        message = 'Frequency=0.0 for '
                     message += 'allele "{:s}" at locus "{:s}" '.format(allele, locus)
                     message += 'for population "{:s}"; '.format(popid)
                     message += 'using RMP=0.001 for this allele'
                     microhapulator.plog('[MicroHapulator::genotype] WARNING:', message)
-                    prob *= 0.001  # No allele frequency data for this pop/allele combo
+                    prob *= 0.001
                 else:
                     prob *= frequency
         return prob
