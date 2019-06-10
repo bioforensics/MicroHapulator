@@ -15,7 +15,7 @@
         "MHDBL000018": {
             "genotype": [
                 {
-                    "allele": "T,G,C,T,G",
+                    "allele": "C,G,T,T,A",
                     "haplotype": 0
                 },
                 {
@@ -39,7 +39,7 @@
         "MHDBL000138": {
             "genotype": [
                 {
-                    "allele": "G,G,C,A",
+                    "allele": "A,A,C,A",
                     "haplotype": 0
                 },
                 {

@@ -15,11 +15,11 @@
         "MHDBL000018": {
             "genotype": [
                 {
-                    "allele": "T,G,C,T,G",
+                    "allele": "C,G,C,C,G",
                     "haplotype": 0
                 },
                 {
-                    "allele": "T,G,C,T,G",
+                    "allele": "C,G,T,T,A",
                     "haplotype": 1
                 }
             ]

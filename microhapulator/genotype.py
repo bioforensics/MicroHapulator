@@ -81,8 +81,10 @@ class Genotype(object):
         observed in the genotype.
         """
         prob = 1.0
-        for locus in self.loci():
-            for allele in self.alleles(locus):
+        for locus in sorted(self.loci()):
+            alleles = self.alleles(locus)
+            alleles = [*alleles] * 2 if len(alleles) == 1 else alleles
+            for allele in sorted(alleles):
                 result = microhapdb.frequencies[
                     (microhapdb.frequencies.Population == popid) &
                     (microhapdb.frequencies.Locus == locus) &
@@ -106,7 +108,7 @@ class Genotype(object):
                     prob *= frequency
         return prob
 
-    def rmp_lr_test(self, other, popid):
+    def rmp_lr_test(self, other, popid, erate=0.001):
         """Compute a likelihood ratio test for the random match probability.
 
         The likelihood ratio test compares the probability that the two samples
@@ -118,18 +120,17 @@ class Genotype(object):
         identical or nearly identical.
         """
         assert self.data['ploidy'] == 2 and other.data['ploidy'] == 2
-        matches, mismatches = 0, 0
+        mismatches = 0
         for locus in self.loci():
             selfalleles = self.alleles(locus)
             otheralleles = other.alleles(locus)
             if selfalleles == otheralleles:
-                matches += 2
+                pass
             elif len(selfalleles & otheralleles) == 1:
-                matches += 1
                 mismatches += 1
             else:
                 mismatches += 2
-        numerator = matches / (matches + mismatches)
+        numerator = erate ** mismatches
         denominator = self.rand_match_prob(popid)
         return numerator / denominator
 

@@ -22,6 +22,10 @@ def subparser(subparsers):
     )
     cli = subparsers.add_parser('prob', description=desc)
     cli.add_argument(
+        '-e', '--erate', type=float, metavar='ε', default=0.001, help='rate '
+        'at which errors in genotyping are expected; default is 0.001'
+    )
+    cli.add_argument(
         '-o', '--out', metavar='FILE', help='write output to "FILE"; by '
         'default, output is written to the terminal (standard output)'
     )
