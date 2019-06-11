@@ -27,6 +27,7 @@ from microhapulator import getrefr
 from microhapulator import mixture
 from microhapulator import prob
 from microhapulator import refr
+from microhapulator import seq
 from microhapulator import sim
 from microhapulator import type
 from microhapulator import __main__

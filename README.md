@@ -57,7 +57,7 @@ subcommands listed below to see instructions for that operation.
 
 Subcommands:
   subcmd             contain, contrib, dist, getrefr, mixture, prob, refr,
-                     sim, type
+                     seq, sim, type
 
 Global arguments:
   -h, --help         show this help message and exit

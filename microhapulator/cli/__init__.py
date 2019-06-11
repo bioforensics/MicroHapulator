@@ -18,6 +18,7 @@ from . import getrefr
 from . import mixture
 from . import prob
 from . import refr
+from . import seq
 from . import sim
 from . import type
 
@@ -29,6 +30,7 @@ mains = {
     'mixture': microhapulator.mixture.main,
     'prob': microhapulator.prob.main,
     'refr': microhapulator.refr.main,
+    'seq': microhapulator.seq.main,
     'sim': microhapulator.sim.main,
     'type': microhapulator.type.main,
 }
@@ -41,6 +43,7 @@ subparser_funcs = {
     'mixture': mixture.subparser,
     'prob': prob.subparser,
     'refr': refr.subparser,
+    'seq': seq.subparser,
     'sim': sim.subparser,
     'type': type.subparser,
 }

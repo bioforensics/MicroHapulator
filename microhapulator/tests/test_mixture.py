@@ -16,56 +16,6 @@ import pytest
 from tempfile import NamedTemporaryFile
 
 
-@pytest.mark.parametrize('n,totalreads,prop,result', [
-    (3, 100, None, [33, 33, 33]),
-    (3, 100, [0.5, 0.4, 0.1], [50, 40, 10]),
-    (4, 4000000, [20, 30, 40, 50], [571428, 857142, 1142857, 1428571]),
-])
-def test_proportions(n, totalreads, prop, result):
-    assert calc_n_reads_from_proportions(n, totalreads, prop) == result
-
-
-def test_proportions_failure_modes():
-    with pytest.raises(ValueError) as ve:
-        calc_n_reads_from_proportions(3, 1000, [0.6, 0.4])
-    assert 'mismatch between contributor number and proportions' in str(ve)
-
-
-def test_even_mixture(capsys):
-    seed = numpy.random.randint(1, 2**32 - 1)
-    print('Seed:', seed)
-    numpy.random.seed(seed)
-    n = numpy.random.randint(2, 6)
-    popids = microhapdb.populations[microhapdb.populations.Source == 'ALFRED'].ID.unique()
-    indiv_pops = [(numpy.random.choice(popids), numpy.random.choice(popids)) for _ in range(n)]
-    panel = microhapulator.panel.panel_allpops()[:5]
-    simulator = microhapulator.mixture.mixture(
-        indiv_pops, panel, totalreads=500, seqthreads=2,
-    )
-    for m, read in enumerate(simulator):
-        pass
-    assert m == pytest.approx(500, abs=25)
-
-
-def test_mixture_genotype_file(capsys):
-    indiv_pops = [
-        ['MHDBP000022'],
-        ['MHDBP000022'],
-        ['MHDBP000022', 'MHDBP000004'],
-    ]
-    with NamedTemporaryFile(suffix='.bed') as outfile:
-        simulator = microhapulator.mixture.mixture(
-            indiv_pops, ['alpha'], totalreads=200, hapseeds=[22, 44, 88], gtfile=outfile.name
-        )
-        for m, read in enumerate(simulator):
-            pass
-        gt = microhapulator.genotype.SimulatedGenotype(fromfile=outfile.name)
-        testgt = microhapulator.genotype.SimulatedGenotype.populate_from_bed(
-            data_file('mixture-genotype.bed')
-        )
-        assert gt == testgt
-
-
 @pytest.mark.known_failing
 def test_uneven_mixture(capfd):
     simulator = microhapulator.mixture.mixture(

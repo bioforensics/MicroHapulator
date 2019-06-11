@@ -16,14 +16,6 @@ import numpy.random
 from pyfaidx import Fasta as Fastaidx
 
 
-def get_haplo_seq(genotype):
-    '''Apply genotype to reference and construct full haplotype sequences.'''
-    seqindex = Fastaidx(microhapulator.package_file('hg38.fasta'))
-    mutator = mutate(genotype.seqstream(seqindex), genotype.bedstream)
-    for defline, sequence in mutator:
-        yield defline, sequence
-
-
 def sim(popids, panel, seed=None, relaxed=False):
     '''Simulate a diploid genotype for the specified panel.
 
@@ -58,7 +50,7 @@ def main(args):
         microhapulator.plog('[MicroHapulator::sim]', message)
     if args.haplo_seq:
         with microhapulator.open(args.haplo_seq, 'w') as fh:
-            for defline, sequence in get_haplo_seq(genotype):
+            for defline, sequence in genotype.haploseqs:
                 print('>', defline, '\n', sequence, sep='', file=fh)
             message = 'haplotype sequences written to {:s}'.format(fh.name)
             microhapulator.plog('[MicroHapulator::sim]', message)
