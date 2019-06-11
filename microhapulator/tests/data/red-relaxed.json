@@ -1,0 +1,43 @@
+{
+    "loci": {
+        "MHDBL000013": {
+            "genotype": [
+                {
+                    "allele": "A,G,G,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,A,C,T",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000197": {
+            "genotype": [
+                {
+                    "allele": "A,A,T,T,C",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,T,A,A,C",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "MHDBL000212": {
+            "genotype": [
+                {
+                    "allele": "G,C,C,C,T",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,C,C,A,T",
+                    "haplotype": 1
+                }
+            ]
+        }
+    },
+    "ploidy": 2,
+    "type": "SimulatedGenotype",
+    "version": "0.2+12.g51cb32c.dirty"
+}

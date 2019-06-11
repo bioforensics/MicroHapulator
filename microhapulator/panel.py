@@ -230,8 +230,8 @@ def validate_populations(popids):
         message = 'please provide only 1 or 2 population IDs'
         raise ValueError(message)
     haplopops = microhapdb.standardize_ids(popids)
-    if len(haplopops) < len(popids):
-        raise ValueError('invalid or duplicated population ID(s)')
+    if not haplopops <= popids:
+        raise ValueError('invalid population ID(s)')
     if len(haplopops) == 1:
         haplopops = haplopops * 2
     return haplopops
