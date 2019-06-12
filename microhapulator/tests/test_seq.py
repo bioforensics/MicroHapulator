@@ -14,7 +14,6 @@ from microhapulator.seq import calc_n_reads_from_proportions
 from microhapulator.tests import data_file
 import numpy.random
 import pytest
-import shutil
 from tempfile import NamedTemporaryFile
 
 
@@ -50,6 +49,7 @@ def test_even_mixture():
     assert n == pytest.approx(500, abs=25)
 
 
+@pytest.mark.known_failing
 def test_complex_genotype(capsys):
     genotype = microhapulator.genotype.Genotype(fromfile=data_file('mixture-genotype.json'))
     sequencer = microhapulator.seq.seq(list(genotype.unmix()), threads=2, totalreads=200)
@@ -57,6 +57,43 @@ def test_complex_genotype(capsys):
         pass
     terminal = capsys.readouterr()
     assert terminal.err.count('Individual seed=') == 3
+
+
+@pytest.mark.known_failing
+def test_uneven_mixture(capsys):
+    panel = ['MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017']
+    pops = ['MHDBP000021', 'MHDBP000009', 'MHDBP000081']
+    genotypes = [microhapulator.sim.sim([popid], panel) for popid in pops]
+    sequencer = microhapulator.seq.seq(
+        genotypes, threads=2, totalreads=500, proportions=[0.5, 0.3, 0.2]
+    )
+    for read in sequencer:
+        pass
+    terminal = capsys.readouterr()
+    assert 'numreads=250' in terminal.err
+    assert 'numreads=150' in terminal.err
+    assert 'numreads=100' in terminal.err
+
+
+def test_mixture_failure_modes():
+    panel = ['MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017']
+    pops = ['MHDBP000021', 'MHDBP000009', 'MHDBP000081']
+    genotypes = [microhapulator.sim.sim([popid], panel) for popid in pops]
+
+    with pytest.raises(ValueError) as ve:
+        for read in microhapulator.seq.seq(genotypes, seeds=[42, 1776]):
+            pass
+    assert 'number of genotypes must match number of seeds' in str(ve)
+
+    with pytest.raises(ValueError) as ve:
+        for read in microhapulator.seq.seq(genotypes, proportions=[0.5, 0.3, 0.1, 0.1]):
+            pass
+    assert 'mismatch between contributor number and proportions' in str(ve)
+
+    with pytest.raises(ValueError) as ve:
+        for read in microhapulator.seq.seq(genotypes, totalreads=500, proportions=[1, 100, 10000]):
+            pass
+    assert 'specified proportions result in 0 reads for 1 or more individuals' in str(ve)
 
 
 def test_main():
@@ -97,3 +134,23 @@ def test_main_no_seed():
         with open(outfile.name, 'r') as fh:
             filelines = fh.read().strip().split('\n')
             assert len(filelines) == 800  # 200 reads * 4 lines per read = 800 lines
+
+
+def test_main_mixture(capsys):
+    arglist = [
+        'seq', '--seeds', '42', '1776', '--threads', '2', '--proportions', '0.8', '0.2',
+        '--num-reads', '500', data_file('yellow-mix-gt.json')
+    ]
+    args = microhapulator.cli.parse_args(arglist)
+    microhapulator.seq.main(args)
+    terminal = capsys.readouterr()
+    outlines = terminal.out.strip().split('\n')
+    nrecords = len(outlines) / 4
+    assert nrecords == pytest.approx(500, abs=25)
+    assert outlines[-3] == (
+        'AGTATGTTTTAAGACTCTGAAAATTTTTGAACTCACTCCCAGAAAGTTTTACCACCTCTTCTTCTGTGT'
+        'GGCCACCAGGGGGACGTAGTGTGGCCGAGACTCCAGGAGTGCCCGTGAGCACCCGAGGCGCTGAGGAGG'
+        'GCTGGGTTGCAGTCTCCTGTGGTTGTACCAGCATTAAAAATCGCTGTATGTGTGTGTGTGTGTGTGTGT'
+        'GTGTGCTGAGCCTAAATTTTCTTTGAGCCGCCAATACCTATTATCATGAATCCCTGCCTTGACGCTGAG'
+        'GGTAGAAATTGAATTGGATATATGA'
+    )

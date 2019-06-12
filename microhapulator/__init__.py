@@ -24,7 +24,7 @@ from microhapulator import contain
 from microhapulator import contrib
 from microhapulator import dist
 from microhapulator import getrefr
-from microhapulator import mixture
+# from microhapulator import mixture
 from microhapulator import prob
 from microhapulator import refr
 from microhapulator import seq

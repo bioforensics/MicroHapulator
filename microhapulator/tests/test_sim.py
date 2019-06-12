@@ -23,8 +23,8 @@ def test_meaning_of_life():
 
 
 @pytest.mark.parametrize('relaxmode,testfile', [
-    (False, 'red-strict.json'),
-    (True, 'red-relaxed.json'),
+    (False, 'red-strict-gt.json'),
+    (True, 'red-relaxed-gt.json'),
 ])
 def test_sim_relaxed(relaxmode, testfile):
     genotype = microhapulator.sim.sim(
