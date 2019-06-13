@@ -8,11 +8,13 @@
 # -----------------------------------------------------------------------------
 
 from collections import defaultdict
+from happer.mutate import mutate
 from io import StringIO
 import json
 import jsonschema
 import microhapdb
 import microhapulator
+from pyfaidx import Fasta as Fastaidx
 
 
 def load_schema():
@@ -41,6 +43,10 @@ class Genotype(object):
     @property
     def gttype(self):
         return 'base'
+
+    @property
+    def ploidy(self):
+        return self.data['ploidy']
 
     def initialize(self):
         data = {
@@ -154,6 +160,56 @@ class Genotype(object):
     def __str__(self):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
+    @property
+    def bedstream(self):
+        hapids = self.haplotypes()
+        for locusid in sorted(self.loci()):
+            locusdata = microhapdb.id_xref(locusid).iloc[0]
+            context = microhapulator.panel.LocusContext(locusdata)
+            coords = microhapdb.allele_positions(locusdata['ID'])
+            coords = list(map(context.global_to_local, coords))
+            locusvars = [list() for _ in range(len(coords))]
+            for haplotype in sorted(hapids):
+                allele = self.alleles(locusid, haplotype=haplotype).pop()
+                for var, varlist in zip(allele.split(','), locusvars):
+                    varlist.append(var)
+            for coord, var in zip(coords, locusvars):
+                allelestr = '|'.join(var)
+                yield '\t'.join((locusid, str(coord), str(coord + 1), allelestr))
+
+    def seqstream(self, seqindex, prechr=False):
+        for locusid in sorted(self.loci()):
+            canonid = microhapdb.id_xref(locusid).iloc[0]
+            context = microhapulator.panel.LocusContext(canonid)
+            yield context.defline(), context.sequence(seqindex, prechr=prechr)
+
+    @property
+    def bedstr(self):
+        out = StringIO()
+        for line in self.bedstream:
+            print(line, file=out)
+        return out.getvalue()
+
+    @property
+    def haploseqs(self):
+        '''Apply genotype to reference and construct full haplotype sequences.'''
+        seqindex = Fastaidx(microhapulator.package_file('hg38.fasta'))
+        mutator = mutate(self.seqstream(seqindex), self.bedstream)
+        for defline, sequence in mutator:
+            yield defline, sequence
+
+    def unmix(self):
+        assert self.ploidy % 2 == 0
+        ncontrib = int(self.ploidy / 2)
+        genotypes = [SimulatedGenotype() for _ in range(ncontrib)]
+        for locus in self.loci():
+            for contrib in range(ncontrib):
+                for hap in range(2):
+                    haplotype = (2 * contrib) + hap
+                    allele = self.alleles(locus, haplotype=haplotype).pop()
+                    genotypes[contrib].add(hap, locus, allele)
+        return genotypes
+
 
 class SimulatedGenotype(Genotype):
     """Genotype represented by phased alleles at a number of specified loci.
@@ -221,39 +277,9 @@ class SimulatedGenotype(Genotype):
             self.data['loci'][locusid] = {'genotype': list()}
         self.data['loci'][locusid]['genotype'].append({'allele': allele, 'haplotype': hapid})
 
-    def seqstream(self, seqindex, prechr=False):
-        for locusid in sorted(self.loci()):
-            canonid = microhapdb.id_xref(locusid).iloc[0]
-            context = microhapulator.panel.LocusContext(canonid)
-            yield context.defline(), context.sequence(seqindex, prechr=prechr)
-
     @property
     def gttype(self):
         return 'SimulatedGenotype'
-
-    @property
-    def bedstream(self):
-        hapids = self.haplotypes()
-        for locusid in sorted(self.loci()):
-            locusdata = microhapdb.id_xref(locusid).iloc[0]
-            context = microhapulator.panel.LocusContext(locusdata)
-            coords = microhapdb.allele_positions(locusdata['ID'])
-            coords = list(map(context.global_to_local, coords))
-            locusvars = [list() for _ in range(len(coords))]
-            for haplotype in sorted(hapids):
-                allele = self.alleles(locusid, haplotype=haplotype).pop()
-                for var, varlist in zip(allele.split(','), locusvars):
-                    varlist.append(var)
-            for coord, var in zip(coords, locusvars):
-                allelestr = '|'.join(var)
-                yield '\t'.join((locusid, str(coord), str(coord + 1), allelestr))
-
-    @property
-    def bedstr(self):
-        out = StringIO()
-        for line in self.bedstream:
-            print(line, file=out)
-        return out.getvalue()
 
 
 class ObservedGenotype(Genotype):

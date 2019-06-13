@@ -9,59 +9,36 @@
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser('sim')
-    cli._positionals.title = 'Input configuration'
-    cli._optionals.title = 'Miscellaneous'
-
-    hapargs = cli.add_argument_group('Haplotype simulation')
-    hapargs.add_argument(
-        '--panel', nargs='+', metavar='ID', help='list of MicroHapDB locus '
-        'IDs for which to simulate data; by default, a panel of 22 ALFRED '
-        'microhaplotype loci is used'
+    desc = (
+        'Use precomputed population allele frequencies to simulate a diploid '
+        'genotype for the specified panel of microhaplotypes.'
     )
-    hapargs.add_argument(
+    cli = subparsers.add_parser('sim', description=desc)
+
+    cli.add_argument(
+        '-o', '--out', metavar='FILE', help='write simulated genotype data in '
+        'JSON format to FILE'
+    )
+    cli.add_argument(
+        '--haplo-seq', metavar='FILE', help='write simulated haplotype '
+        'sequences in FASTA format to FILE'
+    )
+    cli.add_argument(
+        '-s', '--seed', type=int, default=None, metavar='INT', help='seed for '
+        'random number generator'
+    )
+    cli.add_argument(
         '-r', '--relaxed', action='store_true', help='if a locus in the panel '
         'has no frequency data for a requested population, randomly draw an '
         'allele (from a uniform distribution) from all possible alleles; by '
         'default, these loci are exluded from simulation'
     )
-    hapargs.add_argument(
-        '--hap-seed', type=int, default=None, metavar='INT', help='random '
-        'seed for simulating haplotypes'
+    cli.add_argument(
+        'popid', nargs=2, help='population identifiers for two haplotypes'
     )
-
-    seqargs = cli.add_argument_group('Targeted sequencing')
-    seqargs.add_argument(
-        '-n', '--num-reads', type=int, default=500000, metavar='N',
-        help='number of reads to simulate; default is 500000'
+    cli.add_argument(
+        'panel', nargs='+', help='panel from which to simulate microhap '
+        'genotypes; can be a list of MicroHapDB locus identifiers or the '
+        'label for one of MicroHapulator\'s preset panels (such as alpha, '
+        'beta, or usa)'
     )
-    seqargs.add_argument(
-        '--seq-seed', type=int, default=None, metavar='INT', help='random '
-        'seed for simulated sequencing'
-    )
-    seqargs.add_argument(
-        '--seq-threads', type=int, default=None, metavar='INT', help='number '
-        'of threads to use when simulating targeted amplicon sequencing'
-    )
-    outargs = cli.add_argument_group('Output configuration')
-    outargs.add_argument(
-        '-y', '--dry-run', action='store_true', help='simulate genotype and '
-        'produce any requested outputs, but terminate prior to simulating '
-        'reads'
-    )
-    outargs.add_argument(
-        '-o', '--out', metavar='FILE', help='write simulated MiSeq reads in '
-        'FASTQ format to FILE; by default, reads are written to terminal '
-        '(standard output)'
-    )
-    outargs.add_argument(
-        '--genotype', metavar='FILE', help='write simulated genotype data in '
-        'JSON format to FILE'
-    )
-    outargs.add_argument(
-        '--haploseq', metavar='FILE', help='write simulated haplotype '
-        'sequences in FASTA format to FILE'
-    )
-
-    cli.add_argument('popid', nargs='+', help='population ID(s)')
-    cli._action_groups[1], cli._action_groups[-1] = cli._action_groups[-1], cli._action_groups[1]

@@ -229,6 +229,7 @@ def validate_populations(popids):
     if len(popids) not in (1, 2):
         message = 'please provide only 1 or 2 population IDs'
         raise ValueError(message)
+    popids = sorted(set(popids))
     haplopops = microhapdb.standardize_ids(popids)
     if len(haplopops) < len(popids):
         raise ValueError('invalid or duplicated population ID(s)')

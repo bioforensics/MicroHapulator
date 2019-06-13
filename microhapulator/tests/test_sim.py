@@ -9,91 +9,70 @@
 
 import filecmp
 import microhapulator
+from microhapulator.genotype import SimulatedGenotype
 from microhapulator.tests import data_file
 import pytest
 import shutil
 import tempfile
 
 
-def test_main():
-    tempdir = tempfile.mkdtemp()
-    try:
-        arglist = [
-            'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
-            '--num-reads', '500', '--haploseq', tempdir + '/haplo.fasta',
-            '--genotype', tempdir + '/genotype.bed', '--hap-seed', '293847',
-            '--seq-seed', '123454321', 'MHDBP000004'
-        ]
-        args = microhapulator.cli.parse_args(arglist)
-        microhapulator.sim.main(args)
-
-        gt = microhapulator.genotype.SimulatedGenotype(fromfile=tempdir + '/genotype.bed')
-        testgt = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('alpha.sim.json'))
-        assert gt == testgt
-        assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('alpha.fasta'))
-        assert filecmp.cmp(tempdir + '/reads.fastq', data_file('alpha.fastq'))
-    finally:
-        shutil.rmtree(tempdir)
+def test_meaning_of_life():
+    genotype = microhapulator.sim.sim(['MHDBP000022', 'MHDBP000022'], ['beta'], seed=42)
+    testgenotype = SimulatedGenotype(fromfile=data_file('meaning-of-life.json.gz'))
+    assert genotype == testgenotype
 
 
-def test_main_no_haploseq():
-    tempdir = tempfile.mkdtemp()
-    try:
-        arglist = [
-            'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
-            '--num-reads', '250', '--hap-seed', '1234', '--seq-seed', '5678',
-            '--seq-threads', '2', 'MHDBP000004',
-        ]
-        args = microhapulator.cli.parse_args(arglist)
-        microhapulator.sim.main(args)
-        assert filecmp.cmp(tempdir + '/reads.fastq', data_file('beta.fastq'))
-    finally:
-        shutil.rmtree(tempdir)
-
-
-@pytest.mark.parametrize('relaxed,testfile', [
-    (False, 'gamma-strict.fastq'),
-    (True, 'gamma-relaxed.fastq'),
+@pytest.mark.parametrize('relaxmode,testfile', [
+    (False, 'red-strict-gt.json'),
+    (True, 'red-relaxed-gt.json'),
 ])
-def test_main_relaxed(relaxed, testfile):
+def test_sim_relaxed(relaxmode, testfile):
+    genotype = microhapulator.sim.sim(
+        ['MHDBP000003'], ['MHDBL000013', 'MHDBL000212', 'MHDBL000197'],
+        seed=54321, relaxed=relaxmode
+    )
+    testgenotype = SimulatedGenotype(fromfile=data_file(testfile))
+    assert genotype == testgenotype
+
+
+def test_main():
+    with tempfile.NamedTemporaryFile(suffix='.gt.json') as outfile:
+        arglist = [
+            'sim', '--out', outfile.name, '--seed', '1985', 'MHDBP000022', 'MHDBP000022',
+            'usa'
+        ]
+        args = microhapulator.cli.parse_args(arglist)
+        microhapulator.sim.main(args)
+        gt = SimulatedGenotype(fromfile=outfile.name)
+        testgt = SimulatedGenotype(fromfile=data_file('bitusa-gt.json'))
+        assert gt == testgt
+
+
+def test_main_haplo_seq():
     tempdir = tempfile.mkdtemp()
     try:
         arglist = [
-            'sim', '--panel', 'MHDBL000013', 'MHDBL000212', 'MHDBL000197', '--num-reads', '100',
-            '--hap-seed', '54321', '--seq-seed', '24680', '--out', tempdir + '/reads.fastq',
-            'MHDBP000003',
+            'sim', '--seed', '293847', '--out', tempdir + '/genotype.json',
+            '--haplo-seq', tempdir + '/haplo.fasta', 'MHDBP000004', 'MHDBP000004',
+            'MHDBL000197', 'MHDBL000066'
         ]
         args = microhapulator.cli.parse_args(arglist)
-        args.relaxed = relaxed
         microhapulator.sim.main(args)
-        assert filecmp.cmp(tempdir + '/reads.fastq', data_file(testfile))
+        gt = SimulatedGenotype(fromfile=tempdir + '/genotype.json')
+        testgt = SimulatedGenotype(fromfile=data_file('orange-sim-gt.json'))
+        assert gt == testgt
+        assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('orange-haplo.fasta'))
     finally:
         shutil.rmtree(tempdir)
 
 
-def test_main_no_seeds():
-    tempdir = tempfile.mkdtemp()
-    try:
-        arglist = [
-            'sim', '--panel', 'MHDBL000197', 'MHDBL000066', '--out', tempdir + '/reads.fastq',
-            '--num-reads', '200', '--seq-threads', '1', 'MHDBP000004',
-        ]
-        args = microhapulator.cli.parse_args(arglist)
-        microhapulator.sim.main(args)
-        with open(tempdir + '/reads.fastq', 'r') as fh:
-            filelines = fh.read().strip().split('\n')
-            assert len(filelines) == 800  # 200 reads * 4 lines per read = 800 lines
-    finally:
-        shutil.rmtree(tempdir)
+def test_no_seed():
+    genotype = microhapulator.sim.sim(['MHDBP000004'], ['MHDBL000197', 'MHDBL000066'])
+    assert len(genotype.data['loci']) == 2
+    assert sorted(genotype.data['loci']) == ['MHDBL000066', 'MHDBL000197']
 
 
-def test_main_bad_panel():
-    with tempfile.NamedTemporaryFile(suffix='fq.gz') as outfile:
-        arglist = [
-            'sim', '--panel', 'DUUUUDE', 'SWEEEET', '--num-reads', '10',
-            '-o', outfile.name, 'MHDBP000004'
-        ]
-        args = microhapulator.cli.parse_args(arglist)
-        with pytest.raises(ValueError) as ve:
-            microhapulator.sim.main(args)
-        assert 'invalid panel' in str(ve)
+def test_bad_panel():
+    with pytest.raises(ValueError) as ve:
+        microhapulator.sim.sim(['MHDBP000004'], ['DUUUUDE', 'SWEEEET'])
+    assert 'invalid panel' in str(ve)

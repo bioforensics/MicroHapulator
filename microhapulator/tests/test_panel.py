@@ -38,6 +38,7 @@ def test_panel_loci(panel, size, included, excluded):
 def test_validate_populations():
     from microhapulator.panel import validate_populations as valpop
     assert valpop(['MHDBP000012']) == ['MHDBP000012', 'MHDBP000012']
+    assert valpop(['MHDBP000012', 'MHDBP000012']) == ['MHDBP000012', 'MHDBP000012']
     assert valpop(['SA000020C', 'SA000012D']) == ['MHDBP000023', 'MHDBP000063']
     assert valpop(['SA000025H', 'MHDBP000063']) == ['MHDBP000063', 'MHDBP000075']
 
@@ -49,9 +50,6 @@ def test_validate_populations_bad_ids():
     assert 'invalid or duplicated population ID(s)' in str(ve)
     with pytest.raises(ValueError) as ve:
         _ = valpop(['NotARealID', 'MHDBP000077'])
-    assert 'invalid or duplicated population ID(s)' in str(ve)
-    with pytest.raises(ValueError) as ve:
-        _ = valpop(['MHDBP000012', 'MHDBP000012'])
     assert 'invalid or duplicated population ID(s)' in str(ve)
     with pytest.raises(ValueError) as ve:
         _ = valpop(['SA000020C', 'MHDBP000023'])
