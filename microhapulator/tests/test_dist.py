@@ -55,7 +55,7 @@ def test_dist_sim_vs_obs(hdist):
             'dist', '--out', outfile.name, data_file(filename),
             data_file('murica/z-sim-genotype.json')
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.dist.main(args)
         with open(outfile.name, 'r') as fh:
             assert json.load(fh) == {"hamming_distance": hdist}
@@ -67,7 +67,7 @@ def test_dist_cli():
             'dist', '--out', outfile.name, data_file('gujarati-ind2-gt.json'),
             data_file('gujarati-ind3-gt.json')
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.dist.main(args)
         with open(outfile.name, 'r') as fh:
             assert json.load(fh) == {"hamming_distance": 3}

@@ -36,7 +36,7 @@ def test_contrib_main(capsys):
     bam = data_file('three-contrib-log.bam')
     refr = data_file('default-panel.fasta.gz')
     arglist = ['contrib', '-b', bam, '-r', refr]
-    args = microhapulator.cli.parse_args(arglist)
+    args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.contrib.main(args)
     out, err = capsys.readouterr()
     assert '"min_num_contrib": 3' in out

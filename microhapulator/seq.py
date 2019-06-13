@@ -96,7 +96,8 @@ def seq(genotypes, seeds=None, threads=1, totalreads=500000, proportions=None,
         microhapulator.plog('[MicroHapulator::mixture]', message)
         sequencer = sequencing(
             genotype, seed=seed, threads=threads, numreads=nreads,
-            readsignature=readsignature, readindex=reads_sequenced
+            readsignature=readsignature, readindex=reads_sequenced,
+            debug=debug,
         )
         for data in sequencer:
             yield data

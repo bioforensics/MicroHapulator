@@ -39,7 +39,7 @@ def test_type_cli_simple():
             data_file('pashtun-sim/tiny-panel.fasta.gz'),
             data_file('pashtun-sim/aligned-reads.bam'),
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.type.main(args)
         testgtfile = data_file('pashtun-sim/test-output.json')
         gtdata = microhapulator.genotype.ObservedGenotype(fromfile=outfile.name)

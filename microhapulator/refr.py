@@ -22,9 +22,7 @@ def get_seqs(locusids, seqindex, delta=30, minlength=350):
         yield context.defline(), context.sequence(seqindex)
 
 
-def main(args=None):
-    if args is None:  # pragma: no cover
-        args = get_parser().parse_args()
+def main(args):
     locusids = panel_loci(args.panel)
     seqindex = Fastaidx(microhapulator.package_file('hg38.fasta'))
     with microhapulator.open(args.out, 'w') as fh:

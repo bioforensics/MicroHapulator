@@ -31,6 +31,7 @@ def test_refr_cli_simple():
             'refr', '--min-length', '250', '--out', outfile.name,
             'mh06KK-008', 'SI664615C', 'MHDBL000031'
         ]
-        microhapulator.__main__.main(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
+        microhapulator.refr.main(args)
         testoutfile = data_file('three-loci-refr.fasta')
         assert filecmp.cmp(outfile.name, testoutfile)

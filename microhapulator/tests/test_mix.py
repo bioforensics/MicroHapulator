@@ -20,7 +20,7 @@ def test_mix_main():
             'mix', '--out', outfile.name, data_file('green-sim-gt-1.json.gz'),
             data_file('green-sim-gt-2.json.gz'), data_file('green-sim-gt-3.json.gz')
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.mix.main(args)
         gt = SimulatedGenotype(fromfile=outfile.name)
         testgt = SimulatedGenotype(fromfile=data_file('green-sim-gt-combined.json.gz'))

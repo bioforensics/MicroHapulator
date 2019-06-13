@@ -67,6 +67,8 @@ def open(filename, mode):
 
 def plog(*args, **kwargs):
     """Print logging output."""
+    global logstream
+    global teelog
     if logstream is not None:
         print(*args, **kwargs, file=logstream)
     if logstream is None or teelog:

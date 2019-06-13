@@ -41,7 +41,7 @@ def test_main():
             'sim', '--out', outfile.name, '--seed', '1985', 'MHDBP000022', 'MHDBP000022',
             'usa'
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)
         gt = SimulatedGenotype(fromfile=outfile.name)
         testgt = SimulatedGenotype(fromfile=data_file('bitusa-gt.json'))
@@ -56,7 +56,7 @@ def test_main_haplo_seq():
             '--haplo-seq', tempdir + '/haplo.fasta', 'MHDBP000004', 'MHDBP000004',
             'MHDBL000197', 'MHDBL000066'
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)
         gt = SimulatedGenotype(fromfile=tempdir + '/genotype.json')
         testgt = SimulatedGenotype(fromfile=data_file('orange-sim-gt.json'))
