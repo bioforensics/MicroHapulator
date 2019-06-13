@@ -31,7 +31,7 @@ def test_contain_cli(capsys):
     arglist = [
         'contain', data_file('one-brit-sim.json'), data_file('one-italian-sim.json')
     ]
-    args = microhapulator.cli.parse_args(arglist)
+    args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.contain.main(args)
     terminal = capsys.readouterr()
     assert '"containment": 0.4444' in terminal.out

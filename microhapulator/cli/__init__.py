@@ -10,7 +10,7 @@
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import microhapulator
-from sys import stderr
+import sys
 from . import contain
 from . import contrib
 from . import dist
@@ -82,9 +82,14 @@ subcommands listed below to see instructions for that operation.
     return parser
 
 
-def parse_args(arglist=None):
+def parse_args(arglist=None):  # pragma: no cover
+    '''Parse arguments from the command line and configure logging.
+
+    Calling this function in a testing context has proven problematic. Please
+    use only in a runtime context.
+    '''
     args = get_parser().parse_args(arglist)
-    microhapulator.logstream = stderr
+    microhapulator.logstream = sys.stderr
     if args.logfile and args.logfile != '-':
         microhapulator.logstream = open(args.logfile, 'w')
     microhapulator.teelog = args.tee

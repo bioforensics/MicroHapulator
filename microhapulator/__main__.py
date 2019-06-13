@@ -10,7 +10,7 @@
 import microhapulator
 
 
-def main(arglist=None):
+def main(arglist=None):  # pragma: no cover
     """Entry point for the MicroHapulator CLI.
 
     Isolated as a method so that the CLI can be called by other Python code
@@ -19,8 +19,8 @@ def main(arglist=None):
     line.
     """
     args = microhapulator.cli.parse_args(arglist)
-    if args.subcmd is None:  # pragma: no cover
-        microhapulator.cli.parser().parse_args(['-h'])
+    if args.subcmd is None:
+        microhapulator.cli.get_parser().parse_args(['-h'])
 
     assert args.subcmd in microhapulator.cli.mains
     mainmethod = microhapulator.cli.mains[args.subcmd]

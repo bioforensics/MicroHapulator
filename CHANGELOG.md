@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New `contain` module for calculating the proportion of alleles from one sample present in another sample (see #41).
 - New `--dry-run` mode for `sim` and `mixture` modules (see #41).
 - New `prob` module for calculating likelihood ratio tests based on the random match probability (see #43).
+- New `seq` module focused entirely on sequencing samples where genotypes have already been simulated (see #45).
+- New `mix` module for merging simulated genotypes into a simulated mixture sample (see #45).
+
+### Changed
+- The `sim` module no longer performs simulated sequencing (now handled by new `seq` module) and instead focuses entirely on haplotype simulation (see #45).
+
+### Removed
+- Dropped the `mixture` module, whose functionality is now covered by the more granular `sim`, `mix`, and `seq` modules (see #45).
 
 
 ## [0.3] 2019-06-06

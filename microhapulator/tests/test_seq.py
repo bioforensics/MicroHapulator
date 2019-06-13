@@ -49,7 +49,6 @@ def test_even_mixture():
     assert n == pytest.approx(500, abs=25)
 
 
-@pytest.mark.known_failing
 def test_complex_genotype(capsys):
     genotype = microhapulator.genotype.Genotype(fromfile=data_file('mixture-genotype.json'))
     sequencer = microhapulator.seq.seq(list(genotype.unmix()), threads=2, totalreads=200)
@@ -59,7 +58,6 @@ def test_complex_genotype(capsys):
     assert terminal.err.count('Individual seed=') == 3
 
 
-@pytest.mark.known_failing
 def test_uneven_mixture(capsys):
     panel = ['MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017']
     pops = ['MHDBP000021', 'MHDBP000009', 'MHDBP000081']
@@ -102,7 +100,7 @@ def test_main():
             'seq', '--out', outfile.name, '--seeds', '123454321', '--num-reads', '500',
             '--signature', 'srd6Sei', data_file('orange-sim-gt.json')
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.seq.main(args)
         assert filecmp.cmp(outfile.name, data_file('orange-reads.fastq'))
 
@@ -117,7 +115,7 @@ def test_main_relaxed(relaxmode, gtfile, signature, testfile):
             'seq', '--out', outfile.name, '--seeds', '24680', '--num-reads', '100',
             '--signature', signature, data_file(gtfile)
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         args.relaxed = relaxmode
         microhapulator.seq.main(args)
         assert filecmp.cmp(outfile.name, data_file(testfile))
@@ -129,7 +127,7 @@ def test_main_no_seed():
             'seq', '--out', outfile.name, '--num-reads', '200', '--threads', '1',
             data_file('orange-sim-gt.json')
         ]
-        args = microhapulator.cli.parse_args(arglist)
+        args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.seq.main(args)
         with open(outfile.name, 'r') as fh:
             filelines = fh.read().strip().split('\n')
@@ -141,7 +139,7 @@ def test_main_mixture(capsys):
         'seq', '--seeds', '42', '1776', '--threads', '2', '--proportions', '0.8', '0.2',
         '--num-reads', '500', data_file('yellow-mix-gt.json')
     ]
-    args = microhapulator.cli.parse_args(arglist)
+    args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
     terminal = capsys.readouterr()
     outlines = terminal.out.strip().split('\n')
