@@ -37,3 +37,7 @@ make devhooks
 - in its dedicated module, each subcommand has a primary function matching the name of that subcommand
 - in its dedicated module, each subcommand has a function named `main` whose only purpose is to call the primary function and, if necessary, do file I/O
 - the intent of the previous two points is to maintain a Python API that closely matches the command-line interface; if someone invokes a command on the command line, it should be very easy for them to translate that into a Python API call
+
+There are a few exceptions to this rule, such as the `mix` and `unite` subcommands.
+These are accomplished by calling a single Python command and do not warrant a separate dedicated module.
+The `mhpl8r mix` command is simply a command-line interface to the `microhapulator.genotype.SimulatedGenotype.merge` function, while the `mhpl8r unite` command is an interface to the `microhapulator.genotype.Genotype.unite` function.

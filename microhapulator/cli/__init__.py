@@ -21,6 +21,7 @@ from . import refr
 from . import seq
 from . import sim
 from . import type
+from . import unite
 
 mains = {
     'contain': microhapulator.contain.main,
@@ -33,6 +34,7 @@ mains = {
     'seq': microhapulator.seq.main,
     'sim': microhapulator.sim.main,
     'type': microhapulator.type.main,
+    'unite': microhapulator.unite.main,
 }
 
 subparser_funcs = {
@@ -46,6 +48,7 @@ subparser_funcs = {
     'seq': seq.subparser,
     'sim': sim.subparser,
     'type': type.subparser,
+    'unite': unite.subparser,
 }
 
 
