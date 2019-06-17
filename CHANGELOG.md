@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New `prob` module for calculating likelihood ratio tests based on the random match probability (see #43).
 - New `seq` module focused entirely on sequencing samples where genotypes have already been simulated (see #45).
 - New `mix` module for merging simulated genotypes into a simulated mixture sample (see #45).
+- New `unite` module for "mating" two genotypes to create a simulated "offspring" genotype (see #47).
 
 ### Changed
 - The `sim` module no longer performs simulated sequencing (now handled by new `seq` module) and instead focuses entirely on haplotype simulation (see #45).
