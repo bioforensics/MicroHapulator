@@ -14,6 +14,7 @@ import json
 import jsonschema
 import microhapdb
 import microhapulator
+from numpy.random import choice
 from pyfaidx import Fasta as Fastaidx
 
 
@@ -26,6 +27,24 @@ schema = None
 
 
 class Genotype(object):
+    def unite(mom, dad):
+        """Simulate the creation of a new genotype from a mother and father."""
+        gt = SimulatedGenotype(ploidy=2)
+        allloci = mom.loci() | dad.loci()
+        commonloci = mom.loci() & dad.loci()
+        if len(commonloci) == 0:
+            raise ValueError('mom and dad genotypes have no loci in common')
+        notshared = allloci - commonloci
+        if len(notshared) > 0:
+            message = 'loci not common to mom and dad genotypes are excluded: '
+            message += ', '.join(notshared)
+            microhapulator.plog('[MicroHapulator::genotype]', message)
+        for parent, hapid in zip((mom, dad), (0, 1)):
+            for locus in sorted(commonloci):
+                haploallele = choice(sorted(parent.alleles(locus)))
+                gt.add(hapid, locus, haploallele)
+        return gt
+
     def __init__(self, fromfile=None):
         global schema
         if fromfile:
