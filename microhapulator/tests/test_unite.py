@@ -12,6 +12,7 @@ import microhapulator
 from microhapulator.genotype import Genotype
 from microhapulator.tests import data_file
 import pytest
+from tempfile import NamedTemporaryFile
 
 
 @pytest.mark.parametrize('momgt,dadgt,kidgt,seed', [
@@ -24,5 +25,17 @@ def test_unite_basic(momgt, dadgt, kidgt, seed):
     kid = Genotype(fromfile=data_file(kidgt))
     numpy.random.seed(seed)
     test = Genotype.unite(mom, dad)
-    test.dump('BOOGER' + kidgt)
     assert test == kid
+
+
+def test_unite_cli():
+    with NamedTemporaryFile(suffix='.json') as outfile:
+        arglist = [
+            'unite', '--seed', '113817', '--out', outfile.name,
+            data_file('green-mom-3-gt.json'), data_file('green-dad-3-gt.json'),
+        ]
+        args = microhapulator.cli.get_parser().parse_args(arglist)
+        microhapulator.unite.main(args)
+        gt = Genotype(fromfile=outfile.name)
+        testgt = Genotype(fromfile=data_file('green-kid-3-gt.json'))
+        assert gt == testgt

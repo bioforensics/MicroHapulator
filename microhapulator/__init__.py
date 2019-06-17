@@ -30,6 +30,7 @@ from microhapulator import refr
 from microhapulator import seq
 from microhapulator import sim
 from microhapulator import type
+from microhapulator import unite
 from microhapulator import __main__
 from microhapulator import cli
 
