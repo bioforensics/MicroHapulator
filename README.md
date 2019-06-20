@@ -1,7 +1,8 @@
 [![MicroHapulator build status][travisbadge]](https://travis-ci.org/bioforensics/MicroHapulator)
 [![Test coverage][codecovbadge]](https://codecov.io/github/bioforensics/MicroHapulator)
-[![BSD licensed][licensebadge]](https://github.com/bioforensics/MicroHapDB/blob/master/LICENSE.txt)
+![Platform support][platformbadge]
 [![install with bioconda][biocondabadge]](http://bioconda.github.io/recipes/microhapulator/README.html)
+[![BSD licensed][licensebadge]](https://github.com/bioforensics/MicroHapDB/blob/master/LICENSE.txt)
 
 # MicroHapulator
 
@@ -81,3 +82,4 @@ All contributors are expected to abide by the project's [Code of Conduct](docs/C
 [licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
 [biocondabadge]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
 [binderbadge]: https://mybinder.org/badge_logo.svg
+[platformbadge]: https://img.shields.io/badge/Platforms-linux--64%2Cosx--64-orange.svg
