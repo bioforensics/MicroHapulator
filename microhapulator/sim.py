@@ -33,10 +33,16 @@ def sim(popids, panel, seed=None, relaxed=False):
     if loci in (None, list()):
         raise ValueError('invalid panel: {}'.format(panel))
     genotype = SimulatedGenotype(ploidy=2)
-    if seed:
-        numpy.random.seed(seed)
+    if seed is None:
+        seed = numpy.random.randint(2**32-1)
+    numpy.random.seed(seed)
     for haplotype, locus, allele in sample_panel(haplopops, loci):
         genotype.add(haplotype, locus, allele)
+    genotype.data['metadata'] = {
+        'MaternalHaploPop': haplopops[0],
+        'PaternalHaploPop': haplopops[1],
+        'HaploSeed': seed,
+    }
     message = 'simulated microhaplotype variation at {loc:d} loci'.format(loc=len(loci))
     microhapulator.plog('[MicroHapulator::sim]', message)
     return genotype
