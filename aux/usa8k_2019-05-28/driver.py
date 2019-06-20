@@ -43,7 +43,7 @@ with open('sample-contrib.tsv', 'w') as cout, open('sample-seq.tsv', 'w') as sou
             mom, dad = numpy.random.choice(target_pop, 2, replace=False)
             kidlabel = gen_sim_params.get_id()
             print(
-                kidlabel, mom.label, dad.label,
+                kidlabel, mom.contriblabel, dad.contriblabel,
                 numpy.random.randint(2**32 - 1), sep='\t', file=uout
             )
             print(

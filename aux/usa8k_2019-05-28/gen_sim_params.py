@@ -79,6 +79,11 @@ class SimulatedSample(object):
         props = ','.join(map('{:.4f}'.format, self.proportions))
         return '\t'.join((self.label, contribs, seqseeds, props))
 
+    @property
+    def contriblabel(self):
+        assert self.ncontrib == 1
+        return self.contributors[0].label
+
 
 def haplotype_pair(popdata):
     pop1 = numpy.random.choice(popdata.Population, p=popdata.Weight)
