@@ -144,7 +144,8 @@ class Genotype(object):
         The test only makes sense when the two genotypes being compared are
         identical or nearly identical.
         """
-        assert self.data['ploidy'] == 2 and other.data['ploidy'] == 2
+        assert self.data['ploidy'] in (2, None)
+        assert other.data['ploidy'] in (2, None)
         mismatches = 0
         for locus in self.loci():
             selfalleles = self.alleles(locus)
@@ -333,3 +334,7 @@ class ObservedGenotype(Genotype):
             self.data['loci'][locusid]['genotype'] = [
                 {'allele': a, 'haplotype': None} for a in sorted(gt)
             ]
+
+    @property
+    def gttype(self):
+        return 'ObservedGenotype'

@@ -48,5 +48,5 @@ with open('sample-contrib.tsv', 'w') as cout, open('sample-seq.tsv', 'w') as sou
             )
             print(
                 gen_sim_params.get_id(), kidlabel, numpy.random.randint(2**32 - 1),
-                '1.0', file=sout
+                '1.0', sep='\t', file=sout
             )

@@ -47,7 +47,7 @@ def sequencing(genotype, seed=None, threads=1, numreads=500000,
                 print('>', defline, '\n', sequence, sep='', file=fh)
         isscmd = [
             'iss', 'generate', '--n_reads', str(numreads * 2), '--draft', haplofile,
-            '--model', 'MiSeq', '--output', tempdir + '/seq'
+            '--model', 'MiSeq', '--output', tempdir + '/seq', '--quiet'
         ]
         if seed:
             isscmd.extend(['--seed', str(seed)])
@@ -93,7 +93,7 @@ def seq(genotypes, seeds=None, threads=1, totalreads=500000, proportions=None,
     reads_sequenced = 0
     for genotype, seed, nreads in zip(genotypes, seeds, numreads):
         message = 'Individual seed={seed} numreads={n}'.format(seed=seed, n=nreads)
-        microhapulator.plog('[MicroHapulator::mixture]', message)
+        microhapulator.plog('[MicroHapulator::seq]', message)
         sequencer = sequencing(
             genotype, seed=seed, threads=threads, numreads=nreads,
             readsignature=readsignature, readindex=reads_sequenced,
