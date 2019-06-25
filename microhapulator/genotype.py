@@ -321,7 +321,9 @@ class ObservedGenotype(Genotype):
     def infer(self, threshold=None):
         for locusid, locusdata in self.data['loci'].items():
             allelecounts = locusdata['allele_counts']
-            avgcount = sum(allelecounts.values()) / len(allelecounts.values())
+            avgcount = 0.0
+            if len(allelecounts.values()) > 0:
+                avgcount = sum(allelecounts.values()) / len(allelecounts.values())
             gt = set()
             for allele, count in allelecounts.items():
                 if threshold is not None:

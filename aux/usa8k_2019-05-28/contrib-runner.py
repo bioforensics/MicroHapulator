@@ -21,7 +21,7 @@ def simulate(data):
         row['PaternalHaploPop'],
     ]
     genotype = microhapulator.sim.sim(populations, usapanel, seed=row['HaploSeed'])
-    filename = row['ID'] + '-genotype.json'
+    filename = row['ID'] + '-simulated-genotype.json'
     genotype.dump(filename)
 
 

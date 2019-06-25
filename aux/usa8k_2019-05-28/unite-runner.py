@@ -15,11 +15,11 @@ args = cli.parse_args()
 
 def unite(data):
     index, row = data
-    mom = microhapulator.genotype.SimulatedGenotype(fromfile=row['MaternalID'] + '-genotype.json')
-    dad = microhapulator.genotype.SimulatedGenotype(fromfile=row['PaternalID'] + '-genotype.json')
+    mom = microhapulator.genotype.SimulatedGenotype(fromfile=row['MaternalID'] + '-simulated-genotype.json')
+    dad = microhapulator.genotype.SimulatedGenotype(fromfile=row['PaternalID'] + '-simulated-genotype.json')
     numpy.random.seed(row['Seed'])
     kid = microhapulator.genotype.Genotype.unite(mom, dad)
-    filename = row['ID'] + '-genotype.json'
+    filename = row['ID'] + '-simulated-genotype.json'
     kid.dump(filename)
 
 

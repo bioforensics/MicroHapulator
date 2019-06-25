@@ -24,6 +24,7 @@ class SimulatedSample(object):
         self.seqseeds = list()
         self.evenprops = even
         self._prop = None
+        self._min_prop = 0.01
 
     def add_contributor(self, maternalpop, paternalpop, haploseed, seqseed):
         contrib = Contributor(get_id(), maternalpop, paternalpop, haploseed)
@@ -56,16 +57,16 @@ class SimulatedSample(object):
                 if self.evenprops:
                     self._prop = [1.0 / self.ncontrib] * self.ncontrib
                 else:
-                    samp_vals = sorted(
-                        numpy.random.random(self.ncontrib - 1) * 0.9 + 0.05
+                    limit = int(1 / self._min_prop)
+                    dividers = sorted(
+                        numpy.random.choice(
+                            range(1, limit), self.ncontrib - 1, replace=False,
+                        )
                     )
-                    total = 0.0
-                    self._prop = list()
-                    for val in samp_vals:
-                        prop = val - total
-                        self._prop.append(prop)
-                        total += prop
-                    self._prop.append(1.0 - total)
+                    self._prop = [
+                        (a - b) / limit
+                        for a, b in zip(dividers + [limit], [0] + dividers)
+                    ]
         return self._prop
 
     @property
@@ -76,7 +77,7 @@ class SimulatedSample(object):
     def seqparams(self):
         contribs = ','.join([c.label for c in self.contributors])
         seqseeds = ','.join(map(str, self.seqseeds))
-        props = ','.join(map('{:.4f}'.format, self.proportions))
+        props = ','.join(map('{:.3f}'.format, self.proportions))
         return '\t'.join((self.label, contribs, seqseeds, props))
 
     @property

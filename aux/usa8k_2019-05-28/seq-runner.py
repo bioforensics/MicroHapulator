@@ -16,7 +16,7 @@ args = cli.parse_args()
 def simulate(data):
     index, row = data
     genotypes = [
-        microhapulator.genotype.SimulatedGenotype(fromfile=contrib + '-genotype.json')
+        microhapulator.genotype.SimulatedGenotype(fromfile=contrib + '-simulated-genotype.json')
         for contrib in row['Contributors'].split(',')
     ]
     seeds = list(map(int, row['SeqSeeds'].split(',')))
