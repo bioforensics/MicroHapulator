@@ -1,0 +1,675 @@
+# --------------------------------------------------------------------------------------------------
+# Copyright (c) 2019, Battelle National Biodefense Institute.
+#
+# This file is part of MicroHapulator (github.com/bioforensics/microhapulator)
+# and is licensed under the BSD license: see LICENSE.txt.
+# --------------------------------------------------------------------------------------------------
+
+from collections import defaultdict, namedtuple
+from gzip import open as gzopen
+import microhapulator
+from microhapulator.genotype import SimulatedGenotype
+import numpy
+import os
+import pandas
+from string import ascii_letters, digits
+
+
+# --------------------------------------------------------------------------------------------------
+# Supporting code: simulating samples
+# --------------------------------------------------------------------------------------------------
+
+def get_id(length=7):
+    '''Generate a new unique alphanumeric sample/contributor label.'''
+    symbols = list(ascii_letters + digits)
+    return ''.join([numpy.random.choice(symbols) for _ in range(length)])
+
+
+Contributor = namedtuple('Contributor', 'label mompop dadpop haploseed')
+
+
+class SimulatedSample(object):
+    '''Convenience class for simulating single- or multi-contributor samples'''
+
+    def __init__(self, even=False):
+        self.label = get_id()
+        self.contributors = list()
+        self.seqseeds = list()
+        self.evenprops = even
+        self._prop = None
+        self._min_prop = 0.01
+
+    def add_contributor(self, maternalpop, paternalpop, haploseed, seqseed):
+        contrib = Contributor(get_id(), maternalpop, paternalpop, haploseed)
+        self.contributors.append(contrib)
+        self.seqseeds.append(seqseed)
+
+    @property
+    def ncontrib(self):
+        return len(self.contributors)
+
+    @property
+    def popstring(self):
+        assert self.ncontrib == 1
+        pops = sorted(
+            set(
+                [
+                    self.contributors[0].mompop,
+                    self.contributors[0].dadpop,
+                ]
+            )
+        )
+        return ','.join(pops)
+
+    @property
+    def proportions(self):
+        if self._prop is None:
+            if self.ncontrib == 1:
+                self._prop = [1.0]
+            else:
+                if self.evenprops:
+                    self._prop = [1.0 / self.ncontrib] * self.ncontrib
+                else:
+                    limit = int(1 / self._min_prop)
+                    dividers = sorted(
+                        numpy.random.choice(
+                            range(1, limit), self.ncontrib - 1, replace=False,
+                        )
+                    )
+                    self._prop = [
+                        (a - b) / limit
+                        for a, b in zip(dividers + [limit], [0] + dividers)
+                    ]
+        return self._prop
+
+    @property
+    def simparams(self):
+        return '\n'.join(['\t'.join(map(str, c)) for c in self.contributors])
+
+    @property
+    def seqparams(self):
+        contribs = ','.join([c.label for c in self.contributors])
+        seqseeds = ','.join(map(str, self.seqseeds))
+        props = ','.join(map('{:.3f}'.format, self.proportions))
+        return '\t'.join((self.label, contribs, seqseeds, props))
+
+    @property
+    def contriblabel(self):
+        assert self.ncontrib == 1
+        return self.contributors[0].label
+
+
+def haplotype_pair(popdata):
+    pop1 = numpy.random.choice(popdata.Population, p=popdata.Weight)
+    if numpy.random.random() < 0.1:
+        otherpops = popdata[popdata.Population != pop1].copy()
+        otherpops.Weight /= sum(otherpops.Weight)
+        pop2 = numpy.random.choice(otherpops.Population, p=otherpops.Weight)
+    else:
+        pop2 = pop1
+    return pop1, pop2
+
+
+def simulate_contributor(popdata):
+    pop1, pop2 = haplotype_pair(popdata)
+    haploseed = numpy.random.randint(2**32-1)
+    seqseed = numpy.random.randint(2**32-1)
+    return pop1, pop2, haploseed, seqseed
+
+
+def simulate_samples(nsamples, ncontrib=1, even=False, seed=None):
+    demofile = microhapulator.package_file('usa-demographics.tsv')
+    demo = pandas.read_csv(demofile, sep='\t')
+    demo.Weight /= sum(demo.Weight)
+    if not seed:
+        seed = numpy.random.randint(2**32-1)
+    print('Using random seed', seed)
+    numpy.random.seed(seed)
+    for x in range(nsamples):
+        sample = SimulatedSample(even=even)
+        for y in range(ncontrib):
+            pop1, pop2, haploseed, seqseed = simulate_contributor(demo)
+            sample.add_contributor(pop1, pop2, haploseed, seqseed)
+        yield sample
+
+
+# --------------------------------------------------------------------------------------------------
+# Supporting code: parameter indexes
+# --------------------------------------------------------------------------------------------------
+
+class ParamIndex():
+    def __init__(self):
+        self.table = None
+        self.data = None
+        if os.path.isfile(self.tablefile):
+            self.table = dict()
+            self.data = pandas.read_csv(self.tablefile, sep='\t')
+            for n, row in self.data.iterrows():
+                self.table[row['ID']] = row
+
+    def __getitem__(self, label):
+        if self.table is None:
+            return None
+        return self.table[label]
+
+    def __contains__(self, label):
+        if self.table is None:
+            return False
+        return label in self.table
+
+    @property
+    def ids(self):
+        if self.table is None:
+            return []
+        return list(self.table.keys())
+
+
+class ContributorParamIndex(ParamIndex):
+    def __init__(self):
+        super(ContributorParamIndex, self).__init__()
+        if self.data is not None:
+            self.samples_by_haplopops = defaultdict(list)
+            for n, row in self.data.iterrows():
+                haplostr = ','.join([
+                    row['MaternalHaploPop'], row['PaternalHaploPop']
+                ])
+                self.samples_by_haplopops[haplostr].append(row['ID'])
+
+    @property
+    def tablefile(self):
+        return os.path.join(os.getcwd(), 'sample-contrib.tsv')
+
+    def haplopops(self, label):
+        result = self.data[self.data.ID == label]
+        assert len(result) == 1
+        return [*result.MaternalHaploPop, *result.PaternalHaploPop]
+
+
+class UniteParamIndex(ParamIndex):
+    @property
+    def tablefile(self):
+        return os.path.join(os.getcwd(), 'sample-unite.tsv')
+
+    def contrib_prereqs(self, label):
+        data = self.table[label]
+        mom = data['MaternalID'] + '-simulated-genotype.json'
+        dad = data['PaternalID'] + '-simulated-genotype.json'
+        return mom, dad
+
+
+class SeqParamIndex(ParamIndex):
+    @property
+    def tablefile(self):
+        return os.path.join(os.getcwd(), 'sample-seq.tsv')
+
+    def contributors(self, label):
+        data = self.table[label]
+        return data['Contributors'].split(',')
+
+
+class ReseqParamIndex(SeqParamIndex):
+    @property
+    def tablefile(self):
+        return os.path.join(os.getcwd(), 'sample-match-subset-500.tsv')
+
+    @property
+    def subjects(self):
+        if not hasattr(self, 'data') or self.data is None:
+            return []
+        return self.data['Contributors'].unique()
+
+
+class MatchSamepopIndex(ParamIndex):
+    @property
+    def tablefile(self):
+        return os.path.join(os.getcwd(), 'sample-match-samepop.tsv')
+
+    def background(self, label):
+        bkg = self.table[label]['Background']
+        sfiles = list()
+        for sample in bkg.split(','):
+            sfiles.append(sample + '-simulated-genotype.json')
+        return sfiles
+
+
+class MatchAllpopIndex(MatchSamepopIndex):
+    @property
+    def tablefile(self):
+        return os.path.join(os.getcwd(), 'sample-match-allpop.tsv')
+
+
+usapanel = microhapulator.panel.panel_usa()
+contrib_genotype_params = ContributorParamIndex()
+unite_params = UniteParamIndex()
+seq_params = SeqParamIndex()
+reseq_params = ReseqParamIndex()
+match_samepop_params = MatchSamepopIndex()
+match_allpop_params = MatchAllpopIndex()
+
+def genotype_files(label):
+    assert label in seq_params or label in reseq_params, label
+    index = seq_params if label in seq_params else reseq_params
+    contributors = index.contributors(label)
+    gtfiles = list()
+    for contrib in contributors:
+        if contrib in unite_params:
+            gtfiles.append(contrib + '-united-genotype.json')
+        else:
+            gtfiles.append(contrib + '-simulated-genotype.json')
+    return gtfiles
+
+
+# --------------------------------------------------------------------------------------------------
+# Workflow prep: select simulation parameters
+# --------------------------------------------------------------------------------------------------
+
+rule prep_init:
+    output:
+        contrib='sample-contrib.tsv',
+        seq='sample-seq.tsv',
+        unite='sample-unite.tsv'
+    message: 'Produce parameters for simulating genotypes and sequencing'
+    run:
+        simulators = [
+            simulate_samples(4000, ncontrib=1, seed=4294195554),
+            simulate_samples(400, ncontrib=2, even=True, seed=2762204106),
+            simulate_samples(400, ncontrib=3, even=True, seed=2124137260),
+            simulate_samples(400, ncontrib=4, even=True, seed=778059273),
+            simulate_samples(400, ncontrib=5, even=True, seed=2972194569),
+            simulate_samples(400, ncontrib=6, even=True, seed=2570983910),
+            simulate_samples(400, ncontrib=2, even=False, seed=481612327),
+            simulate_samples(400, ncontrib=3, even=False, seed=2019626428),
+            simulate_samples(400, ncontrib=4, even=False, seed=3191594573),
+            simulate_samples(400, ncontrib=5, even=False, seed=597241784),
+            simulate_samples(400, ncontrib=6, even=False, seed=2822645581),
+        ]
+
+        samples = list()
+        samples_by_population = defaultdict(list)
+
+        with open(output.contrib, 'w') as cout, open(output.seq, 'w') as sout:
+            columns = ['ID', 'Contributors', 'SeqSeeds', 'Proportions']
+            print(*columns, sep='\t', file=sout)
+            columns = ['ID', 'MaternalHaploPop', 'PaternalHaploPop', 'HaploSeed']
+            print(*columns, sep='\t', file=cout)
+            for simulator in simulators:
+                for sample in simulator:
+                    if sample.ncontrib == 1:
+                        samples.append(sample)
+                        samples_by_population[sample.popstring].append(sample)
+                    print(sample.seqparams, file=sout)
+                    print(sample.simparams, file=cout)
+
+            numpy.random.seed(3709894119)
+            with open(output.unite, 'w') as uout:
+                columns = ['ID', 'MaternalID', 'PaternalID', 'Seed']
+                print(*columns, sep='\t', file=uout)
+                for _ in range(100):
+                    probe = numpy.random.choice(samples)
+                    target_pop = samples_by_population[probe.popstring]
+                    mom, dad = numpy.random.choice(target_pop, 2, replace=False)
+                    kidlabel = get_id()
+                    print(
+                        kidlabel, mom.contriblabel, dad.contriblabel,
+                        numpy.random.randint(2**32 - 1), sep='\t', file=uout
+                    )
+                    print(
+                        get_id(), kidlabel,
+                        numpy.random.randint(2**32 - 1), '1.0', sep='\t', file=sout
+                    )
+
+
+rule select_reseq_subjects:
+    input: 'sample-contrib.tsv'
+    output: 'sample-match-subset-500.tsv'
+    message: 'Select a random sample of 500 individuals for resequencing to assess sample matching'
+    run:
+        contrib = pandas.read_csv(input[0], sep='\t')
+        numpy.random.seed(880120311)
+        contrib500 = numpy.random.choice(contrib.ID, 500, replace=False)
+        data = {
+            'ID': list(), 'Contributors': list(), 'SeqSeeds': list(),
+            'Proportions': list()
+        }
+        for c in contrib500:
+            for i in range(3):
+                theid = '{contrib:s}-repl{repl:d}'.format(contrib=c, repl=i+1)
+                data['ID'].append(theid)
+                data['Contributors'].append(c)
+                data['SeqSeeds'].append(numpy.random.randint(0, 2**32 - 1))
+                data['Proportions'].append(1.0)
+        df = pandas.DataFrame(data)
+        df.to_csv(output[0], sep='\t', index=False)
+
+
+rule select_samepop_background:
+    input: 'sample-match-subset-500.tsv'
+    output: 'sample-match-samepop.tsv'
+    message: 'Select individuals from the same population for sample matching comparison'
+    run:
+        subjects = pandas.read_csv(input[0], sep='\t')
+        data = {
+            'ID': list(), 'MaternalHaploPop': list(), 'PaternalHaploPop': list(),
+            'Background': list()
+        }
+        numpy.random.seed(706301801)
+        for subject in subjects.Contributors.unique():
+            hp = contrib_genotype_params.haplopops(subject)
+            hpstr = ','.join(hp)
+            data['ID'].append(subject)
+            data['MaternalHaploPop'].append(hp[0])
+            data['PaternalHaploPop'].append(hp[1])
+            fullbackground = [
+                c for c in contrib_genotype_params.samples_by_haplopops[hpstr] if c != subject
+            ]
+            samplesize = min(3, len(fullbackground))
+            if samplesize < 3:
+                print('DEBUG background', subject, hpstr, samplesize, file=sys.stderr)
+            background = numpy.random.choice(fullbackground, samplesize, replace=False)
+            data['Background'].append(','.join(background))
+        dataframe = pandas.DataFrame(data)
+        dataframe.to_csv(output[0], sep='\t', index=False)
+
+
+rule select_allpop_background:
+    input: 'sample-match-subset-500.tsv'
+    output: 'sample-match-allpop.tsv'
+    message: 'Select individuals from all populations for sample matching comparison'
+    run:
+        subjects = pandas.read_csv(input[0], sep='\t')
+        data = {
+            'ID': list(), 'MaternalHaploPop': list(), 'PaternalHaploPop': list(),
+            'Background': list()
+        }
+        numpy.random.seed(650570422)
+        for subject in subjects.Contributors.unique():
+            hp = contrib_genotype_params.haplopops(subject)
+            hpstr = ','.join(hp)
+            data['ID'].append(subject)
+            data['MaternalHaploPop'].append(hp[0])
+            data['PaternalHaploPop'].append(hp[1])
+            tempbackground = numpy.random.choice(contrib_genotype_params.ids, 5, replace=False)
+            tempbackground = [b for b in tempbackground if b != subject]
+            background = numpy.random.choice(tempbackground, 3, replace=False)
+            data['Background'].append(','.join(background))
+        dataframe = pandas.DataFrame(data)
+        dataframe.to_csv(output[0], sep='\t', index=False)
+
+
+rule prep:
+    input:
+        'sample-contrib.tsv',
+        'sample-seq.tsv',
+        'sample-unite.tsv',
+        'sample-match-samepop.tsv',
+        'sample-match-allpop.tsv'
+
+
+# --------------------------------------------------------------------------------------------------
+# Workflow proper: create mock samples, simulate sample sequencing
+# --------------------------------------------------------------------------------------------------
+
+rule simulate_contributor_genotype:
+    output: '{label}-simulated-genotype.json'
+    message: 'Simulate genotype for contributor {wildcards.label}'
+    run:
+        params = contrib_genotype_params[wildcards.label]
+        populations = [
+            params['MaternalHaploPop'],
+            params['PaternalHaploPop'],
+        ]
+        genotype = microhapulator.sim.sim(populations, usapanel, seed=params['HaploSeed'])
+        genotype.dump(output[0])
+
+
+rule simulate_all_contributor_genotypes:
+    input: expand('{label}-simulated-genotype.json', label=contrib_genotype_params.ids)
+
+
+rule unite_contributor_genotypes:
+    input: lambda wildcards: unite_params.contrib_prereqs(wildcards.label)
+    output: '{label}-united-genotype.json'
+    message: 'Unite genotypes "{input[0]}" and "{input[1]}" to create "offspring" {wildcards.label}'
+    run:
+        params = unite_params[wildcards.label]
+        mom = SimulatedGenotype(fromfile=input[0])
+        dad = SimulatedGenotype(fromfile=input[1])
+        numpy.random.seed(params['Seed'])
+        kid = microhapulator.genotype.Genotype.unite(mom, dad)
+        kid.dump(output[0])
+
+
+rule unite_all_contributor_genotypes:
+    input: expand('{label}-united-genotype.json', label=unite_params.ids)
+
+
+rule sequence_sample:
+    input: lambda wildcards: genotype_files(wildcards.label)
+    output: '{label}-reads.fastq.gz'
+    message: 'Simulated Illumina MiSeq sequencing of sample "{wildcards.label}"'
+    threads: lambda wildcards: config['seqthreads'] if 'seqthreads' in config else 4
+    run:
+        if wildcards.label in seq_params:
+            params = seq_params[wildcards.label]
+            seeds = list(map(int, params['SeqSeeds'].split(',')))
+            proportions = list(map(float, params['Proportions'].split(',')))
+        else:
+            params = reseq_params[wildcards.label]
+            seeds = [params['SeqSeeds']]
+            proportions = [params['Proportions']]
+        genotypes = [
+            SimulatedGenotype(fromfile=infile) for infile in input
+        ]
+        assert len(genotypes) == len(seeds)
+        assert len(genotypes) == len(proportions)
+        sequencer = microhapulator.seq.seq(
+            genotypes, seeds=seeds, threads=threads, totalreads=250000,
+            proportions=proportions, sig=params['ID']
+        )
+        with gzopen(params['ID'] + '-reads.fastq.gz', 'wt') as fh:
+            for n, defline, sequence, qualities in sequencer:
+                print(defline, sequence, '+\n', qualities, sep='', end='', file=fh)
+        print('Simulated', n, 'reads for sample', params['ID'])
+
+
+rule sequence_all_samples:
+    input: expand('{label}-reads.fastq.gz', label=seq_params.ids)
+
+
+# --------------------------------------------------------------------------------------------------
+# Workflow proper: align reads, infer sample genotype profiles
+# --------------------------------------------------------------------------------------------------
+
+rule get_panel:
+    output: 'panel-usa.fasta'
+    message: 'Extract panel sequences'
+    shell:
+        '''
+        mhpl8r refr --out {output} usa
+        bwa index {output}
+        '''
+
+
+rule genotype_sample:
+    input:
+        refr='panel-usa.fasta',
+        reads='{label}-reads.fastq.gz'
+    output:
+        bam='{label}-reads.bam',
+        json='{label}-inferred-genotype.json'
+    message: 'Infer genotype for sample {wildcards.label} from mapped reads'
+    shell:
+        '''
+        bwa mem {input.refr} {input.reads} | samtools view -bS | samtools sort -o {output.bam} -
+        samtools index {output.bam}
+        mhpl8r type --out {output.json} {input.refr} {output.bam}
+        '''
+
+rule genotype_all_samples:
+    input: expand('{label}-inferred-genotype.json', label=seq_params.ids)
+
+
+
+# --------------------------------------------------------------------------------------------------
+# Evaluation of sample matching
+# --------------------------------------------------------------------------------------------------
+
+rule resequence_all_subjects:
+    input: expand('{label}-reads.fastq.gz', label=reseq_params.ids)
+
+
+rule sample_matching_reseq:
+    input:
+        expand('{{label}}-repl{repl}-inferred-genotype.json', repl=(1, 2, 3)),
+        refr='{label}-simulated-genotype.json'
+    output: temp('{label}-sample-match-reseq-temp.tsv')
+    run:
+        gt = SimulatedGenotype(fromfile=input.refr)
+        haplopops = '{:s},{:s}'.format(
+            gt.data['metadata']['MaternalHaploPop'],
+            gt.data['metadata']['PaternalHaploPop'],
+        )
+        ids = list()
+        hpops = list()
+        testsamples = list()
+        hammdists = list()
+        lrtests = list()
+        for n, gtfile in enumerate(input[:3]):
+            othergt = SimulatedGenotype(fromfile=gtfile)
+            dist = microhapulator.dist.dist(gt, othergt)
+            rmplrt = max([
+                gt.rmp_lr_test(othergt, gt.data['metadata']['MaternalHaploPop']),
+                gt.rmp_lr_test(othergt, gt.data['metadata']['PaternalHaploPop']),
+            ])
+            ids.append(wildcards.label)
+            hpops.append(haplopops)
+            testsamples.append('{:s}-repl{:d}'.format(wildcards.label, n + 1))
+            hammdists.append(dist)
+            lrtests.append(rmplrt)
+        data = pandas.DataFrame({
+            'ID': ids,
+            'HaploPops': hpops,
+            'TestSample': testsamples,
+            'HammingDist': hammdists,
+            'LRTest': lrtests,
+        })
+        data.to_csv(output[0], sep='\t', index=False)
+
+
+rule sample_matching_reseq_all:
+    input: expand('{label}-sample-match-reseq-temp.tsv', label=reseq_params.subjects)
+    output: 'sample-match-reseq-eval.tsv'
+    run:
+        data = pandas.concat(
+            [pandas.read_csv(infile, sep='\t') for infile in input],
+            ignore_index=True
+        )
+        data.to_csv(output[0], sep='\t', index=False)
+
+
+rule sample_matching_samepop:
+    input:
+        lambda wildcards: match_samepop_params.background(wildcards.label),
+        refr='{label}-simulated-genotype.json'
+    output: temp('{label}-sample-match-samepop-temp.tsv')
+    run:
+        gt = SimulatedGenotype(fromfile=input.refr)
+        haplopops = '{:s},{:s}'.format(
+            gt.data['metadata']['MaternalHaploPop'],
+            gt.data['metadata']['PaternalHaploPop'],
+        )
+        ids = list()
+        hpops = list()
+        testsamples = list()
+        hammdists = list()
+        lrtests = list()
+        for gtfile in input[:3]:
+            othergt = SimulatedGenotype(fromfile=gtfile)
+            dist = microhapulator.dist.dist(gt, othergt)
+            four_pops = [
+                gt.data['metadata']['MaternalHaploPop'],
+                gt.data['metadata']['PaternalHaploPop'],
+                othergt.data['metadata']['MaternalHaploPop'],
+                othergt.data['metadata']['PaternalHaploPop'],
+            ]
+            rmplrt = max([gt.rmp_lr_test(othergt, pop) for pop in four_pops])
+            ids.append(wildcards.label)
+            hpops.append(haplopops)
+            testsamples.append(gtfile.split('-')[0])
+            hammdists.append(dist)
+            lrtests.append(rmplrt)
+        data = pandas.DataFrame({
+            'ID': ids,
+            'HaploPops': hpops,
+            'TestSample': testsamples,
+            'HammingDist': hammdists,
+            'LRTest': lrtests,
+        })
+        data.to_csv(output[0], sep='\t', index=False)
+
+
+rule sample_matching_samepop_all:
+    input: expand('{label}-sample-match-samepop-temp.tsv', label=match_samepop_params.ids)
+    output: 'sample-match-samepop-eval.tsv'
+    run:
+        data = pandas.concat(
+            [pandas.read_csv(infile, sep='\t') for infile in input],
+            ignore_index=True
+        )
+        data.to_csv(output[0], sep='\t', index=False)
+
+
+rule sample_matching_allpop:
+    input:
+        lambda wildcards: match_allpop_params.background(wildcards.label),
+        refr='{label}-simulated-genotype.json'
+    output: temp('{label}-sample-match-allpop-temp.tsv')
+    run:
+        gt = SimulatedGenotype(fromfile=input.refr)
+        haplopops = '{:s},{:s}'.format(
+            gt.data['metadata']['MaternalHaploPop'],
+            gt.data['metadata']['PaternalHaploPop'],
+        )
+        ids = list()
+        hpops = list()
+        testsamples = list()
+        hammdists = list()
+        lrtests = list()
+        for gtfile in input[:3]:
+            othergt = SimulatedGenotype(fromfile=gtfile)
+            dist = microhapulator.dist.dist(gt, othergt)
+            four_pops = [
+                gt.data['metadata']['MaternalHaploPop'],
+                gt.data['metadata']['PaternalHaploPop'],
+                othergt.data['metadata']['MaternalHaploPop'],
+                othergt.data['metadata']['PaternalHaploPop'],
+            ]
+            rmplrt = max([gt.rmp_lr_test(othergt, pop) for pop in four_pops])
+            ids.append(wildcards.label)
+            hpops.append(haplopops)
+            testsamples.append(gtfile.split('-')[0])
+            hammdists.append(dist)
+            lrtests.append(rmplrt)
+        data = pandas.DataFrame({
+            'ID': ids,
+            'HaploPops': hpops,
+            'TestSample': testsamples,
+            'HammingDist': hammdists,
+            'LRTest': lrtests,
+        })
+        data.to_csv(output[0], sep='\t', index=False)
+
+
+rule sample_matching_allpop_all:
+    input: expand('{label}-sample-match-allpop-temp.tsv', label=match_allpop_params.ids)
+    output: 'sample-match-allpop-eval.tsv'
+    run:
+        data = pandas.concat(
+            [pandas.read_csv(infile, sep='\t') for infile in input],
+            ignore_index=True
+        )
+        data.to_csv(output[0], sep='\t', index=False)
+
+
+rule all_sample_matching_tests:
+    input: expand('sample-match-{test}-eval.tsv', test=('reseq', 'samepop', 'allpop'))
