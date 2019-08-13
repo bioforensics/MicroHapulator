@@ -1,9 +1,9 @@
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Copyright (c) 2019, Battelle National Biodefense Institute.
 #
 # This file is part of MicroHapulator (github.com/bioforensics/microhapulator)
 # and is licensed under the BSD license: see LICENSE.txt.
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 
 from collections import defaultdict, namedtuple
 from gzip import open as gzopen
@@ -15,9 +15,9 @@ import pandas
 from string import ascii_letters, digits
 
 
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Supporting code: simulating samples
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 
 def get_id(length=7):
     '''Generate a new unique alphanumeric sample/contributor label.'''
@@ -133,9 +133,9 @@ def simulate_samples(nsamples, ncontrib=1, even=False, seed=None):
         yield sample
 
 
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Supporting code: parameter indexes
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 
 class ParamIndex():
     def __init__(self):
@@ -246,6 +246,7 @@ reseq_params = ReseqParamIndex()
 match_samepop_params = MatchSamepopIndex()
 match_allpop_params = MatchAllpopIndex()
 
+
 def genotype_files(label):
     assert label in seq_params or label in reseq_params, label
     index = seq_params if label in seq_params else reseq_params
@@ -259,9 +260,9 @@ def genotype_files(label):
     return gtfiles
 
 
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Workflow prep: select simulation parameters
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 
 rule prep_init:
     output:
@@ -405,9 +406,9 @@ rule prep:
         'sample-match-allpop.tsv'
 
 
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Workflow proper: create mock samples, simulate sample sequencing
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 
 rule simulate_contributor_genotype:
     output: '{label}-simulated-genotype.json'
@@ -429,7 +430,7 @@ rule simulate_all_contributor_genotypes:
 rule unite_contributor_genotypes:
     input: lambda wildcards: unite_params.contrib_prereqs(wildcards.label)
     output: '{label}-united-genotype.json'
-    message: 'Unite genotypes "{input[0]}" and "{input[1]}" to create "offspring" {wildcards.label}'
+    message: 'Unite genotypes "{input[0]}" & "{input[1]}" to create "offspring" {wildcards.label}'
     run:
         params = unite_params[wildcards.label]
         mom = SimulatedGenotype(fromfile=input[0])
@@ -476,9 +477,9 @@ rule sequence_all_samples:
     input: expand('{label}-reads.fastq.gz', label=seq_params.ids)
 
 
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Workflow proper: align reads, infer sample genotype profiles
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 
 rule get_panel:
     output: 'panel-usa.fasta'
@@ -509,10 +510,9 @@ rule genotype_all_samples:
     input: expand('{label}-inferred-genotype.json', label=seq_params.ids)
 
 
-
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 # Evaluation of sample matching
-# --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------
 
 rule resequence_all_subjects:
     input: expand('{label}-reads.fastq.gz', label=reseq_params.ids)
