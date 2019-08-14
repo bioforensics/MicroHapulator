@@ -318,18 +318,21 @@ class ObservedGenotype(Genotype):
     def record_allele(self, locusid, allele, count):
         self.data['loci'][locusid]['allele_counts'][allele] = count
 
-    def infer(self, threshold=None):
+    def infer(self, threshold=8):
         for locusid, locusdata in self.data['loci'].items():
             allelecounts = locusdata['allele_counts']
+            eff_cov = 1.0 - (locusdata['num_discarded_reads'] / locusdata['max_coverage'])
             avgcount = 0.0
             if len(allelecounts.values()) > 0:
                 avgcount = sum(allelecounts.values()) / len(allelecounts.values())
             gt = set()
             for allele, count in allelecounts.items():
-                if threshold is not None:
+                if eff_cov < 0.25:
+                    # Low effective coverage --> use static cutoff
                     if count < threshold:
                         continue
                 else:
+                    # High effective coverage --> compute cutoff dynamically
                     if count * 4 < avgcount:
                         continue
                 gt.add(allele)
