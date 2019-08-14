@@ -45,3 +45,16 @@ def test_type_cli_simple():
         gtdata = microhapulator.genotype.ObservedGenotype(fromfile=outfile.name)
         testgtdata = microhapulator.genotype.ObservedGenotype(fromfile=testgtfile)
         assert gtdata == testgtdata
+
+
+def test_type_dyn_cutoff():
+    bam = data_file('dyncut-test-reads.bam')
+    fasta = data_file('dyncut-panel.fasta.gz')
+
+    gt = microhapulator.type.type(bam, fasta)
+    assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G'])
+    assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
+
+    gt = microhapulator.type.type(bam, fasta, threshold=4)
+    assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G', 'C,A,C,T,A', 'T,G,C,T,A'])
+    assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
