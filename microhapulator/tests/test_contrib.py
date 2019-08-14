@@ -43,6 +43,6 @@ def test_contrib_main(capsys):
 
 
 def test_no_op():
-    with pytest.raises(ValueError) as ve:
+    pattern = r'must provide either genotype JSON or BAM and refr FASTA'
+    with pytest.raises(ValueError, match=pattern) as ve:
         microhapulator.contrib.contrib()
-    assert 'must provide either genotype JSON or BAM and refr FASTA' in str(ve)

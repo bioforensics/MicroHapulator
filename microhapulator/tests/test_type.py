@@ -27,9 +27,8 @@ def test_type_simple():
 def test_type_missing_bam_index():
     bam = data_file('three-contrib-log-link.bam')
     fasta = data_file('default-panel.fasta.gz')
-    with pytest.raises(MissingBAMIndexError) as ie:
+    with pytest.raises(MissingBAMIndexError, match=r'Please index') as ie:
         gt = microhapulator.type.type(bam, fasta)
-    assert 'Please index' in str(ie)
 
 
 def test_type_cli_simple():

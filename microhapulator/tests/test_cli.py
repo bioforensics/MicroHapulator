@@ -19,7 +19,6 @@ def test_microhapulator_open():
         filecontents = filehandle.read()
         assert len(filecontents.strip().split('\n')) == 6
 
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError, match=r'invalid mode "p"') as ve:
         with microhapulator.open(thefile, 'p') as filehandle:
             pass
-    assert 'invalid mode "p"' in str(ve)
