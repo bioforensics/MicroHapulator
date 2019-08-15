@@ -73,6 +73,5 @@ def test_no_seed():
 
 
 def test_bad_panel():
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError, match=r'invalid panel') as ve:
         microhapulator.sim.sim(['MHDBP000004'], ['DUUUUDE', 'SWEEEET'])
-    assert 'invalid panel' in str(ve)

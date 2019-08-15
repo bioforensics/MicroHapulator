@@ -27,9 +27,9 @@ def test_proportions(n, totalreads, prop, result):
 
 
 def test_proportions_failure_modes():
-    with pytest.raises(ValueError) as ve:
+    message = r'mismatch between contributor number and proportions'
+    with pytest.raises(ValueError, match=message) as ve:
         calc_n_reads_from_proportions(3, 1000, [0.6, 0.4])
-    assert 'mismatch between contributor number and proportions' in str(ve)
 
 
 def test_even_mixture():
@@ -78,20 +78,20 @@ def test_mixture_failure_modes():
     pops = ['MHDBP000021', 'MHDBP000009', 'MHDBP000081']
     genotypes = [microhapulator.sim.sim([popid], panel) for popid in pops]
 
-    with pytest.raises(ValueError) as ve:
+    message = r'number of genotypes must match number of seeds'
+    with pytest.raises(ValueError, match=message) as ve:
         for read in microhapulator.seq.seq(genotypes, seeds=[42, 1776]):
             pass
-    assert 'number of genotypes must match number of seeds' in str(ve)
 
-    with pytest.raises(ValueError) as ve:
+    message = r'mismatch between contributor number and proportions'
+    with pytest.raises(ValueError, match=message) as ve:
         for read in microhapulator.seq.seq(genotypes, proportions=[0.5, 0.3, 0.1, 0.1]):
             pass
-    assert 'mismatch between contributor number and proportions' in str(ve)
 
-    with pytest.raises(ValueError) as ve:
+    message = r'specified proportions result in 0 reads for 1 or more individuals'
+    with pytest.raises(ValueError, match=message) as ve:
         for read in microhapulator.seq.seq(genotypes, totalreads=500, proportions=[1, 100, 10000]):
             pass
-    assert 'specified proportions result in 0 reads for 1 or more individuals' in str(ve)
 
 
 def test_main():
