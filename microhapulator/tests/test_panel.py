@@ -45,25 +45,20 @@ def test_validate_populations():
 
 def test_validate_populations_bad_ids():
     from microhapulator.panel import validate_populations as valpop
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError, match=r'invalid or duplicated population ID\(s\)') as ve:
         _ = valpop(['BogU$pOPiD'])
-    assert 'invalid or duplicated population ID(s)' in str(ve)
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError, match=r'invalid or duplicated population ID\(s\)') as ve:
         _ = valpop(['NotARealID', 'MHDBP000077'])
-    assert 'invalid or duplicated population ID(s)' in str(ve)
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError, match=r'invalid or duplicated population ID\(s\)') as ve:
         _ = valpop(['SA000020C', 'MHDBP000023'])
-    assert 'invalid or duplicated population ID(s)' in str(ve)
 
 
 def test_validate_populations_cardinality():
     from microhapulator.panel import validate_populations as valpop
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError, match=r'please provide only 1 or 2 population IDs') as ve:
         _ = valpop([])
-    assert 'please provide only 1 or 2 population IDs' in str(ve)
-    with pytest.raises(ValueError) as ve:
+    with pytest.raises(ValueError, match=r'please provide only 1 or 2 population IDs') as ve:
         _ = valpop(['MHDBP000012', 'MHDBP000023', 'MHDBP000063'])
-    assert 'please provide only 1 or 2 population IDs' in str(ve)
 
 
 def test_validate_loci():
