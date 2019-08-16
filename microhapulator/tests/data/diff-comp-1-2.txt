@@ -1,0 +1,6 @@
+MHDBL000140
+>>> C,C,A,A
+<<< C,C,T,A
+MHDBL000163
+>>> A,A,G,A,T
+<<< C,G,A,A,T

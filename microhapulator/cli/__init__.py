@@ -13,6 +13,7 @@ import microhapulator
 import sys
 from . import contain
 from . import contrib
+from . import diff
 from . import dist
 from . import getrefr
 from . import mix
@@ -26,6 +27,7 @@ from . import unite
 mains = {
     'contain': microhapulator.contain.main,
     'contrib': microhapulator.contrib.main,
+    'diff': microhapulator.diff.main,
     'dist': microhapulator.dist.main,
     'getrefr': microhapulator.getrefr.main,
     'mix': microhapulator.mix.main,
@@ -40,6 +42,7 @@ mains = {
 subparser_funcs = {
     'contain': contain.subparser,
     'contrib': contrib.subparser,
+    'diff': diff.subparser,
     'dist': dist.subparser,
     'getrefr': getrefr.subparser,
     'mix': mix.subparser,

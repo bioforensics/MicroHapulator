@@ -1,0 +1,83 @@
+MHDBL000002
+>>> T,G,G,C
+<<< T,G,C,C
+MHDBL000007
+>>> T,T,G,G
+MHDBL000013
+>>> A,G,C,C
+MHDBL000017
+>>> A,A,G,C,T:T,A,A,T,T
+<<< T,G,G,C,C
+MHDBL000018
+>>> C,A,C,C,G
+<<< C,A,C,T,G:T,A,T,T,G
+MHDBL000030
+>>> A,C,C,C
+<<< A,A,T,C
+MHDBL000036
+>>> A,C,G:G,C,G
+<<< G,T,G
+MHDBL000038
+>>> T,A,A,T
+MHDBL000058
+>>> A,G,C,G:A,G,T,G
+<<< A,A,C,G:G,G,C,G
+MHDBL000076
+>>> G,T
+MHDBL000079
+>>> C,T
+<<< A,G
+MHDBL000082
+>>> A,C,T,T
+<<< G,C,T,T:G,T,A,T
+MHDBL000085
+>>> A,C,T,G:G,A,C,A
+<<< G,A,T,G:G,C,T,G
+MHDBL000101
+>>> C,C,C,T
+<<< T,C,C,C
+MHDBL000106
+>>> C,G,T,G
+<<< A,G,C,G
+MHDBL000111
+>>> G,C,A,A,G
+<<< A,C,A,A,A
+MHDBL000112
+>>> G,G,A,C
+MHDBL000122
+>>> T,G,C
+<<< G,A,C
+MHDBL000128
+>>> A,T,C,G
+<<< T,T,T,G
+MHDBL000129
+>>> G,T,C
+<<< G,T,A
+MHDBL000135
+>>> G,C,C:G,T,T
+<<< A,T,C
+MHDBL000138
+>>> A,A,C,A
+<<< G,A,C,G:G,G,C,G
+MHDBL000140
+>>> C,C,A,A
+<<< C,C,T,A
+MHDBL000144
+>>> A,G
+<<< G,G
+MHDBL000154
+>>> C,C
+<<< T,T
+MHDBL000163
+>>> A,A,G,A,T:C,A,G,A,T
+<<< C,G,A,A,T:C,G,G,G,T
+MHDBL000183
+>>> C,G:T,G
+<<< C,A:T,A
+MHDBL000210
+>>> A,T,T,G
+MHDBL000211
+>>> T,A,A
+<<< T,G,A
+MHDBL000212
+>>> G,C,C,C,T

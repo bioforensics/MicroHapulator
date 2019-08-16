@@ -23,6 +23,7 @@ from microhapulator import panel
 from microhapulator import contain
 from microhapulator import contrib
 from microhapulator import dist
+from microhapulator import diff
 from microhapulator import getrefr
 from microhapulator import mix
 from microhapulator import prob
