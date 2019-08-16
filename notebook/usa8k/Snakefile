@@ -592,7 +592,7 @@ rule sample_matching_samepop:
                 othergt.data['metadata']['MaternalHaploPop'],
                 othergt.data['metadata']['PaternalHaploPop'],
             ]
-            rmplrt = max([gt.rmp_lr_test(othergt, pop) for pop in four_pops])
+            rmplrt = max([gt.rmp_lr_test(othergt, pop) for pop in set(four_pops)])
             ids.append(wildcards.label)
             hpops.append(haplopops)
             testsamples.append(gtfile.split('-')[0])
@@ -644,7 +644,7 @@ rule sample_matching_allpop:
                 othergt.data['metadata']['MaternalHaploPop'],
                 othergt.data['metadata']['PaternalHaploPop'],
             ]
-            rmplrt = max([gt.rmp_lr_test(othergt, pop) for pop in four_pops])
+            rmplrt = max([gt.rmp_lr_test(othergt, pop) for pop in set(four_pops)])
             ids.append(wildcards.label)
             hpops.append(haplopops)
             testsamples.append(gtfile.split('-')[0])
@@ -671,5 +671,48 @@ rule sample_matching_allpop_all:
         data.to_csv(output[0], sep='\t', index=False)
 
 
+rule sample_matching_related:
+    input:
+        lambda wildcards: unite_params.contrib_prereqs(wildcards.label),
+        offspring='{label}-united-genotype.json'
+    output: temp('{label}-sample-match-related-temp.tsv')
+    run:
+        gt = SimulatedGenotype(fromfile=input.offspring)
+        ids = list()
+        relatives = list()
+        hammdists = list()
+        lrtests = list()
+        for gtfile in input[:2]:
+            othergt = SimulatedGenotype(fromfile=gtfile)
+            dist = microhapulator.dist.dist(gt, othergt)
+            two_pops = [
+                othergt.data['metadata']['MaternalHaploPop'],
+                othergt.data['metadata']['PaternalHaploPop'],
+            ]
+            rmplrt = max([gt.rmp_lr_test(othergt, pop) for pop in set(two_pops)])
+            ids.append(wildcards.label)
+            relatives.append(gtfile.split('-')[0])
+            hammdists.append(dist)
+            lrtests.append(rmplrt)
+        data = pandas.DataFrame({
+            'ID': ids,
+            'Relative': relatives,
+            'HammingDist': hammdists,
+            'LRTest': lrtests,
+        })
+        data.to_csv(output[0], sep='\t', index=False)
+            
+            
+rule sample_matching_related_all:        
+    input: expand('{label}-sample-match-related-temp.tsv', label=unite_params.ids)
+    output: 'sample-match-related-eval.tsv'
+    run:
+        data = pandas.concat(
+            [pandas.read_csv(infile, sep='\t') for infile in input],
+            ignore_index=True
+        )
+        data.to_csv(output[0], sep='\t', index=False)
+
+
 rule all_sample_matching_tests:
-    input: expand('sample-match-{test}-eval.tsv', test=('reseq', 'samepop', 'allpop'))
+    input: expand('sample-match-{test}-eval.tsv', test=('reseq', 'samepop', 'allpop', 'related'))
