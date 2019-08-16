@@ -701,9 +701,9 @@ rule sample_matching_related:
             'LRTest': lrtests,
         })
         data.to_csv(output[0], sep='\t', index=False)
-            
-            
-rule sample_matching_related_all:        
+
+
+rule sample_matching_related_all:
     input: expand('{label}-sample-match-related-temp.tsv', label=unite_params.ids)
     output: 'sample-match-related-eval.tsv'
     run:
