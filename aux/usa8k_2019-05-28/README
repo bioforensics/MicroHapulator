@@ -1,9 +1,0 @@
-# Generate simulation parameters
-./driver.py
-
-# Generate simulated genotypes
-THREADS=64
-./contrib-runner.py $THREADS sample-contrib.tsv
-./unite-runner.py $THREADS sample-unite.tsv
-./seq-runner.py $THREADS sample-seq.tsv
-./type-runner.py $THREADS sample-seq.tsv
