@@ -583,7 +583,8 @@ rule sample_matching_samepop:
         testsamples = list()
         hammdists = list()
         lrtests = list()
-        for gtfile in input[:3]:
+        nothers = len(input) = 1
+        for gtfile in input[:nothers]:
             othergt = SimulatedGenotype(fromfile=gtfile)
             dist = microhapulator.dist.dist(gt, othergt)
             four_pops = [
@@ -682,6 +683,8 @@ rule sample_matching_related:
         relatives = list()
         hammdists = list()
         lrtests = list()
+        nparents = len(input) - 1
+        assert nparents == 2
         for gtfile in input[:2]:
             othergt = SimulatedGenotype(fromfile=gtfile)
             dist = microhapulator.dist.dist(gt, othergt)
