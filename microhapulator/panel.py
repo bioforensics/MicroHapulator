@@ -173,7 +173,7 @@ def panel_usa():
         testpops = microhapdb.frequencies[
             microhapdb.frequencies.Locus == locusid
         ].Population.unique()
-        if pops < set(testpops):
+        if pops - set(testpops) == set():
             prelim_panel.add(locusid)
 
     final_panel = microhapdb.loci[
