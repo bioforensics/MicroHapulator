@@ -45,6 +45,8 @@ def test_main():
         microhapulator.sim.main(args)
         gt = SimulatedGenotype(fromfile=outfile.name)
         testgt = SimulatedGenotype(fromfile=data_file('bitusa-gt.json'))
+        import subprocess
+        subprocess.check_call(['cp', outfile.name, 'DUDE.json'])
         assert gt == testgt
 
 

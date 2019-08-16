@@ -17,6 +17,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - The `type` module now dynamically selects either an automatic threshold or a fixed threshold based on effective coverage (see #51).
 - Moved simulation scripts to notebook directory, reimplemented as a Snakemake workflow (see #50).
 
+### Fixed
+- Corrected a bug in the USA panel code ensuring that all loci have allele frequency data for all relevant populations (see #56).
+
 ### Removed
 - Dropped the `mixture` module, whose functionality is now covered by the more granular `sim`, `mix`, and `seq` modules (see #45).
 

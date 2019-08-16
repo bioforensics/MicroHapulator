@@ -160,25 +160,19 @@ def panel_beta():
 def panel_usa():
     '''Loci with frequency data for populations in a sample USA demographic.
 
-    Panel containing the top 100 loci (ranked by average Ae) for which
-    population allele frequency data is available for all 19 ALFRED populations
-    in a rough simulation of USA demographics.
+    Panel containing the top 50 loci (ranked by average Ae) composed of 3 or
+    more variants and for which population allele frequency data is available
+    for all 19 ALFRED sub-populations in a mock population roughly reflecting
+    demographics of the United States.
     '''
     demo_file = microhapulator.package_file('usa-demographics.tsv')
     usa_demo = pandas.read_csv(demo_file, sep='\t')
-
-    prelim_panel = set()
     pops = set(usa_demo.Population)
-    for locusid in microhapdb.loci[microhapdb.loci.Source == "ALFRED"].ID.unique():
-        testpops = microhapdb.frequencies[
-            microhapdb.frequencies.Locus == locusid
-        ].Population.unique()
-        if pops < set(testpops):
-            prelim_panel.add(locusid)
-
+    loci = exclude_loci_missing_data(microhapdb.loci.ID.unique(), pops, suppress=True)
+    prelim_panel = [l for l in loci if len(microhapdb.allele_positions(l)) > 2]
     final_panel = microhapdb.loci[
         microhapdb.loci.ID.isin(prelim_panel)
-    ].sort_values('AvgAe', ascending=False).head(100)
+    ].sort_values('AvgAe', ascending=False).head(50)
     return list(final_panel.ID)
 
 
@@ -238,7 +232,7 @@ def validate_populations(popids):
     return haplopops
 
 
-def check_loci_for_population(loci, popid):
+def check_loci_for_population(loci, popid, suppress=False):
     loci = validate_loci(loci)
     if len(loci) == 0:
         return list()
@@ -246,7 +240,7 @@ def check_loci_for_population(loci, popid):
     allelefreqs = freq[(freq.Population == popid) & (freq.Locus.isin(loci))]
     idsfound = list(allelefreqs.Locus.unique())
     nodata = set(loci) - set(idsfound)
-    if len(nodata) > 0:
+    if len(nodata) > 0 and not suppress:
         message = 'no allele frequency data available'
         message += ' for population "{pop:s}"'.format(pop=popid)
         message += ' at the following microhap loci: {loc:s}'.format(loc=','.join(nodata))
@@ -254,10 +248,10 @@ def check_loci_for_population(loci, popid):
     return sorted(set(loci) & set(idsfound))
 
 
-def exclude_loci_missing_data(loci, popids):
+def exclude_loci_missing_data(loci, popids, suppress=False):
     loci_to_keep = None
     for popid in popids:
-        temp_loci = check_loci_for_population(loci, popid)
+        temp_loci = check_loci_for_population(loci, popid, suppress=suppress)
         if loci_to_keep is None:
             loci_to_keep = set(temp_loci)
         else:
