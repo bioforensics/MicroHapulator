@@ -1,2 +1,3 @@
 microhapulator/_version.py export-subst
 binder/demo.ipynb linguist-documentation
+notebook/usa8k/sample-matching.ipynb linguist-documentation
