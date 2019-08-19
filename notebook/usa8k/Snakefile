@@ -464,7 +464,7 @@ rule sequence_sample:
         assert len(genotypes) == len(seeds)
         assert len(genotypes) == len(proportions)
         sequencer = microhapulator.seq.seq(
-            genotypes, seeds=seeds, threads=threads, totalreads=250000,
+            genotypes, seeds=seeds, threads=threads, totalreads=150000,
             proportions=proportions, sig=params['ID']
         )
         with gzopen(params['ID'] + '-reads.fastq.gz', 'wt') as fh:
@@ -583,7 +583,7 @@ rule sample_matching_samepop:
         testsamples = list()
         hammdists = list()
         lrtests = list()
-        nothers = len(input) = 1
+        nothers = len(input) - 1
         for gtfile in input[:nothers]:
             othergt = SimulatedGenotype(fromfile=gtfile)
             dist = microhapulator.dist.dist(gt, othergt)
