@@ -17,8 +17,8 @@ def subparser(subparsers):
     cli.add_argument(
         '-t', '--threshold', metavar='T', type=int, default=8,
         help='coverage threshold below which alleles will be ignored at loci with low effective '
-        'coverage (discarded reads are > 75%% of total reads); by default T=8; used to '
-        'distinguish true alleles from alleles resulting from sequencing error; the threshold is '
+        'coverage (discarded reads are > 75%% of total reads); by default T=10; this is used to '
+        'distinguish true alleles from sequencing error induced alleles; the threshold is '
         'computed automatically at loci with high effective coverage'
     )
     cli.add_argument(

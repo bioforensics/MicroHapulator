@@ -78,7 +78,7 @@ def observe_genotypes(bamfile, refrfasta):
     )
 
 
-def type(bamfile, refrfasta, threshold=8):
+def type(bamfile, refrfasta, threshold=10):
     genotyper = observe_genotypes(bamfile, refrfasta)
     gt = microhapulator.genotype.ObservedGenotype()
     for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
