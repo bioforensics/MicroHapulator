@@ -15,7 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - The `sim` module no longer performs simulated sequencing (now handled by new `seq` module) and instead focuses entirely on haplotype simulation (see #45).
-- The `type` module now dynamically selects either an automatic threshold or a fixed threshold based on effective coverage (see #51).
+- The `type` module now dynamically selects either an automatic threshold or a fixed threshold based on effective coverage (see #51, #61).
 - Moved simulation scripts to notebook directory, reimplemented as a Snakemake workflow (see #50, #57, #59).
 
 ### Fixed
