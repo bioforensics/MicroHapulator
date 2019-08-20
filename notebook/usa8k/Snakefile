@@ -397,13 +397,43 @@ rule select_allpop_background:
         dataframe.to_csv(output[0], sep='\t', index=False)
 
 
+rule select_containment_sample:
+    input: 'sample-seq.tsv'
+    output: 'sample-contain-subset-500.tsv'
+    message: 'Randomly select samples for containment analysis'
+    run:
+        samples = pandas.read_csv(input[0], sep='\t')
+        data = {'ID': list(), 'Sample': list(), 'Proportion': list()}
+        numpy.random.seed(1550678459)
+        singles = samples[samples.Proportions == '1.000']
+        sampleids = numpy.random.choice(singles.ID, 100, replace=False)
+        single_sample = singles[singles.ID.isin(sampleids)]
+        for n, row in single_sample.iterrows():
+            data['ID'].append(row['Contributors'])
+            data['Sample'].append(row['ID'])
+            data['Proportion'].append(float(row['Proportions']))
+        mixtures = samples[samples.Contributors.str.contains(',')]
+        sampleids = numpy.random.choice(mixtures.ID, 400, replace=False)
+        mixture_sample = mixtures[mixtures.ID.isin(sampleids)]
+        for n, row in mixture_sample.iterrows():
+            contribs = row['Contributors'].split(',')
+            props = row['Proportions'].split(',')
+            for contrib, proportion in zip(contribs, props):
+                data['ID'].append(contrib)
+                data['Sample'].append(row['ID'])
+                data['Proportion'].append(float(proportion))
+        dataframe = pandas.DataFrame(data).sort_values('ID')
+        dataframe.to_csv(output[0], sep='\t', index=False)
+
+
 rule prep:
     input:
         'sample-contrib.tsv',
         'sample-seq.tsv',
         'sample-unite.tsv',
         'sample-match-samepop.tsv',
-        'sample-match-allpop.tsv'
+        'sample-match-allpop.tsv',
+        'sample-contain-subset-500.tsv'
 
 
 # -------------------------------------------------------------------------------------------------
