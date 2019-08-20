@@ -29,17 +29,19 @@ def test_diff_large():
     gt2 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('diff-comp-3.json'))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     loci = [d[0] for d in diff]
-    print(diff[9], diff[13], diff[16])
+    print(diff[9], diff[17], diff[21])
     assert loci == [
-        'MHDBL000002', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017', 'MHDBL000018', 'MHDBL000030',
-        'MHDBL000036', 'MHDBL000038', 'MHDBL000058', 'MHDBL000076', 'MHDBL000079', 'MHDBL000082',
-        'MHDBL000085', 'MHDBL000101', 'MHDBL000106', 'MHDBL000111', 'MHDBL000112', 'MHDBL000122',
-        'MHDBL000128', 'MHDBL000129', 'MHDBL000135', 'MHDBL000138', 'MHDBL000140', 'MHDBL000144',
-        'MHDBL000154', 'MHDBL000163', 'MHDBL000183', 'MHDBL000210', 'MHDBL000211', 'MHDBL000212'
+        'MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017', 'MHDBL000018',
+        'MHDBL000030', 'MHDBL000036', 'MHDBL000038', 'MHDBL000047', 'MHDBL000058', 'MHDBL000061',
+        'MHDBL000076', 'MHDBL000079', 'MHDBL000082', 'MHDBL000085', 'MHDBL000088', 'MHDBL000101',
+        'MHDBL000106', 'MHDBL000108', 'MHDBL000111', 'MHDBL000112', 'MHDBL000122', 'MHDBL000124',
+        'MHDBL000128', 'MHDBL000129', 'MHDBL000135', 'MHDBL000136', 'MHDBL000138', 'MHDBL000140',
+        'MHDBL000144', 'MHDBL000152', 'MHDBL000154', 'MHDBL000163', 'MHDBL000181', 'MHDBL000183',
+        'MHDBL000194', 'MHDBL000210', 'MHDBL000211', 'MHDBL000212'
     ]
-    assert diff[9] == ('MHDBL000076', {'G,T'}, set())
-    assert diff[13] == ('MHDBL000101', {'C,C,C,T'}, {'T,C,C,C'})
-    assert diff[16] == ('MHDBL000112', {'G,G,A,C'}, set())
+    assert diff[9] == ('MHDBL000047', set(), {'T,T'})
+    assert diff[17] == ('MHDBL000101', {'C,C,C,T'}, {'T,C,C,C'})
+    assert diff[21] == ('MHDBL000112', {'G,G,A,C'}, set())
 
 
 def test_diff_cli():
@@ -54,3 +56,10 @@ def test_diff_cli():
         with microhapulator.open(data_file('diff-comp-1-3.txt'), 'r') as fh:
             testoutput = fh.read().strip()
         assert output == testoutput
+
+
+def test_diff2():
+    gt1 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('euramer-sim-gt.json'))
+    gt2 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('euramer-inf-gt.json'))
+    diff = list(microhapulator.diff.diff(gt1, gt2))
+    assert diff == [('MHDBL000018', set(), {'T,G,C,T,A'})]

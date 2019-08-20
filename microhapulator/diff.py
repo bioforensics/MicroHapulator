@@ -19,7 +19,7 @@ def diff(gt1, gt2):
         allele2 = gt2.alleles(locus)
         diff1 = allele1 - allele2
         diff2 = allele2 - allele1
-        if len(diff1) > 0 or len(diff2) > 2:
+        if len(diff1) > 0 or len(diff2) > 0:
             yield locus, diff1, diff2
 
 

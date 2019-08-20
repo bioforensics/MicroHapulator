@@ -98,6 +98,14 @@ class Genotype(object):
             )
         return set([a['allele'] for a in self.data['loci'][locusid]['genotype']])
 
+    def allele_counts(self, locusid):
+        if locusid not in self.data['loci']:
+            return None
+        counts = defaultdict(int)
+        for adata in self.data['loci'][locusid]['genotype']:
+            counts[adata['allele']] += 1
+        return counts
+
     def rand_match_prob(self, popid):
         """Compute the random match probability of this genotype.
 

@@ -19,6 +19,7 @@ def dist(gt1, gt2):
         allele1 = gt1.alleles(locus)
         allele2 = gt2.alleles(locus)
         if allele1 != allele2:
+            print('DEBUG', locus, allele1, allele2)
             hammdist += 1
     return hammdist
 
