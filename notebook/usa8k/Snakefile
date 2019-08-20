@@ -503,7 +503,7 @@ rule genotype_sample:
         '''
         bwa mem {input.refr} {input.reads} | samtools view -bS | samtools sort -o {output.bam} -
         samtools index {output.bam}
-        mhpl8r type --out {output.json} {input.refr} {output.bam}
+        mhpl8r type --threshold 10 --out {output.json} {input.refr} {output.bam}
         '''
 
 rule genotype_all_samples:

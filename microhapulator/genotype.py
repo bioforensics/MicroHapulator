@@ -318,7 +318,7 @@ class ObservedGenotype(Genotype):
     def record_allele(self, locusid, allele, count):
         self.data['loci'][locusid]['allele_counts'][allele] = count
 
-    def infer(self, threshold=8):
+    def infer(self, threshold=10):
         for locusid, locusdata in self.data['loci'].items():
             allelecounts = locusdata['allele_counts']
             eff_cov = 1.0 - (locusdata['num_discarded_reads'] / locusdata['max_coverage'])
