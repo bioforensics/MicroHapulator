@@ -815,10 +815,10 @@ rule sample_containment:
         nsamples = len(input) - 1
         for gtfile in input[:nsamples]:
             othergt = SimulatedGenotype(fromfile=gtfile)
-            cont = microhapulator.contain.contain(othergt, gt)
+            cont, total = microhapulator.contain.contain(othergt, gt)
             ids.append(wildcards.label)
             samples.append(gtfile.split('-')[0])
-            containment.append(cont)
+            containment.append(cont / total)
         data = pandas.DataFrame({
             'ID': ids,
             'Sample': samples,
