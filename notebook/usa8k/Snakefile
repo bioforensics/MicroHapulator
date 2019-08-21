@@ -238,6 +238,42 @@ class MatchAllpopIndex(MatchSamepopIndex):
         return os.path.join(os.getcwd(), 'sample-match-allpop.tsv')
 
 
+class ContainmentIndex():
+    def __init__(self):
+        self.table = None
+        self.data = None
+        if os.path.isfile(self.tablefile):
+            self.table = defaultdict(list)
+            self.data = pandas.read_csv(self.tablefile, sep='\t')
+            for n, row in self.data.iterrows():
+                self.table[row['ID']].append(row)
+
+    @property
+    def tablefile(self):
+        return os.path.join(os.getcwd(), 'sample-contain-subset-500.tsv')
+
+    @property
+    def ids(self):
+        if self.table is None:
+            return []
+        return list(self.table.keys())
+
+    def sampleids(self, contrib):
+        if contrib not in self.table:
+            return None
+        return [row['Sample'] for row in self.table[contrib]]
+
+    def sample_gt_files(self, contrib):
+        if contrib not in self.table:
+            return None
+        return [sample + '-inferred-genotype.json' for sample in self.sampleids(contrib)]
+
+    def sample_proportions(self, contrib):
+        if contrib not in self.table:
+            return None
+        return [row['Proportion'] for row in self.table[contrib]]
+
+
 usapanel = microhapulator.panel.panel_usa()
 contrib_genotype_params = ContributorParamIndex()
 unite_params = UniteParamIndex()
@@ -245,6 +281,7 @@ seq_params = SeqParamIndex()
 reseq_params = ReseqParamIndex()
 match_samepop_params = MatchSamepopIndex()
 match_allpop_params = MatchAllpopIndex()
+contain_params = ContainmentIndex()
 
 
 def genotype_files(label):
@@ -408,20 +445,28 @@ rule select_containment_sample:
         singles = samples[samples.Proportions == '1.000']
         sampleids = numpy.random.choice(singles.ID, 100, replace=False)
         single_sample = singles[singles.ID.isin(sampleids)]
-        for n, row in single_sample.iterrows():
-            data['ID'].append(row['Contributors'])
-            data['Sample'].append(row['ID'])
-            data['Proportion'].append(float(row['Proportions']))
+        single_background = samples[~samples.ID.isin(sampleids)].sample(n=100)
+        for (n, row1), (m, row2) in zip(single_sample.iterrows(), single_background.iterrows()):
+            data['ID'].append(row1['Contributors'])
+            data['Sample'].append(row1['ID'])
+            data['Proportion'].append(float(row1['Proportions']))
+            data['ID'].append(row1['Contributors'])
+            data['Sample'].append(row2['ID'])
+            data['Proportion'].append(0.0)
         mixtures = samples[samples.Contributors.str.contains(',')]
         sampleids = numpy.random.choice(mixtures.ID, 400, replace=False)
         mixture_sample = mixtures[mixtures.ID.isin(sampleids)]
-        for n, row in mixture_sample.iterrows():
-            contribs = row['Contributors'].split(',')
-            props = row['Proportions'].split(',')
+        mixture_background = samples[~samples.ID.isin(sampleids)].sample(n=400)
+        for (n, row1), (m, row2) in zip(mixture_sample.iterrows(), mixture_background.iterrows()):
+            contribs = row1['Contributors'].split(',')
+            props = row1['Proportions'].split(',')
             for contrib, proportion in zip(contribs, props):
                 data['ID'].append(contrib)
-                data['Sample'].append(row['ID'])
+                data['Sample'].append(row1['ID'])
                 data['Proportion'].append(float(proportion))
+            data['ID'].append(contrib)
+            data['Sample'].append(row2['ID'])
+            data['Proportion'].append(0.0)
         dataframe = pandas.DataFrame(data).sort_values('ID')
         dataframe.to_csv(output[0], sep='\t', index=False)
 
@@ -749,3 +794,46 @@ rule sample_matching_related_all:
 
 rule all_sample_matching_tests:
     input: expand('sample-match-{test}-eval.tsv', test=('reseq', 'samepop', 'allpop', 'related'))
+
+
+# -------------------------------------------------------------------------------------------------
+# Evaluation of sample containment
+# -------------------------------------------------------------------------------------------------
+
+rule sample_containment:
+    input:
+        lambda wildcards: contain_params.sample_gt_files(wildcards.label),
+        contrib='{label}-simulated-genotype.json'
+    params:
+        proportions=lambda wildcards: contain_params.sample_proportions(wildcards.label)
+    output: temp('{label}-containment-temp.tsv')
+    run:
+        gt = SimulatedGenotype(fromfile=input.contrib)
+        ids = list()
+        samples = list()
+        containment = list()
+        nsamples = len(input) - 1
+        for gtfile in input[:nsamples]:
+            othergt = SimulatedGenotype(fromfile=gtfile)
+            cont = microhapulator.contain.contain(othergt, gt)
+            ids.append(wildcards.label)
+            samples.append(gtfile.split('-')[0])
+            containment.append(cont)
+        data = pandas.DataFrame({
+            'ID': ids,
+            'Sample': samples,
+            'Containment': containment,
+            'Proportion': params.proportions,
+        })
+        data.to_csv(output[0], sep='\t', index=False)
+
+
+rule sample_containment_all:
+    input: expand('{label}-containment-temp.tsv', label=contain_params.ids)
+    output: 'sample-containment-eval.tsv'
+    run:
+        data = pandas.concat(
+            [pandas.read_csv(infile, sep='\t') for infile in input],
+            ignore_index=True
+        )
+        data.to_csv(output[0], sep='\t', index=False)
