@@ -818,7 +818,7 @@ rule sample_containment:
             cont, total = microhapulator.contain.contain(othergt, gt)
             ids.append(wildcards.label)
             samples.append(gtfile.split('-')[0])
-            containment.append(cont / total)
+            containment.append(float(format(cont / total, '.4f')))
         data = pandas.DataFrame({
             'ID': ids,
             'Sample': samples,
