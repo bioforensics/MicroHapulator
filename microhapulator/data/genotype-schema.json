@@ -1,5 +1,6 @@
 {
     "type": "object",
+    "additionalProperties": false,
     "properties": {
         "ploidy": {
             "description": "The number of haplotypes present in the sample. Should be 2 times the number of each diploid individual. For simulated genotypes, the ploidy is known, but it is usually unknown for observed genotypes.",
@@ -25,6 +26,10 @@
                 "SimulatedGenotype",
                 "ObservedGenotype"
             ]
+        },
+        "metadata": {
+            "description": "Free-form metadata.",
+            "type": "object"
         },
         "loci": {
             "patternProperties": {
