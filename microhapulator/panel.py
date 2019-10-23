@@ -15,98 +15,38 @@ from numpy.random import choice
 import pandas
 
 
-class LocusContext(object):
-    """A class for resolving the context around a microhaplotype locus.
-
-    >>> row = microhapdb.id_xref('mh01KK-172').iloc[0]
-    >>> context = LocusContext(row)
-    >>> len(context)
-    350
-    >>> context.offset
-    1551391
-    >>> context.global_to_local(1551522)
-    131
-    >>> context.local_to_global(287)
-    1551678
-    """
-    def __init__(self, rowdata, mindelta=30, minlen=350):
-        self._data = rowdata
-        start = rowdata['Start'] - mindelta
-        end = rowdata['End'] + mindelta
-        initlen = end - start
-        if initlen < minlen:
-            lendiff = minlen - initlen
-            bpextend = ceil(lendiff / 2)
-            start -= bpextend
-            end += bpextend
-        self.start = start
-        self.end = end
-
-    def __len__(self):
-        return self.end - self.start
-
-    @property
-    def chrom(self):
-        return str(self._data['Chrom'])
-
-    @property
-    def offset(self):
-        return self.start
-
-    def global_to_local(self, coord):
-        if coord < self.start or coord > self.end:
-            return None
-        return coord - self.start
-
-    def local_to_global(self, coord):
-        if coord >= len(self):
-            return None
-        return coord + self.start
-
-    def sequence(self, seqindex, prechr=False):
-        seqid = 'chr' + self.chrom if prechr else self.chrom
-        return str(seqindex[seqid][self.start:self.end].seq).upper()
-
-    def defline(self):
-        coords = [self.global_to_local(x) for x in microhapdb.allele_positions(self._data['ID'])]
-        return '{loc} GRCh38:{chrom}:{s}-{e} variants={var}'.format(
-            loc=self._data['ID'], chrom=self.chrom, s=self.start,
-            e=self.end, var=':'.join(map(str, coords))
-        )
-
-
-def panel_loci(panellist):
+def panel_markers(panellist):
     if panellist is None or panellist == ['alpha']:
-        loci = panel_alpha()
+        markers = panel_alpha()
     elif panellist == ['beta']:
-        loci = panel_beta()
+        markers = panel_beta()
     elif panellist == ['usa']:
-        loci = panel_usa()
+        markers = panel_usa()
     elif panellist == ['allpops']:
-        loci = panel_allpops()
+        markers = panel_allpops()
     else:
-        loci = panellist
-    return validate_loci(loci)
+        markers = panellist
+    return validate_markers(markers)
 
 
 def panel_alpha():
     '''Initial minimum-effort panel selection.
 
-    There are many factors to consider when designing a panel. This method
-    ignores most of those considerations and simply grabs the microhap locus
-    from each autosome with the largest effective number of alleles (Ae)
-    averaged across all populations.
+    There are many factors to consider when designing a panel. This method ignores most of those
+    considerations and simply grabs the microhap marker from each autosome with the largest
+    effective number of alleles (Ae) averaged across all populations. Only populations from ALFRED
+    were considered as these were the most comprehensive published resource at the time.
     '''
-    loci = microhapdb.loci.query('Source == "ALFRED"').\
+    markers = microhapdb.markers.query('Source == "ALFRED"').\
         sort_values('AvgAe', ascending=False).\
         drop_duplicates('Chrom')
-    return list(loci.ID)
+    return list(markers.Name)
 
 
 def panel_beta():
     '''First attempt at optimizing panel design.
 
-    Slightly less unsophisticated approach to panel selection than panel_alpha,
+    Slightly less unsophisticated approach to panel selection than alpha,
     but still ignoring some important considerations. This method focuses on a
     few simple filters and simple operations.
     - discard any microhap not present in ALFRED
@@ -118,43 +58,44 @@ def panel_beta():
       microhaps from 3 to 2 until a compatible set is selected
     - combine microhaps from all chromosomes and select the top 50 by AvgAe
     '''
-    loci = microhapdb.loci.copy()
-    loci['Length'] = loci['End'] - loci['Start']
-    locusids = set()
-    for chromid in loci.Chrom.unique():
-        chromloci = loci[
-            (loci.Source == 'ALFRED') &
-            (loci.Chrom == chromid) &
-            (loci.AvgAe > 2.0) &
-            (loci.Length <= 250)
+    markers = microhapdb.markers.copy()
+    markers['Start'] = markers.Offsets.apply(lambda x: min(map(int, x.split(','))))
+    markers['End'] = markers.Offsets.apply(lambda x: max(map(int, x.split(','))) + 1)
+    markers['Length'] = markers.apply(lambda x: x.End - x.Start, axis=1)
+    markerids = set()
+    for chromid in markers.Chrom.unique():
+        chromloci = markers[
+            (markers.Source == 'ALFRED')
+            & (markers.Chrom == chromid)
+            & (markers.AvgAe > 2.0)
+            & (markers.Length <= 250)
         ]
 
         def trycombos(n=3, dist=25e6):
-            opt_ae, opt_loci = None, None
-            for testlocusids in combinations(chromloci.ID, n):
-                testloci = loci[loci.ID.isin(testlocusids)]
-                for coord1, coord2 in combinations(testloci.Start, 2):
+            opt_ae, opt_markers = None, None
+            for testmarkerids in combinations(chromloci.Name, n):
+                testmarkers = markers[markers.Name.isin(testmarkerids)]
+                for coord1, coord2 in combinations(testmarkers.Start, 2):
                     if abs(coord1 - coord2) < dist:
                         break
                 else:
-                    ae = sum(testloci.AvgAe) / len(testloci.AvgAe)
+                    ae = sum(testmarkers.AvgAe) / len(testmarkers.AvgAe)
                     if opt_ae is None or ae > opt_ae:
                         opt_ae = ae
-                        opt_loci = testlocusids
-            return opt_loci
+                        opt_markers = testmarkerids
+            return opt_markers
         params = (
             (3, 25e6), (3, 20e6), (2, 25e6), (2, 20e6),
             (3, 15e6), (2, 15e6),
             (3, 10e6), (2, 10e6), (2, 7.5e6),
         )
         for n, dist in params:
-            testloci = trycombos(n=n, dist=dist)
-            if testloci is not None:
+            testmarkers = trycombos(n=n, dist=dist)
+            if testmarkers is not None:
+                markerids.update(testmarkers)
                 break
-        assert testloci is not None, chromid
-        locusids.update(testloci)
-    panel = loci[loci.ID.isin(locusids)].sort_values('AvgAe').head(50)
-    return list(panel.ID)
+    panel = markers[markers.Name.isin(markerids)].sort_values('AvgAe').head(50)
+    return list(panel.Name)
 
 
 def panel_usa():
@@ -168,12 +109,15 @@ def panel_usa():
     demo_file = microhapulator.package_file('usa-demographics.tsv')
     usa_demo = pandas.read_csv(demo_file, sep='\t')
     pops = set(usa_demo.Population)
-    loci = exclude_loci_missing_data(microhapdb.loci.ID.unique(), pops, suppress=True)
-    prelim_panel = [l for l in loci if len(microhapdb.allele_positions(l)) > 2]
-    final_panel = microhapdb.loci[
-        microhapdb.loci.ID.isin(prelim_panel)
+    markerids = exclude_markers_missing_freq_data(
+        microhapdb.markers.Name.unique(), pops, suppress=True
+    )
+    markers = microhapdb.markers.copy()
+    markers['NumVariants'] = markers.Offsets.apply(lambda x: x.count(',') + 1)
+    panel = markers[
+        (markers.Name.isin(markerids)) & (markers.NumVariants > 2)
     ].sort_values('AvgAe', ascending=False).head(50)
-    return list(final_panel.ID)
+    return list(panel.Name)
 
 
 def panel_allpops():
@@ -190,33 +134,33 @@ def panel_allpops():
     return sorted(panel)
 
 
-def validate_loci(panel):
-    valid_loci = microhapdb.standardize_ids(panel)
-    if len(valid_loci) < len(panel):
-        message = 'panel includes duplicate and/or invalid locus IDs'
-        microhapulator.plog('[MicroHapulator::loci] WARNING', message)
-    return valid_loci
+def validate_markers(panel):
+    valid_markers = microhapdb.marker.standardize_ids(panel)
+    if len(valid_markers) < len(panel):
+        message = 'panel includes duplicate and/or invalid marker IDs'
+        microhapulator.plog('[MicroHapulator::panel] WARNING', message)
+    return valid_markers
 
 
-def sample_panel(popids, loci):
+def sample_panel(popids, markers):
     for haplotype, popid in enumerate(popids):
-        for locusid in loci:
+        for markerid in markers:
             f = microhapdb.frequencies
-            allelefreqs = f[(f.Population == popid) & (f.Locus == locusid)]
+            allelefreqs = f[(f.Population == popid) & (f.Marker == markerid)]
             if len(allelefreqs) == 0:
                 message = 'no allele frequencies available'
                 message += ' for population "{pop}"'.format(pop=popid)
-                message += ' at locus "{loc}"'.format(loc=locusid)
+                message += ' at marker "{loc}"'.format(loc=markerid)
                 message += '; in "relaxed" mode, drawing an allele uniformly'
                 microhapulator.plog('[MicroHapulator::panel] WARNING:', message)
-                alleles = list(f[f.Locus == locusid].Allele.unique())
+                alleles = list(f[f.Marker == markerid].Allele.unique())
                 sampled_allele = choice(alleles)
             else:
                 alleles = list(allelefreqs.Allele)
                 freqs = list(allelefreqs.Frequency)
                 freqs = [x / sum(freqs) for x in freqs]
                 sampled_allele = choice(alleles, p=freqs)
-            yield haplotype, locusid, sampled_allele
+            yield haplotype, markerid, sampled_allele
 
 
 def validate_populations(popids):
@@ -224,7 +168,7 @@ def validate_populations(popids):
         message = 'please provide only 1 or 2 population IDs'
         raise ValueError(message)
     popids = sorted(set(popids))
-    haplopops = microhapdb.standardize_ids(popids)
+    haplopops = list(microhapdb.population.standardize_ids(popids))
     if len(haplopops) < len(popids):
         raise ValueError('invalid or duplicated population ID(s)')
     if len(haplopops) == 1:
@@ -232,28 +176,25 @@ def validate_populations(popids):
     return haplopops
 
 
-def check_loci_for_population(loci, popid, suppress=False):
-    loci = validate_loci(loci)
-    if len(loci) == 0:
+def check_markers_for_population(markers, popid, suppress=False):
+    markers = validate_markers(markers)
+    if len(markers) == 0:
         return list()
     freq = microhapdb.frequencies
-    allelefreqs = freq[(freq.Population == popid) & (freq.Locus.isin(loci))]
-    idsfound = list(allelefreqs.Locus.unique())
-    nodata = set(loci) - set(idsfound)
+    allelefreqs = freq[(freq.Population == popid) & (freq.Marker.isin(markers))]
+    idsfound = list(allelefreqs.Marker.unique())
+    nodata = set(markers) - set(idsfound)
     if len(nodata) > 0 and not suppress:
         message = 'no allele frequency data available'
         message += ' for population "{pop:s}"'.format(pop=popid)
-        message += ' at the following microhap loci: {loc:s}'.format(loc=','.join(nodata))
+        message += ' at the following microhap markers: {loc:s}'.format(loc=','.join(nodata))
         microhapulator.plog('[MicroHapulator::panel] WARNING:', message)
-    return sorted(set(loci) & set(idsfound))
+    return sorted(set(markers) & set(idsfound))
 
 
-def exclude_loci_missing_data(loci, popids, suppress=False):
-    loci_to_keep = None
+def exclude_markers_missing_freq_data(markers, popids, suppress=False):
+    markers_to_keep = set(markers)
     for popid in popids:
-        temp_loci = check_loci_for_population(loci, popid, suppress=suppress)
-        if loci_to_keep is None:
-            loci_to_keep = set(temp_loci)
-        else:
-            loci_to_keep = set(loci_to_keep) & set(temp_loci)
-    return sorted(loci_to_keep)
+        temp_markers = check_markers_for_population(markers, popid, suppress=suppress)
+        markers_to_keep = markers_to_keep & set(temp_markers)
+    return sorted(markers_to_keep)

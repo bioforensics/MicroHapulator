@@ -57,8 +57,8 @@ Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
 subcommands listed below to see instructions for that operation.
 
 Subcommands:
-  subcmd             contain, contrib, diff, dist, getrefr, mix, prob, refr,
-                     seq, sim, type, unite
+  subcmd             contain, contrib, diff, dist, mix, prob, seq, sim, type,
+                     unite
 
 Global arguments:
   -h, --help         show this help message and exit

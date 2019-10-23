@@ -11,7 +11,7 @@
 def subparser(subparsers):
     desc = (
         'Use precomputed population allele frequencies to simulate a diploid '
-        'genotype for the specified panel of microhaplotypes.'
+        'DNA profile for the specified panel of microhaplotypes.'
     )
     cli = subparsers.add_parser('sim', description=desc)
 
@@ -28,17 +28,18 @@ def subparser(subparsers):
         'random number generator'
     )
     cli.add_argument(
-        '-r', '--relaxed', action='store_true', help='if a locus in the panel '
+        '-r', '--relaxed', action='store_true', help='if a marker in the panel '
         'has no frequency data for a requested population, randomly draw an '
         'allele (from a uniform distribution) from all possible alleles; by '
-        'default, these loci are exluded from simulation'
+        'default, these markers are exluded from simulation'
     )
     cli.add_argument(
-        'popid', nargs=2, help='population identifiers for two haplotypes'
+        'popid', nargs=2, help='population identifiers for the two parental '
+        'haplotypes'
     )
     cli.add_argument(
         'panel', nargs='+', help='panel from which to simulate microhap '
-        'genotypes; can be a list of MicroHapDB locus identifiers or the '
+        'profiles; can be a list of MicroHapDB marker identifiers or the '
         'label for one of MicroHapulator\'s preset panels (such as alpha, '
         'beta, or usa)'
     )

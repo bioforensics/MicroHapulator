@@ -10,7 +10,7 @@
 from happer.mutate import mutate
 import microhapulator
 from microhapulator.genotype import SimulatedGenotype
-from microhapulator.panel import panel_loci, exclude_loci_missing_data
+from microhapulator.panel import panel_markers, exclude_markers_missing_freq_data
 from microhapulator.panel import validate_populations, sample_panel
 import numpy.random
 from pyfaidx import Fasta as Fastaidx
@@ -27,23 +27,23 @@ def sim(popids, panel, seed=None, relaxed=False):
     uniform distribution).
     '''
     haplopops = validate_populations(popids)
-    loci = panel_loci(panel)
+    markers = panel_markers(panel)
     if not relaxed:
-        loci = exclude_loci_missing_data(loci, haplopops)
-    if loci in (None, list()):
+        markers = exclude_markers_missing_freq_data(markers, haplopops)
+    if markers in (None, list()):
         raise ValueError('invalid panel: {}'.format(panel))
     genotype = SimulatedGenotype(ploidy=2)
     if seed is None:
         seed = numpy.random.randint(2**32-1)
     numpy.random.seed(seed)
-    for haplotype, locus, allele in sample_panel(haplopops, loci):
+    for haplotype, locus, allele in sample_panel(haplopops, markers):
         genotype.add(haplotype, locus, allele)
     genotype.data['metadata'] = {
         'MaternalHaploPop': haplopops[0],
         'PaternalHaploPop': haplopops[1],
         'HaploSeed': seed,
     }
-    message = 'simulated microhaplotype variation at {loc:d} loci'.format(loc=len(loci))
+    message = 'simulated microhaplotype variation at {loc:d} markers'.format(loc=len(markers))
     microhapulator.plog('[MicroHapulator::sim]', message)
     return genotype
 

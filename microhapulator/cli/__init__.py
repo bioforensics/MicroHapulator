@@ -15,7 +15,6 @@ from . import contain
 from . import contrib
 from . import diff
 from . import dist
-from . import getrefr
 from . import mix
 from . import prob
 from . import refr
@@ -29,10 +28,8 @@ mains = {
     'contrib': microhapulator.contrib.main,
     'diff': microhapulator.diff.main,
     'dist': microhapulator.dist.main,
-    'getrefr': microhapulator.getrefr.main,
     'mix': microhapulator.mix.main,
     'prob': microhapulator.prob.main,
-    'refr': microhapulator.refr.main,
     'seq': microhapulator.seq.main,
     'sim': microhapulator.sim.main,
     'type': microhapulator.type.main,
@@ -44,10 +41,8 @@ subparser_funcs = {
     'contrib': contrib.subparser,
     'diff': diff.subparser,
     'dist': dist.subparser,
-    'getrefr': getrefr.subparser,
     'mix': mix.subparser,
     'prob': prob.subparser,
-    'refr': refr.subparser,
     'seq': seq.subparser,
     'sim': sim.subparser,
     'type': type.subparser,
