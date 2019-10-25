@@ -9,7 +9,7 @@
 
 import json
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
 def prob(popid, gt1, gt2=None, erate=0.001):

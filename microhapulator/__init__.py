@@ -16,7 +16,7 @@ from pkg_resources import resource_filename
 import sys
 
 # Internal modules
-from microhapulator import genotype
+from microhapulator import profile
 
 # Subcommands and command-line interface
 from microhapulator import contain

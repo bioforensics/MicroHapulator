@@ -15,30 +15,29 @@ import jsonschema
 import microhapdb
 import microhapulator
 from numpy.random import choice
-from pyfaidx import Fasta as Fastaidx
 
 
 def load_schema():
-    with microhapulator.open(microhapulator.package_file('genotype-schema.json'), 'r') as fh:
+    with microhapulator.open(microhapulator.package_file('profile-schema.json'), 'r') as fh:
         return json.load(fh)
 
 
 schema = None
 
 
-class Genotype(object):
+class Profile(object):
     def unite(mom, dad):
-        """Simulate the creation of a new genotype from a mother and father."""
-        gt = SimulatedGenotype(ploidy=2)
+        """Simulate the creation of a new profile from a mother and father."""
+        gt = SimulatedProfile(ploidy=2)
         allloci = mom.loci() | dad.loci()
         commonloci = mom.loci() & dad.loci()
         if len(commonloci) == 0:
-            raise ValueError('mom and dad genotypes have no loci in common')
+            raise ValueError('mom and dad profiles have no loci in common')
         notshared = allloci - commonloci
         if len(notshared) > 0:
-            message = 'loci not common to mom and dad genotypes are excluded: '
+            message = 'loci not common to mom and dad profiles are excluded: '
             message += ', '.join(notshared)
-            microhapulator.plog('[MicroHapulator::genotype]', message)
+            microhapulator.plog('[MicroHapulator::profile]', message)
         for parent, hapid in zip((mom, dad), (0, 1)):
             for locus in sorted(commonloci):
                 haploallele = choice(sorted(parent.alleles(locus)))
@@ -99,11 +98,11 @@ class Genotype(object):
         return set([a['allele'] for a in self.data['loci'][locusid]['genotype']])
 
     def rand_match_prob(self, popid):
-        """Compute the random match probability of this genotype.
+        """Compute the random match probability of this profile.
 
         Given a set of population allele frequencies, the random match
         probability is the product of the allele frequencies of each allele
-        observed in the genotype.
+        observed in the profile.
         """
         prob = 1.0
         for locus in sorted(self.loci()):
@@ -127,7 +126,7 @@ class Genotype(object):
                     message += 'allele "{:s}" at locus "{:s}" '.format(allele, locus)
                     message += 'for population "{:s}"; '.format(popid)
                     message += 'using RMP=0.001 for this allele'
-                    microhapulator.plog('[MicroHapulator::genotype] WARNING:', message)
+                    microhapulator.plog('[MicroHapulator::profile] WARNING:', message)
                     prob *= 0.001
                 else:
                     prob *= frequency
@@ -141,7 +140,7 @@ class Genotype(object):
         two unrelated sources. The first probability (numerator) should be 1.0,
         with any missing or incongruent alleles treated as genotyping error.
         The second probability (denominator) is the random match probability.
-        The test only makes sense when the two genotypes being compared are
+        The test only makes sense when the two profiles being compared are
         identical or nearly identical.
         """
         assert self.data['ploidy'] in (2, None)
@@ -168,7 +167,7 @@ class Genotype(object):
             json.dump(self.data, outfile, indent=4, sort_keys=True)
 
     def __eq__(self, other):
-        if not isinstance(other, Genotype):
+        if not isinstance(other, Profile):
             return False
         if self.loci() != other.loci():
             return False
@@ -184,9 +183,12 @@ class Genotype(object):
     def bedstream(self):
         hapids = self.haplotypes()
         for locusid in sorted(self.loci()):
-            locusdata = microhapdb.id_xref(locusid).iloc[0]
+            result = microhapdb.markers[microhapdb.markers.Name == locusid]
+            if len(result) == 0:
+                raise ValueError('unknown marker identifier "{:s}"'.format(locusid))
+            locusdata = result.iloc[0]
             context = microhapulator.panel.LocusContext(locusdata)
-            coords = microhapdb.allele_positions(locusdata['ID'])
+            coords = list(map(int, locusdata.Offsets.split(',')))
             coords = list(map(context.global_to_local, coords))
             locusvars = [list() for _ in range(len(coords))]
             for haplotype in sorted(hapids):
@@ -197,11 +199,12 @@ class Genotype(object):
                 allelestr = '|'.join(var)
                 yield '\t'.join((locusid, str(coord), str(coord + 1), allelestr))
 
-    def seqstream(self, seqindex, prechr=False):
+    @property
+    def seqstream(self):
         for locusid in sorted(self.loci()):
-            canonid = microhapdb.id_xref(locusid).iloc[0]
+            canonid = microhapdb.markers[microhapdb.markers.Name == locusid].iloc[0]
             context = microhapulator.panel.LocusContext(canonid)
-            yield context.defline(), context.sequence(seqindex, prechr=prechr)
+            yield context.defline, context.sequence
 
     @property
     def bedstr(self):
@@ -213,34 +216,33 @@ class Genotype(object):
     @property
     def haploseqs(self):
         '''Apply genotype to reference and construct full haplotype sequences.'''
-        seqindex = Fastaidx(microhapulator.package_file('hg38.fasta'))
-        mutator = mutate(self.seqstream(seqindex), self.bedstream)
+        mutator = mutate(self.seqstream, self.bedstream)
         for defline, sequence in mutator:
             yield defline, sequence
 
     def unmix(self):
         assert self.ploidy % 2 == 0
         ncontrib = int(self.ploidy / 2)
-        genotypes = [SimulatedGenotype() for _ in range(ncontrib)]
+        profiles = [SimulatedProfile() for _ in range(ncontrib)]
         for locus in self.loci():
             for contrib in range(ncontrib):
                 for hap in range(2):
                     haplotype = (2 * contrib) + hap
                     allele = self.alleles(locus, haplotype=haplotype).pop()
-                    genotypes[contrib].add(hap, locus, allele)
-        return genotypes
+                    profiles[contrib].add(hap, locus, allele)
+        return profiles
 
 
-class SimulatedGenotype(Genotype):
-    """Genotype represented by phased alleles at a number of specified loci.
+class SimulatedProfile(Profile):
+    """Profile represented by phased alleles at a number of specified loci.
 
     Alleles are stored in a dictionary, with microhap locus ID/name as the key
     and a list as the value. Typically each list contains 2 items, the
     haplotype/phase 0 allele and the hap/phase 1 allele. However, if the
-    genotype represents a mixture there may be more than 2 haplotypes, as
+    profile represents a mixture there may be more than 2 haplotypes, as
     indicated by the `ploidy` parameter.
 
-    >>> gt = SimulatedGenotype()
+    >>> gt = SimulatedProfile()
     >>> gt.add(0, 'mh21KK-315', 'G,C,T')
     >>> gt.add(1, 'mh21KK-315', 'A,T,C')
     >>> gt.add(0, 'mh21KK-316', 'A,C,G,T')
@@ -268,25 +270,25 @@ class SimulatedGenotype(Genotype):
                 alleles = allelestr.split('|')
                 for i, a in enumerate(alleles):
                     locus_alleles[locusid][i].append(a)
-            genotype = SimulatedGenotype(ploidy=ploidy)
+            profile = SimulatedProfile(ploidy=ploidy)
             for locusid, allele_list in locus_alleles.items():
                 for i, allele in enumerate(allele_list):
-                    genotype.add(i, locusid, ','.join(allele))
-            return genotype
+                    profile.add(i, locusid, ','.join(allele))
+            return profile
 
-    def merge(genotypes):
-        ploidy = 2 * len(genotypes)
-        gt = SimulatedGenotype(ploidy=ploidy)
+    def merge(profiles):
+        ploidy = 2 * len(profiles)
+        gt = SimulatedProfile(ploidy=ploidy)
         offset = 0
-        for genotype in genotypes:
-            for locusid, locusdata in sorted(genotype.data['loci'].items()):
+        for profile in profiles:
+            for locusid, locusdata in sorted(profile.data['loci'].items()):
                 for allele in locusdata['genotype']:
                     gt.add(offset + allele['haplotype'], locusid, allele['allele'])
             offset += 2
         return gt
 
     def __init__(self, fromfile=None, ploidy=0):
-        super(SimulatedGenotype, self).__init__(fromfile=fromfile)
+        super(SimulatedProfile, self).__init__(fromfile=fromfile)
         if ploidy:
             self.data['ploidy'] = ploidy
 
@@ -299,12 +301,12 @@ class SimulatedGenotype(Genotype):
 
     @property
     def gttype(self):
-        return 'SimulatedGenotype'
+        return 'SimulatedProfile'
 
 
-class ObservedGenotype(Genotype):
+class ObservedProfile(Profile):
     def __init__(self, fromfile=None):
-        super(ObservedGenotype, self).__init__(fromfile=fromfile)
+        super(ObservedProfile, self).__init__(fromfile=fromfile)
 
     def record_coverage(self, locusid, cov_by_pos, ndiscarded=0):
         self.data['loci'][locusid] = {
@@ -342,4 +344,4 @@ class ObservedGenotype(Genotype):
 
     @property
     def gttype(self):
-        return 'ObservedGenotype'
+        return 'ObservedProfile'

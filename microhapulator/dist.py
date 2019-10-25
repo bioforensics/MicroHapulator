@@ -9,7 +9,7 @@
 
 import json
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
 def dist(gt1, gt2):

@@ -80,7 +80,7 @@ def observe_genotypes(bamfile, refrfasta):
 
 def type(bamfile, refrfasta, threshold=10):
     genotyper = observe_genotypes(bamfile, refrfasta)
-    gt = microhapulator.genotype.ObservedGenotype()
+    gt = microhapulator.profile.ObservedProfile()
     for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
         gt.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for allele, count in gtcounts.items():

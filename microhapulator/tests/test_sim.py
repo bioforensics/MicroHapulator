@@ -9,7 +9,7 @@
 
 import filecmp
 import microhapulator
-from microhapulator.genotype import SimulatedGenotype
+from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
 import pytest
 import shutil
@@ -17,36 +17,34 @@ import tempfile
 
 
 def test_meaning_of_life():
-    genotype = microhapulator.sim.sim(['MHDBP000022', 'MHDBP000022'], ['beta'], seed=42)
-    testgenotype = SimulatedGenotype(fromfile=data_file('meaning-of-life.json.gz'))
+    genotype = microhapulator.sim.sim(['SA004250L', 'SA004250L'], ['beta'], seed=42)
+    testgenotype = SimulatedProfile(fromfile=data_file('meaning-of-life.json.gz'))
     assert genotype == testgenotype
 
 
 @pytest.mark.parametrize('relaxmode,testfile', [
-    (False, 'red-strict-gt.json'),
-    (True, 'red-relaxed-gt.json'),
+    (False, 'red-strict-profile.json'),
+    (True, 'red-relaxed-profile.json'),
 ])
 def test_sim_relaxed(relaxmode, testfile):
     genotype = microhapulator.sim.sim(
-        ['MHDBP000003'], ['MHDBL000013', 'MHDBL000212', 'MHDBL000197'],
+        ['SA000101C'], ['mh01KK-117', 'mh09KK-157', 'mh07CP-004'],
         seed=54321, relaxed=relaxmode
     )
-    testgenotype = SimulatedGenotype(fromfile=data_file(testfile))
+    testgenotype = SimulatedProfile(fromfile=data_file(testfile))
     assert genotype == testgenotype
 
 
 def test_main():
     with tempfile.NamedTemporaryFile(suffix='.gt.json') as outfile:
         arglist = [
-            'sim', '--out', outfile.name, '--seed', '1985', 'MHDBP000022', 'MHDBP000022',
+            'sim', '--out', outfile.name, '--seed', '1985', 'SA004250L', 'SA004250L',
             'usa'
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)
-        gt = SimulatedGenotype(fromfile=outfile.name)
-        testgt = SimulatedGenotype(fromfile=data_file('bitusa-gt.json'))
-        import subprocess
-        subprocess.check_call(['cp', outfile.name, 'DUDE.json'])
+        gt = SimulatedProfile(fromfile=outfile.name)
+        testgt = SimulatedProfile(fromfile=data_file('bitusa-gt.json'))
         assert gt == testgt
 
 
@@ -55,13 +53,13 @@ def test_main_haplo_seq():
     try:
         arglist = [
             'sim', '--seed', '293847', '--out', tempdir + '/genotype.json',
-            '--haplo-seq', tempdir + '/haplo.fasta', 'MHDBP000004', 'MHDBP000004',
-            'MHDBL000197', 'MHDBL000066'
+            '--haplo-seq', tempdir + '/haplo.fasta', 'SA004047P', 'SA004047P',
+            'mh07CP-004', 'mh14CP-003'
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)
-        gt = SimulatedGenotype(fromfile=tempdir + '/genotype.json')
-        testgt = SimulatedGenotype(fromfile=data_file('orange-sim-gt.json'))
+        gt = SimulatedProfile(fromfile=tempdir + '/genotype.json')
+        testgt = SimulatedProfile(fromfile=data_file('orange-sim-profile.json'))
         assert gt == testgt
         assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('orange-haplo.fasta'))
     finally:
@@ -69,11 +67,11 @@ def test_main_haplo_seq():
 
 
 def test_no_seed():
-    genotype = microhapulator.sim.sim(['MHDBP000004'], ['MHDBL000197', 'MHDBL000066'])
+    genotype = microhapulator.sim.sim(['SA004047P'], ['mh07CP-004', 'mh14CP-003'])
     assert len(genotype.data['loci']) == 2
-    assert sorted(genotype.data['loci']) == ['MHDBL000066', 'MHDBL000197']
+    assert sorted(genotype.data['loci']) == ['mh07CP-004', 'mh14CP-003']
 
 
 def test_bad_panel():
     with pytest.raises(ValueError, match=r'invalid panel') as ve:
-        microhapulator.sim.sim(['MHDBP000004'], ['DUUUUDE', 'SWEEEET'])
+        microhapulator.sim.sim(['SA004047P'], ['DUUUUDE', 'SWEEEET'])

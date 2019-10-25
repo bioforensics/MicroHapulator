@@ -2,7 +2,7 @@
     "type": "object",
     "properties": {
         "ploidy": {
-            "description": "The number of haplotypes present in the sample. Should be 2 times the number of each diploid individual. For simulated genotypes, the ploidy is known, but it is usually unknown for observed genotypes.",
+            "description": "The number of haplotypes present in the sample. Should be 2 times the number of each diploid individual. For simulated profiles, the ploidy is known, but it is usually unknown for observed profiles.",
             "anyOf": [
                 {
                     "type": "integer",
@@ -14,16 +14,16 @@
             ]
         },
         "version": {
-            "description": "The version of the MicroHapulator software used to create the genotype file. Important to track when breaking changes are made to the API.",
+            "description": "The version of the MicroHapulator software used to create the profile file. Important to track when breaking changes are made to the API.",
             "type": "string"
         },
         "type": {
-            "description": "Whether the genotype is simulated directly, observed (inferred from read mappings) or undetermined.",
+            "description": "Whether the profile is simulated directly, observed (inferred from read mappings) or undetermined.",
             "type": "string",
             "enum": [
                 "base",
-                "SimulatedGenotype",
-                "ObservedGenotype"
+                "SimulatedProfile",
+                "ObservedProfile"
             ]
         },
         "loci": {

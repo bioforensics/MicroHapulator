@@ -20,7 +20,7 @@ from numpy.random import choice, randint
 
 # Internal imports
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
 def calc_n_reads_from_proportions(n, totalreads, prop):

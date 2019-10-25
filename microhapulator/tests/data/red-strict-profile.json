@@ -1,6 +1,6 @@
 {
     "loci": {
-        "MHDBL000013": {
+        "mh01KK-117": {
             "genotype": [
                 {
                     "allele": "A,G,G,C",
@@ -12,7 +12,7 @@
                 }
             ]
         },
-        "MHDBL000212": {
+        "mh09KK-157": {
             "genotype": [
                 {
                     "allele": "G,C,C,A,C",
@@ -25,7 +25,12 @@
             ]
         }
     },
+    "metadata": {
+        "HaploSeed": 54321,
+        "MaternalHaploPop": "SA000101C",
+        "PaternalHaploPop": "SA000101C"
+    },
     "ploidy": 2,
-    "type": "SimulatedGenotype",
-    "version": "0.2+12.g51cb32c.dirty"
+    "type": "SimulatedProfile",
+    "version": "0.3+23.g22f3f45.dirty"
 }

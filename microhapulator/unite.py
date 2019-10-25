@@ -10,7 +10,7 @@
 import json
 import numpy.random
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
 def main(args):

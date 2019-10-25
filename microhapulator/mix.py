@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.genotype import SimulatedGenotype
+from microhapulator.profile import SimulatedProfile
 
 
 def main(args):
