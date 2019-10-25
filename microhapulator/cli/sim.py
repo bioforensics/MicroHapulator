@@ -16,7 +16,7 @@ def subparser(subparsers):
     cli = subparsers.add_parser('sim', description=desc)
 
     cli.add_argument(
-        '-o', '--out', metavar='FILE', help='write simulated genotype data in '
+        '-o', '--out', metavar='FILE', help='write simulated profile data in '
         'JSON format to FILE'
     )
     cli.add_argument(

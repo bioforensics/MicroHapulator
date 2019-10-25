@@ -106,9 +106,9 @@ def test_merge_sim_genotypes():
     profile = microhapulator.profile.SimulatedProfile.merge([prof1, prof2, prof3])
     print(profile.bedstr)
     assert profile.bedstr == (
-        'mh05KK-123\t71\t72\tA|A|A|A|G|G\n'
-        'mh05KK-123\t178\t179\tC|T|T|T|C|T\n'
-        'mh11CP-004\t112\t113\tC|C|C|C|C|T\n'
-        'mh11CP-004\t113\t114\tG|G|T|T|G|G\n'
-        'mh11CP-004\t137\t138\tG|G|A|G|G|G\n'
+        'mh05KK-123\t121\t122\tA|A|A|A|G|G\n'
+        'mh05KK-123\t228\t229\tC|T|T|T|C|T\n'
+        'mh11CP-004\t162\t163\tC|C|C|C|C|T\n'
+        'mh11CP-004\t163\t164\tG|G|T|T|G|G\n'
+        'mh11CP-004\t187\t188\tG|G|A|G|G|G\n'
     )

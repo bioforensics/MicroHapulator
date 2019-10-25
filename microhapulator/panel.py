@@ -29,7 +29,7 @@ class LocusContext(object):
     >>> context.local_to_global(287)
     1551678
     """
-    def __init__(self, rowdata, mindelta=25, minlen=250):
+    def __init__(self, rowdata, mindelta=30, minlen=350):
         self._data = rowdata
         start = int(rowdata.Offsets.split(',')[0]) - mindelta
         end = int(rowdata.Offsets.split(',')[-1]) + mindelta + 1
