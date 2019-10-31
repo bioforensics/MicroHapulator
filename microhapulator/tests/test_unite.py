@@ -9,7 +9,7 @@
 
 import numpy.random
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pytest
 from tempfile import NamedTemporaryFile
@@ -20,11 +20,11 @@ from tempfile import NamedTemporaryFile
     ('green-mom-2-gt.json', 'green-dad-2-gt.json', 'green-kid-2-gt.json', 111017),
 ])
 def test_unite_basic(momgt, dadgt, kidgt, seed):
-    mom = Genotype(fromfile=data_file(momgt))
-    dad = Genotype(fromfile=data_file(dadgt))
-    kid = Genotype(fromfile=data_file(kidgt))
+    mom = Profile(fromfile=data_file(momgt))
+    dad = Profile(fromfile=data_file(dadgt))
+    kid = Profile(fromfile=data_file(kidgt))
     numpy.random.seed(seed)
-    test = Genotype.unite(mom, dad)
+    test = Profile.unite(mom, dad)
     assert test == kid
 
 
@@ -36,6 +36,6 @@ def test_unite_cli():
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.unite.main(args)
-        gt = Genotype(fromfile=outfile.name)
-        testgt = Genotype(fromfile=data_file('green-kid-3-gt.json'))
-        assert gt == testgt
+        p = Profile(fromfile=outfile.name)
+        testp = Profile(fromfile=data_file('green-kid-3-gt.json'))
+        assert p == testp

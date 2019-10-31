@@ -84,7 +84,7 @@ class Profile(object):
         assert sorted(hapids) == sorted(range(len(hapids)))
         return hapids
 
-    def loci(self):
+    def markers(self):
         return set(list(self.data['loci']))
 
     def alleles(self, locusid, haplotype=None):

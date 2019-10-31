@@ -23,10 +23,13 @@ def parse_variant_offsets_from_fasta_headers(fasta):
     for line in fasta:
         if not line.startswith('>'):
             continue
-        locusid, refrloc, varinfo = line[1:].strip().split()
-        varoffsets = varinfo.split('=')[1]
-        varloc = [int(x) for x in varoffsets.split(':')]
-        offsets[locusid] = varloc
+        markerid = line[1:].split()[0]
+        if ' variants=' not in line:
+            message = 'variant offsets not annotated for target amplicon: ' + line
+            raise ValueError(message)
+        offsetstr = re.search(r'variants=(\S+)', line).group(1)
+        varloc = [int(x) for x in offsetstr.split(',')]
+        offsets[markerid] = varloc
     return offsets
 
 

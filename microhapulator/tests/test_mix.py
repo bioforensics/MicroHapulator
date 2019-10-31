@@ -8,7 +8,7 @@
 # -----------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.genotype import SimulatedGenotype
+from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
 import pytest
 from tempfile import NamedTemporaryFile
@@ -22,6 +22,6 @@ def test_mix_main():
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.mix.main(args)
-        gt = SimulatedGenotype(fromfile=outfile.name)
-        testgt = SimulatedGenotype(fromfile=data_file('green-sim-gt-combined.json.gz'))
-        assert gt == testgt
+        p = SimulatedProfile(fromfile=outfile.name)
+        testp = SimulatedProfile(fromfile=data_file('green-sim-gt-combined.json.gz'))
+        assert p == testp

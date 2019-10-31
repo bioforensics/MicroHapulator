@@ -15,8 +15,8 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
-        'genotype1', help='simulated or inferred genotype in JSON format'
+        'profile1', help='simulated or inferred profile in JSON format'
     )
     cli.add_argument(
-        'genotype2', help='simulated or inferred genotype in JSON format'
+        'profile2', help='simulated or inferred profile in JSON format'
     )
