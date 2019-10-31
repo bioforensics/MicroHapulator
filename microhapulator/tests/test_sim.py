@@ -36,7 +36,7 @@ def test_sim_relaxed(relaxmode, testfile):
 
 
 def test_main():
-    with tempfile.NamedTemporaryFile(suffix='.gt.json') as outfile:
+    with tempfile.NamedTemporaryFile(suffix='-profile.json') as outfile:
         arglist = [
             'sim', '--out', outfile.name, '--seed', '1985', 'SA004250L', 'SA004250L',
             'usa'
@@ -44,7 +44,7 @@ def test_main():
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)
         p = SimulatedProfile(fromfile=outfile.name)
-        testp = SimulatedProfile(fromfile=data_file('bitusa-gt.json'))
+        testp = SimulatedProfile(fromfile=data_file('bitusa-profile.json'))
         assert p == testp
 
 
@@ -52,13 +52,13 @@ def test_main_haplo_seq():
     tempdir = tempfile.mkdtemp()
     try:
         arglist = [
-            'sim', '--seed', '293847', '--out', tempdir + '/genotype.json',
+            'sim', '--seed', '293847', '--out', tempdir + '/profile.json',
             '--haplo-seq', tempdir + '/haplo.fasta', 'SA004047P', 'SA004047P',
             'mh07CP-004', 'mh14CP-003'
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)
-        p = SimulatedProfile(fromfile=tempdir + '/genotype.json')
+        p = SimulatedProfile(fromfile=tempdir + '/profile.json')
         testp = SimulatedProfile(fromfile=data_file('orange-sim-profile.json'))
         assert p == testp
         assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('orange-haplo.fasta'))
@@ -68,8 +68,8 @@ def test_main_haplo_seq():
 
 def test_no_seed():
     genotype = microhapulator.sim.sim(['SA004047P'], ['mh07CP-004', 'mh14CP-003'])
-    assert len(genotype.data['loci']) == 2
-    assert sorted(genotype.data['loci']) == ['mh07CP-004', 'mh14CP-003']
+    assert len(genotype.data['markers']) == 2
+    assert sorted(genotype.data['markers']) == ['mh07CP-004', 'mh14CP-003']
 
 
 def test_bad_panel():

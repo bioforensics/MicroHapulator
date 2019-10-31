@@ -1,5 +1,8 @@
 {
     "type": "object",
+    "required": [
+        "markers"
+    ],
     "properties": {
         "ploidy": {
             "description": "The number of haplotypes present in the sample. Should be 2 times the number of each diploid individual. For simulated profiles, the ploidy is known, but it is usually unknown for observed profiles.",
@@ -26,16 +29,16 @@
                 "ObservedProfile"
             ]
         },
-        "loci": {
+        "markers": {
             "patternProperties": {
-                "^MHDBL\\d+$": {
+                "^mh\\d\\d..-\\S+$": {
                     "type": "object",
                     "required": [
                         "genotype"
                     ],
                     "properties": {
                         "LocusID": {
-                            "description": "A MicroHapDB locus identifier.",
+                            "description": "A microhaplotype marker identifier.",
                             "type": "string"
                         },
                         "allele_counts": {

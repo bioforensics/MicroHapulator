@@ -1,5 +1,5 @@
 {
-    "loci": {
+    "markers": {
         "mh01KK-117": {
             "genotype": [
                 {
@@ -43,6 +43,5 @@
         "PaternalHaploPop": "SA000101C"
     },
     "ploidy": 2,
-    "type": "SimulatedProfile",
-    "version": "0.3+23.g22f3f45.dirty"
+    "type": "SimulatedProfile"
 }
