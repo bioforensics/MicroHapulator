@@ -29,19 +29,19 @@ class Profile(object):
     def unite(mom, dad):
         """Simulate the creation of a new profile from a mother and father."""
         gt = SimulatedProfile(ploidy=2)
-        allloci = mom.loci() | dad.loci()
-        commonloci = mom.loci() & dad.loci()
-        if len(commonloci) == 0:
+        allmarkers = mom.markers() | dad.markers()
+        commonmarkers = mom.markers() & dad.markers()
+        if len(commonmarkers) == 0:
             raise ValueError('mom and dad profiles have no loci in common')
-        notshared = allloci - commonloci
+        notshared = allloci - commonmarkers
         if len(notshared) > 0:
             message = 'loci not common to mom and dad profiles are excluded: '
             message += ', '.join(notshared)
             microhapulator.plog('[MicroHapulator::profile]', message)
         for parent, hapid in zip((mom, dad), (0, 1)):
-            for locus in sorted(commonloci):
-                haploallele = choice(sorted(parent.alleles(locus)))
-                gt.add(hapid, locus, haploallele)
+            for marker in sorted(commonmarkers):
+                haploallele = choice(sorted(parent.alleles(marker)))
+                gt.add(hapid, marker, haploallele)
         return gt
 
     def __init__(self, fromfile=None):
@@ -105,13 +105,13 @@ class Profile(object):
         observed in the profile.
         """
         prob = 1.0
-        for locus in sorted(self.loci()):
-            alleles = self.alleles(locus)
+        for marker in sorted(self.markers()):
+            alleles = self.alleles(marker)
             alleles = [*alleles] * 2 if len(alleles) == 1 else alleles
             for allele in sorted(alleles):
                 result = microhapdb.frequencies[
                     (microhapdb.frequencies.Population == popid) &
-                    (microhapdb.frequencies.Locus == locus) &
+                    (microhapdb.frequencies.Marker == marker) &
                     (microhapdb.frequencies.Allele == allele)
                 ]
                 frequency = None
@@ -123,7 +123,7 @@ class Profile(object):
                         message = 'No population allele frequency data for '
                     else:
                         message = 'Frequency=0.0 for '
-                    message += 'allele "{:s}" at locus "{:s}" '.format(allele, locus)
+                    message += 'allele "{:s}" at marker "{:s}" '.format(allele, marker)
                     message += 'for population "{:s}"; '.format(popid)
                     message += 'using RMP=0.001 for this allele'
                     microhapulator.plog('[MicroHapulator::profile] WARNING:', message)
@@ -146,7 +146,7 @@ class Profile(object):
         assert self.data['ploidy'] in (2, None)
         assert other.data['ploidy'] in (2, None)
         mismatches = 0
-        for locus in self.loci():
+        for locus in self.markers():
             selfalleles = self.alleles(locus)
             otheralleles = other.alleles(locus)
             if selfalleles == otheralleles:
@@ -169,9 +169,9 @@ class Profile(object):
     def __eq__(self, other):
         if not isinstance(other, Profile):
             return False
-        if self.loci() != other.loci():
+        if self.markers() != other.markers():
             return False
-        for locusid in self.loci():
+        for locusid in self.markers():
             if self.alleles(locusid) != other.alleles(locusid):
                 return False
         return True
@@ -182,7 +182,7 @@ class Profile(object):
     @property
     def bedstream(self):
         hapids = self.haplotypes()
-        for locusid in sorted(self.loci()):
+        for locusid in sorted(self.markers()):
             result = microhapdb.markers[microhapdb.markers.Name == locusid]
             if len(result) == 0:
                 raise ValueError('unknown marker identifier "{:s}"'.format(locusid))
@@ -201,7 +201,7 @@ class Profile(object):
 
     @property
     def seqstream(self):
-        for locusid in sorted(self.loci()):
+        for locusid in sorted(self.markers()):
             canonid = microhapdb.markers[microhapdb.markers.Name == locusid].iloc[0]
             context = microhapulator.panel.LocusContext(canonid)
             yield context.defline, context.sequence
@@ -224,7 +224,7 @@ class Profile(object):
         assert self.ploidy % 2 == 0
         ncontrib = int(self.ploidy / 2)
         profiles = [SimulatedProfile() for _ in range(ncontrib)]
-        for locus in self.loci():
+        for locus in self.markers():
             for contrib in range(ncontrib):
                 for hap in range(2):
                     haplotype = (2 * contrib) + hap
