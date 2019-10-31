@@ -12,18 +12,18 @@ import microhapulator
 from microhapulator.profile import Profile
 
 
-def prob(popid, gt1, gt2=None, erate=0.001):
-    if gt2 is None:
-        return gt1.rand_match_prob(popid)
+def prob(popid, prof1, prof2=None, erate=0.001):
+    if prof2 is None:
+        return prof1.rand_match_prob(popid)
     else:
-        return gt1.rmp_lr_test(gt2, popid, erate=erate)
+        return prof1.rmp_lr_test(prof2, popid, erate=erate)
 
 
 def main(args):
-    gt1 = Genotype(fromfile=args.genotype1)
-    gt2 = Genotype(fromfile=args.genotype2) if args.genotype2 else None
-    result = prob(args.population, gt1, gt2=gt2, erate=args.erate)
-    key = 'random_match_probability' if gt2 is None else 'rmp_likelihood_ratio'
+    prof1 = Profile(fromfile=args.profile1)
+    prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
+    result = prob(args.population, prof1, prof2=prof2, erate=args.erate)
+    key = 'random_match_probability' if prof2 is None else 'rmp_likelihood_ratio'
     data = {
         key: '{:.3E}'.format(result),
     }

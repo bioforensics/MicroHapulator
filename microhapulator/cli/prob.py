@@ -10,11 +10,11 @@
 
 def subparser(subparsers):
     desc = (
-        'If a single genotype is provided, the random match probability of '
-        'the genotype is computed. If a pair of genotypes are provided, a '
+        'If a single profile is provided, the random match probability of '
+        'the profile is computed. If a pair of profiles is provided, a '
         'likelihood ratio test is performed comparing the likelihood that the '
-        'two genotypes are from the same individual versus the likelihood '
-        'that the two genotypes are from random unrelated individuals. The '
+        'two profiles are from the same individual versus the likelihood '
+        'that the two profiles are from random unrelated individuals. The '
         'genotype profiles are assumed to be identical, and differences '
         'between the two profiles are assumed to be the result of genotyping '
         'error. The test does not make sense for profiles with many allele '
@@ -33,8 +33,8 @@ def subparser(subparsers):
         'population', help='indicate which allele frequencies to use'
     )
     cli.add_argument(
-        'genotype1', help='genotype in JSON format'
+        'profile1', help='profile in JSON format'
     )
     cli.add_argument(
-        'genotype2', nargs='?', default=None, help='genotype in JSON format'
+        'profile2', nargs='?', default=None, help='profile in JSON format'
     )

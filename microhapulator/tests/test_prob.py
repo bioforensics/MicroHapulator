@@ -15,14 +15,14 @@ import pytest
 
 def test_rmp():
     p = Profile(fromfile=data_file('korea-5loc.json'))
-    assert p.rand_match_prob('MHDBP000053') == pytest.approx(9.30529727667e-10)
+    assert p.rand_match_prob('SA000936S') == pytest.approx(9.30529727667e-10)
 
 
 def test_rmp_lrt():
     p1 = Profile(fromfile=data_file('korea-5loc.json'))
     p2 = Profile(fromfile=data_file('korea-5loc-1diff.json'))
-    assert p1.rmp_lr_test(p1, 'MHDBP000053') == pytest.approx(1074656693.1355)
-    assert p1.rmp_lr_test(p2, 'MHDBP000053') == pytest.approx(1074656.6931355)
+    assert p1.rmp_lr_test(p1, 'SA000936S') == pytest.approx(1074656693.1355)
+    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(1074656.6931355)
 
 
 @pytest.mark.parametrize('altfile,lrvalue', [
@@ -33,13 +33,13 @@ def test_rmp_lrt():
 def test_rmp_lrt_2diff(altfile, lrvalue):
     p1 = Profile(fromfile=data_file('korea-5loc.json'))
     p2 = Profile(fromfile=data_file(altfile))
-    assert p1.rmp_lr_test(p2, 'MHDBP000053') == pytest.approx(1074.6567)
-    assert p2.rmp_lr_test(p1, 'MHDBP000053') == pytest.approx(lrvalue)
+    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(1074.6567)
+    assert p2.rmp_lr_test(p1, 'SA000936S') == pytest.approx(lrvalue)
 
 
 def test_prob_cli_rmp(capsys):
     arglist = [
-        'prob', 'MHDBP000053', data_file('korea-5loc.json')
+        'prob', 'SA000936S', data_file('korea-5loc.json')
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
@@ -49,7 +49,7 @@ def test_prob_cli_rmp(capsys):
 
 def test_prob_cli_lrt(capsys):
     arglist = [
-        'prob', 'MHDBP000053', data_file('korea-5loc.json'), data_file('korea-5loc-1diff.json')
+        'prob', 'SA000936S', data_file('korea-5loc.json'), data_file('korea-5loc-1diff.json')
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
@@ -59,9 +59,9 @@ def test_prob_cli_lrt(capsys):
 
 def test_prob_zero_freq():
     p = Profile(fromfile=data_file('korea-5loc-zerofreq.json'))
-    assert p.rand_match_prob('MHDBP000053') == pytest.approx(2.963E-12)
+    assert p.rand_match_prob('SA000936S') == pytest.approx(2.963E-12)
 
 
 def test_prob_missing_freq():
     p = Profile(fromfile=data_file('korea-5loc-missfreq.json'))
-    assert p.rand_match_prob('MHDBP000053') == pytest.approx(4.898E-11)
+    assert p.rand_match_prob('SA000936S') == pytest.approx(4.898E-11)
