@@ -187,16 +187,16 @@ def panel_usa():
 
 
 def panel_allpops():
-    '''Loci with frequency data for all ALFRED populations.
+    '''Markers with frequency data for all ALFRED populations.
 
-    Panel containing only loci for which population allele frequency data is
+    Panel containing only markers for which population allele frequency data is
     available for all 96 ALFRED populations.
     '''
     panel = set()
-    for locusid in microhapdb.loci[microhapdb.loci.Source == "ALFRED"].ID.unique():
-        pops = microhapdb.frequencies[microhapdb.frequencies.Locus == locusid].Population.unique()
+    for marker in microhapdb.markers[microhapdb.markers.Source == "ALFRED"].Name.unique():
+        pops = microhapdb.frequencies[microhapdb.frequencies.Marker == marker].Population.unique()
         if len(pops) == 96:
-            panel.add(locusid)
+            panel.add(marker)
     return sorted(panel)
 
 
