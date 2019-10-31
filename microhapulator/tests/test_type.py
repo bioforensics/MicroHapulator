@@ -9,6 +9,7 @@
 
 import json
 import microhapulator
+from microhapulator.profile import ObservedProfile
 from microhapulator.tests import data_file
 from microhapulator.type import MissingBAMIndexError
 import pytest
@@ -20,7 +21,7 @@ def test_type_simple():
     fasta = data_file('pashtun-sim/tiny-panel.fasta.gz')
     gt = microhapulator.type.type(bam, fasta)
     testgtfile = data_file('pashtun-sim/test-output.json')
-    testgt = microhapulator.genotype.ObservedGenotype(fromfile=testgtfile)
+    testgt = ObservedProfile(fromfile=testgtfile)
     assert gt == testgt
 
 
@@ -41,8 +42,8 @@ def test_type_cli_simple():
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.type.main(args)
         testgtfile = data_file('pashtun-sim/test-output.json')
-        gtdata = microhapulator.genotype.ObservedGenotype(fromfile=outfile.name)
-        testgtdata = microhapulator.genotype.ObservedGenotype(fromfile=testgtfile)
+        gtdata = ObservedProfile(fromfile=outfile.name)
+        testgtdata = ObservedProfile(fromfile=testgtfile)
         assert gtdata == testgtdata
 
 

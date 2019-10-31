@@ -17,7 +17,7 @@ import pytest
 from tempfile import NamedTemporaryFile
 
 
-def test_profile_genotype_roundtrip():
+def test_profile_roundtrip():
     seed = numpy.random.randint(1, 2**32 - 1)
     print('DEBUG seed:', seed)
     numpy.random.seed(seed)
@@ -25,17 +25,17 @@ def test_profile_genotype_roundtrip():
     populations = ['SA004047P', 'SA004250L']
     simulator = microhapulator.panel.sample_panel(populations, panel)
 
-    genotype = SimulatedProfile(ploidy=2)
+    profile = SimulatedProfile(ploidy=2)
     for haplotype, locusid, allele in simulator:
-        genotype.add(haplotype, locusid, allele)
+        profile.add(haplotype, locusid, allele)
     with NamedTemporaryFile() as outfile:
-        genotype.dump(outfile.name)
-        testgenotype = SimulatedProfile(fromfile=outfile.name)
-        assert testgenotype == genotype
+        profile.dump(outfile.name)
+        testprofile = SimulatedProfile(fromfile=outfile.name)
+        assert testprofile == profile
 
     output = StringIO()
-    genotype.dump(output)
-    assert output.getvalue() == str(genotype)
+    profile.dump(output)
+    assert output.getvalue() == str(profile)
 
 
 def test_alleles():
@@ -51,39 +51,39 @@ def test_alleles():
 
 
 def test_haplotypes():
-    simgt = SimulatedProfile.populate_from_bed(data_file('gttest-mismatch1.bed.gz'))
-    assert simgt.haplotypes() == set([0, 1])
-    obsgt = ObservedProfile(data_file('pashtun-sim/test-output.json'))
-    assert obsgt.haplotypes() == set()
+    simprof = SimulatedProfile.populate_from_bed(data_file('gttest-mismatch1.bed.gz'))
+    assert simprof.haplotypes() == set([0, 1])
+    obsprof = ObservedProfile(data_file('pashtun-sim/test-output.json'))
+    assert obsprof.haplotypes() == set()
 
 
 def test_sim_obs_profile_equality():
-    simgt = SimulatedProfile.populate_from_bed(data_file('gttest.bed.gz'))
-    obsgt = ObservedProfile(fromfile=data_file('gttest.json'))
-    assert simgt == obsgt
-    assert obsgt == simgt
+    simprof = SimulatedProfile.populate_from_bed(data_file('gttest.bed.gz'))
+    obsprof = ObservedProfile(fromfile=data_file('gttest.json'))
+    assert simprof == obsprof
+    assert obsprof == simprof
 
 
 def test_sim_obs_profile_not_equal():
-    simgt1 = SimulatedProfile.populate_from_bed(data_file('gttest-mismatch1.bed.gz'))
-    assert simgt1 is not None
-    assert simgt1 != 42
-    assert simgt1 != 3.14159
-    assert simgt1 != 'A,C,C,T'
+    simprof1 = SimulatedProfile.populate_from_bed(data_file('gttest-mismatch1.bed.gz'))
+    assert simprof1 is not None
+    assert simprof1 != 42
+    assert simprof1 != 3.14159
+    assert simprof1 != 'A,C,C,T'
 
-    obsgt1 = ObservedProfile(fromfile=data_file('gttest.json'))
-    assert simgt1 != obsgt1
-    assert obsgt1 != simgt1
-    assert obsgt1 != 1985
-    assert obsgt1 != 98.6
+    obsprof1 = ObservedProfile(fromfile=data_file('gttest.json'))
+    assert simprof1 != obsprof1
+    assert obsprof1 != simprof1
+    assert obsprof1 != 1985
+    assert obsprof1 != 98.6
 
-    simgt2 = SimulatedProfile.populate_from_bed(data_file('gttest-mismatch2.bed.gz'))
-    assert simgt1 != simgt2
-    assert simgt2 != obsgt1
-    assert obsgt1 != simgt2
+    simprof2 = SimulatedProfile.populate_from_bed(data_file('gttest-mismatch2.bed.gz'))
+    assert simprof1 != simprof2
+    assert simprof2 != obsprof1
+    assert obsprof1 != simprof2
 
-    obsgt2 = ObservedProfile(fromfile=data_file('gttest-altered.json'))
-    assert obsgt1 != obsgt2
+    obsprof2 = ObservedProfile(fromfile=data_file('gttest-altered.json'))
+    assert obsprof1 != obsprof2
 
 
 def test_merge_sim_genotypes():

@@ -1,6 +1,6 @@
 {
     "markers": {
-        "MHDBL000060": {
+        "mh13KK-218": {
             "allele_counts": {
                 "G,T,C,T": 1,
                 "T,G,C,T": 1,
@@ -26,7 +26,7 @@
             "min_coverage": 45,
             "num_discarded_reads": 413
         },
-        "MHDBL000138": {
+        "mh21KK-320": {
             "allele_counts": {
                 "G,A,C,A": 1,
                 "G,A,G,A": 2,

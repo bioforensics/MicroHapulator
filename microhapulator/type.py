@@ -93,5 +93,5 @@ def type(bamfile, refrfasta, threshold=10):
 
 
 def main(args):
-    gt = type(args.bam, args.refr, threshold=args.threshold)
-    gt.dump(args.out)
+    profile = type(args.bam, args.refr, threshold=args.threshold)
+    profile.dump(args.out)
