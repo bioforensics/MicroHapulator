@@ -638,6 +638,6 @@
         }
     },
     "ploidy": 2,
-    "type": "SimulatedGenotype",
+    "type": "SimulatedProfile",
     "version": "0.2+16.g4ca8f19.dirty"
 }

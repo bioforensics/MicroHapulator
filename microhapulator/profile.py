@@ -33,7 +33,7 @@ class Profile(object):
         commonmarkers = mom.markers() & dad.markers()
         if len(commonmarkers) == 0:
             raise ValueError('mom and dad profiles have no loci in common')
-        notshared = allloci - commonmarkers
+        notshared = allmarkers - commonmarkers
         if len(notshared) > 0:
             message = 'loci not common to mom and dad profiles are excluded: '
             message += ', '.join(notshared)

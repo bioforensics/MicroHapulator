@@ -638,5 +638,5 @@
         }
     },
     "ploidy": 2,
-    "type": "SimulatedGenotype"
+    "type": "SimulatedProfile"
 }
