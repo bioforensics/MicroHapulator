@@ -10,6 +10,7 @@
 import filecmp
 import microhapdb
 import microhapulator
+from microhapulator.profile import Profile
 from microhapulator.seq import calc_n_reads_from_proportions
 from microhapulator.tests import data_file
 import numpy.random
@@ -37,21 +38,21 @@ def test_even_mixture():
     print('Seed:', seed)
     numpy.random.seed(seed)
     popids = microhapdb.populations[microhapdb.populations.Source == 'ALFRED'].ID.unique()
-    genotypes = list()
+    profiles = list()
     for _ in range(numpy.random.randint(2, 6)):
         pops = [numpy.random.choice(popids), numpy.random.choice(popids)]
         panel = microhapulator.panel.panel_allpops()[:5]
-        gt = microhapulator.sim.sim(pops, panel)
-        genotypes.append(gt)
-    sequencer = microhapulator.seq.seq(genotypes, threads=2, totalreads=500)
+        p = microhapulator.sim.sim(pops, panel)
+        profiles.append(p)
+    sequencer = microhapulator.seq.seq(profiles, threads=2, totalreads=500)
     for n, read in enumerate(sequencer):
         pass
     assert n == pytest.approx(500, abs=25)
 
 
 def test_complex_genotype(capsys):
-    genotype = microhapulator.genotype.Genotype(fromfile=data_file('mixture-genotype.json'))
-    sequencer = microhapulator.seq.seq(list(genotype.unmix()), threads=2, totalreads=200)
+    profile = Profile(fromfile=data_file('mixture-genotype.json'))
+    sequencer = microhapulator.seq.seq(list(profile.unmix()), threads=2, totalreads=200)
     for n, read in enumerate(sequencer):
         pass
     terminal = capsys.readouterr()
@@ -59,11 +60,11 @@ def test_complex_genotype(capsys):
 
 
 def test_uneven_mixture(capsys):
-    panel = ['MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017']
-    pops = ['MHDBP000021', 'MHDBP000009', 'MHDBP000081']
-    genotypes = [microhapulator.sim.sim([popid], panel) for popid in pops]
+    panel = ['mh01KK-001', 'mh01KK-205', 'mh01KK-117', 'mh10KK-163']
+    pops = ['SA004248S', 'SA004239S', 'SA001530J']
+    profiles = [microhapulator.sim.sim([popid], panel) for popid in pops]
     sequencer = microhapulator.seq.seq(
-        genotypes, threads=2, totalreads=500, proportions=[0.5, 0.3, 0.2]
+        profiles, threads=2, totalreads=500, proportions=[0.5, 0.3, 0.2]
     )
     for read in sequencer:
         pass
@@ -74,23 +75,23 @@ def test_uneven_mixture(capsys):
 
 
 def test_mixture_failure_modes():
-    panel = ['MHDBL000002', 'MHDBL000003', 'MHDBL000007', 'MHDBL000013', 'MHDBL000017']
-    pops = ['MHDBP000021', 'MHDBP000009', 'MHDBP000081']
-    genotypes = [microhapulator.sim.sim([popid], panel) for popid in pops]
+    panel = ['mh01KK-001', 'mh01KK-205', 'mh01KK-117', 'mh10KK-163']
+    pops = ['SA004248S', 'SA004239S', 'SA001530J']
+    profiles = [microhapulator.sim.sim([popid], panel) for popid in pops]
 
-    message = r'number of genotypes must match number of seeds'
+    message = r'number of profiles must match number of seeds'
     with pytest.raises(ValueError, match=message) as ve:
-        for read in microhapulator.seq.seq(genotypes, seeds=[42, 1776]):
+        for read in microhapulator.seq.seq(profiles, seeds=[42, 1776]):
             pass
 
     message = r'mismatch between contributor number and proportions'
     with pytest.raises(ValueError, match=message) as ve:
-        for read in microhapulator.seq.seq(genotypes, proportions=[0.5, 0.3, 0.1, 0.1]):
+        for read in microhapulator.seq.seq(profiles, proportions=[0.5, 0.3, 0.1, 0.1]):
             pass
 
     message = r'specified proportions result in 0 reads for 1 or more individuals'
     with pytest.raises(ValueError, match=message) as ve:
-        for read in microhapulator.seq.seq(genotypes, totalreads=500, proportions=[1, 100, 10000]):
+        for read in microhapulator.seq.seq(profiles, totalreads=500, proportions=[1, 100, 10000]):
             pass
 
 
@@ -98,7 +99,7 @@ def test_main():
     with NamedTemporaryFile(suffix='.fastq') as outfile:
         arglist = [
             'seq', '--out', outfile.name, '--seeds', '123454321', '--num-reads', '500',
-            '--signature', 'srd6Sei', data_file('orange-sim-gt.json')
+            '--signature', 'srd6Sei', data_file('orange-sim-profile.json')
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.seq.main(args)
@@ -106,8 +107,8 @@ def test_main():
 
 
 @pytest.mark.parametrize('relaxmode,gtfile,signature,testfile', [
-    (False, 'red-strict-gt.json', 'ihkSW9I', 'red-reads-strict.fastq'),
-    (True, 'red-relaxed-gt.json', 'kSW9IlM', 'red-reads-relaxed.fastq'),
+    (False, 'red-strict-profile.json', 'ihkSW9I', 'red-reads-strict.fastq'),
+    (True, 'red-relaxed-profile.json', 'kSW9IlM', 'red-reads-relaxed.fastq'),
 ])
 def test_main_relaxed(relaxmode, gtfile, signature, testfile):
     with NamedTemporaryFile(suffix='.fastq') as outfile:
@@ -125,7 +126,7 @@ def test_main_no_seed():
     with NamedTemporaryFile(suffix='.fastq') as outfile:
         arglist = [
             'seq', '--out', outfile.name, '--num-reads', '200', '--threads', '1',
-            data_file('orange-sim-gt.json')
+            data_file('orange-sim-profile.json')
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.seq.main(args)

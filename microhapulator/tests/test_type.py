@@ -9,6 +9,7 @@
 
 import json
 import microhapulator
+from microhapulator.profile import ObservedProfile
 from microhapulator.tests import data_file
 from microhapulator.type import MissingBAMIndexError
 import pytest
@@ -20,7 +21,7 @@ def test_type_simple():
     fasta = data_file('pashtun-sim/tiny-panel.fasta.gz')
     gt = microhapulator.type.type(bam, fasta)
     testgtfile = data_file('pashtun-sim/test-output.json')
-    testgt = microhapulator.genotype.ObservedGenotype(fromfile=testgtfile)
+    testgt = ObservedProfile(fromfile=testgtfile)
     assert gt == testgt
 
 
@@ -41,8 +42,8 @@ def test_type_cli_simple():
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.type.main(args)
         testgtfile = data_file('pashtun-sim/test-output.json')
-        gtdata = microhapulator.genotype.ObservedGenotype(fromfile=outfile.name)
-        testgtdata = microhapulator.genotype.ObservedGenotype(fromfile=testgtfile)
+        gtdata = ObservedProfile(fromfile=outfile.name)
+        testgtdata = ObservedProfile(fromfile=testgtfile)
         assert gtdata == testgtdata
 
 
@@ -57,3 +58,10 @@ def test_type_dyn_cutoff():
     gt = microhapulator.type.type(bam, fasta, threshold=4)
     assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G', 'C,A,C,T,A', 'T,G,C,T,A'])
     assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
+
+
+def test_type_no_var_offsets():
+    bam = data_file('sandawe-dad.bam')
+    fasta = data_file('sandawe-panel.fasta.gz')
+    with pytest.raises(ValueError, match=r'variant offsets not annotated for target amplicon:'):
+        profile = microhapulator.type.type(bam, fasta)

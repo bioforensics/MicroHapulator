@@ -1,6 +1,6 @@
 {
-    "loci": {
-        "MHDBL000017": {
+    "markers": {
+        "mh10KK-163": {
             "genotype": [
                 {
                     "allele": "T,A,G,C,T",
@@ -12,7 +12,7 @@
                 }
             ]
         },
-        "MHDBL000018": {
+        "mh10KK-169": {
             "genotype": [
                 {
                     "allele": "C,G,T,T,A",
@@ -24,7 +24,7 @@
                 }
             ]
         },
-        "MHDBL000060": {
+        "mh13KK-218": {
             "genotype": [
                 {
                     "allele": "C,T,T,C",
@@ -36,7 +36,7 @@
                 }
             ]
         },
-        "MHDBL000138": {
+        "mh21KK-320": {
             "genotype": [
                 {
                     "allele": "A,A,C,A",
@@ -48,7 +48,7 @@
                 }
             ]
         },
-        "MHDBL000172": {
+        "mh05KK-170": {
             "genotype": [
                 {
                     "allele": "C,G,G,G",
@@ -62,5 +62,5 @@
         }
     },
     "ploidy": 2,
-    "type": "SimulatedGenotype"
+    "type": "SimulatedProfile"
 }

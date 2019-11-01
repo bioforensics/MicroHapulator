@@ -23,10 +23,13 @@ def parse_variant_offsets_from_fasta_headers(fasta):
     for line in fasta:
         if not line.startswith('>'):
             continue
-        locusid, refrloc, varinfo = line[1:].strip().split()
-        varoffsets = varinfo.split('=')[1]
-        varloc = [int(x) for x in varoffsets.split(':')]
-        offsets[locusid] = varloc
+        markerid = line[1:].split()[0]
+        if ' variants=' not in line:
+            message = 'variant offsets not annotated for target amplicon: ' + line
+            raise ValueError(message)
+        offsetstr = re.search(r'variants=(\S+)', line).group(1)
+        varloc = [int(x) for x in offsetstr.split(',')]
+        offsets[markerid] = varloc
     return offsets
 
 
@@ -80,7 +83,7 @@ def observe_genotypes(bamfile, refrfasta):
 
 def type(bamfile, refrfasta, threshold=10):
     genotyper = observe_genotypes(bamfile, refrfasta)
-    gt = microhapulator.genotype.ObservedGenotype()
+    gt = microhapulator.profile.ObservedProfile()
     for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
         gt.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for allele, count in gtcounts.items():
@@ -90,5 +93,5 @@ def type(bamfile, refrfasta, threshold=10):
 
 
 def main(args):
-    gt = type(args.bam, args.refr, threshold=args.threshold)
-    gt.dump(args.out)
+    profile = type(args.bam, args.refr, threshold=args.threshold)
+    profile.dump(args.out)

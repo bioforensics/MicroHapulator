@@ -15,5 +15,5 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
-        'gtfiles', nargs='+', help='simulated genotype files in JSON format'
+        'profiles', nargs='+', help='simulated genotype profiles in JSON format'
     )

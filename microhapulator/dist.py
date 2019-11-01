@@ -9,22 +9,21 @@
 
 import json
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
-def dist(gt1, gt2):
-    allloci = set(gt1.loci()).union(gt2.loci())
+def dist(p1, p2):
     hammdist = 0
-    for locus in allloci:
-        allele1 = gt1.alleles(locus)
-        allele2 = gt2.alleles(locus)
+    for marker in set(p1.markers()).union(p2.markers()):
+        allele1 = p1.alleles(marker)
+        allele2 = p2.alleles(marker)
         if allele1 != allele2:
             hammdist += 1
     return hammdist
 
 
 def main(args):
-    d = dist(Genotype(fromfile=args.genotype1), Genotype(fromfile=args.genotype2))
+    d = dist(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
     data = {
         'hamming_distance': d,
     }

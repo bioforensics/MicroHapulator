@@ -12,7 +12,7 @@ from microhapulator.tests import data_file
 import pytest
 
 
-@pytest.mark.parametrize('gtjson,numcontrib', [
+@pytest.mark.parametrize('pjson,numcontrib', [
     ('single-contrib-1.json', 1),
     ('single-contrib-2.json', 1),
     ('single-contrib-3.json', 1),
@@ -20,8 +20,8 @@ import pytest
     ('three-contrib-even.json', 3),
     ('three-contrib-log.json', 3),
 ])
-def test_contrib_json(gtjson, numcontrib):
-    n, *data = microhapulator.contrib.contrib(gtjson=data_file(gtjson))
+def test_contrib_json(pjson, numcontrib):
+    n, *data = microhapulator.contrib.contrib(pjson=data_file(pjson))
     assert n == numcontrib
 
 
@@ -43,6 +43,6 @@ def test_contrib_main(capsys):
 
 
 def test_no_op():
-    pattern = r'must provide either genotype JSON or BAM and refr FASTA'
+    pattern = r'must provide either JSON profile or BAM and refr FASTA'
     with pytest.raises(ValueError, match=pattern) as ve:
         microhapulator.contrib.contrib()

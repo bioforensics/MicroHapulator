@@ -8,21 +8,21 @@
 # -----------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pytest
 
 
 def test_rmp():
-    gt = Genotype(fromfile=data_file('korea-5loc.json'))
-    assert gt.rand_match_prob('MHDBP000053') == pytest.approx(9.30529727667e-10)
+    p = Profile(fromfile=data_file('korea-5loc.json'))
+    assert p.rand_match_prob('SA000936S') == pytest.approx(9.30529727667e-10)
 
 
 def test_rmp_lrt():
-    gt1 = Genotype(fromfile=data_file('korea-5loc.json'))
-    gt2 = Genotype(fromfile=data_file('korea-5loc-1diff.json'))
-    assert gt1.rmp_lr_test(gt1, 'MHDBP000053') == pytest.approx(1074656693.1355)
-    assert gt1.rmp_lr_test(gt2, 'MHDBP000053') == pytest.approx(1074656.6931355)
+    p1 = Profile(fromfile=data_file('korea-5loc.json'))
+    p2 = Profile(fromfile=data_file('korea-5loc-1diff.json'))
+    assert p1.rmp_lr_test(p1, 'SA000936S') == pytest.approx(1074656693.1355)
+    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(1074656.6931355)
 
 
 @pytest.mark.parametrize('altfile,lrvalue', [
@@ -31,15 +31,15 @@ def test_rmp_lrt():
     ('korea-5loc-2diff-c.json', 34191.2606),
 ])
 def test_rmp_lrt_2diff(altfile, lrvalue):
-    gt1 = Genotype(fromfile=data_file('korea-5loc.json'))
-    gt2 = Genotype(fromfile=data_file(altfile))
-    assert gt1.rmp_lr_test(gt2, 'MHDBP000053') == pytest.approx(1074.6567)
-    assert gt2.rmp_lr_test(gt1, 'MHDBP000053') == pytest.approx(lrvalue)
+    p1 = Profile(fromfile=data_file('korea-5loc.json'))
+    p2 = Profile(fromfile=data_file(altfile))
+    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(1074.6567)
+    assert p2.rmp_lr_test(p1, 'SA000936S') == pytest.approx(lrvalue)
 
 
 def test_prob_cli_rmp(capsys):
     arglist = [
-        'prob', 'MHDBP000053', data_file('korea-5loc.json')
+        'prob', 'SA000936S', data_file('korea-5loc.json')
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
@@ -49,7 +49,7 @@ def test_prob_cli_rmp(capsys):
 
 def test_prob_cli_lrt(capsys):
     arglist = [
-        'prob', 'MHDBP000053', data_file('korea-5loc.json'), data_file('korea-5loc-1diff.json')
+        'prob', 'SA000936S', data_file('korea-5loc.json'), data_file('korea-5loc-1diff.json')
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
@@ -58,10 +58,10 @@ def test_prob_cli_lrt(capsys):
 
 
 def test_prob_zero_freq():
-    gt = Genotype(fromfile=data_file('korea-5loc-zerofreq.json'))
-    assert gt.rand_match_prob('MHDBP000053') == pytest.approx(2.963E-12)
+    p = Profile(fromfile=data_file('korea-5loc-zerofreq.json'))
+    assert p.rand_match_prob('SA000936S') == pytest.approx(2.963E-12)
 
 
 def test_prob_missing_freq():
-    gt = Genotype(fromfile=data_file('korea-5loc-missfreq.json'))
-    assert gt.rand_match_prob('MHDBP000053') == pytest.approx(4.898E-11)
+    p = Profile(fromfile=data_file('korea-5loc-missfreq.json'))
+    assert p.rand_match_prob('SA000936S') == pytest.approx(4.898E-11)

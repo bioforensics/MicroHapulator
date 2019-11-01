@@ -1,5 +1,5 @@
 {
-    "loci": {
+    "markers": {
         "MHDBL000013": {
             "allele_counts": {
                 "A,A,A,T": 1,
@@ -683,5 +683,5 @@
         }
     },
     "ploidy": null,
-    "type": "ObservedGenotype"
+    "type": "ObservedProfile"
 }

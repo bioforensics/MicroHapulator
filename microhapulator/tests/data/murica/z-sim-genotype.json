@@ -1,5 +1,5 @@
 {
-    "loci": {
+    "markers": {
         "MHDBL000013": {
             "genotype": [
                 {
@@ -266,6 +266,6 @@
         }
     },
     "ploidy": 2,
-    "type": "SimulatedGenotype",
+    "type": "SimulatedProfile",
     "version": "0.2+5.g930d5ed.dirty"
 }

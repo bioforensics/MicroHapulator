@@ -1,6 +1,6 @@
 {
-    "loci": {
-        "MHDBL000013": {
+    "markers": {
+        "mh01KK-117": {
             "genotype": [
                 {
                     "allele": "A,G,G,C",
@@ -12,10 +12,10 @@
                 }
             ]
         },
-        "MHDBL000197": {
+        "mh07CP-004": {
             "genotype": [
                 {
-                    "allele": "A,A,T,T,C",
+                    "allele": "T,T,A,T,C",
                     "haplotype": 0
                 },
                 {
@@ -24,7 +24,7 @@
                 }
             ]
         },
-        "MHDBL000212": {
+        "mh09KK-157": {
             "genotype": [
                 {
                     "allele": "G,C,C,C,T",
@@ -37,7 +37,11 @@
             ]
         }
     },
+    "metadata": {
+        "HaploSeed": 54321,
+        "MaternalHaploPop": "SA000101C",
+        "PaternalHaploPop": "SA000101C"
+    },
     "ploidy": 2,
-    "type": "SimulatedGenotype",
-    "version": "0.2+12.g51cb32c.dirty"
+    "type": "SimulatedProfile"
 }

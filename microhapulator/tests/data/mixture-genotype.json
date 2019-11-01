@@ -1,6 +1,6 @@
 {
-    "loci": {
-        "MHDBL000013": {
+    "markers": {
+        "mh01KK-117": {
             "genotype": [
                 {
                     "allele": "A,A,C,T",
@@ -28,7 +28,7 @@
                 }
             ]
         },
-        "MHDBL000017": {
+        "mh10KK-163": {
             "genotype": [
                 {
                     "allele": "A,A,G,C,T",
@@ -56,7 +56,7 @@
                 }
             ]
         },
-        "MHDBL000030": {
+        "mh11KK-180": {
             "genotype": [
                 {
                     "allele": "A,C,T,C",
@@ -84,7 +84,7 @@
                 }
             ]
         },
-        "MHDBL000048": {
+        "mh12CP-008": {
             "genotype": [
                 {
                     "allele": "C,C,C",
@@ -112,7 +112,7 @@
                 }
             ]
         },
-        "MHDBL000060": {
+        "mh13KK-218": {
             "genotype": [
                 {
                     "allele": "T,T,T,T",
@@ -140,7 +140,7 @@
                 }
             ]
         },
-        "MHDBL000066": {
+        "mh14CP-003": {
             "genotype": [
                 {
                     "allele": "G,G,G",
@@ -168,7 +168,7 @@
                 }
             ]
         },
-        "MHDBL000074": {
+        "mh15CP-001": {
             "genotype": [
                 {
                     "allele": "A,A,T",
@@ -196,7 +196,7 @@
                 }
             ]
         },
-        "MHDBL000081": {
+        "mh16KK-049": {
             "genotype": [
                 {
                     "allele": "A,C,G,G,A",
@@ -224,7 +224,7 @@
                 }
             ]
         },
-        "MHDBL000092": {
+        "mh17CP-001": {
             "genotype": [
                 {
                     "allele": "G,G,G",
@@ -252,7 +252,7 @@
                 }
             ]
         },
-        "MHDBL000105": {
+        "mh18CP-005": {
             "genotype": [
                 {
                     "allele": "A,C,G,C",
@@ -280,7 +280,7 @@
                 }
             ]
         },
-        "MHDBL000111": {
+        "mh19KK-299": {
             "genotype": [
                 {
                     "allele": "G,C,A,A,A",
@@ -308,7 +308,7 @@
                 }
             ]
         },
-        "MHDBL000128": {
+        "mh02KK-134": {
             "genotype": [
                 {
                     "allele": "A,T,C,G",
@@ -336,7 +336,7 @@
                 }
             ]
         },
-        "MHDBL000131": {
+        "mh20KK-307": {
             "genotype": [
                 {
                     "allele": "T,C,G,A",
@@ -364,7 +364,7 @@
                 }
             ]
         },
-        "MHDBL000138": {
+        "mh21KK-320": {
             "genotype": [
                 {
                     "allele": "A,A,C,A",
@@ -392,7 +392,7 @@
                 }
             ]
         },
-        "MHDBL000145": {
+        "mh22KK-061": {
             "genotype": [
                 {
                     "allele": "A,A,A",
@@ -420,7 +420,7 @@
                 }
             ]
         },
-        "MHDBL000147": {
+        "mh03CP-005": {
             "genotype": [
                 {
                     "allele": "A,A,A,T",
@@ -448,7 +448,7 @@
                 }
             ]
         },
-        "MHDBL000156": {
+        "mh04KK-030": {
             "genotype": [
                 {
                     "allele": "T,C,G,G",
@@ -476,7 +476,7 @@
                 }
             ]
         },
-        "MHDBL000172": {
+        "mh05KK-170": {
             "genotype": [
                 {
                     "allele": "C,G,A,G",
@@ -504,7 +504,7 @@
                 }
             ]
         },
-        "MHDBL000195": {
+        "mh06KK-008": {
             "genotype": [
                 {
                     "allele": "T,G,G,G",
@@ -532,7 +532,7 @@
                 }
             ]
         },
-        "MHDBL000197": {
+        "mh07CP-004": {
             "genotype": [
                 {
                     "allele": "A,A,T,T,C",
@@ -560,7 +560,7 @@
                 }
             ]
         },
-        "MHDBL000204": {
+        "mh08KK-039": {
             "genotype": [
                 {
                     "allele": "C,C,A,G,T,G",
@@ -588,7 +588,7 @@
                 }
             ]
         },
-        "MHDBL000212": {
+        "mh09KK-157": {
             "genotype": [
                 {
                     "allele": "G,C,C,C,T",
@@ -618,5 +618,5 @@
         }
     },
     "ploidy": 6,
-    "type": "SimulatedGenotype"
+    "type": "SimulatedProfile"
 }

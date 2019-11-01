@@ -1,5 +1,5 @@
 {
-    "loci": {
+    "markers": {
         "MHDBL000001": {
             "genotype": [
                 {
@@ -607,5 +607,5 @@
         "PaternalHaploPop": "MHDBP000022"
     },
     "ploidy": 2,
-    "type": "SimulatedGenotype"
+    "type": "SimulatedProfile"
 }

@@ -16,18 +16,15 @@ from pkg_resources import resource_filename
 import sys
 
 # Internal modules
-from microhapulator import genotype
-from microhapulator import panel
+from microhapulator import profile
 
 # Subcommands and command-line interface
 from microhapulator import contain
 from microhapulator import contrib
 from microhapulator import dist
 from microhapulator import diff
-from microhapulator import getrefr
 from microhapulator import mix
 from microhapulator import prob
-from microhapulator import refr
 from microhapulator import seq
 from microhapulator import sim
 from microhapulator import type

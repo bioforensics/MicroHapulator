@@ -12,8 +12,8 @@ import argparse
 
 def subparser(subparsers):
     desc = (
-        'Given one or more simulated diploid genotypes, simulate Illumina '
-        'MiSeq sequencing of the given sample.'
+        'Given one or more diploid genotype profiles, simulate Illumina MiSeq '
+        'sequencing of the given "sample."'
     )
     cli = subparsers.add_parser('seq', description=desc)
 
@@ -37,13 +37,13 @@ def subparser(subparsers):
     )
     cli.add_argument(
         '-s', '--seeds', nargs='+', type=int, default=None, metavar='INT',
-        help='seeds for random number generator, 1 per genotype'
+        help='seeds for random number generator, 1 per profile'
     )
     cli.add_argument('--signature', default=None, help=argparse.SUPPRESS)
     cli.add_argument(
         '-d', '--debug', action='store_true', help='print debugging info'
     )
     cli.add_argument(
-        'genotypes', nargs='+', help='one or more simple or complex genotype '
-        'JSON files'
+        'profiles', nargs='+', help='one or more simple or complex profiles '
+        '(JSON files)'
     )

@@ -9,16 +9,16 @@
 
 import json
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
-def contain(gt1, gt2):
-    '''Compute the proportion of alleles from gt2 present in gt1.'''
+def contain(p1, p2):
+    '''Compute the proportion of alleles from p2 present in p1.'''
     total = 0
     contained = 0
-    for locus in gt2.loci():
-        allele1 = gt1.alleles(locus)
-        allele2 = gt2.alleles(locus)
+    for marker in p2.markers():
+        allele1 = p1.alleles(marker)
+        allele2 = p2.alleles(marker)
         total += len(allele2)
         contained += len(allele2 & allele1)
     return contained, total
@@ -26,8 +26,8 @@ def contain(gt1, gt2):
 
 def main(args):
     contained, total = contain(
-        Genotype(fromfile=args.genotype1),
-        Genotype(fromfile=args.genotype2)
+        Profile(fromfile=args.profile1),
+        Profile(fromfile=args.profile2)
     )
     data = {
         'containment': round(contained / total, 4),

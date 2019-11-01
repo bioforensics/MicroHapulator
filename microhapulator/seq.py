@@ -20,7 +20,7 @@ from numpy.random import choice, randint
 
 # Internal imports
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
 def calc_n_reads_from_proportions(n, totalreads, prop):
@@ -37,13 +37,13 @@ def new_signature():
     return ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
 
 
-def sequencing(genotype, seed=None, threads=1, numreads=500000,
+def sequencing(profile, seed=None, threads=1, numreads=500000,
                readsignature=None, readindex=0, debug=False):
     tempdir = mkdtemp()
     try:
         haplofile = tempdir + '/haplo.fasta'
         with microhapulator.open(haplofile, 'w') as fh:
-            for defline, sequence in genotype.haploseqs:
+            for defline, sequence in profile.haploseqs:
                 print('>', defline, '\n', sequence, sep='', file=fh)
         isscmd = [
             'iss', 'generate', '--n_reads', str(numreads * 2), '--draft', haplofile,
@@ -79,23 +79,23 @@ def sequencing(genotype, seed=None, threads=1, numreads=500000,
         rmtree(tempdir)
 
 
-def seq(genotypes, seeds=None, threads=1, totalreads=500000, proportions=None,
+def seq(profiles, seeds=None, threads=1, totalreads=500000, proportions=None,
         sig=None, debug=False):
-    n = len(genotypes)
+    n = len(profiles)
     if seeds is None:
         seeds = [randint(1, 2**32 - 1) for _ in range(n)]
     if len(seeds) != n:
-        raise ValueError('number of genotypes must match number of seeds')
+        raise ValueError('number of profiles must match number of seeds')
     numreads = calc_n_reads_from_proportions(n, totalreads, proportions)
     if 0 in numreads:
         raise ValueError('specified proportions result in 0 reads for 1 or more individuals')
     readsignature = sig if sig else new_signature()
     reads_sequenced = 0
-    for genotype, seed, nreads in zip(genotypes, seeds, numreads):
+    for profile, seed, nreads in zip(profiles, seeds, numreads):
         message = 'Individual seed={seed} numreads={n}'.format(seed=seed, n=nreads)
         microhapulator.plog('[MicroHapulator::seq]', message)
         sequencer = sequencing(
-            genotype, seed=seed, threads=threads, numreads=nreads,
+            profile, seed=seed, threads=threads, numreads=nreads,
             readsignature=readsignature, readindex=reads_sequenced,
             debug=debug,
         )
@@ -104,19 +104,19 @@ def seq(genotypes, seeds=None, threads=1, totalreads=500000, proportions=None,
         reads_sequenced = data[0]
 
 
-def resolve_genotypes(gtfiles):
-    genotypes = list()
+def resolve_profiles(gtfiles):
+    profiles = list()
     for gtfile in gtfiles:
-        genotype = Genotype(fromfile=gtfile)
-        for gt in genotype.unmix():
-            genotypes.append(gt)
-    return genotypes
+        profile = Profile(fromfile=gtfile)
+        for p in profile.unmix():
+            profiles.append(p)
+    return profiles
 
 
 def main(args):
-    genotypes = resolve_genotypes(args.genotypes)
+    profiles = resolve_profiles(args.profiles)
     sequencer = seq(
-        genotypes, seeds=args.seeds, threads=args.threads, totalreads=args.num_reads,
+        profiles, seeds=args.seeds, threads=args.threads, totalreads=args.num_reads,
         proportions=args.proportions, debug=args.debug, sig=args.signature
     )
     with microhapulator.open(args.out, 'w') as fh:

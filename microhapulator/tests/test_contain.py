@@ -20,9 +20,9 @@ from tempfile import NamedTemporaryFile
     ('one-brit-sim.json', 'one-american-sim.json', 38, 11),
 ])
 def test_contain(f1, f2, total, contained):
-    gt1 = microhapulator.genotype.Genotype(data_file(f1))
-    gt2 = microhapulator.genotype.Genotype(data_file(f2))
-    c, t = microhapulator.contain.contain(gt1, gt2)
+    profile1 = microhapulator.profile.Profile(data_file(f1))
+    profile2 = microhapulator.profile.Profile(data_file(f2))
+    c, t = microhapulator.contain.contain(profile1, profile2)
     assert t == total
     assert c == contained
 

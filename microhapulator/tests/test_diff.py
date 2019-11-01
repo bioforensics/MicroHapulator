@@ -9,14 +9,15 @@
 
 import json
 import microhapulator
+from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
 import pytest
 from tempfile import NamedTemporaryFile
 
 
 def test_diff_basic():
-    gt1 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('diff-comp-1.json'))
-    gt2 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('diff-comp-2.json'))
+    gt1 = SimulatedProfile(fromfile=data_file('diff-comp-1.json'))
+    gt2 = SimulatedProfile(fromfile=data_file('diff-comp-2.json'))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     assert diff == [
         ('MHDBL000140', {'C,C,A,A'}, {'C,C,T,A'}),
@@ -25,8 +26,8 @@ def test_diff_basic():
 
 
 def test_diff_large():
-    gt1 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('diff-comp-1.json'))
-    gt2 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('diff-comp-3.json'))
+    gt1 = SimulatedProfile(fromfile=data_file('diff-comp-1.json'))
+    gt2 = SimulatedProfile(fromfile=data_file('diff-comp-3.json'))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     loci = [d[0] for d in diff]
     print(diff[9], diff[17], diff[21])
@@ -59,7 +60,7 @@ def test_diff_cli():
 
 
 def test_diff2():
-    gt1 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('euramer-sim-gt.json'))
-    gt2 = microhapulator.genotype.SimulatedGenotype(fromfile=data_file('euramer-inf-gt.json'))
+    gt1 = SimulatedProfile(fromfile=data_file('euramer-sim-gt.json'))
+    gt2 = SimulatedProfile(fromfile=data_file('euramer-inf-gt.json'))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     assert diff == [('MHDBL000018', set(), {'T,G,C,T,A'})]

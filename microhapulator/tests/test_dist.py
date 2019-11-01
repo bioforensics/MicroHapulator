@@ -9,6 +9,7 @@
 
 import json
 import microhapulator
+from microhapulator.profile import ObservedProfile, SimulatedProfile
 from microhapulator.tests import data_file
 import pytest
 from tempfile import NamedTemporaryFile
@@ -24,25 +25,25 @@ from tempfile import NamedTemporaryFile
     ('gujarati-ind3-gt.json', 'gujarati-ind4-gt.json', 2),
 ])
 def test_dist_gujarati(gt1, gt2, dist):
-    g1 = microhapulator.genotype.ObservedGenotype(data_file(gt1))
-    g2 = microhapulator.genotype.ObservedGenotype(data_file(gt2))
+    g1 = ObservedProfile(data_file(gt1))
+    g2 = ObservedProfile(data_file(gt2))
     assert microhapulator.dist.dist(g1, g2) == dist
 
 
 def test_dist_log_mixture():
     f1 = data_file('murica/y-obs-genotype.json')
-    g1 = microhapulator.genotype.ObservedGenotype(f1)
+    g1 = ObservedProfile(f1)
     f2 = data_file('murica/y-sim-genotype.bed')
-    g2 = microhapulator.genotype.SimulatedGenotype.populate_from_bed(f2)
+    g2 = SimulatedProfile.populate_from_bed(f2)
     assert microhapulator.dist.dist(g1, g2) == 19
     assert g1 != g2
 
 
 def test_dist_even_mixture():
     with microhapulator.open(data_file('murica/x-obs-genotype.json'), 'r') as fh:
-        g1 = microhapulator.genotype.ObservedGenotype(fh)
+        g1 = ObservedProfile(fh)
     f2 = data_file('murica/x-sim-genotype.bed')
-    g2 = microhapulator.genotype.SimulatedGenotype.populate_from_bed(f2)
+    g2 = SimulatedProfile.populate_from_bed(f2)
     assert microhapulator.dist.dist(g1, g2) == 0
     assert g1 == g2
 

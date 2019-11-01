@@ -10,15 +10,15 @@
 import json
 import numpy.random
 import microhapulator
-from microhapulator.genotype import Genotype
+from microhapulator.profile import Profile
 
 
 def main(args):
     if args.seed:
         numpy.random.seed(args.seed)
-    gt = Genotype.unite(
-        Genotype(fromfile=args.mom),
-        Genotype(fromfile=args.dad),
+    profile = Profile.unite(
+        Profile(fromfile=args.mom),
+        Profile(fromfile=args.dad),
     )
     with microhapulator.open(args.out, 'w') as fh:
-        gt.dump(fh)
+        profile.dump(fh)
