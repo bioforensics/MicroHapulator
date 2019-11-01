@@ -12,7 +12,7 @@ from microhapulator.profile import SimulatedProfile
 
 
 def main(args):
-    genotypes = [SimulatedGenotype(gtfile) for gtfile in args.gtfiles]
-    combined = SimulatedGenotype.merge(genotypes)
+    profiles = [SimulatedProfile(pfile) for pfile in args.profiles]
+    combined = SimulatedProfile.merge(profiles)
     with microhapulator.open(args.out, 'w') as fh:
         combined.dump(fh)
