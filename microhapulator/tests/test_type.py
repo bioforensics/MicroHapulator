@@ -58,3 +58,10 @@ def test_type_dyn_cutoff():
     gt = microhapulator.type.type(bam, fasta, threshold=4)
     assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G', 'C,A,C,T,A', 'T,G,C,T,A'])
     assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
+
+
+def test_type_no_var_offsets():
+    bam = data_file('sandawe-dad.bam')
+    fasta = data_file('sandawe-panel.fasta.gz')
+    with pytest.raises(ValueError, match=r'variant offsets not annotated for target amplicon:'):
+        profile = microhapulator.type.type(bam, fasta)
