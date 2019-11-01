@@ -8,12 +8,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New `contain` module for calculating the proportion of alleles from one sample present in another sample (see #41).
 - New `--dry-run` mode for `sim` and `mixture` modules (see #41).
 - New `prob` module for calculating likelihood ratio tests based on the random match probability (see #43).
-- New `seq` module focused entirely on sequencing samples where genotypes have already been simulated (see #45).
-- New `mix` module for merging simulated genotypes into a simulated mixture sample (see #45).
-- New `unite` module for "mating" two genotypes to create a simulated "offspring" genotype (see #47).
-- New `diff` modfule for showing the differences between two genotypes (see #58, #60).
+- New `seq` module focused entirely on sequencing samples where profiles have already been simulated (see #45).
+- New `mix` module for merging simulated profiles into a simulated mixture sample profile (see #45).
+- New `unite` module for "mating" two profiles to create a simulated "offspring" profile (see #47).
+- New `diff` modfule for showing the differences between two profiles (see #58, #60).
 
 ### Changed
+- Huge refactoring effort to accommodate for recent changes to MicroHapDB's Python API (see #66).
 - The `sim` module no longer performs simulated sequencing (now handled by new `seq` module) and instead focuses entirely on haplotype simulation (see #45).
 - The `type` module now dynamically selects either an automatic threshold or a fixed threshold based on effective coverage (see #51, #61).
 - Moved simulation scripts to notebook directory, reimplemented as a Snakemake workflow (see #50, #57, #59).
