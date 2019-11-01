@@ -1,6 +1,6 @@
 {
-    "loci": {
-        "MHDBL000190": {
+    "markers": {
+        "mh06KK-080": {
             "allele_counts": {
                 "A,A": 2,
                 "A,G": 1694,
@@ -23,7 +23,7 @@
             "min_coverage": 1,
             "num_discarded_reads": 345
         },
-        "MHDBL000191": {
+        "mh06KK-026": {
             "allele_counts": {
                 "A,C,G": 1,
                 "G,A,G": 3,
@@ -45,7 +45,7 @@
             "min_coverage": 53,
             "num_discarded_reads": 395
         },
-        "MHDBL000196": {
+        "mh06KK-101": {
             "allele_counts": {
                 "G,A": 3,
                 "G,C": 5,
@@ -63,7 +63,7 @@
             "min_coverage": 4,
             "num_discarded_reads": 609
         },
-        "MHDBL000199": {
+        "mh07KK-030": {
             "allele_counts": {
                 "A,C,C": 1663,
                 "G,C,C": 1687
@@ -85,5 +85,5 @@
         }
     },
     "ploidy": null,
-    "type": "ObservedGenotype"
+    "type": "ObservedProfile"
 }
