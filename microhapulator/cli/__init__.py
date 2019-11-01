@@ -17,7 +17,6 @@ from . import diff
 from . import dist
 from . import mix
 from . import prob
-from . import refr
 from . import seq
 from . import sim
 from . import type
