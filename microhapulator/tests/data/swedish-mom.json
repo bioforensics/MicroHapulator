@@ -1,0 +1,48 @@
+{
+    "markers": {
+        "mh01AT-04": {
+            "genotype": [
+                {
+                    "allele": "G,T,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "G,G,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "mh11AT-22": {
+            "genotype": [
+                {
+                    "allele": "T,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "mh16AT-33": {
+            "genotype": [
+                {
+                    "allele": "A,C,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,C,A",
+                    "haplotype": 1
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "HaploSeed": 4179629890,
+        "MaternalHaploPop": "MHDBP-7c055e7ee8",
+        "PaternalHaploPop": "MHDBP-7c055e7ee8"
+    },
+    "ploidy": 2,
+    "type": "SimulatedProfile",
+    "version": "0.3+42.gafe5f53.dirty"
+}

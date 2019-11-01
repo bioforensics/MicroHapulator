@@ -1,0 +1,48 @@
+{
+    "markers": {
+        "mh01KK-205": {
+            "genotype": [
+                {
+                    "allele": "T,T,A,G",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "T,T,G,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "mh02KK-005": {
+            "genotype": [
+                {
+                    "allele": "G,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,G",
+                    "haplotype": 1
+                }
+            ]
+        },
+        "mh03KK-006": {
+            "genotype": [
+                {
+                    "allele": "A,A",
+                    "haplotype": 0
+                },
+                {
+                    "allele": "A,A",
+                    "haplotype": 1
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "HaploSeed": 3363639364,
+        "MaternalHaploPop": "SA001773S",
+        "PaternalHaploPop": "SA001773S"
+    },
+    "ploidy": 2,
+    "type": "SimulatedProfile",
+    "version": "0.3+42.gafe5f53.dirty"
+}

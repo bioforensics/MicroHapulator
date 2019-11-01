@@ -103,7 +103,7 @@ def test_merge_sim_genotypes():
     prof3.add(0, 'mh05KK-123', 'G,C')
     prof3.add(1, 'mh05KK-123', 'G,T')
 
-    profile = microhapulator.profile.SimulatedProfile.merge([prof1, prof2, prof3])
+    profile = SimulatedProfile.merge([prof1, prof2, prof3])
     print(profile.bedstr)
     assert profile.bedstr == (
         'mh05KK-123\t121\t122\tA|A|A|A|G|G\n'
@@ -112,3 +112,11 @@ def test_merge_sim_genotypes():
         'mh11CP-004\t163\t164\tG|G|T|T|G|G\n'
         'mh11CP-004\t187\t188\tG|G|A|G|G|G\n'
     )
+
+
+def test_bed_error():
+    p = SimulatedProfile()
+    p.add(0, 'BOGUS', 'A,C,C')
+    p.add(1, 'BOGUS', 'A,C,C')
+    with pytest.raises(ValueError, match=r'unknown marker identifier "BOGUS"'):
+        print(p.bedstr)

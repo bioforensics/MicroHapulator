@@ -28,6 +28,22 @@ def test_unite_basic(momgt, dadgt, kidgt, seed):
     assert test == kid
 
 
+def test_unite_unshared(capsys):
+    mom = Profile(fromfile=data_file('swedish-mom.json'))
+    dad = Profile(fromfile=data_file('swedish-dad.json'))
+    kid = Profile.unite(mom, dad)
+    terminal = capsys.readouterr()
+    message = 'markers not common to mom and dad profiles are excluded: mh16AT-33, mh17AT-36'
+    assert message in terminal.err
+
+
+def test_unite_none_shared(capsys):
+    mom = Profile(fromfile=data_file('sandawe-mom.json'))
+    dad = Profile(fromfile=data_file('sandawe-dad.json'))
+    with pytest.raises(ValueError, match=r'mom and dad profiles have no markers in common'):
+        kid = Profile.unite(mom, dad)
+
+
 def test_unite_cli():
     with NamedTemporaryFile(suffix='.json') as outfile:
         arglist = [
