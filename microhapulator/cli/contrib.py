@@ -15,12 +15,12 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
-        '-j', '--json', metavar='FILE', help='precomputed genotype in JSON '
-        'format; if not specified, must supply arguments for `--refr-fasta` '
-        ' and `--bam` flags'
+        '-j', '--json', metavar='FILE', help='precomputed genotype profile in '
+        'JSON format; if not specified, must supply arguments for '
+        '`--refr-fasta` and `--bam` flags'
     )
     cli.add_argument(
-        '-r', '--refr', metavar='FILE', help='microhap locus sequences in '
+        '-r', '--refr', metavar='FILE', help='microhap marker sequences in '
         'Fasta format'
     )
     cli.add_argument(
