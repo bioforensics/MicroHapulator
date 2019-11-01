@@ -33,7 +33,7 @@ def test_unite_unshared(capsys):
     dad = Profile(fromfile=data_file('swedish-dad.json'))
     kid = Profile.unite(mom, dad)
     terminal = capsys.readouterr()
-    message = 'markers not common to mom and dad profiles are excluded: mh16AT-33, mh17AT-36'
+    message = 'markers not common to mom and dad profiles are excluded'
     assert message in terminal.err
 
 
