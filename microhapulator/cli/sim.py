@@ -39,7 +39,6 @@ def subparser(subparsers):
     )
     cli.add_argument(
         'panel', nargs='+', help='panel from which to simulate microhap '
-        'profiles; can be a list of MicroHapDB marker identifiers or the '
-        'label for one of MicroHapulator\'s preset panels (such as alpha, '
-        'beta, or usa)'
+        'profiles; can be a list of MicroHapDB marker identifiers or a '
+        'filename containing marker identifiers (one per line)'
     )
