@@ -54,7 +54,7 @@ def test_prob_cli_lrt(capsys):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
     terminal = capsys.readouterr()
-    assert '"rmp_likelihood_ratio": "1.075E+06"' in terminal.out
+    assert '"likelihood_ratio": "1.075E+06"' in terminal.out
 
 
 def test_prob_zero_freq():

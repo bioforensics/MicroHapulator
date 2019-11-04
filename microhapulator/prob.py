@@ -29,7 +29,7 @@ def main(args):
         raise ValueError(message)
     popid = popids.iloc[0]
     result = prob(popid, prof1, prof2=prof2, erate=args.erate)
-    key = 'random_match_probability' if prof2 is None else 'rmp_likelihood_ratio'
+    key = 'random_match_probability' if prof2 is None else 'likelihood_ratio'
     data = {
         key: '{:.3E}'.format(result),
     }
