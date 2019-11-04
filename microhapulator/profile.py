@@ -13,6 +13,7 @@ from io import StringIO
 import json
 import jsonschema
 import microhapdb
+from microhapdb.marker import TargetAmplicon
 import microhapulator
 from numpy.random import choice
 
@@ -187,7 +188,7 @@ class Profile(object):
             if len(result) == 0:
                 raise ValueError('unknown marker identifier "{:s}"'.format(marker))
             markerdata = result.iloc[0]
-            context = microhapulator.panel.LocusContext(markerdata)
+            context = TargetAmplicon(markerdata, delta=30, minlen=350)
             coords = list(map(int, markerdata.Offsets.split(',')))
             coords = list(map(context.global_to_local, coords))
             variants = [list() for _ in range(len(coords))]
@@ -203,8 +204,8 @@ class Profile(object):
     def seqstream(self):
         for marker in sorted(self.markers()):
             canonid = microhapdb.markers[microhapdb.markers.Name == marker].iloc[0]
-            context = microhapulator.panel.LocusContext(canonid)
-            yield context.defline, context.sequence
+            amp = TargetAmplicon(canonid, delta=30, minlen=350)
+            yield amp.defline, amp.amplicon_seq
 
     @property
     def bedstr(self):
