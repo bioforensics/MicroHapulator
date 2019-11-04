@@ -1,4 +1,4 @@
 beta-panel.fasta*
-mixture.*
-sim*
-*-genotype.json
+*-reads*.bam*
+*-reads*.fastq.gz
+*-profile-*.json
