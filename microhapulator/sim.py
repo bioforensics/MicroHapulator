@@ -12,7 +12,20 @@ import microhapulator
 from microhapulator.profile import SimulatedProfile
 from microhapulator.panel import panel_markers, exclude_markers_missing_freq_data
 from microhapulator.panel import validate_populations, sample_panel
+import os
 import numpy.random
+
+
+def resolve_panel(panellist):
+    panel = list()
+    for value in panellist:
+        if os.path.isfile(value):
+            with open(value, 'r') as fh:
+                for line in fh:
+                    panel.append(line.strip())
+        else:
+            panel.append(value)
+    return panel
 
 
 def sim(popids, panel, seed=None, relaxed=False):
@@ -48,7 +61,8 @@ def sim(popids, panel, seed=None, relaxed=False):
 
 
 def main(args):
-    profile = sim(args.popid, args.panel, seed=args.seed, relaxed=args.relaxed)
+    panel = resolve_panel(args.panel)
+    profile = sim(args.popid, panel, seed=args.seed, relaxed=args.relaxed)
     with microhapulator.open(args.out, 'w') as fh:
         profile.dump(fh)
         message = 'profile JSON written to {:s}'.format(fh.name)
