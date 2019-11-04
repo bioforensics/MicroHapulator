@@ -8,77 +8,10 @@
 # -----------------------------------------------------------------------------
 
 from itertools import combinations
-from math import ceil
 import microhapdb
 import microhapulator
 from numpy.random import choice
 import pandas
-
-
-class LocusContext(object):
-    """A class for resolving the context around a microhaplotype locus.
-
-    >>> row = microhapdb.markers[microhapdb.markers.Name == 'mh01KK-172'].iloc[0]
-    >>> context = LocusContext(row)
-    >>> len(context)
-    350
-    >>> context.offset
-    1551391
-    >>> context.global_to_local(1551522)
-    131
-    >>> context.local_to_global(287)
-    1551678
-    """
-    def __init__(self, rowdata, mindelta=30, minlen=350):
-        self._data = rowdata
-        start = int(rowdata.Offsets.split(',')[0]) - mindelta
-        end = int(rowdata.Offsets.split(',')[-1]) + mindelta + 1
-        initlen = end - start
-        if initlen < minlen:
-            lendiff = minlen - initlen
-            bpextend = ceil(lendiff / 2)
-            start -= bpextend
-            end += bpextend
-        self.start = start
-        self.end = end
-        ampdata = microhapdb.sequences[microhapdb.sequences.Marker == rowdata.Name].iloc[0]
-        ampstart = self.start - ampdata.LeftFlank
-        ampend = self.end - ampdata.LeftFlank
-        self._sequence = ampdata.Sequence[ampstart:ampend]
-
-    def __len__(self):
-        return self.end - self.start
-
-    @property
-    def chrom(self):
-        return str(self._data['Chrom'])
-
-    @property
-    def offset(self):
-        return self.start
-
-    def global_to_local(self, coord):
-        if coord < self.start or coord > self.end:
-            return None
-        return coord - self.start
-
-    def local_to_global(self, coord):
-        if coord >= len(self):
-            return None
-        return coord + self.start
-
-    @property
-    def sequence(self):
-        return self._sequence
-
-    @property
-    def defline(self):
-        gcoords = list(map(int, self._data.Offsets.split(',')))
-        coords = [self.global_to_local(x) for x in gcoords]
-        return '{loc} GRCh38:{chrom}:{s}-{e} variants={var}'.format(
-            loc=self._data.Name, chrom=self.chrom, s=self.start,
-            e=self.end, var=':'.join(map(str, coords))
-        )
 
 
 def panel_markers(panellist):

@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - Dropped the `mixture` module, whose functionality is now covered by the more granular `sim`, `mix`, and `seq` modules (see #45).
+- Dropped the `LocusContext` class in favor of MicroHapDB's `TargetAmplicon` class designed for a similar purpose (see #67).
 
 
 ## [0.3] 2019-06-06
