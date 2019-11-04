@@ -75,3 +75,9 @@ def test_no_seed():
 def test_bad_panel():
     with pytest.raises(ValueError, match=r'invalid panel') as ve:
         microhapulator.sim.sim(['SA004047P'], ['DUUUUDE', 'SWEEEET'])
+
+
+def test_panel_file():
+    arglist = ['sim', 'Pashtun', 'Pashtun', data_file('minipanel.txt')]
+    args = microhapulator.cli.get_parser().parse_args(arglist)
+    microhapulator.sim.main(args)

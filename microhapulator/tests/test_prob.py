@@ -54,7 +54,7 @@ def test_prob_cli_lrt(capsys):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
     terminal = capsys.readouterr()
-    assert '"rmp_likelihood_ratio": "1.075E+06"' in terminal.out
+    assert '"likelihood_ratio": "1.075E+06"' in terminal.out
 
 
 def test_prob_zero_freq():
@@ -65,3 +65,17 @@ def test_prob_zero_freq():
 def test_prob_missing_freq():
     p = Profile(fromfile=data_file('korea-5loc-missfreq.json'))
     assert p.rand_match_prob('SA000936S') == pytest.approx(4.898E-11)
+
+
+def test_bad_pop():
+    arglist = ['prob', 'Han', data_file('korea-5loc.json')]
+    args = microhapulator.cli.get_parser().parse_args(arglist)
+    message = r'issue with population "Han"; invalid or not unique'
+    with pytest.raises(ValueError, match=message):
+        microhapulator.prob.main(args)
+
+    arglist = ['prob', 'FakePopulation', data_file('korea-5loc.json')]
+    args = microhapulator.cli.get_parser().parse_args(arglist)
+    message = r'issue with population "FakePopulation"; invalid or not unique'
+    with pytest.raises(ValueError, match=message):
+        microhapulator.prob.main(args)
