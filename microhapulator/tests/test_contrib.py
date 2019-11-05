@@ -22,7 +22,7 @@ import pytest
     ('three-contrib-log.json', 3),
 ])
 def test_contrib_json(pjson, numcontrib):
-    profile = Profile(fromfile=data_file(pjson))
+    profile = microhapulator.contrib.load_profile(json=data_file(pjson))
     n, *data = microhapulator.contrib.contrib(profile)
     assert n == numcontrib
 
