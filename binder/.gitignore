@@ -3,3 +3,4 @@ reads-*.bam*
 reads-*.fastq.gz
 genotype-*.json
 profile-*.json
+profile.json
