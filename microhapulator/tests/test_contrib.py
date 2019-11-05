@@ -8,6 +8,7 @@
 # -----------------------------------------------------------------------------
 
 import microhapulator
+from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pytest
 
@@ -21,14 +22,16 @@ import pytest
     ('three-contrib-log.json', 3),
 ])
 def test_contrib_json(pjson, numcontrib):
-    n, *data = microhapulator.contrib.contrib(pjson=data_file(pjson))
+    profile = Profile(fromfile=data_file(pjson))
+    n, *data = microhapulator.contrib.contrib(profile)
     assert n == numcontrib
 
 
 def test_contrib_bam():
     bam = data_file('three-contrib-log.bam')
     refr = data_file('default-panel.fasta.gz')
-    n, *data = microhapulator.contrib.contrib(bamfile=bam, refrfasta=refr)
+    profile = microhapulator.contrib.load_profile(bamfile=bam, refrfasta=refr)
+    n, *data = microhapulator.contrib.contrib(profile)
     assert n == 3
 
 
@@ -42,7 +45,9 @@ def test_contrib_main(capsys):
     assert '"min_num_contrib": 3' in out
 
 
-def test_no_op():
+def test_main_no_op():
+    arglist = ['contrib']
+    args = microhapulator.cli.get_parser().parse_args(arglist)
     pattern = r'must provide either JSON profile or BAM and refr FASTA'
     with pytest.raises(ValueError, match=pattern) as ve:
-        microhapulator.contrib.contrib()
+        microhapulator.contrib.main(args)
