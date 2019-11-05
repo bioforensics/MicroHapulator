@@ -11,8 +11,8 @@ https://github.com/bioforensics/microhapulator
 
 **MicroHapulator** is a package for analyzing and interpreting microhaplotype sequence data for forensic analysis.
 It provides tools for genotyping as well as deterministic and probabilistic interpretation of simple and complex samples.
-It also provides tools for constructing mock genotypes and simulating MPS sequencing of simple and complex samples.
-MicroHapulator relies on microhap annotations and population allele frequencies from [MicroHapDB](https://github.com/bioforensics/microhapdb) and the MPS error models included with [InSilicoSeq](https://github.com/HadrienG/InSilicoSeq/).
+It also provides tools for constructing mock genotypes and simulating MPS sequencing of single- and multiple-contributor samples.
+MicroHapulator relies on microhap marker definitions and population allele frequencies from [MicroHapDB](https://github.com/bioforensics/microhapdb) and the MPS error models included with [InSilicoSeq](https://github.com/HadrienG/InSilicoSeq/).
 
 
 ## Installation
