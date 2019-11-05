@@ -9,9 +9,10 @@
 Daniel Standage, 2018-2019  
 https://github.com/bioforensics/microhapulator
 
-**MicroHapulator** is a package for simulating and analyzing microhaplotype sequence data for forensic analysis.
-In addition to simulating targeted sequencing of selected microhap loci, it can be used for calling genotypes and performing sample matching and mixture analysis.
-MicroHapulator relies on microhap annotations and population allele frequencies from [MicroHapDB](https://github.com/bioforensics/microhapdb) and the Illumina error models included with [InSilicoSeq](https://github.com/HadrienG/InSilicoSeq/).
+**MicroHapulator** is a package for analyzing and interpreting microhaplotype sequence data for forensic analysis.
+It provides tools for genotyping as well as deterministic and probabilistic interpretation of simple and complex samples.
+It also provides tools for constructing mock genotypes and simulating MPS sequencing of single- and multiple-contributor samples.
+MicroHapulator relies on microhap marker definitions and population allele frequencies from [MicroHapDB](https://github.com/bioforensics/microhapdb) and the MPS error models included with [InSilicoSeq](https://github.com/HadrienG/InSilicoSeq/).
 
 
 ## Installation
@@ -24,21 +25,12 @@ conda install -c bioconda microhapulator
 
 > ***NOTE**: If you'd prefer to install with pip, see [.travis.yml](.travis.yml) and [setup.py](setup.py) for hints.*
 
-You must also "install" the GRCh38 human reference genome into a dedicated "package data" directory.
-
-```
-mhpl8r getrefr
-```
-
-By default, this grabs the reference genome directly from UCSC.
-If you have downloaded the reference genome previously, you can provide the file path to the `mhpl8r getrefr` command.
-
 
 ## Interactive demo
 
 Click the badge below to launch a quick interactive demo of MicroHapulator.
 
-[![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo.ipynb)
+[![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2FREADME.md)
 
 
 ## Usage
