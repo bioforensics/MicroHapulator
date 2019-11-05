@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [0.4] 2019-11-05
 
 ### Added
 - New `contain` module for calculating the proportion of alleles from one sample present in another sample (see #41).
