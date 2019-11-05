@@ -1,4 +1,4 @@
 beta-panel.fasta*
 *-reads*.bam*
-*-reads*.fastq.gz
-*-profile-*.json
+reads-*.fastq.gz
+genotype-*.json
