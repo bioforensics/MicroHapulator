@@ -43,7 +43,7 @@ setup(
         'Intended Audience :: Legal Industry',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 3',
-        'Topic : Scientific/Engineering :: Bio-Informatics',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
     zip_safe=True,
 )
