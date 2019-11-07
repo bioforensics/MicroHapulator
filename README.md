@@ -30,7 +30,9 @@ conda install -c bioconda microhapulator
 
 Click the badge below to launch a quick interactive demo of MicroHapulator.
 
-[![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2FREADME.md)
+- [![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo-cli.ipynb) MicroHapulator CLI (`mhpl8r --help`) 
+- [![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo-api.ipynb) MicroHapulator Python API (`import microhapulator`)
+- [![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo-sim.ipynb) Mock data simulation
 
 
 ## Usage
