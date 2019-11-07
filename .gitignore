@@ -10,3 +10,4 @@ hg38.fasta.fai
 scratch/
 .ipynb_checkpoints/
 .DS_Store
+dist/

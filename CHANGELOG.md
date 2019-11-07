@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Changed
+- Updated mybinder demo (see #69).
+
 ## [0.4] 2019-11-05
 
 ### Added
