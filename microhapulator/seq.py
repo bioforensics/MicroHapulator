@@ -8,6 +8,7 @@
 # -----------------------------------------------------------------------------
 
 # Core library imports
+from itertools import chain
 from os import fsync
 from shutil import rmtree
 from string import ascii_letters, digits
@@ -45,7 +46,7 @@ def sequencing(profile, seed=None, threads=1, numreads=500000, readsignature=Non
             for defline, sequence in profile.haploseqs:
                 print('>', defline, '\n', sequence, sep='', file=fh)
         isscmd = [
-            'iss', 'generate', '--n_reads', str(numreads * 2), '--draft', haplofile,
+            'iss', 'generate', '--n_reads', str(numreads), '--draft', haplofile,
             '--model', 'MiSeq', '--output', tempdir + '/seq', '--quiet'
         ]
         if seed:
@@ -58,15 +59,16 @@ def sequencing(profile, seed=None, threads=1, numreads=500000, readsignature=Non
         except (AttributeError, OSError):  # pragma: no cover
             pass
         check_call(isscmd)
-        with open(tempdir + '/seq_R1.fastq', 'r') as infh:
+        f1, f2 = tempdir + '/seq_R1.fastq', tempdir + '/seq_R2.fastq'
+        with open(f1, 'r') as infh1, open(f2, 'r') as infh2:
             if readsignature is None:
                 readsignature = new_signature()
             linebuffer = list()
-            for line in infh:
-                if line.startswith('@MHDBL'):
+            for line in chain(infh1, infh2):
+                if line.startswith('@mh'):
                     readindex += 1
-                    prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=readsignature, n=readindex)
-                    line = line.replace('@MHDBL', prefix, 1)
+                    prefix = '@{sig:s}_read{n:d} mh'.format(sig=readsignature, n=readindex)
+                    line = line.replace('@mh', prefix, 1)
                 linebuffer.append(line)
                 if len(linebuffer) == 4:
                     yield readindex, linebuffer[0], linebuffer[1], linebuffer[3]
