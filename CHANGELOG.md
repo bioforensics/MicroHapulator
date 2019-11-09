@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Updated mybinder demo (see #69).
+- Simulated Illumina sequencing now uses 1 thread by default, which paradoxically should lead to better performance (#71).
+
+### Fixed
+- Corrected a bug with Fastq headers in `mhpl8r seq` module (see #71).
 
 ## [0.4] 2019-11-05
 

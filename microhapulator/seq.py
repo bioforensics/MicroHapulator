@@ -8,6 +8,7 @@
 # -----------------------------------------------------------------------------
 
 # Core library imports
+from itertools import chain
 from os import fsync
 from shutil import rmtree
 from string import ascii_letters, digits
@@ -37,8 +38,7 @@ def new_signature():
     return ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
 
 
-def sequencing(profile, seed=None, threads=1, numreads=500000,
-               readsignature=None, readindex=0, debug=False):
+def sequencing(profile, seed=None, threads=1, numreads=500000, readsignature=None, readindex=0):
     tempdir = mkdtemp()
     try:
         haplofile = tempdir + '/haplo.fasta'
@@ -46,7 +46,7 @@ def sequencing(profile, seed=None, threads=1, numreads=500000,
             for defline, sequence in profile.haploseqs:
                 print('>', defline, '\n', sequence, sep='', file=fh)
         isscmd = [
-            'iss', 'generate', '--n_reads', str(numreads * 2), '--draft', haplofile,
+            'iss', 'generate', '--n_reads', str(numreads), '--draft', haplofile,
             '--model', 'MiSeq', '--output', tempdir + '/seq', '--quiet'
         ]
         if seed:
@@ -58,19 +58,17 @@ def sequencing(profile, seed=None, threads=1, numreads=500000,
             fsync(microhapulator.logstream.fileno())
         except (AttributeError, OSError):  # pragma: no cover
             pass
-        if debug:
-            check_call(isscmd, stderr=microhapulator.logstream)
-        else:
-            check_call(isscmd)
-        with open(tempdir + '/seq_R1.fastq', 'r') as infh:
+        check_call(isscmd)
+        f1, f2 = tempdir + '/seq_R1.fastq', tempdir + '/seq_R2.fastq'
+        with open(f1, 'r') as infh1, open(f2, 'r') as infh2:
             if readsignature is None:
                 readsignature = new_signature()
             linebuffer = list()
-            for line in infh:
-                if line.startswith('@MHDBL'):
+            for line in chain(infh1, infh2):
+                if line.startswith('@mh'):
                     readindex += 1
-                    prefix = '@{sig:s}_read{n:d} MHDBL'.format(sig=readsignature, n=readindex)
-                    line = line.replace('@MHDBL', prefix, 1)
+                    prefix = '@{sig:s}_read{n:d} mh'.format(sig=readsignature, n=readindex)
+                    line = line.replace('@mh', prefix, 1)
                 linebuffer.append(line)
                 if len(linebuffer) == 4:
                     yield readindex, linebuffer[0], linebuffer[1], linebuffer[3]
@@ -79,8 +77,7 @@ def sequencing(profile, seed=None, threads=1, numreads=500000,
         rmtree(tempdir)
 
 
-def seq(profiles, seeds=None, threads=1, totalreads=500000, proportions=None,
-        sig=None, debug=False):
+def seq(profiles, seeds=None, threads=1, totalreads=500000, proportions=None, sig=None):
     n = len(profiles)
     if seeds is None:
         seeds = [randint(1, 2**32 - 1) for _ in range(n)]
@@ -97,7 +94,6 @@ def seq(profiles, seeds=None, threads=1, totalreads=500000, proportions=None,
         sequencer = sequencing(
             profile, seed=seed, threads=threads, numreads=nreads,
             readsignature=readsignature, readindex=reads_sequenced,
-            debug=debug,
         )
         for data in sequencer:
             yield data
@@ -117,7 +113,7 @@ def main(args):
     profiles = resolve_profiles(args.profiles)
     sequencer = seq(
         profiles, seeds=args.seeds, threads=args.threads, totalreads=args.num_reads,
-        proportions=args.proportions, debug=args.debug, sig=args.signature
+        proportions=args.proportions, sig=args.signature
     )
     with microhapulator.open(args.out, 'w') as fh:
         for n, defline, sequence, qualities in sequencer:
