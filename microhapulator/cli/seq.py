@@ -27,10 +27,6 @@ def subparser(subparsers):
         help='number of reads to simulate; default is 500000'
     )
     cli.add_argument(
-        '--threads', type=int, default=None, metavar='INT', help='number of '
-        'threads to use when simulating targeted amplicon sequencing'
-    )
-    cli.add_argument(
         '-p', '--proportions', type=float, nargs='+', metavar='P',
         help='simulated mixture samples with multiple contributors at the '
         'specified proportions; by default even proportions are used'
@@ -40,9 +36,7 @@ def subparser(subparsers):
         help='seeds for random number generator, 1 per profile'
     )
     cli.add_argument('--signature', default=None, help=argparse.SUPPRESS)
-    cli.add_argument(
-        '-d', '--debug', action='store_true', help='print debugging info'
-    )
+    cli.add_argument('--threads', type=int, default=1, metavar='INT', help=argparse.SUPPRESS)
     cli.add_argument(
         'profiles', nargs='+', help='one or more simple or complex profiles '
         '(JSON files)'
