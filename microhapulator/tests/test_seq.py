@@ -44,7 +44,7 @@ def test_even_mixture():
         panel = microhapulator.panel.panel_allpops()[:5]
         p = microhapulator.sim.sim(pops, panel)
         profiles.append(p)
-    sequencer = microhapulator.seq.seq(profiles, threads=2, totalreads=500)
+    sequencer = microhapulator.seq.seq(profiles, totalreads=500)
     for n, read in enumerate(sequencer):
         pass
     assert n == pytest.approx(500, abs=25)
@@ -52,7 +52,7 @@ def test_even_mixture():
 
 def test_complex_genotype(capsys):
     profile = Profile(fromfile=data_file('mixture-genotype.json'))
-    sequencer = microhapulator.seq.seq(list(profile.unmix()), threads=2, totalreads=200)
+    sequencer = microhapulator.seq.seq(list(profile.unmix()), totalreads=200)
     for n, read in enumerate(sequencer):
         pass
     terminal = capsys.readouterr()
@@ -64,7 +64,7 @@ def test_uneven_mixture(capsys):
     pops = ['SA004248S', 'SA004239S', 'SA001530J']
     profiles = [microhapulator.sim.sim([popid], panel) for popid in pops]
     sequencer = microhapulator.seq.seq(
-        profiles, threads=2, totalreads=500, proportions=[0.5, 0.3, 0.2]
+        profiles, totalreads=500, proportions=[0.5, 0.3, 0.2]
     )
     for read in sequencer:
         pass
@@ -125,7 +125,7 @@ def test_main_relaxed(relaxmode, gtfile, signature, testfile):
 def test_main_no_seed():
     with NamedTemporaryFile(suffix='.fastq') as outfile:
         arglist = [
-            'seq', '--out', outfile.name, '--num-reads', '200', '--threads', '1',
+            'seq', '--out', outfile.name, '--num-reads', '200',
             data_file('orange-sim-profile.json')
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
@@ -137,8 +137,8 @@ def test_main_no_seed():
 
 def test_main_mixture(capsys):
     arglist = [
-        'seq', '--seeds', '42', '1776', '--threads', '2', '--proportions', '0.8', '0.2',
-        '--num-reads', '500', data_file('yellow-mix-gt.json')
+        'seq', '--seeds', '42', '1776', '--proportions', '0.8', '0.2', '--num-reads', '500',
+        data_file('yellow-mix-gt.json')
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
@@ -147,9 +147,9 @@ def test_main_mixture(capsys):
     nrecords = len(outlines) / 4
     assert nrecords == pytest.approx(500, abs=25)
     assert outlines[-3] == (
-        'AGTATGTTTTAAGACTCTGAAAATTTTTGAACTCACTCCCAGAAAGTTTTACCACCTCTTCTTCTGTGT'
-        'GGCCACCAGGGGGACGTAGTGTGGCCGAGACTCCAGGAGTGCCCGTGAGCACCCGAGGCGCTGAGGAGG'
-        'GCTGGGTTGCAGTCTCCTGTGGTTGTACCAGCATTAAAAATCGCTGTATGTGTGTGTGTGTGTGTGTGT'
-        'GTGTGCTGAGCCTAAATTTTCTTTGAGCCGCCAATACCTATTATCATGAATCCCTGCCTTGACGCTGAG'
-        'GGTAGAAATTGAATTGGATATATGA'
+        'TCAATTCAATTTCTACCCTCAGCATCAAGGCAGGGGTTCATCATAATGGGTATTGGAGGCTCAAAGAAA'
+        'ATTTAGGCTCAGCACACACACACACACACACACACACACACAGCGATTTTTAATGCTGGTACAATCACA'
+        'GGAGACTGCAACCCAGCCCTCCTCAGCGCCTCGGGTGCTCACGGGCACTCCTGGAGTCTCGGCCACACT'
+        'AAGTCCCCCTGGTGGCCACACAGAAGAAGAGGTGGTAAAACTTTCTGGGAGTGAGTTCAAAAATTTTAG'
+        'GAGTCTAAAAACATACTTTTCTAAG'
     )
