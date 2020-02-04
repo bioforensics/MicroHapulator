@@ -38,6 +38,23 @@ def new_signature():
     return ''.join([choice(list(ascii_letters + digits)) for _ in range(7)])
 
 
+def interleave(stream1, stream2):
+    '''Parse paired-end reads from paired files.
+
+    Most languages would require some type of try/catch or other error handling
+    block here to terminate the while loop. Not necessary in Python: the
+    infinite loop continues until a `next()` call raises a `StopIteration`. At
+    that point this generator function halts and relays the `StopIteration` to
+    its calling function.
+    '''
+    while True:
+        record1, record2 = list(), list()
+        for _ in range(4):
+            record1.append(next(stream1))
+            record2.append(next(stream2))
+        yield record1, record2
+
+
 def sequencing(profile, seed=None, threads=1, numreads=500000, readsignature=None, readindex=0):
     tempdir = mkdtemp()
     try:
@@ -63,16 +80,13 @@ def sequencing(profile, seed=None, threads=1, numreads=500000, readsignature=Non
         with open(f1, 'r') as infh1, open(f2, 'r') as infh2:
             if readsignature is None:
                 readsignature = new_signature()
-            linebuffer = list()
-            for line in chain(infh1, infh2):
-                if line.startswith('@mh'):
-                    readindex += 1
-                    prefix = '@{sig:s}_read{n:d} mh'.format(sig=readsignature, n=readindex)
-                    line = line.replace('@mh', prefix, 1)
-                linebuffer.append(line)
-                if len(linebuffer) == 4:
-                    yield readindex, linebuffer[0], linebuffer[1], linebuffer[3]
-                    linebuffer = list()
+            for read1, read2 in interleave(infh1, infh2):
+                readindex += 1
+                for read in (read1, read2):
+                    if read[0].startswith('@mh'):
+                        prefix = '@{sig:s}_read{n:d} mh'.format(sig=readsignature, n=readindex)
+                        read[0] = read[0].replace('@mh', prefix, 1)
+                yield readindex, read1, read2
     finally:
         rmtree(tempdir)
 
@@ -95,9 +109,10 @@ def seq(profiles, seeds=None, threads=1, totalreads=500000, proportions=None, si
             profile, seed=seed, threads=threads, numreads=nreads,
             readsignature=readsignature, readindex=reads_sequenced,
         )
-        for data in sequencer:
-            yield data
-        reads_sequenced = data[0]
+        for index, read1, read2 in sequencer:
+            yield index, read1[0], read1[1], read1[3]
+            yield index, read2[0], read2[1], read2[3]
+        reads_sequenced = index
 
 
 def resolve_profiles(gtfiles):
