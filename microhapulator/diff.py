@@ -29,6 +29,8 @@ def main(args):
         for marker, diff1, diff2 in differ:
             print(marker, file=fh)
             if len(diff1) > 0:
-                print('>>>', ':'.join(sorted(diff1)), file=fh)
+                for haplotype in sorted(diff1):
+                    print('>>>', haplotype, file=fh)
             if len(diff2) > 0:
-                print('<<<', ':'.join(sorted(diff2)), file=fh)
+                for haplotype in sorted(diff2):
+                    print('<<<', haplotype, file=fh)
