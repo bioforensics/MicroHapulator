@@ -15,7 +15,7 @@
         "mh07CP-004": {
             "genotype": [
                 {
-                    "allele": "T,T,A,T,C",
+                    "allele": "A,A,T,T,C",
                     "haplotype": 0
                 },
                 {
@@ -43,5 +43,6 @@
         "PaternalHaploPop": "SA000101C"
     },
     "ploidy": 2,
-    "type": "SimulatedProfile"
+    "type": "SimulatedProfile",
+    "version": "0.4.1+19.g2039d59.dirty"
 }

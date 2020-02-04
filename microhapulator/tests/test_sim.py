@@ -39,8 +39,9 @@ def test_main():
     with tempfile.NamedTemporaryFile(suffix='-profile.json') as outfile:
         arglist = [
             'sim', '--out', outfile.name, '--seed', '1985', 'SA004250L', 'SA004250L',
-            'usa'
+            *microhapulator.panel.panel_usa()
         ]
+        print('DEBUG', arglist)
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)
         p = SimulatedProfile(fromfile=outfile.name)
