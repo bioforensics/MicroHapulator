@@ -37,11 +37,15 @@ def test_even_mixture():
     seed = numpy.random.randint(1, 2**32 - 1)
     print('Seed:', seed)
     numpy.random.seed(seed)
-    popids = microhapdb.populations[microhapdb.populations.Source == 'ALFRED'].ID.unique()
+    popids = microhapdb.populations[microhapdb.populations.Source == '1KGP'].ID.unique()
     profiles = list()
     for _ in range(numpy.random.randint(2, 6)):
         pops = [numpy.random.choice(popids), numpy.random.choice(popids)]
-        panel = microhapulator.panel.panel_allpops()[:5]
+        markerids = microhapdb.frequencies[
+            microhapdb.frequencies.Population.isin(popids)
+        ].Marker.unique()
+        panel = microhapdb.markers[microhapdb.markers.Name.isin(markerids)].Name.unique()
+        panel = numpy.random.choice(panel, 5)
         p = microhapulator.sim.sim(pops, panel)
         profiles.append(p)
     sequencer = microhapulator.seq.seq(profiles, totalreads=500)
