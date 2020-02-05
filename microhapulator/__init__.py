@@ -43,9 +43,7 @@ teelog = False
 
 
 def package_file(path):
-    pathparts = path.split('/')
-    relpath = os.path.join('data', *pathparts)
-    return resource_filename('microhapulator', relpath)
+    return resource_filename('microhapulator', path)
 
 
 @contextmanager
