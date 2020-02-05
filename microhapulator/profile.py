@@ -90,7 +90,7 @@ class Profile(object):
 
     def alleles(self, markerid, haplotype=None):
         if markerid not in self.data['markers']:
-            return None
+            return set()
         if haplotype is not None:
             return set(
                 [a['allele'] for a in self.data['markers'][markerid]['genotype']

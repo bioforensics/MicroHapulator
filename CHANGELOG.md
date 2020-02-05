@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (see #71).
+- Corrected a bug resulting from attempting to do set operations on `None` (see #75).
 
 ## [0.4] 2019-11-05
 

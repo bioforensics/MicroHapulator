@@ -1,4 +1,3 @@
 include versioneer.py
 include microhapulator/_version.py
-recursive-include microhapulator/data *
 recursive-include microhapulator/tests/data *
