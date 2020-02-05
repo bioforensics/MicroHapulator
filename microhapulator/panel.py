@@ -14,20 +14,6 @@ from numpy.random import choice
 import pandas
 
 
-# def panel_markers(panellist):
-#     if panellist is None or panellist == ['alpha']:
-#         markers = panel_alpha()
-#     elif panellist == ['beta']:
-#         markers = panel_beta()
-#     elif panellist == ['usa']:
-#         markers = panel_usa()
-#     elif panellist == ['allpops']:
-#         markers = panel_allpops()
-#     else:
-#         markers = panellist
-#     return validate_markers(markers)
-
-
 def validate_markers(panel):
     valid_markers = microhapdb.marker.standardize_ids(panel)
     if len(valid_markers) < len(panel):
