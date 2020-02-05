@@ -10,7 +10,7 @@
 from happer.mutate import mutate
 import microhapulator
 from microhapulator.profile import SimulatedProfile
-from microhapulator.panel import panel_markers, exclude_markers_missing_freq_data
+from microhapulator.panel import validate_markers, exclude_markers_missing_freq_data
 from microhapulator.panel import validate_populations, sample_panel
 import os
 import numpy.random
@@ -39,7 +39,7 @@ def sim(popids, panel, seed=None, relaxed=False):
     uniform distribution).
     '''
     haplopops = validate_populations(popids)
-    markers = panel_markers(panel)
+    markers = validate_markers(panel)
     if not relaxed:
         markers = exclude_markers_missing_freq_data(markers, haplopops)
     if len(markers) == 0:
