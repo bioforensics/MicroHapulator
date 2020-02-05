@@ -26,8 +26,7 @@ setup(
     packages=['microhapulator', 'microhapulator.cli', 'microhapulator.tests'],
     package_data={
         'microhapulator': [
-            'microhapulator/data/*', 'microhapulator/tests/data/*',
-            'microhapulator/tests/data/*/*'
+            'microhapulator/tests/data/*', 'microhapulator/tests/data/*/*'
         ]
     },
     include_package_data=True,

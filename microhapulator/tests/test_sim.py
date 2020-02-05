@@ -17,7 +17,19 @@ import tempfile
 
 
 def test_meaning_of_life():
-    profile = microhapulator.sim.sim(['SA004250L', 'SA004250L'], ['beta'], seed=42)
+    panel = [
+        'mh01KK-205', 'mh01CP-016', 'mh01KK-117', 'mh10CP-003', 'mh10KK-170', 'mh10KK-101',
+        'mh11KK-180', 'mh11KK-037', 'mh11KK-191', 'mh12CP-008', 'mh12KK-202', 'mh12KK-046',
+        'mh13KK-213', 'mh13KK-223', 'mh14CP-003', 'mh14KK-048', 'mh15KK-069', 'mh15KK-104',
+        'mh16KK-255', 'mh17CP-001', 'mh17KK-052', 'mh17KK-055', 'mh18CP-005', 'mh18KK-293',
+        'mh19KK-299', 'mh19KK-057', 'mh02KK-138', 'mh02KK-136', 'mh20KK-307', 'mh20KK-058',
+        'mh21KK-315', 'mh22KK-060', 'mh22KK-061', 'mh03CP-005', 'mh03KK-007', 'mh03KK-150',
+        'mh04KK-030', 'mh04KK-013', 'mh04KK-017', 'mh05KK-020', 'mh06CP-007', 'mh06KK-008',
+        'mh07CP-004', 'mh07KK-030', 'mh07KK-031', 'mh08KK-039', 'mh08KK-032', 'mh09KK-033',
+        'mh09KK-153', 'mh09KK-157',
+    ]
+    profile = microhapulator.sim.sim(['SA004250L', 'SA004250L'], panel, seed=42)
+    profile.dump('Hummdiddy.json')
     testprofile = SimulatedProfile(fromfile=data_file('meaning-of-life.json.gz'))
     assert profile == testprofile
 
@@ -39,7 +51,15 @@ def test_main():
     with tempfile.NamedTemporaryFile(suffix='-profile.json') as outfile:
         arglist = [
             'sim', '--out', outfile.name, '--seed', '1985', 'SA004250L', 'SA004250L',
-            'usa'
+            'mh13KK-218', 'mh05KK-170', 'mh21KK-320', 'mh10KK-163', 'mh10KK-169', 'mh02KK-134',
+            'mh16KK-049', 'mh06KK-008', 'mh21KK-324', 'mh11KK-180', 'mh13KK-217', 'mh21KK-315',
+            'mh04KK-030', 'mh01KK-117', 'mh19KK-299', 'mh01KK-205', 'mh13KK-223', 'mh02KK-136',
+            'mh04KK-013', 'mh13KK-213', 'mh16KK-255', 'mh20KK-307', 'mh09KK-157', 'mh13KK-225',
+            'mh22KK-061', 'mh18KK-293', 'mh03KK-150', 'mh01KK-001', 'mh21KK-316', 'mh11KK-191',
+            'mh01NK-001', 'mh12KK-202', 'mh09KK-153', 'mh17KK-272', 'mh16KK-302', 'mh09KK-152',
+            'mh10KK-170', 'mh09KK-033', 'mh20KK-058', 'mh11KK-187', 'mh04KK-017', 'mh01KK-172',
+            'mh06KK-030', 'mh18KK-285', 'mh01KK-106', 'mh06KK-025', 'mh02KK-004', 'mh09KK-020',
+            'mh07KK-030', 'mh02KK-213'
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.sim.main(args)

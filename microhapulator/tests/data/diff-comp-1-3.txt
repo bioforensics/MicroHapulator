@@ -8,24 +8,29 @@ MHDBL000007
 MHDBL000013
 >>> A,G,C,C
 MHDBL000017
->>> A,A,G,C,T:T,A,A,T,T
+>>> A,A,G,C,T
+>>> T,A,A,T,T
 <<< T,G,G,C,C
 MHDBL000018
 >>> C,A,C,C,G
-<<< C,A,C,T,G:T,A,T,T,G
+<<< C,A,C,T,G
+<<< T,A,T,T,G
 MHDBL000030
 >>> A,C,C,C
 <<< A,A,T,C
 MHDBL000036
->>> A,C,G:G,C,G
+>>> A,C,G
+>>> G,C,G
 <<< G,T,G
 MHDBL000038
 >>> T,A,A,T
 MHDBL000047
 <<< T,T
 MHDBL000058
->>> A,G,C,G:A,G,T,G
-<<< A,A,C,G:G,G,C,G
+>>> A,G,C,G
+>>> A,G,T,G
+<<< A,A,C,G
+<<< G,G,C,G
 MHDBL000061
 <<< G,A,A
 MHDBL000076
@@ -35,10 +40,13 @@ MHDBL000079
 <<< A,G
 MHDBL000082
 >>> A,C,T,T
-<<< G,C,T,T:G,T,A,T
+<<< G,C,T,T
+<<< G,T,A,T
 MHDBL000085
->>> A,C,T,G:G,A,C,A
-<<< G,A,T,G:G,C,T,G
+>>> A,C,T,G
+>>> G,A,C,A
+<<< G,A,T,G
+<<< G,C,T,G
 MHDBL000088
 <<< C,T
 MHDBL000101
@@ -66,13 +74,15 @@ MHDBL000129
 >>> G,T,C
 <<< G,T,A
 MHDBL000135
->>> G,C,C:G,T,T
+>>> G,C,C
+>>> G,T,T
 <<< A,T,C
 MHDBL000136
 <<< A,C,G,C
 MHDBL000138
 >>> A,A,C,A
-<<< G,A,C,G:G,G,C,G
+<<< G,A,C,G
+<<< G,G,C,G
 MHDBL000140
 >>> C,C,A,A
 <<< C,C,T,A
@@ -85,13 +95,17 @@ MHDBL000154
 >>> C,C
 <<< T,T
 MHDBL000163
->>> A,A,G,A,T:C,A,G,A,T
-<<< C,G,A,A,T:C,G,G,G,T
+>>> A,A,G,A,T
+>>> C,A,G,A,T
+<<< C,G,A,A,T
+<<< C,G,G,G,T
 MHDBL000181
 <<< C,C
 MHDBL000183
->>> C,G:T,G
-<<< C,A:T,A
+>>> C,G
+>>> T,G
+<<< C,A
+<<< T,A
 MHDBL000194
 <<< G,C
 MHDBL000210

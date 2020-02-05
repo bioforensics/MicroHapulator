@@ -41,8 +41,8 @@ def test_profile_roundtrip():
 def test_alleles():
     simprof = SimulatedProfile.populate_from_bed(data_file('gttest.bed.gz'))
     obsprof = ObservedProfile(fromfile=data_file('gttest.json'))
-    assert simprof.alleles('BoGuSlOcUs') is None
-    assert obsprof.alleles('BoGuSlOcUs') is None
+    assert simprof.alleles('BoGuSlOcUs') == set()
+    assert obsprof.alleles('BoGuSlOcUs') == set()
     assert simprof.alleles('MHDBL000135') == set(['G,C,T', 'G,T,C'])
     assert obsprof.alleles('MHDBL000135') == set(['G,C,T', 'G,T,C'])
     assert simprof.alleles('MHDBL000135', haplotype=0) == set(['G,C,T'])

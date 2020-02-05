@@ -64,3 +64,15 @@ def test_diff2():
     gt2 = SimulatedProfile(fromfile=data_file('euramer-inf-gt.json'))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     assert diff == [('MHDBL000018', set(), {'T,G,C,T,A'})]
+
+
+def test_diff_nonmatching_alleles():
+    p1 = SimulatedProfile(fromfile=data_file('red-strict-profile.json'))
+    p2 = SimulatedProfile(fromfile=data_file('red-relaxed-profile.json'))
+    diff = list(microhapulator.diff.diff(p1, p2))
+    print(diff)
+    assert diff == [
+        ('mh01KK-117', {'A,G,C,C'}, {'A,A,C,T'}),
+        ('mh07CP-004', set(), {'T,T,A,A,C', 'A,A,T,T,C'}),
+        ('mh09KK-157', {'G,C,C,A,C'}, {'A,C,C,A,T', 'G,C,C,C,T'})
+    ]
