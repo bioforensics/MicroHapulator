@@ -11,3 +11,4 @@ scratch/
 .ipynb_checkpoints/
 .DS_Store
 dist/
+.snakemake/
