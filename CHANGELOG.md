@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Updated mybinder demo (see #69).
 - Simulated Illumina sequencing now uses 1 thread by default, which paradoxically should lead to better performance (#71).
 - Moved panel definition code moved out of the core code and into dedicated notebooks (#74).
+- Replaced `MissingBAMIndexError` with BAM auto-indexing code (#78).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (see #71).
