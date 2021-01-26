@@ -7,7 +7,7 @@
                     "haplotype": 0
                 },
                 {
-                    "allele": "A,A,C,T",
+                    "allele": "A,G,C,C",
                     "haplotype": 1
                 }
             ]
@@ -15,11 +15,11 @@
         "mh07CP-004": {
             "genotype": [
                 {
-                    "allele": "A,A,T,T,C",
+                    "allele": "T,T,T,A,T",
                     "haplotype": 0
                 },
                 {
-                    "allele": "T,T,A,A,C",
+                    "allele": "A,A,T,A,T",
                     "haplotype": 1
                 }
             ]
@@ -27,11 +27,11 @@
         "mh09KK-157": {
             "genotype": [
                 {
-                    "allele": "G,C,C,C,T",
+                    "allele": "G,C,C,A,T",
                     "haplotype": 0
                 },
                 {
-                    "allele": "A,C,C,A,T",
+                    "allele": "G,C,C,A,C",
                     "haplotype": 1
                 }
             ]
@@ -43,5 +43,6 @@
         "PaternalHaploPop": "SA000101C"
     },
     "ploidy": 2,
-    "type": "SimulatedProfile"
+    "type": "SimulatedProfile",
+    "version": "0.4.1+20.g5818044.dirty"
 }

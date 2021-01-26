@@ -29,7 +29,6 @@ def test_meaning_of_life():
         'mh09KK-153', 'mh09KK-157',
     ]
     profile = microhapulator.sim.sim(['SA004250L', 'SA004250L'], panel, seed=42)
-    profile.dump('Hummdiddy.json')
     testprofile = SimulatedProfile(fromfile=data_file('meaning-of-life.json.gz'))
     assert profile == testprofile
 
@@ -68,22 +67,19 @@ def test_main():
         assert p == testp
 
 
-def test_main_haplo_seq():
-    tempdir = tempfile.mkdtemp()
-    try:
-        arglist = [
-            'sim', '--seed', '293847', '--out', tempdir + '/profile.json',
-            '--haplo-seq', tempdir + '/haplo.fasta', 'SA004047P', 'SA004047P',
-            'mh07CP-004', 'mh14CP-003'
-        ]
-        args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.sim.main(args)
-        p = SimulatedProfile(fromfile=tempdir + '/profile.json')
-        testp = SimulatedProfile(fromfile=data_file('orange-sim-profile.json'))
-        assert p == testp
-        assert filecmp.cmp(tempdir + '/haplo.fasta', data_file('orange-haplo.fasta'))
-    finally:
-        shutil.rmtree(tempdir)
+def test_main_haplo_seq(tmp_path):
+    profile = str(tmp_path / 'profile.json')
+    hapseq = str(tmp_path / 'haplo.fasta')
+    arglist = [
+        'sim', '--seed', '293847', '--out', profile, '--haplo-seq', hapseq,
+        'SA004047P', 'SA004047P', 'mh07CP-004', 'mh14CP-003'
+    ]
+    args = microhapulator.cli.get_parser().parse_args(arglist)
+    microhapulator.sim.main(args)
+    p = SimulatedProfile(fromfile=profile)
+    testp = SimulatedProfile(fromfile=data_file('orange-sim-profile.json'))
+    assert p == testp
+    assert filecmp.cmp(hapseq, data_file('orange-haplo.fasta'))
 
 
 def test_no_seed():

@@ -14,10 +14,6 @@ import pysam
 import re
 
 
-class MissingBAMIndexError(ValueError):
-    pass
-
-
 def parse_variant_offsets_from_fasta_headers(fasta):
     offsets = dict()
     for line in fasta:
@@ -40,8 +36,7 @@ def check_index(bamfile):
         if os.path.isfile(testfile):
             break
     else:
-        message = 'Please index "{bam:s}" with "samtools index"'.format(bam=bamfile)
-        raise MissingBAMIndexError(message)
+        pysam.index(bamfile)
 
 
 def observe_genotypes(bamfile, refrfasta):
