@@ -72,7 +72,6 @@ def test_diff_nonmatching_alleles():
     diff = list(microhapulator.diff.diff(p1, p2))
     print(diff)
     assert diff == [
-        ('mh01KK-117', {'A,G,C,C'}, {'A,A,C,T'}),
-        ('mh07CP-004', set(), {'T,T,A,A,C', 'A,A,T,T,C'}),
-        ('mh09KK-157', {'G,C,C,A,C'}, {'A,C,C,A,T', 'G,C,C,C,T'})
+        ('mh07CP-004', set(), {'T,T,T,A,T', 'A,A,T,A,T'}),
+        ('mh09KK-157', set(), {'G,C,C,A,T'}),
     ]

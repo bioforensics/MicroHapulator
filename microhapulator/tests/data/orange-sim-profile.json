@@ -3,7 +3,7 @@
         "mh07CP-004": {
             "genotype": [
                 {
-                    "allele": "A,A,T,T,C",
+                    "allele": "A,A,T,A,T",
                     "haplotype": 0
                 },
                 {
@@ -15,11 +15,11 @@
         "mh14CP-003": {
             "genotype": [
                 {
-                    "allele": "G,G,G",
+                    "allele": "A,G,G",
                     "haplotype": 0
                 },
                 {
-                    "allele": "G,G,G",
+                    "allele": "G,A,A",
                     "haplotype": 1
                 }
             ]
@@ -27,9 +27,10 @@
     },
     "metadata": {
         "HaploSeed": 293847,
-        "MaternalHaploPop": "SA004047P",
-        "PaternalHaploPop": "SA004047P"
+        "MaternalHaploPop": "ASW",
+        "PaternalHaploPop": "ASW"
     },
     "ploidy": 2,
-    "type": "SimulatedProfile"
+    "type": "SimulatedProfile",
+    "version": "0.4.1+20.g5818044.dirty"
 }

@@ -6,6 +6,7 @@ cache: pip
 python:
     - 3.6
     - 3.7
+    - 3.8
 install:
     - make devdeps
     - pip install git+https://github.com/bioforensics/happer.git

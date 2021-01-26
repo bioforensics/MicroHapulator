@@ -11,8 +11,8 @@ import json
 import microhapulator
 from microhapulator.profile import ObservedProfile
 from microhapulator.tests import data_file
-from microhapulator.type import MissingBAMIndexError
 import pytest
+from shutil import copyfile
 from tempfile import NamedTemporaryFile
 
 
@@ -25,11 +25,18 @@ def test_type_simple():
     assert gt == testgt
 
 
-def test_type_missing_bam_index():
+def test_type_missing_bam_index(tmp_path):
     bam = data_file('three-contrib-log-link.bam')
     fasta = data_file('default-panel.fasta.gz')
-    with pytest.raises(MissingBAMIndexError, match=r'Please index') as ie:
-        gt = microhapulator.type.type(bam, fasta)
+    tmp_bam = str(tmp_path / 'three-contrib-log-link.bam')
+    tmp_fasta = str(tmp_path / 'default-panel.fasta.gz')
+    copyfile(bam, tmp_bam)
+    copyfile(fasta, tmp_fasta)
+    gt = microhapulator.type.type(tmp_bam, tmp_fasta)
+    ac30 = gt.data['markers']['MHDBL000030']['allele_counts']
+    ac197 = gt.data['markers']['MHDBL000197']['allele_counts']
+    assert ac30 == {'A,A,T,C': 3, 'A,C,C,C': 2, 'A,C,C,G': 18, 'G,C,C,C': 1, 'G,C,C,G': 34}
+    assert ac197 == {'A,A,T,T,T': 30, 'A,A,T,T,C': 39, 'A,A,T,A,T': 1, 'A,A,T,A,C': 1}
 
 
 def test_type_cli_simple():
