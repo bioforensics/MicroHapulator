@@ -330,7 +330,11 @@ class ObservedProfile(Profile):
                 avgcount = sum(allelecounts.values()) / len(allelecounts.values())
             gt = set()
             for allele, count in allelecounts.items():
-                if eff_cov < 0.25:
+                if markerdata['mean_coverage'] < 50.0:
+                    # Low absolute coverage --> compute cutoff dynamically
+                    if count < avgcount:
+                        continue
+                elif eff_cov < 0.25:
                     # Low effective coverage --> use static cutoff
                     if count < threshold:
                         continue
