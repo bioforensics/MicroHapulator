@@ -46,12 +46,22 @@ def observe_genotypes(bamfile, refrfasta):
     check_index(bamfile)
     bam = pysam.AlignmentFile(bamfile, 'rb')
     for locusid in sorted(offsets):
+        print("DEBUG", locusid)
         discarded = 0
         genotypes = defaultdict(int)
         gt = defaultdict(dict)
-        varloc = set(offsets[locusid])
+        varloc = sorted(offsets[locusid])
         cov_pos = list()
+        seq_counts = defaultdict(int)
+        # for aligned_segment in bam.fetch(locusid, varloc[0], varloc[-1]):
+        #     sequence = (
+        #         "-" * aligned_segment.reference_start) +
+        #         aligned_segment.query_alignment_sequence +
+        #         ("-" * (varloc[-1] - aligned_segment.reference_end)
+        #     )
+        #     seq_counts[aligned_segment.query_alignment_sequence] += 1
         for column in bam.pileup(locusid):
+            print("DEBUG nope", column.pos)
             cov_pos.append(column.n)
             if column.pos not in varloc:
                 continue
@@ -61,6 +71,7 @@ def observe_genotypes(bamfile, refrfasta):
                     continue
                 aligned_base = record.alignment.query_sequence[record.query_position]
                 gt[record.alignment.query_name][column.pos] = aligned_base
+                print("DEBUG", record.alignment.query_name, column.pos, aligned_base)
         for readname, gtdict in gt.items():
             gtlist = [gtdict[pos] for pos in sorted(gtdict)]
             if len(gtlist) < len(varloc):
@@ -68,7 +79,7 @@ def observe_genotypes(bamfile, refrfasta):
                 continue
             gtstr = ','.join(gtlist)
             genotypes[gtstr] += 1
-        yield locusid, cov_pos, genotypes, discarded
+        yield locusid, cov_pos, genotypes, seq_counts, discarded
         totaldiscarded += discarded
     microhapulator.plog(
         '[MicroHapulator::type] discarded', totaldiscarded,
@@ -79,10 +90,12 @@ def observe_genotypes(bamfile, refrfasta):
 def type(bamfile, refrfasta, threshold=10):
     genotyper = observe_genotypes(bamfile, refrfasta)
     gt = microhapulator.profile.ObservedProfile()
-    for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
+    for locusid, cov_by_pos, gtcounts, seq_counts, ndiscarded in genotyper:
+        print('DEBUG', cov_by_pos, ndiscarded)
         gt.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for allele, count in gtcounts.items():
             gt.record_allele(locusid, allele, count)
+        gt.data["markers"][locusid]["sequence_counts"] = seq_counts
     gt.infer(threshold=threshold)
     return gt
 
