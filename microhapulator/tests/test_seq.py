@@ -46,7 +46,7 @@ def test_even_mixture():
             microhapdb.frequencies.Population.isin(popids)
         ].Marker.unique()
         markerids = microhapdb.markers[
-            microhapdb.markers.source != "10.1016/j.fsigen.2020.102275"
+            microhapdb.markers.Source != "10.1016/j.fsigen.2020.102275"
         ].Name.unique()
         panel = microhapdb.markers[microhapdb.markers.Name.isin(markerids)].Name.unique()
         panel = numpy.random.choice(panel, 5)
