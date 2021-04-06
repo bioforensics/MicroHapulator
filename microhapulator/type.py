@@ -39,7 +39,7 @@ def check_index(bamfile):
         pysam.index(bamfile)
 
 
-def observe_genotypes(bamfile, refrfasta):
+def tally_haplotypes(bamfile, refrfasta):
     totaldiscarded = 0
     with microhapulator.open(refrfasta, 'r') as fh:
         offsets = parse_variant_offsets_from_fasta_headers(fh)
@@ -47,8 +47,8 @@ def observe_genotypes(bamfile, refrfasta):
     bam = pysam.AlignmentFile(bamfile, 'rb')
     for locusid in sorted(offsets):
         discarded = 0
-        genotypes = defaultdict(int)
-        gt = defaultdict(dict)
+        haplotypes = defaultdict(int)
+        ht = defaultdict(dict)
         varloc = set(offsets[locusid])
         cov_pos = list()
         for column in bam.pileup(locusid):
@@ -60,15 +60,15 @@ def observe_genotypes(bamfile, refrfasta):
                 if record.is_del or record.is_refskip:
                     continue
                 aligned_base = record.alignment.query_sequence[record.query_position]
-                gt[record.alignment.query_name][column.pos] = aligned_base
-        for readname, gtdict in gt.items():
-            gtlist = [gtdict[pos] for pos in sorted(gtdict)]
-            if len(gtlist) < len(varloc):
+                ht[record.alignment.query_name][column.pos] = aligned_base
+        for readname, htdict in ht.items():
+            htlist = [htdict[pos] for pos in sorted(htdict)]
+            if len(htlist) < len(varloc):
                 discarded += 1
                 continue
-            gtstr = ','.join(gtlist)
-            genotypes[gtstr] += 1
-        yield locusid, cov_pos, genotypes, discarded
+            htstr = ','.join(htlist)
+            haplotypes[htstr] += 1
+        yield locusid, cov_pos, haplotypes, discarded
         totaldiscarded += discarded
     microhapulator.plog(
         '[MicroHapulator::type] discarded', totaldiscarded,
@@ -77,14 +77,14 @@ def observe_genotypes(bamfile, refrfasta):
 
 
 def type(bamfile, refrfasta, threshold=10):
-    genotyper = observe_genotypes(bamfile, refrfasta)
-    gt = microhapulator.profile.ObservedProfile()
-    for locusid, cov_by_pos, gtcounts, ndiscarded in genotyper:
-        gt.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
-        for allele, count in gtcounts.items():
-            gt.record_allele(locusid, allele, count)
-    gt.infer(threshold=threshold)
-    return gt
+    genotyper = tally_haplotypes(bamfile, refrfasta)
+    profile = microhapulator.profile.ObservedProfile()
+    for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
+        profile.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
+        for allele, count in htcounts.items():
+            profile.record_allele(locusid, allele, count)
+    profile.infer(threshold=threshold)
+    return profile
 
 
 def main(args):
