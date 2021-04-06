@@ -14,6 +14,7 @@ from microhapulator.profile import Profile
 from microhapulator.seq import calc_n_reads_from_proportions
 from microhapulator.tests import data_file
 import numpy.random
+import os
 import pytest
 from tempfile import NamedTemporaryFile
 
@@ -158,3 +159,48 @@ def test_main_mixture(capsys):
         'AAGTCCCCCTGGTGGCCACACAGAAGAAGAGGTGGTAAAACTTTCTGGGAGTGAGTTCAAAAATTTTAG'
         'GAGTCTAAAAACATACTTTTCTAAG'
     )
+
+
+def test_main_out_stdout(capsys):
+    arglist = ['seq', '--num-reads', '100', data_file('orange-sim-profile.json')]
+    args = microhapulator.cli.get_parser().parse_args(arglist)
+    microhapulator.seq.main(args)
+    terminal = capsys.readouterr()
+    outlines = terminal.out.strip().split('\n')
+    nrecords = len(outlines) / 4
+    assert nrecords == pytest.approx(100, abs=5)
+
+
+def test_main_out_one_filename(tmp_path):
+    outfile = str(tmp_path / 'reads-interleaved.fastq')
+    arglist = ['seq', '--out', outfile, '--num-reads', '100', data_file('orange-sim-profile.json')]
+    args = microhapulator.cli.get_parser().parse_args(arglist)
+    microhapulator.seq.main(args)
+    assert os.path.isfile(outfile)
+    with open(outfile, 'r') as fh:
+        outlines = fh.read().strip().split('\n')
+        nrecords = len(outlines) / 4
+        assert nrecords == pytest.approx(100, abs=5)
+
+
+def test_main_out_two_filenames(tmp_path):
+    f1 = str(tmp_path / 'reads-R1.fastq')
+    f2 = str(tmp_path / 'reads-R2.fastq')
+    arglist = ['seq', '--out', f1, f2, '--num-reads', '100', data_file('orange-sim-profile.json')]
+    args = microhapulator.cli.get_parser().parse_args(arglist)
+    microhapulator.seq.main(args)
+    assert os.path.isfile(f1)
+    assert os.path.isfile(f2)
+    for fn in (f1, f2):
+        with open(fn, 'r') as fh:
+            outlines = fh.read().strip().split('\n')
+            nrecords = len(outlines) / 4
+            assert nrecords == pytest.approx(50, abs=5)
+
+
+def test_main_out_three_filenames(capsys):
+    arglist = ['seq', '--out', 'ONE', 'TWO', 'THREE', '--', data_file('orange-sim-profile.json')]
+    with pytest.raises(SystemExit):
+        args = microhapulator.cli.get_parser().parse_args(arglist)
+    terminal = capsys.readouterr()
+    assert 'expected 1 or 2 output filenames, got 3' in terminal.err
