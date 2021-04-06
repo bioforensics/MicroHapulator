@@ -49,9 +49,10 @@ def test_even_mixture():
         p = microhapulator.sim.sim(pops, panel)
         profiles.append(p)
     sequencer = microhapulator.seq.seq(profiles, totalreads=500)
-    for n, read in enumerate(sequencer):
+    for n, read1, read2 in sequencer:
         pass
-    assert n == pytest.approx(500, abs=25)
+    numfragments = n * 2
+    assert numfragments == pytest.approx(500, abs=25)
 
 
 def test_complex_genotype(capsys):
