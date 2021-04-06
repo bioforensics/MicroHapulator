@@ -13,6 +13,7 @@ from os import fsync
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call
+import sys
 from tempfile import mkdtemp
 
 # Third-party library imports
@@ -138,3 +139,6 @@ def main(args):
     for n, read1, read2 in sequencer:
         print(read1.identifier, read1.sequence, '+\n', read1.quality, sep='', end='', file=fh1)
         print(read2.identifier, read2.sequence, '+\n', read2.quality, sep='', end='', file=fh2)
+    for fh in args.out:
+        if fh != sys.stdout:
+            fh.close()
