@@ -30,7 +30,7 @@ def test_contrib_json(pjson, numcontrib):
 def test_contrib_bam():
     bam = data_file('three-contrib-log.bam')
     refr = data_file('default-panel.fasta.gz')
-    profile = microhapulator.contrib.load_profile(bamfile=bam, refrfasta=refr)
+    profile = microhapulator.contrib.load_profile(bamfile=bam, refrfasta=refr, threshold=10)
     n, *data = microhapulator.contrib.contrib(profile)
     assert n == 3
 
@@ -38,7 +38,7 @@ def test_contrib_bam():
 def test_contrib_main(capsys):
     bam = data_file('three-contrib-log.bam')
     refr = data_file('default-panel.fasta.gz')
-    arglist = ['contrib', '-b', bam, '-r', refr]
+    arglist = ['contrib', '-b', bam, '-r', refr, '-t', '10']
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.contrib.main(args)
     out, err = capsys.readouterr()
