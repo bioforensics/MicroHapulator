@@ -25,6 +25,15 @@ def test_type_simple():
     assert gt == testgt
 
 
+def test_type_simpler():
+    bam = data_file('pashtun-sim/aligned-reads.bam')
+    fasta = data_file('pashtun-sim/tiny-panel.fasta.gz')
+    gt = microhapulator.type.type(bam, fasta)
+    testgtfile = data_file('pashtun-sim/test-output-sans-genotype.json')
+    testgt = ObservedProfile(fromfile=testgtfile)
+    assert gt == testgt
+
+
 def test_type_missing_bam_index(tmp_path):
     bam = data_file('three-contrib-log-link.bam')
     fasta = data_file('default-panel.fasta.gz')
