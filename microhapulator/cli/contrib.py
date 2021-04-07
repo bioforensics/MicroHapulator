@@ -27,3 +27,7 @@ def subparser(subparsers):
         '-b', '--bam', metavar='FILE', help='aligned and sorted reads in BAM '
         'format'
     )
+    cli.add_argument(
+        '-t', '--threshold', metavar='T', type=int, default=None,
+        help='threshold for inferring genotypes'
+    )
