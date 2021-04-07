@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Moved panel definition code moved out of the core code and into dedicated notebooks (#74).
 - Replaced `MissingBAMIndexError` with BAM auto-indexing code (#78).
 - Improved read names and choice of interleaved or paired output for `mhpl8r seq` (#80).
+- Disable application of filtering thresholds by default in `mhpl8r type` (#82).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (see #71).
