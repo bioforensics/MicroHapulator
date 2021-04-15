@@ -321,22 +321,25 @@ class ObservedProfile(Profile):
     def record_allele(self, marker, allele, count):
         self.data['markers'][marker]['allele_counts'][allele] = count
 
-    def infer(self, threshold=10):
-        for marker, markerdata in self.data['markers'].items():
-            allelecounts = markerdata['allele_counts']
-            eff_cov = 1.0 - (markerdata['num_discarded_reads'] / markerdata['max_coverage'])
-            avgcount = 0.0
-            if len(allelecounts.values()) > 0:
-                avgcount = sum(allelecounts.values()) / len(allelecounts.values())
+    def infer(self, ecthreshold=0.25, static=None, dynamic=None):
+        for marker, mdata in self.data['markers'].items():
+            if static is None and dynamic is None:
+                # No thresholds for calling haplotypes, just report raw haplotype counts
+                self.data['markers'][marker]['genotype'] = list()
+                continue
             gt = set()
-            for allele, count in allelecounts.items():
-                if eff_cov < 0.25:
-                    # Low effective coverage --> use static cutoff
-                    if count < threshold:
+            for allele, count in mdata['allele_counts'].items():
+                if dynamic is None or eff_cov < ecthreshold:
+                    # Use static cutoff (low effective coverage, or dynamic cutoff undefined)
+                    if count < static:
                         continue
                 else:
-                    # High effective coverage --> compute cutoff dynamically
-                    if count * 4 < avgcount:
+                    # Use dynamic cutoff (high effective coverage, or static cutoff undefined)
+                    eff_cov = 1.0 - (mdata['num_discarded_reads'] / mdata['max_coverage'])
+                    avgcount = 0.0
+                    if len(allelecounts.values()) > 0:
+                        avgcount = sum(allelecounts.values()) / len(allelecounts.values())
+                    if count < avgcount * dynamic:
                         continue
                 gt.add(allele)
             self.data['markers'][marker]['genotype'] = [

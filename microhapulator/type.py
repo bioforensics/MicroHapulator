@@ -76,20 +76,19 @@ def tally_haplotypes(bamfile, refrfasta):
     )
 
 
-def type(bamfile, refrfasta, threshold=None):
+def type(bamfile, refrfasta, ecthreshold=0.25, static=None, dynamic=None):
     genotyper = tally_haplotypes(bamfile, refrfasta)
     profile = microhapulator.profile.ObservedProfile()
     for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
         profile.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for allele, count in htcounts.items():
             profile.record_allele(locusid, allele, count)
-        if threshold is None:
-            profile.data['markers'][locusid]['genotype'] = list()
-    if threshold is not None:
-        profile.infer(threshold=threshold)
+    profile.infer(ecthreshold=ecthreshold, static=static, dynamic=dynamic)
     return profile
 
 
 def main(args):
-    profile = type(args.bam, args.refr, threshold=args.threshold)
+    profile = type(
+        args.bam, args.refr, ecthreshold=args.effcov, static=args.static, dynamic=args.dynamic
+    )
     profile.dump(args.out)

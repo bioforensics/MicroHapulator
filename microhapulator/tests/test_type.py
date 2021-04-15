@@ -19,7 +19,7 @@ from tempfile import NamedTemporaryFile
 def test_type_simple():
     bam = data_file('pashtun-sim/aligned-reads.bam')
     fasta = data_file('pashtun-sim/tiny-panel.fasta.gz')
-    gt = microhapulator.type.type(bam, fasta, threshold=10)
+    gt = microhapulator.type.type(bam, fasta, static=10)
     testgtfile = data_file('pashtun-sim/test-output.json')
     testgt = ObservedProfile(fromfile=testgtfile)
     assert gt == testgt
@@ -51,7 +51,7 @@ def test_type_missing_bam_index(tmp_path):
 def test_type_cli_simple():
     with NamedTemporaryFile() as outfile:
         arglist = [
-            'type', '--out', outfile.name, '--threshold', '5',
+            'type', '--out', outfile.name, '--static', '5',
             data_file('pashtun-sim/tiny-panel.fasta.gz'),
             data_file('pashtun-sim/aligned-reads.bam'),
         ]
@@ -67,11 +67,11 @@ def test_type_dyn_cutoff():
     bam = data_file('dyncut-test-reads.bam')
     fasta = data_file('dyncut-panel.fasta.gz')
 
-    gt = microhapulator.type.type(bam, fasta, threshold=10)
+    gt = microhapulator.type.type(bam, fasta, static=10)
     assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G'])
     assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
 
-    gt = microhapulator.type.type(bam, fasta, threshold=4)
+    gt = microhapulator.type.type(bam, fasta, static=4)
     assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G', 'C,A,C,T,A', 'T,G,C,T,A'])
     assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
 
