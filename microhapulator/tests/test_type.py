@@ -19,7 +19,7 @@ from tempfile import NamedTemporaryFile
 def test_type_simple():
     bam = data_file('pashtun-sim/aligned-reads.bam')
     fasta = data_file('pashtun-sim/tiny-panel.fasta.gz')
-    gt = microhapulator.type.type(bam, fasta, static=10)
+    gt = microhapulator.type.type(bam, fasta, static=10, dynamic=0.25)
     testgtfile = data_file('pashtun-sim/test-output.json')
     testgt = ObservedProfile(fromfile=testgtfile)
     assert gt == testgt
@@ -41,7 +41,7 @@ def test_type_missing_bam_index(tmp_path):
     tmp_fasta = str(tmp_path / 'default-panel.fasta.gz')
     copyfile(bam, tmp_bam)
     copyfile(fasta, tmp_fasta)
-    gt = microhapulator.type.type(tmp_bam, tmp_fasta)
+    gt = microhapulator.type.type(tmp_bam, tmp_fasta, minbasequal=13)
     ac30 = gt.data['markers']['MHDBL000030']['allele_counts']
     ac197 = gt.data['markers']['MHDBL000197']['allele_counts']
     assert ac30 == {'A,A,T,C': 3, 'A,C,C,C': 2, 'A,C,C,G': 18, 'G,C,C,C': 1, 'G,C,C,G': 34}
@@ -51,7 +51,7 @@ def test_type_missing_bam_index(tmp_path):
 def test_type_cli_simple():
     with NamedTemporaryFile() as outfile:
         arglist = [
-            'type', '--out', outfile.name, '--static', '5',
+            'type', '--out', outfile.name, '--static', '5', '--dynamic', '0.25',
             data_file('pashtun-sim/tiny-panel.fasta.gz'),
             data_file('pashtun-sim/aligned-reads.bam'),
         ]
@@ -67,11 +67,11 @@ def test_type_dyn_cutoff():
     bam = data_file('dyncut-test-reads.bam')
     fasta = data_file('dyncut-panel.fasta.gz')
 
-    gt = microhapulator.type.type(bam, fasta, static=10)
+    gt = microhapulator.type.type(bam, fasta, static=10, dynamic=0.25)
     assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G'])
     assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
 
-    gt = microhapulator.type.type(bam, fasta, static=4)
+    gt = microhapulator.type.type(bam, fasta, static=4, dynamic=0.25)
     assert gt.alleles('MHDBL000018') == set(['C,A,C,T,G', 'T,G,C,T,G', 'C,A,C,T,A', 'T,G,C,T,A'])
     assert gt.alleles('MHDBL000156') == set(['T,C,A,C', 'T,C,G,G'])
 

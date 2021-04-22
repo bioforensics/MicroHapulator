@@ -28,6 +28,10 @@ def subparser(subparsers):
         'format'
     )
     cli.add_argument(
-        '-t', '--threshold', metavar='T', type=int, default=None,
-        help='threshold for inferring genotypes'
+        '-s', '--static', metavar='ST', type=int, default=None,
+        help='apply a static threshold for calling genotypes; see `mhpl8r type --help`'
+    )
+    cli.add_argument(
+        '-d', '--dynamic', metavar='DT', type=float, default=None,
+        help='apply a dynamic threshold for calling genotypes; see `mhpl8r type --help`'
     )
