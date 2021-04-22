@@ -328,17 +328,18 @@ class ObservedProfile(Profile):
                 self.data['markers'][marker]['genotype'] = list()
                 continue
             gt = set()
-            for allele, count in mdata['allele_counts'].items():
-                if dynamic is None or eff_cov < ecthreshold:
+            allelecounts = mdata['allele_counts']
+            for allele, count in allelecounts.items():
+                eff_cov = 1.0 - (mdata['num_discarded_reads'] / mdata['max_coverage'])
+                if dynamic is None or (static is not None and eff_cov < ecthreshold):
                     # Use static cutoff (low effective coverage, or dynamic cutoff undefined)
                     if count < static:
                         continue
                 else:
                     # Use dynamic cutoff (high effective coverage, or static cutoff undefined)
-                    eff_cov = 1.0 - (mdata['num_discarded_reads'] / mdata['max_coverage'])
-                    avgcount = 0.0
-                    if len(allelecounts.values()) > 0:
-                        avgcount = sum(allelecounts.values()) / len(allelecounts.values())
+                    if len(allelecounts.values()) == 0:
+                        continue
+                    avgcount = sum(allelecounts.values()) / len(allelecounts.values())
                     if count < avgcount * dynamic:
                         continue
                 gt.add(allele)

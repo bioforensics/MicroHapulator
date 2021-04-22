@@ -17,6 +17,11 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
+        '-b', '--base-qual', metavar='B', type=int, default=10,
+        help='minimum base quality required for haplotype calling; by default B=10, '
+        'corresponding to Q10, i.e., 90%% probability that base call is correct'
+    )
+    cli.add_argument(
         '-e', '--effcov', metavar='EC', type=float, default=0.25,
         help='only reads that span all SNPs in a microhaplotype are retained, all others are '
         'discarded; if most of the reads related to a marker are discarded, it has low *effective '
