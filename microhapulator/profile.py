@@ -311,12 +311,17 @@ class ObservedProfile(Profile):
 
     def record_coverage(self, marker, cov_by_pos, ndiscarded=0):
         self.data['markers'][marker] = {
-            'mean_coverage': round(sum(cov_by_pos) / len(cov_by_pos), 1),
-            'min_coverage': min(cov_by_pos),
-            'max_coverage': max(cov_by_pos),
+            'mean_coverage': 0.0,
+            'min_coverage': 0,
+            'max_coverage': 0,
             'num_discarded_reads': ndiscarded,
             'allele_counts': dict(),
         }
+        if len(cov_by_pos) > 0:
+            avgcov = sum(cov_by_pos) / len(cov_by_pos)
+            self.data['markers'][marker]['mean_coverage'] = round(avgcov, 1)
+            self.data['markers'][marker]['min_coverage'] = min(cov_by_pos)
+            self.data['markers'][marker]['max_coverage'] = max(cov_by_pos)
 
     def record_allele(self, marker, allele, count):
         self.data['markers'][marker]['allele_counts'][allele] = count
