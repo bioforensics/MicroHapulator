@@ -318,8 +318,8 @@ class ObservedProfile(Profile):
             'allele_counts': dict(),
         }
         if len(cov_by_pos) > 0:
-            avgcov = sum(cov_by_pos) / len(cov_by_pos), 1
-            self.data['markers'][marker]['mean_coverage'] = round(avgcov)
+            avgcov = sum(cov_by_pos) / len(cov_by_pos)
+            self.data['markers'][marker]['mean_coverage'] = round(avgcov, 1)
             self.data['markers'][marker]['min_coverage'] = min(cov_by_pos)
             self.data['markers'][marker]['max_coverage'] = max(cov_by_pos)
 
