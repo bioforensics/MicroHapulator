@@ -19,6 +19,7 @@ import sys
 from microhapulator import profile
 
 # Subcommands and command-line interface
+from microhapulator import balance
 from microhapulator import contain
 from microhapulator import contrib
 from microhapulator import dist

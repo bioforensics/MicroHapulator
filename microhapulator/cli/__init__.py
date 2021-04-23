@@ -11,6 +11,7 @@
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import microhapulator
 import sys
+from . import balance
 from . import contain
 from . import contrib
 from . import diff
@@ -23,6 +24,7 @@ from . import type
 from . import unite
 
 mains = {
+    'balance': microhapulator.balance.main,
     'contain': microhapulator.contain.main,
     'contrib': microhapulator.contrib.main,
     'diff': microhapulator.diff.main,
@@ -36,6 +38,7 @@ mains = {
 }
 
 subparser_funcs = {
+    'balance': balance.subparser,
     'contain': contain.subparser,
     'contrib': contrib.subparser,
     'diff': diff.subparser,
