@@ -35,8 +35,11 @@ def balance(profile, include_discarded=True):
         tfile = os.path.join(tempdir, "data.tsv")
         data.to_csv(tfile, index=False, header=False)
         subprocess.run(['termgraph', tfile])
+    return data
 
 
 def main(args):
     profile = microhapulator.profile.ObservedProfile(fromfile=args.input)
-    balance(profile, include_discarded=args.discarded)
+    data = balance(profile, include_discarded=args.discarded)
+    if args.csv:
+        data.to_csv(args.csv, index=False)

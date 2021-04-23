@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - New `--base-qual` parameter for `mhpl8r type` to set the minimum required base quality when iterating over reads in a pileup (#83).
+- New `mhpl8r balance` module for calculating and visualizing interlocus balance (#85).
 
 ### Changed
 - Updated mybinder demo (see #69).
