@@ -108,29 +108,29 @@ class Profile(object):
         prob = 1.0
         for marker in sorted(self.markers()):
             alleles = self.alleles(marker)
-            alleles = [*alleles] * 2 if len(alleles) == 1 else alleles
-            for allele in sorted(alleles):
-                result = microhapdb.frequencies[
-                    (microhapdb.frequencies.Population == popid) &
-                    (microhapdb.frequencies.Marker == marker) &
-                    (microhapdb.frequencies.Allele == allele)
-                ]
-                frequency = None
-                if len(result) > 0:
-                    assert len(result) == 1
-                    frequency = list(result.Frequency)[0]
-                if frequency is None or frequency == 0.0:
-                    if frequency is None:
-                        message = 'No population allele frequency data for '
-                    else:
-                        message = 'Frequency=0.0 for '
-                    message += 'allele "{:s}" at marker "{:s}" '.format(allele, marker)
-                    message += 'for population "{:s}"; '.format(popid)
-                    message += 'using RMP=0.001 for this allele'
-                    microhapulator.plog('[MicroHapulator::profile] WARNING:', message)
-                    prob *= 0.001
-                else:
-                    prob *= frequency
+            diploid_consistent = 1 <= len(alleles) <= 2
+            if not diploid_consistent:
+                message = 'cannot compute random match prob. for marker with {:d} alleles'.format(
+                    len(alleles)
+                )
+                raise RandomMatchError(message)
+            result = microhapdb.frequencies[
+                (microhapdb.frequencies.Population == popid) &
+                (microhapdb.frequencies.Marker == marker) &
+                (microhapdb.frequencies.Allele.isin(alleles))
+            ]
+            if len(alleles) == 1:
+                p = 0.001
+                if len(result) == 1:
+                    p = list(result.Frequency)[0]
+                prob *= p * p
+            else:
+                p, q = 0.001, 0.001
+                if len(result) == 2:
+                    p, q = list(result.Frequency)
+                elif len(result) == 1:
+                    p = list(result.Frequency)[0]
+                prob *= 2 * p * q
         return prob
 
     def rmp_lr_test(self, other, popid, erate=0.001):
