@@ -39,7 +39,7 @@ def check_index(bamfile):
         pysam.index(bamfile)
 
 
-def tally_haplotypes(bamfile, refrfasta, minbasequal=10):
+def tally_haplotypes(bamfile, refrfasta, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
     with microhapulator.open(refrfasta, 'r') as fh:
         offsets = parse_variant_offsets_from_fasta_headers(fh)
@@ -51,7 +51,7 @@ def tally_haplotypes(bamfile, refrfasta, minbasequal=10):
         ht = defaultdict(dict)
         varloc = set(offsets[locusid])
         cov_pos = list()
-        for column in bam.pileup(locusid, min_base_quality=minbasequal):
+        for column in bam.pileup(locusid, min_base_quality=minbasequal, max_depth=max_depth):
             cov_pos.append(column.n)
             if column.pos not in varloc:
                 continue
@@ -76,8 +76,9 @@ def tally_haplotypes(bamfile, refrfasta, minbasequal=10):
     )
 
 
-def type(bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None):
-    genotyper = tally_haplotypes(bamfile, refrfasta, minbasequal=minbasequal)
+def type(bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None,
+         max_depth=1e6):
+    genotyper = tally_haplotypes(bamfile, refrfasta, minbasequal=minbasequal, max_depth=max_depth)
     profile = microhapulator.profile.ObservedProfile()
     for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
         profile.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
@@ -90,6 +91,6 @@ def type(bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dyna
 def main(args):
     profile = type(
         args.bam, args.refr, minbasequal=args.base_qual, ecthreshold=args.effcov,
-        static=args.static, dynamic=args.dynamic
+        static=args.static, dynamic=args.dynamic, max_depth=args.max_depth
     )
     profile.dump(args.out)

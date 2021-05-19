@@ -15,11 +15,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Replaced `MissingBAMIndexError` with BAM auto-indexing code (#78).
 - Improved read names and choice of interleaved or paired output for `mhpl8r seq` (#80).
 - Replaced `--threshold` with `--static` and `--dynamic` in in `mhpl8r type`, disabled both by default (#82, #83).
+- Changed the default pysam pileup `max_depth` parameter, overriding 8000 with 1e6 and exposing as a hidden CLI parameter (#87).
 
 ### Fixed
-- Corrected a bug with Fastq headers in `mhpl8r seq` module (see #71).
-- Corrected a bug resulting from attempting to do set operations on `None` (see #75).
-- Corrected a bug with RMP implementation (see #86).
+- Corrected a bug with Fastq headers in `mhpl8r seq` module (#71).
+- Corrected a bug resulting from attempting to do set operations on `None` (#75).
+- Corrected a bug with RMP implementation (#86).
 
 ## [0.4] 2019-11-05
 
