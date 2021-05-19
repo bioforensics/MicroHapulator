@@ -311,32 +311,41 @@ class ObservedProfile(Profile):
 
     def record_coverage(self, marker, cov_by_pos, ndiscarded=0):
         self.data['markers'][marker] = {
-            'mean_coverage': round(sum(cov_by_pos) / len(cov_by_pos), 1),
-            'min_coverage': min(cov_by_pos),
-            'max_coverage': max(cov_by_pos),
+            'mean_coverage': 0.0,
+            'min_coverage': 0,
+            'max_coverage': 0,
             'num_discarded_reads': ndiscarded,
             'allele_counts': dict(),
         }
+        if len(cov_by_pos) > 0:
+            avgcov = sum(cov_by_pos) / len(cov_by_pos)
+            self.data['markers'][marker]['mean_coverage'] = round(avgcov, 1)
+            self.data['markers'][marker]['min_coverage'] = min(cov_by_pos)
+            self.data['markers'][marker]['max_coverage'] = max(cov_by_pos)
 
     def record_allele(self, marker, allele, count):
         self.data['markers'][marker]['allele_counts'][allele] = count
 
-    def infer(self, threshold=10):
-        for marker, markerdata in self.data['markers'].items():
-            allelecounts = markerdata['allele_counts']
-            eff_cov = 1.0 - (markerdata['num_discarded_reads'] / markerdata['max_coverage'])
-            avgcount = 0.0
-            if len(allelecounts.values()) > 0:
-                avgcount = sum(allelecounts.values()) / len(allelecounts.values())
+    def infer(self, ecthreshold=0.25, static=None, dynamic=None):
+        for marker, mdata in self.data['markers'].items():
+            if static is None and dynamic is None:
+                # No thresholds for calling haplotypes, just report raw haplotype counts
+                self.data['markers'][marker]['genotype'] = list()
+                continue
             gt = set()
+            allelecounts = mdata['allele_counts']
             for allele, count in allelecounts.items():
-                if eff_cov < 0.25:
-                    # Low effective coverage --> use static cutoff
-                    if count < threshold:
+                eff_cov = 1.0 - (mdata['num_discarded_reads'] / mdata['max_coverage'])
+                if dynamic is None or (static is not None and eff_cov < ecthreshold):
+                    # Use static cutoff (low effective coverage, or dynamic cutoff undefined)
+                    if count < static:
                         continue
                 else:
-                    # High effective coverage --> compute cutoff dynamically
-                    if count * 4 < avgcount:
+                    # Use dynamic cutoff (high effective coverage, or static cutoff undefined)
+                    if len(allelecounts.values()) == 0:
+                        continue
+                    avgcount = sum(allelecounts.values()) / len(allelecounts.values())
+                    if count < avgcount * dynamic:
                         continue
                 gt.add(allele)
             self.data['markers'][marker]['genotype'] = [

@@ -14,14 +14,14 @@ from microhapulator.profile import Profile
 import sys
 
 
-def load_profile(bamfile=None, refrfasta=None, json=None, threshold=None):
+def load_profile(bamfile=None, refrfasta=None, json=None, **kwargs):
     if not json and (not bamfile or not refrfasta):
         message = 'must provide either JSON profile or BAM and refr FASTA'
         raise ValueError(message)
     if json:
         profile = microhapulator.profile.Profile(fromfile=json)
     else:
-        profile = microhapulator.type.type(bamfile, refrfasta, threshold=threshold)
+        profile = microhapulator.type.type(bamfile, refrfasta, **kwargs)
     return profile
 
 
@@ -36,7 +36,8 @@ def contrib(profile):
 
 def main(args):
     profile = load_profile(
-        bamfile=args.bam, refrfasta=args.refr, json=args.json, threshold=args.threshold
+        bamfile=args.bam, refrfasta=args.refr, json=args.json, static=args.static,
+        dynamic=args.dynamic
     )
     ncontrib, nloci, ploci = contrib(profile)
     data = {

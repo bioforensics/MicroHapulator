@@ -17,14 +17,34 @@ def subparser(subparsers):
         'default, output is written to the terminal (standard output)'
     )
     cli.add_argument(
-        '-t', '--threshold', metavar='T', type=int, default=8,
-        help='coverage threshold below which alleles will be ignored at loci with low effective '
-        'coverage (discarded reads are > 75%% of total reads); by default T=10; this is used to '
-        'distinguish true alleles from sequencing error induced alleles; the threshold is '
-        'computed automatically at loci with high effective coverage'
+        '-b', '--base-qual', metavar='B', type=int, default=10,
+        help='minimum base quality required for haplotype calling; by default B=10, '
+        'corresponding to Q10, i.e., 90%% probability that base call is correct'
     )
     cli.add_argument(
-        'refr', help='microhap locus sequences in Fasta format'
+        '-e', '--effcov', metavar='EC', type=float, default=0.25,
+        help='only reads that span all SNPs in a microhaplotype are retained, all others are '
+        'discarded; if most of the reads related to a marker are discarded, it has low *effective '
+        'coverage*; this parameter sets that threshold, i.e., if the fraction of retained reads '
+        'is < EC it is considered low effective coverage; by default EC=0.25 (or 25%%)'
+    )
+    cli.add_argument(
+        '-s', '--static', metavar='ST', type=int, default=None,
+        help='apply a static threshold for calling genotypes, i.e., discard any haplotype whose '
+        'count is less than ST; by default, ST is undefined, the static filter is not applied, '
+        'and only raw haplotype counts are reported, not genotype calls; if --dynamic is also '
+        'defined, --static is only applied to markers with low effective coverage'
+    )
+    cli.add_argument(
+        '-d', '--dynamic', metavar='DT', type=float, default=None,
+        help='apply a dynamic threshold for calling genotypes, i.e., if AC is the average count '
+        'of all haplotypes observed at the marker, discard any haplotypes whose count is less '
+        'than DT * AC; by default, DT is undefined, the dynamic filter is not applied, and only '
+        'raw haplotype counts are reported, not genotype calls; if --static is also defined, '
+        '--dynamic is only applied to markers with high effective coverage'
+    )
+    cli.add_argument(
+        'refr', help='microhap marker sequences in Fasta format'
     )
     cli.add_argument(
         'bam', help='aligned and sorted reads in BAM format'

@@ -30,7 +30,7 @@ setup(
         ]
     },
     include_package_data=True,
-    install_requires=['insilicoseq', 'numpy', 'microhapdb', 'happer', 'jsonschema'],
+    install_requires=['insilicoseq', 'numpy', 'microhapdb', 'happer', 'jsonschema', 'termgraph'],
     entry_points={
         'console_scripts': ['mhpl8r = microhapulator.__main__:main']
     },
