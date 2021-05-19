@@ -15,25 +15,25 @@ import pytest
 
 def test_rmp():
     p = Profile(fromfile=data_file('korea-5loc.json'))
-    assert p.rand_match_prob('SA000936S') == pytest.approx(9.30529727667e-10)
+    assert p.rand_match_prob('SA000936S') == pytest.approx(7.444E-09)
 
 
 def test_rmp_lrt():
     p1 = Profile(fromfile=data_file('korea-5loc.json'))
     p2 = Profile(fromfile=data_file('korea-5loc-1diff.json'))
-    assert p1.rmp_lr_test(p1, 'SA000936S') == pytest.approx(1074656693.1355)
-    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(1074656.6931355)
+    assert p1.rmp_lr_test(p1, 'SA000936S') == pytest.approx(134332086.64194357)
+    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(134332.08664194357)
 
 
 @pytest.mark.parametrize('altfile,lrvalue', [
-    ('korea-5loc-2diff-a.json', 1943.0058),
-    ('korea-5loc-2diff-b.json', 9624.2067),
-    ('korea-5loc-2diff-c.json', 34191.2606),
+    ('korea-5loc-2diff-a.json', 121.4379),
+    ('korea-5loc-2diff-b.json', 1203.0258),
+    ('korea-5loc-2diff-c.json', 2136.9538),
 ])
 def test_rmp_lrt_2diff(altfile, lrvalue):
     p1 = Profile(fromfile=data_file('korea-5loc.json'))
     p2 = Profile(fromfile=data_file(altfile))
-    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(1074.6567)
+    assert p1.rmp_lr_test(p2, 'SA000936S') == pytest.approx(134.3321)
     assert p2.rmp_lr_test(p1, 'SA000936S') == pytest.approx(lrvalue)
 
 
@@ -44,7 +44,8 @@ def test_prob_cli_rmp(capsys):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
     terminal = capsys.readouterr()
-    assert '"random_match_probability": "9.305E-10"' in terminal.out
+    print(terminal.out)
+    assert '"random_match_probability": "7.444E-09"' in terminal.out
 
 
 def test_prob_cli_lrt(capsys):
@@ -54,17 +55,18 @@ def test_prob_cli_lrt(capsys):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.prob.main(args)
     terminal = capsys.readouterr()
-    assert '"likelihood_ratio": "1.075E+06"' in terminal.out
+    print(terminal.out)
+    assert '"likelihood_ratio": "1.343E+05"' in terminal.out
 
 
 def test_prob_zero_freq():
     p = Profile(fromfile=data_file('korea-5loc-zerofreq.json'))
-    assert p.rand_match_prob('SA000936S') == pytest.approx(2.963E-12)
+    assert p.rand_match_prob('SA000936S') == pytest.approx(2.3708e-11)
 
 
 def test_prob_missing_freq():
     p = Profile(fromfile=data_file('korea-5loc-missfreq.json'))
-    assert p.rand_match_prob('SA000936S') == pytest.approx(4.898E-11)
+    assert p.rand_match_prob('SA000936S') == pytest.approx(7.8360e-10)
 
 
 def test_bad_pop():

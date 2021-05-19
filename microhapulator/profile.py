@@ -122,14 +122,20 @@ class Profile(object):
             if len(alleles) == 1:
                 p = 0.001
                 if len(result) == 1:
-                    p = list(result.Frequency)[0]
+                    pp = list(result.Frequency)[0]
+                    if pp > 0.0:
+                        p = pp
                 prob *= p * p
             else:
                 p, q = 0.001, 0.001
                 if len(result) == 2:
-                    p, q = list(result.Frequency)
+                    pp, qp = list(result.Frequency)
                 elif len(result) == 1:
-                    p = list(result.Frequency)[0]
+                    pp = list(result.Frequency)[0]
+                if pp > 0.0:
+                    p = pp
+                if len(result) == 2 and qp > 0.0:
+                    q = qp
                 prob *= 2 * p * q
         return prob
 
