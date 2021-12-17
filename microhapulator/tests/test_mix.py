@@ -15,13 +15,17 @@ from tempfile import NamedTemporaryFile
 
 
 def test_mix_main():
-    with NamedTemporaryFile(suffix='.json.gz') as outfile:
+    with NamedTemporaryFile(suffix=".json.gz") as outfile:
         arglist = [
-            'mix', '--out', outfile.name, data_file('green-sim-gt-1.json.gz'),
-            data_file('green-sim-gt-2.json.gz'), data_file('green-sim-gt-3.json.gz')
+            "mix",
+            "--out",
+            outfile.name,
+            data_file("green-sim-gt-1.json.gz"),
+            data_file("green-sim-gt-2.json.gz"),
+            data_file("green-sim-gt-3.json.gz"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.mix.main(args)
         p = SimulatedProfile(fromfile=outfile.name)
-        testp = SimulatedProfile(fromfile=data_file('green-sim-gt-combined.json.gz'))
+        testp = SimulatedProfile(fromfile=data_file("green-sim-gt-combined.json.gz"))
         assert p == testp

@@ -13,7 +13,7 @@ from microhapulator.profile import Profile
 
 
 def contain(p1, p2):
-    '''Compute the proportion of alleles from p2 present in p1.'''
+    """Compute the proportion of alleles from p2 present in p1."""
     total = 0
     contained = 0
     for marker in p2.markers():
@@ -25,14 +25,11 @@ def contain(p1, p2):
 
 
 def main(args):
-    contained, total = contain(
-        Profile(fromfile=args.profile1),
-        Profile(fromfile=args.profile2)
-    )
+    contained, total = contain(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
     data = {
-        'containment': round(contained / total, 4),
-        'contained_alleles': contained,
-        'total_alleles': total
+        "containment": round(contained / total, 4),
+        "contained_alleles": contained,
+        "total_alleles": total,
     }
-    with microhapulator.open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, "w") as fh:
         json.dump(data, fh, indent=4)

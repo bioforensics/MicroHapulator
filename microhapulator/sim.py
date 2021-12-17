@@ -20,7 +20,7 @@ def resolve_panel(panellist):
     panel = list()
     for value in panellist:
         if os.path.isfile(value):
-            with open(value, 'r') as fh:
+            with open(value, "r") as fh:
                 for line in fh:
                     panel.append(line.strip())
         else:
@@ -29,7 +29,7 @@ def resolve_panel(panellist):
 
 
 def sim(popids, panel, seed=None, relaxed=False):
-    '''Simulate a diploid genotype profile for the specified panel.
+    """Simulate a diploid genotype profile for the specified panel.
 
     For each locus in the panel simulate a diploid microhap profile. For each
     haplotype, alleles are selected according to population allele frequencies
@@ -37,39 +37,39 @@ def sim(popids, panel, seed=None, relaxed=False):
     population allele frequency data for a particular locus it is excluded
     (except in `relaxed` mode, in which case an allele is sampled from a
     uniform distribution).
-    '''
+    """
     haplopops = validate_populations(popids)
     markers = validate_markers(panel)
     if not relaxed:
         markers = exclude_markers_missing_freq_data(markers, haplopops)
     if len(markers) == 0:
-        raise ValueError('invalid panel: {}'.format(panel))
+        raise ValueError("invalid panel: {}".format(panel))
     profile = SimulatedProfile(ploidy=2)
     if seed is None:
-        seed = numpy.random.randint(2**32-1)
+        seed = numpy.random.randint(2 ** 32 - 1)
     numpy.random.seed(seed)
     for haplotype, locus, allele in sample_panel(haplopops, markers):
         profile.add(haplotype, locus, allele)
-    profile.data['metadata'] = {
-        'MaternalHaploPop': haplopops[0],
-        'PaternalHaploPop': haplopops[1],
-        'HaploSeed': seed,
+    profile.data["metadata"] = {
+        "MaternalHaploPop": haplopops[0],
+        "PaternalHaploPop": haplopops[1],
+        "HaploSeed": seed,
     }
-    message = 'simulated microhaplotype variation at {loc:d} markers'.format(loc=len(markers))
-    microhapulator.plog('[MicroHapulator::sim]', message)
+    message = "simulated microhaplotype variation at {loc:d} markers".format(loc=len(markers))
+    microhapulator.plog("[MicroHapulator::sim]", message)
     return profile
 
 
 def main(args):
     panel = resolve_panel(args.panel)
     profile = sim(args.popid, panel, seed=args.seed, relaxed=args.relaxed)
-    with microhapulator.open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, "w") as fh:
         profile.dump(fh)
-        message = 'profile JSON written to {:s}'.format(fh.name)
-        microhapulator.plog('[MicroHapulator::sim]', message)
+        message = "profile JSON written to {:s}".format(fh.name)
+        microhapulator.plog("[MicroHapulator::sim]", message)
     if args.haplo_seq:
-        with microhapulator.open(args.haplo_seq, 'w') as fh:
+        with microhapulator.open(args.haplo_seq, "w") as fh:
             for defline, sequence in profile.haploseqs:
-                print('>', defline, '\n', sequence, sep='', file=fh)
-            message = 'haplotype sequences written to {:s}'.format(fh.name)
-            microhapulator.plog('[MicroHapulator::sim]', message)
+                print(">", defline, "\n", sequence, sep="", file=fh)
+            message = "haplotype sequences written to {:s}".format(fh.name)
+            microhapulator.plog("[MicroHapulator::sim]", message)

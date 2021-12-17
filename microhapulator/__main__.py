@@ -20,10 +20,10 @@ def main(arglist=None):  # pragma: no cover
     """
     args = microhapulator.cli.parse_args(arglist)
     if args.subcmd is None:
-        microhapulator.cli.get_parser().parse_args(['-h'])
+        microhapulator.cli.get_parser().parse_args(["-h"])
 
     assert args.subcmd in microhapulator.cli.mains
     mainmethod = microhapulator.cli.mains[args.subcmd]
-    versionmessage = '[MicroHapulator] running version {}'.format(microhapulator.__version__)
+    versionmessage = "[MicroHapulator] running version {}".format(microhapulator.__version__)
     microhapulator.plog(versionmessage)
     mainmethod(args)

@@ -16,7 +16,7 @@ import sys
 
 def load_profile(bamfile=None, refrfasta=None, json=None, **kwargs):
     if not json and (not bamfile or not refrfasta):
-        message = 'must provide either JSON profile or BAM and refr FASTA'
+        message = "must provide either JSON profile or BAM and refr FASTA"
         raise ValueError(message)
     if json:
         profile = microhapulator.profile.Profile(fromfile=json)
@@ -36,14 +36,17 @@ def contrib(profile):
 
 def main(args):
     profile = load_profile(
-        bamfile=args.bam, refrfasta=args.refr, json=args.json, static=args.static,
-        dynamic=args.dynamic
+        bamfile=args.bam,
+        refrfasta=args.refr,
+        json=args.json,
+        static=args.static,
+        dynamic=args.dynamic,
     )
     ncontrib, nloci, ploci = contrib(profile)
     data = {
-        'min_num_contrib': ncontrib,
-        'num_loci_max_alleles': nloci,
-        'perc_loci_max_alleles': ploci,
+        "min_num_contrib": ncontrib,
+        "num_loci_max_alleles": nloci,
+        "perc_loci_max_alleles": ploci,
     }
-    with microhapulator.open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, "w") as fh:
         json.dump(data, fh, indent=4)
