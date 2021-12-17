@@ -183,45 +183,36 @@ class Profile(object):
     def __str__(self):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
-    @property
-    def bedstream(self):
-        hapids = self.haplotypes()
+    def bedstream(self, markers):
         for marker in sorted(self.markers()):
-            result = microhapdb.markers[microhapdb.markers.Name == marker]
+            result = markers[markers.Marker == marker]
             if len(result) == 0:
-                raise ValueError('unknown marker identifier "{:s}"'.format(marker))
-            markerdata = result.iloc[0]
-            context = TargetAmplicon(markerdata, delta=30, minlen=350)
-            coords = list(map(int, markerdata.Offsets.split(",")))
-            coords = list(map(context.global_to_local, coords))
-            variants = [list() for _ in range(len(coords))]
-            for haplotype in sorted(hapids):
+                raise ValueError(f"unknown marker identifier '{marker}'")
+            offsets = sorted(result.Offset)
+            variants = [list() for _ in range(len(offsets))]
+            for haplotype in sorted(self.haplotypes()):
                 allele = self.alleles(marker, haplotype=haplotype).pop()
                 for var, varlist in zip(allele.split(","), variants):
                     varlist.append(var)
-            for coord, var in zip(coords, variants):
-                allelestr = "|".join(var)
-                yield "\t".join((marker, str(coord), str(coord + 1), allelestr))
+            for offset, var in zip(offsets, variants):
+                haplostr = "|".join(var)
+                yield "\t".join((marker, str(offset), str(offset + 1), haplostr))
 
-    @property
-    def seqstream(self):
+    def seqstream(self, refrseqs):
         for marker in sorted(self.markers()):
-            canonid = microhapdb.markers[microhapdb.markers.Name == marker].iloc[0]
-            amp = TargetAmplicon(canonid, delta=30, minlen=350)
-            yield amp.defline, amp.amplicon_seq
+            yield marker, refrseqs[marker]
 
-    @property
-    def bedstr(self):
+    def bedstr(self, markers):
         out = StringIO()
-        for line in self.bedstream:
+        for line in self.bedstream(markers):
             print(line, file=out)
         return out.getvalue()
 
-    @property
-    def haploseqs(self):
+    def haploseqs(self, markers, refrseqs):
         """Apply genotype to reference and construct full haplotype sequences."""
-        mutator = mutate(self.seqstream, self.bedstream)
-        for defline, sequence in mutator:
+        ss = self.seqstream(refrseqs)
+        bs = self.bedstream(markers)
+        for defline, sequence in mutate(ss, bs):
             yield defline, sequence
 
     def unmix(self):
