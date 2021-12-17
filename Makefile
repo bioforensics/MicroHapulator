@@ -18,7 +18,7 @@ test4:
 devdeps:
 	pip install --upgrade pip setuptools
 	pip install wheel twine
-	pip install pycodestyle 'pytest>=5.0' pytest-cov pytest-sugar
+	pip install 'black==21.12b0' 'pytest>=5.0' pytest-cov pytest-sugar
 
 
 ## devhooks:  install development hooks
