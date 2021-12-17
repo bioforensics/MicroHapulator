@@ -18,7 +18,7 @@ test4:
 devdeps:
 	pip install --upgrade pip setuptools
 	pip install wheel twine
-	pip install pycodestyle 'pytest>=5.0' pytest-cov pytest-sugar
+	pip install 'black==21.12b0' 'pytest>=5.0' pytest-cov pytest-sugar
 
 
 ## devhooks:  install development hooks
@@ -32,6 +32,10 @@ devhooks:
 clean:
 	rm -rf __pycache__/ microhapulator/__pycache__/ microhapulator/*/__pycache__ build/ dist/ *.egg-info/
 
-## style:     check code style against PEP8
+## style:     check code style vs Black
 style:
-	pycodestyle --max-line-length=99 microhapulator/*.py microhapulator/*/*.py
+	black --line-length=99 --check microhapulator/*.py microhapulator/*/*.py setup.py
+
+## format:     autoformat Python code
+format:
+	black --line-length=99 microhapulator/*.py microhapulator/*/*.py setup.py

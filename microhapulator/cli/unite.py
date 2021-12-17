@@ -9,18 +9,21 @@
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser('unite')
+    cli = subparsers.add_parser("unite")
     cli.add_argument(
-        '-o', '--out', metavar='FILE', help='write output to "FILE"; by '
-        'default, output is written to the terminal (standard output)'
+        "-o",
+        "--out",
+        metavar="FILE",
+        help='write output to "FILE"; by '
+        "default, output is written to the terminal (standard output)",
     )
     cli.add_argument(
-        '-s', '--seed', type=int, default=None, metavar='INT', help='seed for '
-        'random number generator'
+        "-s",
+        "--seed",
+        type=int,
+        default=None,
+        metavar="INT",
+        help="seed for " "random number generator",
     )
-    cli.add_argument(
-        'mom', help='simulated or inferred genotype in JSON format'
-    )
-    cli.add_argument(
-        'dad', help='simulated or inferred genotype in JSON format'
-    )
+    cli.add_argument("mom", help="simulated or inferred genotype in JSON format")
+    cli.add_argument("dad", help="simulated or inferred genotype in JSON format")

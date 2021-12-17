@@ -14,5 +14,5 @@ from microhapulator.profile import SimulatedProfile
 def main(args):
     profiles = [SimulatedProfile(pfile) for pfile in args.profiles]
     combined = SimulatedProfile.merge(profiles)
-    with microhapulator.open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, "w") as fh:
         combined.dump(fh)

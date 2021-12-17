@@ -20,5 +20,5 @@ def main(args):
         Profile(fromfile=args.mom),
         Profile(fromfile=args.dad),
     )
-    with microhapulator.open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, "w") as fh:
         profile.dump(fh)

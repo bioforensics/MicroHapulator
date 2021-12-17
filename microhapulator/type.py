@@ -17,21 +17,21 @@ import re
 def parse_variant_offsets_from_fasta_headers(fasta):
     offsets = dict()
     for line in fasta:
-        if not line.startswith('>'):
+        if not line.startswith(">"):
             continue
         markerid = line[1:].split()[0]
-        if ' variants=' not in line:
-            message = 'variant offsets not annotated for target amplicon: ' + line
+        if " variants=" not in line:
+            message = "variant offsets not annotated for target amplicon: " + line
             raise ValueError(message)
-        offsetstr = re.search(r'variants=(\S+)', line).group(1)
-        varloc = [int(x) for x in offsetstr.split(',')]
+        offsetstr = re.search(r"variants=(\S+)", line).group(1)
+        varloc = [int(x) for x in offsetstr.split(",")]
         offsets[markerid] = varloc
     return offsets
 
 
 def check_index(bamfile):
-    index1 = bamfile + '.bai'
-    index2 = re.sub(r'.bam$', '.bai', bamfile)
+    index1 = bamfile + ".bai"
+    index2 = re.sub(r".bam$", ".bai", bamfile)
     for testfile in (index1, index2):
         if os.path.isfile(testfile):
             break
@@ -41,10 +41,10 @@ def check_index(bamfile):
 
 def tally_haplotypes(bamfile, refrfasta, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
-    with microhapulator.open(refrfasta, 'r') as fh:
+    with microhapulator.open(refrfasta, "r") as fh:
         offsets = parse_variant_offsets_from_fasta_headers(fh)
     check_index(bamfile)
-    bam = pysam.AlignmentFile(bamfile, 'rb')
+    bam = pysam.AlignmentFile(bamfile, "rb")
     for locusid in sorted(offsets):
         discarded = 0
         haplotypes = defaultdict(int)
@@ -66,18 +66,20 @@ def tally_haplotypes(bamfile, refrfasta, minbasequal=10, max_depth=1e6):
             if len(htlist) < len(varloc):
                 discarded += 1
                 continue
-            htstr = ','.join(htlist)
+            htstr = ",".join(htlist)
             haplotypes[htstr] += 1
         yield locusid, cov_pos, haplotypes, discarded
         totaldiscarded += discarded
     microhapulator.plog(
-        '[MicroHapulator::type] discarded', totaldiscarded,
-        'reads with gaps or missing data at positions of interest'
+        "[MicroHapulator::type] discarded",
+        totaldiscarded,
+        "reads with gaps or missing data at positions of interest",
     )
 
 
-def type(bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None,
-         max_depth=1e6):
+def type(
+    bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None, max_depth=1e6
+):
     genotyper = tally_haplotypes(bamfile, refrfasta, minbasequal=minbasequal, max_depth=max_depth)
     profile = microhapulator.profile.ObservedProfile()
     for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
@@ -90,7 +92,12 @@ def type(bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dyna
 
 def main(args):
     profile = type(
-        args.bam, args.refr, minbasequal=args.base_qual, ecthreshold=args.effcov,
-        static=args.static, dynamic=args.dynamic, max_depth=args.max_depth
+        args.bam,
+        args.refr,
+        minbasequal=args.base_qual,
+        ecthreshold=args.effcov,
+        static=args.static,
+        dynamic=args.dynamic,
+        max_depth=args.max_depth,
     )
     profile.dump(args.out)

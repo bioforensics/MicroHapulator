@@ -25,12 +25,12 @@ def diff(prof1, prof2):
 
 def main(args):
     differ = diff(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
-    with microhapulator.open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, "w") as fh:
         for marker, diff1, diff2 in differ:
             print(marker, file=fh)
             if len(diff1) > 0:
                 for haplotype in sorted(diff1):
-                    print('>>>', haplotype, file=fh)
+                    print(">>>", haplotype, file=fh)
             if len(diff2) > 0:
                 for haplotype in sorted(diff2):
-                    print('<<<', haplotype, file=fh)
+                    print("<<<", haplotype, file=fh)

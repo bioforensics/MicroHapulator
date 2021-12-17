@@ -20,14 +20,14 @@ def count_and_sort(profile, include_discarded=True):
     for marker, mdata in profile.data["markers"].items():
         readcount = 0
         if include_discarded:
-            readcount += mdata['num_discarded_reads']
-        for haplotype, count in mdata['allele_counts'].items():
+            readcount += mdata["num_discarded_reads"]
+        for haplotype, count in mdata["allele_counts"].items():
             readcount += count
-        counts['Marker'].append(marker)
-        counts['ReadCount'].append(readcount)
-    data = pandas.DataFrame(counts)\
-        .sort_values(['ReadCount'], ascending=False)\
-        .reset_index(drop=True)
+        counts["Marker"].append(marker)
+        counts["ReadCount"].append(readcount)
+    data = (
+        pandas.DataFrame(counts).sort_values(["ReadCount"], ascending=False).reset_index(drop=True)
+    )
     return data
 
 
@@ -36,7 +36,7 @@ def balance(profile, include_discarded=True):
     with TemporaryDirectory() as tempdir:
         tfile = os.path.join(tempdir, "data.tsv")
         data.to_csv(tfile, index=False, header=False)
-        subprocess.run(['termgraph', tfile])
+        subprocess.run(["termgraph", tfile])
     return data
 
 

@@ -25,7 +25,7 @@ def dist(p1, p2):
 def main(args):
     d = dist(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
     data = {
-        'hamming_distance': d,
+        "hamming_distance": d,
     }
-    with microhapulator.open(args.out, 'w') as fh:
+    with microhapulator.open(args.out, "w") as fh:
         json.dump(data, fh, indent=4)
