@@ -65,5 +65,5 @@ def subparser(subparsers):
         "--dynamic is only applied to markers with high effective coverage",
     )
     cli.add_argument("-m", "--max-depth", metavar="M", type=float, default=1e6, help=SUPPRESS)
-    cli.add_argument("refr", help="microhap marker sequences in Fasta format")
+    cli.add_argument("tsv", help="microhap marker definitions in TSV format")
     cli.add_argument("bam", help="aligned and sorted reads in BAM format")
