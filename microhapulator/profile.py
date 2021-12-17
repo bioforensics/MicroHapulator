@@ -101,7 +101,7 @@ class Profile(object):
             )
         return set([a["allele"] for a in self.data["markers"][markerid]["genotype"]])
 
-    def rand_match_prob(self, popid):
+    def rand_match_prob(self, freqs):
         """Compute the random match probability of this profile.
 
         Given a set of population allele frequencies, the random match
@@ -113,15 +113,9 @@ class Profile(object):
             alleles = self.alleles(marker)
             diploid_consistent = 1 <= len(alleles) <= 2
             if not diploid_consistent:
-                message = "cannot compute random match prob. for marker with {:d} alleles".format(
-                    len(alleles)
-                )
-                raise RandomMatchError(message)
-            result = microhapdb.frequencies[
-                (microhapdb.frequencies.Population == popid)
-                & (microhapdb.frequencies.Marker == marker)
-                & (microhapdb.frequencies.Allele.isin(alleles))
-            ]
+                msg = f"cannot compute random match prob. for marker with {len(alleles)} alleles"
+                raise RandomMatchError(msg)
+            result = freqs[(freqs.Marker == marker) & (freqs.Allele.isin(alleles))]
             if len(alleles) == 1:
                 p = 0.001
                 if len(result) == 1:
@@ -142,7 +136,7 @@ class Profile(object):
                 prob *= 2 * p * q
         return prob
 
-    def rmp_lr_test(self, other, popid, erate=0.001):
+    def rmp_lr_test(self, other, freqs, erate=0.001):
         """Compute a likelihood ratio test for the random match probability.
 
         The likelihood ratio test compares the probability that the two samples
@@ -166,7 +160,7 @@ class Profile(object):
             else:
                 mismatches += 2
         numerator = erate ** mismatches
-        denominator = self.rand_match_prob(popid)
+        denominator = self.rand_match_prob(freqs)
         return numerator / denominator
 
     def dump(self, outfile):

@@ -7,22 +7,25 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+import microhapdb
 import microhapulator
 from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pytest
 
+FREQS = microhapdb.frequencies[microhapdb.frequencies.Population == "SA000936S"]
+
 
 def test_rmp():
     p = Profile(fromfile=data_file("korea-5loc.json"))
-    assert p.rand_match_prob("SA000936S") == pytest.approx(7.444e-09)
+    assert p.rand_match_prob(FREQS) == pytest.approx(7.444e-09)
 
 
 def test_rmp_lrt():
     p1 = Profile(fromfile=data_file("korea-5loc.json"))
     p2 = Profile(fromfile=data_file("korea-5loc-1diff.json"))
-    assert p1.rmp_lr_test(p1, "SA000936S") == pytest.approx(134332086.64194357)
-    assert p1.rmp_lr_test(p2, "SA000936S") == pytest.approx(134332.08664194357)
+    assert p1.rmp_lr_test(p1, FREQS) == pytest.approx(134332086.64194357)
+    assert p1.rmp_lr_test(p2, FREQS) == pytest.approx(134332.08664194357)
 
 
 @pytest.mark.parametrize(
@@ -36,8 +39,8 @@ def test_rmp_lrt():
 def test_rmp_lrt_2diff(altfile, lrvalue):
     p1 = Profile(fromfile=data_file("korea-5loc.json"))
     p2 = Profile(fromfile=data_file(altfile))
-    assert p1.rmp_lr_test(p2, "SA000936S") == pytest.approx(134.3321)
-    assert p2.rmp_lr_test(p1, "SA000936S") == pytest.approx(lrvalue)
+    assert p1.rmp_lr_test(p2, FREQS) == pytest.approx(134.3321)
+    assert p2.rmp_lr_test(p1, FREQS) == pytest.approx(lrvalue)
 
 
 def test_prob_cli_rmp(capsys):
@@ -65,12 +68,12 @@ def test_prob_cli_lrt(capsys):
 
 def test_prob_zero_freq():
     p = Profile(fromfile=data_file("korea-5loc-zerofreq.json"))
-    assert p.rand_match_prob("SA000936S") == pytest.approx(2.3708e-11)
+    assert p.rand_match_prob(FREQS) == pytest.approx(2.3708e-11)
 
 
 def test_prob_missing_freq():
     p = Profile(fromfile=data_file("korea-5loc-missfreq.json"))
-    assert p.rand_match_prob("SA000936S") == pytest.approx(7.8360e-10)
+    assert p.rand_match_prob(FREQS) == pytest.approx(7.8360e-10)
 
 
 def test_bad_pop():

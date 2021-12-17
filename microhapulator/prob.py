@@ -14,10 +14,11 @@ from microhapulator.profile import Profile
 
 
 def prob(popid, prof1, prof2=None, erate=0.001):
+    freqs = microhapdb.frequencies[microhapdb.frequencies.Population == popid]
     if prof2 is None:
-        return prof1.rand_match_prob(popid)
+        return prof1.rand_match_prob(freqs)
     else:
-        return prof1.rmp_lr_test(prof2, popid, erate=erate)
+        return prof1.rmp_lr_test(prof2, freqs, erate=erate)
 
 
 def main(args):
