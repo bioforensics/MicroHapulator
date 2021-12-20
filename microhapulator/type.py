@@ -65,6 +65,9 @@ def type(
     bamfile, markertsv, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None, max_depth=1e6
 ):
     markers = pd.read_csv(markertsv, sep="\t")
+    columns = list(markers.columns)
+    assert "Marker" in columns
+    assert "Offset" in columns
     # More elegant (but less intuitive) solution
     # offsets = dict(
     #     markers.groupby("Marker")

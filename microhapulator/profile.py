@@ -12,10 +12,11 @@ from happer.mutate import mutate
 from io import StringIO
 import json
 import jsonschema
-import microhapdb
-from microhapdb.marker import TargetAmplicon
 import microhapulator
 from numpy.random import choice
+
+
+SCHEMA = None
 
 
 def load_schema():
@@ -23,39 +24,18 @@ def load_schema():
         return json.load(fh)
 
 
-schema = None
-
-
 class Profile(object):
-    def unite(mom, dad):
-        """Simulate the creation of a new profile from a mother and father."""
-        gt = SimulatedProfile(ploidy=2)
-        allmarkers = mom.markers() | dad.markers()
-        commonmarkers = mom.markers() & dad.markers()
-        if len(commonmarkers) == 0:
-            raise ValueError("mom and dad profiles have no markers in common")
-        notshared = allmarkers - commonmarkers
-        if len(notshared) > 0:
-            message = "markers not common to mom and dad profiles are excluded: "
-            message += ", ".join(notshared)
-            microhapulator.plog("[MicroHapulator::profile]", message)
-        for parent, hapid in zip((mom, dad), (0, 1)):
-            for marker in sorted(commonmarkers):
-                haploallele = choice(sorted(parent.alleles(marker)))
-                gt.add(hapid, marker, haploallele)
-        return gt
-
     def __init__(self, fromfile=None):
-        global schema
+        global SCHEMA
         if fromfile:
             if isinstance(fromfile, str):
                 with microhapulator.open(fromfile, "r") as fh:
                     self.data = json.load(fh)
             else:
                 self.data = json.load(fromfile)
-            if schema is None:
-                schema = load_schema()
-            jsonschema.validate(instance=self.data, schema=schema)
+            if SCHEMA is None:
+                SCHEMA = load_schema()
+            jsonschema.validate(instance=self.data, schema=SCHEMA)
         else:
             self.data = self.initialize()
 
@@ -68,13 +48,12 @@ class Profile(object):
         return self.data["ploidy"]
 
     def initialize(self):
-        data = {
+        return {
             "version": microhapulator.__version__,
             "type": self.gttype,
             "ploidy": None,
             "markers": dict(),
         }
-        return data
 
     def haplotypes(self):
         hapids = set()
@@ -214,6 +193,24 @@ class Profile(object):
         bs = self.bedstream(markers)
         for defline, sequence in mutate(ss, bs):
             yield defline, sequence
+
+    def unite(mom, dad):
+        """Simulate the creation of a new profile from a mother and father."""
+        gt = SimulatedProfile(ploidy=2)
+        allmarkers = mom.markers() | dad.markers()
+        commonmarkers = mom.markers() & dad.markers()
+        if len(commonmarkers) == 0:
+            raise ValueError("mom and dad profiles have no markers in common")
+        notshared = allmarkers - commonmarkers
+        if len(notshared) > 0:
+            message = "markers not common to mom and dad profiles are excluded: "
+            message += ", ".join(notshared)
+            microhapulator.plog("[MicroHapulator::profile]", message)
+        for parent, hapid in zip((mom, dad), (0, 1)):
+            for marker in sorted(commonmarkers):
+                haploallele = choice(sorted(parent.alleles(marker)))
+                gt.add(hapid, marker, haploallele)
+        return gt
 
     def unmix(self):
         assert self.ploidy % 2 == 0

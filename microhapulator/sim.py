@@ -7,69 +7,89 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
+from Bio import SeqIO
+from collections import defaultdict
 from happer.mutate import mutate
 import microhapulator
 from microhapulator.profile import SimulatedProfile
-from microhapulator.panel import validate_markers, exclude_markers_missing_freq_data
-from microhapulator.panel import validate_populations, sample_panel
-import os
 import numpy.random
+import pandas as pd
 
 
-def resolve_panel(panellist):
-    panel = list()
-    for value in panellist:
-        if os.path.isfile(value):
-            with open(value, "r") as fh:
-                for line in fh:
-                    panel.append(line.strip())
-        else:
-            panel.append(value)
-    return panel
-
-
-def sim(popids, panel, seed=None, relaxed=False):
-    """Simulate a diploid genotype profile for the specified panel.
-
-    For each locus in the panel simulate a diploid microhap profile. For each
-    haplotype, alleles are selected according to population allele frequencies
-    corresponding to the populations indicated in `popids`. If there is no
-    population allele frequency data for a particular locus it is excluded
-    (except in `relaxed` mode, in which case an allele is sampled from a
-    uniform distribution).
-    """
-    haplopops = validate_populations(popids)
-    markers = validate_markers(panel)
-    if not relaxed:
-        markers = exclude_markers_missing_freq_data(markers, haplopops)
-    if len(markers) == 0:
-        raise ValueError("invalid panel: {}".format(panel))
+def sim(frequencies, seed=None):
+    """Simulate a diploid genotype from the specified microhaplotype frequencies."""
     profile = SimulatedProfile(ploidy=2)
     if seed is None:
         seed = numpy.random.randint(2 ** 32 - 1)
-    numpy.random.seed(seed)
-    for haplotype, locus, allele in sample_panel(haplopops, markers):
-        profile.add(haplotype, locus, allele)
     profile.data["metadata"] = {
-        "MaternalHaploPop": haplopops[0],
-        "PaternalHaploPop": haplopops[1],
         "HaploSeed": seed,
     }
-    message = "simulated microhaplotype variation at {loc:d} markers".format(loc=len(markers))
+    numpy.random.seed(seed)
+    markers = sorted(frequencies.Marker.unique())
+    for haploindex in range(2):
+        for marker in markers:
+            haplofreqs = frequencies[frequencies.Marker == marker]
+            haplotypes = list(haplofreqs.Haplotype)
+            freqs = list(haplofreqs.Frequency)
+            freqs = [x / sum(freqs) for x in freqs]
+            sampled_haplotype = numpy.random.choice(haplotypes, p=freqs)
+            profile.add(haploindex, marker, sampled_haplotype)
+    message = f"simulated microhaplotype variation at {len(markers)} markers"
     microhapulator.plog("[MicroHapulator::sim]", message)
     return profile
 
 
+def load_inputs(freqfile, markerfile, seqfile, haploseqs=False):
+    frequencies = pd.read_csv(freqfile, sep="\t")
+    columns = list(frequencies.columns)
+    assert "Marker" in columns
+    assert "Haplotype" in columns
+    assert "Frequency" in columns
+    if not haploseqs:
+        return frequencies, None, None
+    markers = pd.read_csv(markerfile, sep="\t")
+    columns = list(markers.columns)
+    assert "Marker" in columns
+    assert "Offset" in columns
+    sequences = SeqIO.to_dict(SeqIO.parse(seqfile, "fasta"))
+    sequences = {seqid: record.seq for seqid, record in sequences.items()}
+    if set(frequencies.Marker) != set(markers.Marker):
+        frequniq = set(frequencies.Marker) - set(markers.Marker)
+        markeruniq = set(markers.Marker) - set(frequencies.Marker)
+        message = "discrepancy between marker definitions and population frequencies:"
+        if frequniq:
+            markerids = ", ".join(frequniq)
+            message += f" markers with frequency data but no definition={{{markerids}}};"
+        if markeruniq:
+            markerids = ", ".join(markeruniq)
+            message += f" markers with defined offsets but no frequency data={{{markerids}}};"
+        raise ValueError(message)
+    if set(frequencies.Marker) != set(sequences.keys()):
+        frequniq = set(frequencies.Marker) - set(sequences.keys())
+        sequniq = set(sequences.keys()) - set(frequencies.Marker)
+        message = "discrepancy between marker definitions and population frequencies:"
+        if frequniq:
+            markerids = ", ".join(frequniq)
+            message += f" markers with frequency data but no reference sequence={{{markerids}}};"
+        if sequniq:
+            markerids = ", ".join(sequniq)
+            message += f" markers with a reference sequence but no frequency data={{{markerids}}};"
+        raise ValueError(message)
+    return frequencies, markers, sequences
+
+
 def main(args):
-    panel = resolve_panel(args.panel)
-    profile = sim(args.popid, panel, seed=args.seed, relaxed=args.relaxed)
+    frequencies, markers, sequences = load_inputs(
+        args.freq, args.markers, args.sequences, haploseqs=args.haplo_seq
+    )
+    profile = sim(frequencies, seed=args.seed)
     with microhapulator.open(args.out, "w") as fh:
         profile.dump(fh)
         message = "profile JSON written to {:s}".format(fh.name)
         microhapulator.plog("[MicroHapulator::sim]", message)
     if args.haplo_seq:
         with microhapulator.open(args.haplo_seq, "w") as fh:
-            for defline, sequence in profile.haploseqs:
+            for defline, sequence in profile.haploseqs(markers, sequences):
                 print(">", defline, "\n", sequence, sep="", file=fh)
             message = "haplotype sequences written to {:s}".format(fh.name)
             microhapulator.plog("[MicroHapulator::sim]", message)
