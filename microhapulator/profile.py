@@ -94,7 +94,7 @@ class Profile(object):
             if not diploid_consistent:
                 msg = f"cannot compute random match prob. for marker with {len(alleles)} alleles"
                 raise RandomMatchError(msg)
-            result = freqs[(freqs.Marker == marker) & (freqs.Allele.isin(alleles))]
+            result = freqs[(freqs.Marker == marker) & (freqs.Haplotype.isin(alleles))]
             if len(alleles) == 1:
                 p = 0.001
                 if len(result) == 1:
