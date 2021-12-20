@@ -7,35 +7,24 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-from io import StringIO
 import microhapdb
 import microhapulator
 from microhapulator.profile import SimulatedProfile, ObservedProfile
 from microhapulator.tests import data_file
 import numpy
+import pandas as pd
 import pytest
 from tempfile import NamedTemporaryFile
 
 
-def test_profile_roundtrip():
+def test_profile_roundtrip(tmp_path):
     seed = numpy.random.randint(1, 2 ** 32 - 1)
-    print("DEBUG seed:", seed)
-    numpy.random.seed(seed)
-    panel = ["mh01KK-072", "mh17KK-014", "mh05CP-006", "mh04CP-007", "mh14KK-101"]
-    populations = ["SA004047P", "SA004250L"]
-    simulator = microhapulator.panel.sample_panel(populations, panel)
-
-    profile = SimulatedProfile(ploidy=2)
-    for haplotype, locusid, allele in simulator:
-        profile.add(haplotype, locusid, allele)
-    with NamedTemporaryFile() as outfile:
-        profile.dump(outfile.name)
-        testprofile = SimulatedProfile(fromfile=outfile.name)
-        assert testprofile == profile
-
-    output = StringIO()
-    profile.dump(output)
-    assert output.getvalue() == str(profile)
+    freqs = pd.read_csv(data_file("asw5-freq.tsv"), sep="\t")
+    profile = microhapulator.sim.sim(freqs, seed=seed)
+    profile.dump(tmp_path / "profile.json")
+    test = SimulatedProfile(fromfile=tmp_path / "profile.json")
+    assert profile == test
+    assert str(profile) == str(test)
 
 
 def test_alleles():
@@ -102,10 +91,11 @@ def test_merge_sim_genotypes():
     prof3.add(1, "mh11CP-004", "T,G,G")
     prof3.add(0, "mh05KK-123", "G,C")
     prof3.add(1, "mh05KK-123", "G,T")
-
     profile = SimulatedProfile.merge([prof1, prof2, prof3])
-    print(profile.bedstr)
-    assert profile.bedstr == (
+    markers = pd.read_csv(data_file("loc2-offsets.tsv"), sep="\t")
+    output = profile.bedstr(markers)
+    print(output)
+    assert output == (
         "mh05KK-123\t121\t122\tA|A|A|A|G|G\n"
         "mh05KK-123\t228\t229\tC|T|T|T|C|T\n"
         "mh11CP-004\t162\t163\tC|C|C|C|C|T\n"
@@ -118,5 +108,6 @@ def test_bed_error():
     p = SimulatedProfile()
     p.add(0, "BOGUS", "A,C,C")
     p.add(1, "BOGUS", "A,C,C")
-    with pytest.raises(ValueError, match=r'unknown marker identifier "BOGUS"'):
-        print(p.bedstr)
+    markers = pd.read_csv(data_file("loc2-offsets.tsv"), sep="\t")
+    with pytest.raises(ValueError, match=r"unknown marker identifier 'BOGUS'"):
+        print(p.bedstr(markers))

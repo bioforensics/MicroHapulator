@@ -14,6 +14,7 @@ import json
 import jsonschema
 import microhapulator
 from numpy.random import choice
+from pathlib import Path
 
 
 SCHEMA = None
@@ -28,8 +29,8 @@ class Profile(object):
     def __init__(self, fromfile=None):
         global SCHEMA
         if fromfile:
-            if isinstance(fromfile, str):
-                with microhapulator.open(fromfile, "r") as fh:
+            if isinstance(fromfile, str) or isinstance(fromfile, Path):
+                with microhapulator.open(str(fromfile), "r") as fh:
                     self.data = json.load(fh)
             else:
                 self.data = json.load(fromfile)
@@ -59,7 +60,7 @@ class Profile(object):
         hapids = set()
         for markerid, markerdata in self.data["markers"].items():
             for alleledata in markerdata["genotype"]:
-                if "haplotype" in alleledata:
+                if "haplotype" in alleledata and alleledata["haplotype"] is not None:
                     hapids.add(alleledata["haplotype"])
         assert sorted(hapids) == sorted(range(len(hapids)))
         return hapids
@@ -143,8 +144,8 @@ class Profile(object):
         return numerator / denominator
 
     def dump(self, outfile):
-        if isinstance(outfile, str):
-            with microhapulator.open(outfile, "w") as fh:
+        if isinstance(outfile, str) or isinstance(outfile, Path):
+            with microhapulator.open(str(outfile), "w") as fh:
                 json.dump(self.data, fh, indent=4, sort_keys=True)
         else:
             json.dump(self.data, outfile, indent=4, sort_keys=True)
@@ -163,6 +164,7 @@ class Profile(object):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
     def bedstream(self, markers):
+        print("DEBUG", self.markers())
         for marker in sorted(self.markers()):
             result = markers[markers.Marker == marker]
             if len(result) == 0:
