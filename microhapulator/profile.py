@@ -322,6 +322,7 @@ class ObservedProfile(Profile):
             'max_coverage': 0,
             'num_discarded_reads': ndiscarded,
             'allele_counts': dict(),
+            'incomplete_allele_counts': dict(),
         }
         if len(cov_by_pos) > 0:
             avgcov = sum(cov_by_pos) / len(cov_by_pos)
@@ -330,7 +331,8 @@ class ObservedProfile(Profile):
             self.data['markers'][marker]['max_coverage'] = max(cov_by_pos)
 
     def record_allele(self, marker, allele, count):
-        self.data['markers'][marker]['allele_counts'][allele] = count
+        key = 'incomplete_allele_counts' if '?' in allele else 'allele_counts'
+        self.data['markers'][marker][key][allele] = count
 
     def infer(self, ecthreshold=0.25, static=None, dynamic=None):
         for marker, mdata in self.data['markers'].items():

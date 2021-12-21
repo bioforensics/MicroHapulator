@@ -46,7 +46,7 @@ def tally_haplotypes(bamfile, refrfasta, minbasequal=10, max_depth=1e6):
     check_index(bamfile)
     bam = pysam.AlignmentFile(bamfile, 'rb')
     for locusid in sorted(offsets):
-        discarded = 0
+        incomplete = defaultdict(int)
         haplotypes = defaultdict(int)
         ht = defaultdict(dict)
         varloc = set(offsets[locusid])
@@ -62,14 +62,17 @@ def tally_haplotypes(bamfile, refrfasta, minbasequal=10, max_depth=1e6):
                 aligned_base = record.alignment.query_sequence[record.query_position]
                 ht[record.alignment.query_name][column.pos] = aligned_base
         for readname, htdict in ht.items():
-            htlist = [htdict[pos] for pos in sorted(htdict)]
-            if len(htlist) < len(varloc):
-                discarded += 1
-                continue
+            htlist = list()
+            for pos in sorted(varloc):
+                allele = htdict[pos] if pos in htdict else "?"
+                htlist.append(allele)
             htstr = ','.join(htlist)
-            haplotypes[htstr] += 1
-        yield locusid, cov_pos, haplotypes, discarded
-        totaldiscarded += discarded
+            if "?" in htlist:
+                incomplete[htstr] += 1
+            else:
+                haplotypes[htstr] += 1
+        yield locusid, cov_pos, haplotypes, incomplete
+        totaldiscarded += sum(incomplete.values())
     microhapulator.plog(
         '[MicroHapulator::type] discarded', totaldiscarded,
         'reads with gaps or missing data at positions of interest'
@@ -80,9 +83,11 @@ def type(bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dyna
          max_depth=1e6):
     genotyper = tally_haplotypes(bamfile, refrfasta, minbasequal=minbasequal, max_depth=max_depth)
     profile = microhapulator.profile.ObservedProfile()
-    for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
-        profile.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
+    for locusid, cov_by_pos, htcounts, incomplete in genotyper:
+        profile.record_coverage(locusid, cov_by_pos, ndiscarded=sum(incomplete.values()))
         for allele, count in htcounts.items():
+            profile.record_allele(locusid, allele, count)
+        for allele, count in incomplete.items():
             profile.record_allele(locusid, allele, count)
     profile.infer(ecthreshold=ecthreshold, static=static, dynamic=dynamic)
     return profile
