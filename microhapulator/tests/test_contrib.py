@@ -8,7 +8,6 @@
 # -----------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pytest
 
@@ -32,9 +31,9 @@ def test_contrib_json(pjson, numcontrib):
 
 def test_contrib_bam():
     bam = data_file("three-contrib-log.bam")
-    refr = data_file("default-panel.fasta.gz")
+    defn = data_file("default-panel-offsets.tsv")
     profile = microhapulator.contrib.load_profile(
-        bamfile=bam, refrfasta=refr, dynamic=0.25, static=10
+        bamfile=bam, markertsv=defn, dynamic=0.25, static=10
     )
     n, *data = microhapulator.contrib.contrib(profile)
     assert n == 3
@@ -42,8 +41,8 @@ def test_contrib_bam():
 
 def test_contrib_main(capsys):
     bam = data_file("three-contrib-log.bam")
-    refr = data_file("default-panel.fasta.gz")
-    arglist = ["contrib", "-b", bam, "-r", refr, "--static", "10", "--dynamic", "0.25"]
+    defn = data_file("default-panel-offsets.tsv")
+    arglist = ["contrib", "-b", bam, "-t", defn, "--static", "10", "--dynamic", "0.25"]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.contrib.main(args)
     out, err = capsys.readouterr()
