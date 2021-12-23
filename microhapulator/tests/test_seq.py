@@ -202,7 +202,14 @@ def test_main_mixture(capsys):
 
 
 def test_main_out_stdout(capsys):
-    arglist = ["seq", "--num-reads", "100", data_file("orange-sim-profile.json")]
+    arglist = [
+        "seq",
+        "--num-reads",
+        "100",
+        data_file("orange-offsets.tsv"),
+        data_file("orange-refr.fasta"),
+        data_file("orange-sim-profile.json"),
+    ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
     terminal = capsys.readouterr()
@@ -213,7 +220,16 @@ def test_main_out_stdout(capsys):
 
 def test_main_out_one_filename(tmp_path):
     outfile = str(tmp_path / "reads-interleaved.fastq")
-    arglist = ["seq", "--out", outfile, "--num-reads", "100", data_file("orange-sim-profile.json")]
+    arglist = [
+        "seq",
+        "--out",
+        outfile,
+        "--num-reads",
+        "100",
+        data_file("orange-offsets.tsv"),
+        data_file("orange-refr.fasta"),
+        data_file("orange-sim-profile.json"),
+    ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
     assert os.path.isfile(outfile)
@@ -226,7 +242,17 @@ def test_main_out_one_filename(tmp_path):
 def test_main_out_two_filenames(tmp_path):
     f1 = str(tmp_path / "reads-R1.fastq")
     f2 = str(tmp_path / "reads-R2.fastq")
-    arglist = ["seq", "--out", f1, f2, "--num-reads", "100", data_file("orange-sim-profile.json")]
+    arglist = [
+        "seq",
+        "--out",
+        f1,
+        f2,
+        "--num-reads",
+        "100",
+        data_file("orange-offsets.tsv"),
+        data_file("orange-refr.fasta"),
+        data_file("orange-sim-profile.json"),
+    ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
     assert os.path.isfile(f1)
@@ -239,7 +265,17 @@ def test_main_out_two_filenames(tmp_path):
 
 
 def test_main_out_three_filenames(capsys):
-    arglist = ["seq", "--out", "ONE", "TWO", "THREE", "--", data_file("orange-sim-profile.json")]
+    arglist = [
+        "seq",
+        "--out",
+        "ONE",
+        "TWO",
+        "THREE",
+        "--",
+        data_file("orange-offsets.tsv"),
+        data_file("orange-refr.fasta"),
+        data_file("orange-sim-profile.json"),
+    ]
     with pytest.raises(SystemExit):
         args = microhapulator.cli.get_parser().parse_args(arglist)
     terminal = capsys.readouterr()

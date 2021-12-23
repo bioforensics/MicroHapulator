@@ -167,10 +167,12 @@ def main(args):
     if len(args.out) == 2:
         fh2 = args.out[1]
     profiles = resolve_profiles(args.profiles)
+    markers = microhapulator.load_marker_definitions(args.tsv)
+    refrseqs = microhapulator.load_marker_reference_sequences(args.refrseqs)
     sequencer = seq(
         profiles,
-        args.tsv,
-        args.refrseqs,
+        markers,
+        refrseqs,
         seeds=args.seeds,
         threads=args.threads,
         totalreads=args.num_reads,
