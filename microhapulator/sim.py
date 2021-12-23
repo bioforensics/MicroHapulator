@@ -41,8 +41,12 @@ def load_inputs(freqfile, markerfile, seqfile, haploseqs=False):
         return frequencies, None, None
     markers = microhapulator.load_marker_definitions(markerfile)
     sequences = microhapulator.load_marker_reference_sequences(seqfile)
-    microhapulator.cross_check_marker_ids(frequencies.Marker, markers.Marker, "marker frequencies", "marker definitions")
-    microhapulator.cross_check_marker_ids(frequencies.Marker, sequences.keys(), "marker frequencies", "marker reference sequences")
+    microhapulator.cross_check_marker_ids(
+        frequencies.Marker, markers.Marker, "marker frequencies", "marker definitions"
+    )
+    microhapulator.cross_check_marker_ids(
+        frequencies.Marker, sequences.keys(), "marker frequencies", "marker reference sequences"
+    )
     return frequencies, markers, sequences
 
 

@@ -28,9 +28,7 @@ def subparser(subparsers):
     cli.add_argument(
         "-t", "--tsv", metavar="FILE", help="microhap marker definitions in tabular (TSV) format"
     )
-    cli.add_argument(
-        "-b", "--bam", metavar="FILE", help="aligned and sorted reads in BAM format"
-    )
+    cli.add_argument("-b", "--bam", metavar="FILE", help="aligned and sorted reads in BAM format")
     cli.add_argument(
         "-s",
         "--static",

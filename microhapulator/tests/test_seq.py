@@ -64,7 +64,9 @@ def test_even_mixture():
 
 def test_complex_genotype(capsys):
     profile = Profile(fromfile=data_file("mixture-genotype.json"))
-    sequencer = microhapulator.seq.seq(list(profile.unmix()), totalreads=200)
+    markers = microhapulator.load_marker_definitions(data_file("russ4-offsets.tsv"))
+    seqs = microhapulator.load_marker_reference_sequences(data_file("russ4-refr.fasta"))
+    sequencer = microhapulator.seq.seq(list(profile.unmix()), markers, seqs, totalreads=200)
     for n, read in enumerate(sequencer):
         pass
     terminal = capsys.readouterr()
@@ -72,10 +74,13 @@ def test_complex_genotype(capsys):
 
 
 def test_uneven_mixture(capsys):
-    panel = ["mh01KK-001", "mh01KK-205", "mh01KK-117", "mh10KK-163"]
-    pops = ["SA004248S", "SA004239S", "SA001530J"]
-    profiles = [microhapulator.sim.sim([popid], panel) for popid in pops]
-    sequencer = microhapulator.seq.seq(profiles, totalreads=500, proportions=[0.5, 0.3, 0.2])
+    freqs = microhapulator.load_marker_frequencies(data_file("russ4-freq.tsv"))
+    markers = microhapulator.load_marker_definitions(data_file("russ4-offsets.tsv"))
+    seqs = microhapulator.load_marker_reference_sequences(data_file("russ4-refr.fasta"))
+    profiles = [microhapulator.sim.sim(freqs) for _ in range(3)]
+    sequencer = microhapulator.seq.seq(
+        profiles, markers, seqs, totalreads=500, proportions=[0.5, 0.3, 0.2]
+    )
     for read in sequencer:
         pass
     terminal = capsys.readouterr()

@@ -164,7 +164,6 @@ class Profile(object):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
     def bedstream(self, markers):
-        print("DEBUG", self.markers())
         for marker in sorted(self.markers()):
             result = markers[markers.Marker == marker]
             if len(result) == 0:

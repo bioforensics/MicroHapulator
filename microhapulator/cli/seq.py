@@ -67,6 +67,8 @@ def subparser(subparsers):
     )
     cli.add_argument("--signature", default=None, help=SUPPRESS)
     cli.add_argument("--threads", type=int, default=1, metavar="INT", help=SUPPRESS)
+    cli.add_argument("tsv", help="microhaplotype marker definitions in tabular (TSV) format")
+    cli.add_argument("refrseqs", help="microhaplotype reference sequences in FASTA format")
     cli.add_argument(
         "profiles", nargs="+", help="one or more simple or complex profiles " "(JSON files)"
     )

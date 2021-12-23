@@ -42,12 +42,21 @@ def new_signature():
     return "".join([choice(list(ascii_letters + digits)) for _ in range(7)])
 
 
-def sequencing(profile, seed=None, threads=1, numreads=500000, readsignature=None, readindex=0):
+def sequencing(
+    profile,
+    markers,
+    refrseqs,
+    seed=None,
+    threads=1,
+    numreads=500000,
+    readsignature=None,
+    readindex=0,
+):
     tempdir = mkdtemp()
     try:
         haplofile = tempdir + "/haplo.fasta"
         with microhapulator.open(haplofile, "w") as fh:
-            for defline, sequence in profile.haploseqs:
+            for defline, sequence in profile.haploseqs(markers, refrseqs):
                 print(">", defline, "\n", sequence, sep="", file=fh)
         isscmd = [
             "iss",
@@ -104,7 +113,16 @@ def sequencing(profile, seed=None, threads=1, numreads=500000, readsignature=Non
         rmtree(tempdir)
 
 
-def seq(profiles, seeds=None, threads=1, totalreads=500000, proportions=None, sig=None):
+def seq(
+    profiles,
+    markers,
+    refrseqs,
+    seeds=None,
+    threads=1,
+    totalreads=500000,
+    proportions=None,
+    sig=None,
+):
     n = len(profiles)
     if seeds is None:
         seeds = [randint(1, 2 ** 32 - 1) for _ in range(n)]
@@ -120,6 +138,8 @@ def seq(profiles, seeds=None, threads=1, totalreads=500000, proportions=None, si
         microhapulator.plog("[MicroHapulator::seq]", message)
         sequencer = sequencing(
             profile,
+            markers,
+            refrseqs,
             seed=seed,
             threads=threads,
             numreads=nreads,
@@ -149,6 +169,8 @@ def main(args):
     profiles = resolve_profiles(args.profiles)
     sequencer = seq(
         profiles,
+        args.tsv,
+        args.refrseqs,
         seeds=args.seeds,
         threads=args.threads,
         totalreads=args.num_reads,
