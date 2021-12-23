@@ -8,10 +8,8 @@
 # -----------------------------------------------------------------------------
 
 import json
-import microhapdb
 import microhapulator
 from microhapulator.profile import Profile
-import pandas as pd
 
 
 def prob(frequencies, prof1, prof2=None, erate=0.001):
@@ -24,11 +22,7 @@ def prob(frequencies, prof1, prof2=None, erate=0.001):
 def main(args):
     prof1 = Profile(fromfile=args.profile1)
     prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
-    frequencies = pd.read_csv(args.freq, sep="\t")
-    columns = list(frequencies.columns)
-    assert "Marker" in columns
-    assert "Haplotype" in columns
-    assert "Frequency" in columns
+    frequencies = microhapulator.load_marker_frequencies(args.freq)
     result = prob(frequencies, prof1, prof2=prof2, erate=args.erate)
     key = "random_match_probability" if prof2 is None else "likelihood_ratio"
     data = {

@@ -10,7 +10,6 @@
 from collections import defaultdict
 import microhapulator
 import os.path
-import pandas as pd
 import pysam
 import re
 
@@ -64,17 +63,7 @@ def tally_haplotypes(bamfile, offsets, minbasequal=10, max_depth=1e6):
 def type(
     bamfile, markertsv, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None, max_depth=1e6
 ):
-    markers = pd.read_csv(markertsv, sep="\t")
-    columns = list(markers.columns)
-    assert "Marker" in columns
-    assert "Offset" in columns
-    # More elegant (but less intuitive) solution
-    # offsets = dict(
-    #     markers.groupby("Marker")
-    #         .agg({"Offset": lambda col: col.tolist()})
-    #         .reset_index()
-    #         .values
-    # )
+    markers = microhapulator.load_marker_definitions(markertsv)
     offsets = defaultdict(list)
     for n, row in markers.iterrows():
         offsets[row.Marker].append(row.Offset)

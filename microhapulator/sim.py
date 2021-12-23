@@ -7,13 +7,9 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-from Bio import SeqIO
-from collections import defaultdict
-from happer.mutate import mutate
 import microhapulator
 from microhapulator.profile import SimulatedProfile
 import numpy.random
-import pandas as pd
 
 
 def sim(frequencies, seed=None):
@@ -40,41 +36,13 @@ def sim(frequencies, seed=None):
 
 
 def load_inputs(freqfile, markerfile, seqfile, haploseqs=False):
-    frequencies = pd.read_csv(freqfile, sep="\t")
-    columns = list(frequencies.columns)
-    assert "Marker" in columns
-    assert "Haplotype" in columns
-    assert "Frequency" in columns
+    frequencies = microhapulator.load_marker_frequencies(freqfile)
     if not haploseqs:
         return frequencies, None, None
-    markers = pd.read_csv(markerfile, sep="\t")
-    columns = list(markers.columns)
-    assert "Marker" in columns
-    assert "Offset" in columns
-    sequences = SeqIO.to_dict(SeqIO.parse(seqfile, "fasta"))
-    sequences = {seqid: record.seq for seqid, record in sequences.items()}
-    if set(frequencies.Marker) != set(markers.Marker):
-        frequniq = set(frequencies.Marker) - set(markers.Marker)
-        markeruniq = set(markers.Marker) - set(frequencies.Marker)
-        message = "discrepancy between marker definitions and population frequencies:"
-        if frequniq:
-            markerids = ", ".join(frequniq)
-            message += f" markers with frequency data but no definition={{{markerids}}};"
-        if markeruniq:
-            markerids = ", ".join(markeruniq)
-            message += f" markers with defined offsets but no frequency data={{{markerids}}};"
-        raise ValueError(message)
-    if set(frequencies.Marker) != set(sequences.keys()):
-        frequniq = set(frequencies.Marker) - set(sequences.keys())
-        sequniq = set(sequences.keys()) - set(frequencies.Marker)
-        message = "discrepancy between marker definitions and population frequencies:"
-        if frequniq:
-            markerids = ", ".join(frequniq)
-            message += f" markers with frequency data but no reference sequence={{{markerids}}};"
-        if sequniq:
-            markerids = ", ".join(sequniq)
-            message += f" markers with a reference sequence but no frequency data={{{markerids}}};"
-        raise ValueError(message)
+    markers = microhapulator.load_marker_definitions(markerfile)
+    sequences = microhapulator.load_marker_reference_sequences(seqfile)
+    microhapulator.cross_check_marker_ids(frequencies.Marker, markers.Marker, "marker frequencies", "marker definitions")
+    microhapulator.cross_check_marker_ids(frequencies.Marker, sequences.keys(), "marker frequencies", "marker reference sequences")
     return frequencies, markers, sequences
 
 
