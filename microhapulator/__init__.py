@@ -80,7 +80,7 @@ def plog(*args, **kwargs):
 
 def load_marker_frequencies(tsvfile):
     frequencies = pd.read_csv(tsvfile, sep="\t")
-    missing = set(frequencies.columns) - set(["Marker", "Haplotype", "Frequency"])
+    missing = set(["Marker", "Haplotype", "Frequency"]) - set(frequencies.columns)
     if len(missing) > 0:
         message = "column(s) missing from marker frequency file: " + ", ".join(sorted(missing))
         raise ValueError(message)
@@ -89,7 +89,7 @@ def load_marker_frequencies(tsvfile):
 
 def load_marker_definitions(tsvfile):
     markers = pd.read_csv(tsvfile, sep="\t")
-    missing = set(markers.columns) - set(["Marker", "Offset"])
+    missing = set(["Marker", "Offset"]) - set(markers.columns)
     if len(missing) > 0:
         message = "column(s) missing from marker definition file: " + ", ".join(sorted(missing))
         raise ValueError(message)
