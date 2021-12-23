@@ -8,7 +8,6 @@
 # -----------------------------------------------------------------------------
 
 import filecmp
-import microhapdb
 import microhapulator
 from microhapulator.profile import Profile
 from microhapulator.seq import calc_n_reads_from_proportions

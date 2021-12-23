@@ -7,14 +7,12 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-import microhapdb
 import microhapulator
 from microhapulator.profile import SimulatedProfile, ObservedProfile
 from microhapulator.tests import data_file
 import numpy
 import pandas as pd
 import pytest
-from tempfile import NamedTemporaryFile
 
 
 def test_profile_roundtrip(tmp_path):

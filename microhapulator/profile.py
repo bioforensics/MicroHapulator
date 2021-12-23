@@ -234,20 +234,6 @@ class SimulatedProfile(Profile):
     haplotype/phase 0 allele and the hap/phase 1 allele. However, if the
     profile represents a mixture there may be more than 2 haplotypes, as
     indicated by the `ploidy` parameter.
-
-    >>> gt = SimulatedProfile()
-    >>> gt.add(0, 'mh21KK-315', 'G,C,T')
-    >>> gt.add(1, 'mh21KK-315', 'A,T,C')
-    >>> gt.add(0, 'mh21KK-316', 'A,C,G,T')
-    >>> gt.add(1, 'mh21KK-316', 'A,T,G,C')
-    >>> print(gt.bedstr)
-    mh21KK-315 102     103     G|A
-    mh21KK-315 207     208     C|T
-    mh21KK-315 247     248     T|C
-    mh21KK-316 108     109     A|A
-    mh21KK-316 132     133     C|T
-    mh21KK-316 179     180     G|G
-    mh21KK-316 242     243     T|C
     """
 
     def populate_from_bed(bedfile):

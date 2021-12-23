@@ -7,7 +7,6 @@
 # and is licensed under the BSD license: see LICENSE.txt.
 # -----------------------------------------------------------------------------
 
-import microhapdb
 import microhapulator
 from microhapulator.profile import Profile
 from microhapulator.tests import data_file
