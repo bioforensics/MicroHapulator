@@ -31,7 +31,7 @@ def test_contrib_json(pjson, numcontrib):
 
 def test_contrib_bam():
     bam = data_file("bam/three-contrib-log.bam")
-    defn = data_file("default-panel-offsets.tsv")
+    defn = data_file("def/default-panel-offsets.tsv")
     profile = microhapulator.contrib.load_profile(
         bamfile=bam, markertsv=defn, dynamic=0.25, static=10
     )
@@ -41,7 +41,7 @@ def test_contrib_bam():
 
 def test_contrib_main(capsys):
     bam = data_file("bam/three-contrib-log.bam")
-    defn = data_file("default-panel-offsets.tsv")
+    defn = data_file("def/default-panel-offsets.tsv")
     arglist = ["contrib", "-b", bam, "-t", defn, "--static", "10", "--dynamic", "0.25"]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.contrib.main(args)

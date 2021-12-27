@@ -37,12 +37,12 @@ def test_main(tmp_path):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.sim.main(args)
     observed = SimulatedProfile(fromfile=outfile)
-    expected = SimulatedProfile(fromfile=data_file("bitusa-profile.json"))
+    expected = SimulatedProfile(fromfile=data_file("prof/bitusa-profile.json"))
     assert observed == expected
 
 
 def test_no_seed():
-    freqs = pd.read_csv(data_file("asw2-freq.tsv"), sep="\t")
+    freqs = pd.read_csv(data_file("freq/asw2-freq.tsv"), sep="\t")
     genotype = microhapulator.sim.sim(freqs)
     assert len(genotype.data["markers"]) == 2
     assert sorted(genotype.data["markers"]) == ["mh07CP-004", "mh14CP-003"]
@@ -63,7 +63,7 @@ def test_main_haplo_seq(tmp_path):
         data_file("refr/orange-refr.fasta"),
         "--markers",
         data_file("def/orange-offsets.tsv"),
-        data_file("asw2-freq.tsv"),
+        data_file("freq/asw2-freq.tsv"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.sim.main(args)

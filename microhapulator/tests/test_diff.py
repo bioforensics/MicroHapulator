@@ -16,8 +16,8 @@ from tempfile import NamedTemporaryFile
 
 
 def test_diff_basic():
-    gt1 = SimulatedProfile(fromfile=data_file("diff-comp-1.json"))
-    gt2 = SimulatedProfile(fromfile=data_file("diff-comp-2.json"))
+    gt1 = SimulatedProfile(fromfile=data_file("prof/diff-comp-1.json"))
+    gt2 = SimulatedProfile(fromfile=data_file("prof/diff-comp-2.json"))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     assert diff == [
         ("MHDBL000140", {"C,C,A,A"}, {"C,C,T,A"}),
@@ -26,8 +26,8 @@ def test_diff_basic():
 
 
 def test_diff_large():
-    gt1 = SimulatedProfile(fromfile=data_file("diff-comp-1.json"))
-    gt2 = SimulatedProfile(fromfile=data_file("diff-comp-3.json"))
+    gt1 = SimulatedProfile(fromfile=data_file("prof/diff-comp-1.json"))
+    gt2 = SimulatedProfile(fromfile=data_file("prof/diff-comp-3.json"))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     loci = [d[0] for d in diff]
     print(diff[9], diff[17], diff[21])
@@ -79,8 +79,8 @@ def test_diff_large():
 
 
 def test_diff_cli():
-    f1 = data_file("diff-comp-1.json")
-    f2 = data_file("diff-comp-3.json")
+    f1 = data_file("prof/diff-comp-1.json")
+    f2 = data_file("prof/diff-comp-3.json")
     with NamedTemporaryFile(suffix=".json") as outfile:
         arglist = ["diff", "-o", outfile.name, f1, f2]
         args = microhapulator.cli.get_parser().parse_args(arglist)
@@ -93,15 +93,15 @@ def test_diff_cli():
 
 
 def test_diff2():
-    gt1 = SimulatedProfile(fromfile=data_file("euramer-sim-gt.json"))
-    gt2 = SimulatedProfile(fromfile=data_file("euramer-inf-gt.json"))
+    gt1 = SimulatedProfile(fromfile=data_file("prof/euramer-sim-gt.json"))
+    gt2 = SimulatedProfile(fromfile=data_file("prof/euramer-inf-gt.json"))
     diff = list(microhapulator.diff.diff(gt1, gt2))
     assert diff == [("MHDBL000018", set(), {"T,G,C,T,A"})]
 
 
 def test_diff_nonmatching_alleles():
-    p1 = SimulatedProfile(fromfile=data_file("red-strict-profile.json"))
-    p2 = SimulatedProfile(fromfile=data_file("red-relaxed-profile.json"))
+    p1 = SimulatedProfile(fromfile=data_file("prof/red-strict-profile.json"))
+    p2 = SimulatedProfile(fromfile=data_file("prof/red-relaxed-profile.json"))
     diff = list(microhapulator.diff.diff(p1, p2))
     print(diff)
     assert diff == [

@@ -14,7 +14,7 @@ import pytest
     "tsv,nrows,value",
     [
         ("freq/russ4-freq.tsv", 38, 0.123),
-        ("acb-dozen-freq.tsv", 61, 0.182),
+        ("freq/acb-dozen-freq.tsv", 61, 0.182),
     ],
 )
 def test_load_marker_frequencies(tsv, nrows, value):

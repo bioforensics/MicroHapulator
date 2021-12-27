@@ -17,7 +17,7 @@ import pytest
 
 def test_profile_roundtrip(tmp_path):
     seed = numpy.random.randint(1, 2 ** 32 - 1)
-    freqs = pd.read_csv(data_file("asw5-freq.tsv"), sep="\t")
+    freqs = pd.read_csv(data_file("freq/asw5-freq.tsv"), sep="\t")
     profile = microhapulator.sim.sim(freqs, seed=seed)
     profile.dump(tmp_path / "profile.json")
     test = SimulatedProfile(fromfile=tmp_path / "profile.json")
@@ -27,7 +27,7 @@ def test_profile_roundtrip(tmp_path):
 
 def test_alleles():
     simprof = SimulatedProfile.populate_from_bed(data_file("gttest.bed.gz"))
-    obsprof = ObservedProfile(fromfile=data_file("gttest.json"))
+    obsprof = ObservedProfile(fromfile=data_file("prof/gttest.json"))
     assert simprof.alleles("BoGuSlOcUs") == set()
     assert obsprof.alleles("BoGuSlOcUs") == set()
     assert simprof.alleles("MHDBL000135") == set(["G,C,T", "G,T,C"])
@@ -46,7 +46,7 @@ def test_haplotypes():
 
 def test_sim_obs_profile_equality():
     simprof = SimulatedProfile.populate_from_bed(data_file("gttest.bed.gz"))
-    obsprof = ObservedProfile(fromfile=data_file("gttest.json"))
+    obsprof = ObservedProfile(fromfile=data_file("prof/gttest.json"))
     assert simprof == obsprof
     assert obsprof == simprof
 
@@ -58,7 +58,7 @@ def test_sim_obs_profile_not_equal():
     assert simprof1 != 3.14159
     assert simprof1 != "A,C,C,T"
 
-    obsprof1 = ObservedProfile(fromfile=data_file("gttest.json"))
+    obsprof1 = ObservedProfile(fromfile=data_file("prof/gttest.json"))
     assert simprof1 != obsprof1
     assert obsprof1 != simprof1
     assert obsprof1 != 1985
@@ -69,7 +69,7 @@ def test_sim_obs_profile_not_equal():
     assert simprof2 != obsprof1
     assert obsprof1 != simprof2
 
-    obsprof2 = ObservedProfile(fromfile=data_file("gttest-altered.json"))
+    obsprof2 = ObservedProfile(fromfile=data_file("prof/gttest-altered.json"))
     assert obsprof1 != obsprof2
 
 

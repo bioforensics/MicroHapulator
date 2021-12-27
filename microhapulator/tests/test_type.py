@@ -34,7 +34,7 @@ def test_type_simpler():
 
 def test_type_missing_bam_index(tmp_path):
     bam = data_file("bam/three-contrib-log-link.bam")
-    tsv = data_file("default-panel-offsets.tsv")
+    tsv = data_file("def/default-panel-offsets.tsv")
     tmp_bam = str(tmp_path / "reads.bam")
     tmp_tsv = str(tmp_path / "offsets.tsv")
     copyfile(bam, tmp_bam)
@@ -67,8 +67,8 @@ def test_type_cli_simple(tmp_path):
 
 
 def test_type_dyn_cutoff():
-    bam = data_file("dyncut-test-reads.bam")
-    fasta = data_file("dyncut-panel.tsv")
+    bam = data_file("bam/dyncut-test-reads.bam")
+    fasta = data_file("def/dyncut-panel.tsv")
     rslt = microhapulator.type.type(bam, fasta, static=10, dynamic=0.25)
     assert rslt.alleles("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
     assert rslt.alleles("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])

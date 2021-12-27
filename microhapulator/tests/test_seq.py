@@ -40,9 +40,9 @@ def test_even_mixture():
     seed = numpy.random.randint(1, 2 ** 32 - 1)
     print("Seed:", seed)
     numpy.random.seed(seed)
-    freqs = microhapulator.load_marker_frequencies(data_file("acb-dozen-freq.tsv"))
-    markers = microhapulator.load_marker_definitions(data_file("acb-dozen-offsets.tsv"))
-    seqs = microhapulator.load_marker_reference_sequences(data_file("acb-dozen-refr.fasta"))
+    freqs = microhapulator.load_marker_frequencies(data_file("freq/acb-dozen-freq.tsv"))
+    markers = microhapulator.load_marker_definitions(data_file("def/acb-dozen-offsets.tsv"))
+    seqs = microhapulator.load_marker_reference_sequences(data_file("refr/acb-dozen-refr.fasta"))
     profiles = list()
     for _ in range(numpy.random.randint(2, 6)):
         p = microhapulator.sim.sim(freqs)
