@@ -1,11 +1,14 @@
-#!/usr/bin/env python3
+# -------------------------------------------------------------------------------------------------
+# Copyright (c) 2018, DHS.
 #
-# -----------------------------------------------------------------------------
-# Copyright (c) 2018, Battelle National Biodefense Institute.
+# This file is part of MicroHapulator (https://github.com/bioforensics/microhapulator) and is
+# licensed under the BSD license: see LICENSE.txt.
 #
-# This file is part of MicroHapulator (github.com/bioforensics/microhapulator)
-# and is licensed under the BSD license: see LICENSE.txt.
-# -----------------------------------------------------------------------------
+# This software was prepared for the Department of Homeland Security (DHS) by the Battelle National
+# Biodefense Institute, LLC (BNBI) as part of contract HSHQDC-15-C-00064 to manage and operate the
+# National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
+# Development Center.
+# -------------------------------------------------------------------------------------------------
 
 from setuptools import setup
 import versioneer
@@ -28,7 +31,7 @@ setup(
         "microhapulator": ["microhapulator/tests/data/*", "microhapulator/tests/data/*/*"]
     },
     include_package_data=True,
-    install_requires=["insilicoseq", "numpy", "microhapdb", "happer", "jsonschema", "termgraph"],
+    install_requires=["insilicoseq", "numpy", "happer", "jsonschema", "termgraph"],
     entry_points={"console_scripts": ["mhpl8r = microhapulator.__main__:main"]},
     classifiers=[
         "Environment :: Console",
