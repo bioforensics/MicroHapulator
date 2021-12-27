@@ -33,10 +33,10 @@ def test_type_simpler():
 
 
 def test_type_missing_bam_index(tmp_path):
-    bam = data_file("three-contrib-log-link.bam")
+    bam = data_file("bam/three-contrib-log-link.bam")
     tsv = data_file("default-panel-offsets.tsv")
-    tmp_bam = str(tmp_path / "three-contrib-log-link.bam")
-    tmp_tsv = str(tmp_path / "default-panel-offsets.tsv")
+    tmp_bam = str(tmp_path / "reads.bam")
+    tmp_tsv = str(tmp_path / "offsets.tsv")
     copyfile(bam, tmp_bam)
     copyfile(tsv, tmp_tsv)
     result = microhapulator.type.type(tmp_bam, tmp_tsv, minbasequal=13)

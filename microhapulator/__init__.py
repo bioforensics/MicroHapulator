@@ -97,8 +97,9 @@ def load_marker_definitions(tsvfile):
 
 
 def load_marker_reference_sequences(fastafile):
-    sequences = SeqIO.to_dict(SeqIO.parse(fastafile, "fasta"))
-    sequences = {seqid: record.seq for seqid, record in sequences.items()}
+    with open(fastafile, "r") as fh:
+        sequences = SeqIO.to_dict(SeqIO.parse(fh, "fasta"))
+        sequences = {seqid: record.seq for seqid, record in sequences.items()}
     return sequences
 
 

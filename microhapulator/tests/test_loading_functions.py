@@ -13,7 +13,7 @@ import pytest
 @pytest.mark.parametrize(
     "tsv,nrows,value",
     [
-        ("russ4-freq.tsv", 38, 0.123),
+        ("freq/russ4-freq.tsv", 38, 0.123),
         ("acb-dozen-freq.tsv", 61, 0.182),
     ],
 )

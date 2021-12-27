@@ -47,17 +47,17 @@ def test_even_mixture():
     for _ in range(numpy.random.randint(2, 6)):
         p = microhapulator.sim.sim(freqs)
         profiles.append(p)
-    sequencer = microhapulator.seq.seq(profiles, markers, seqs, totalreads=500)
+    sequencer = microhapulator.seq.seq(profiles, markers, seqs, totalreads=1000)
     for n, read1, read2 in sequencer:
         pass
     numfragments = n * 2
-    assert numfragments == pytest.approx(500, abs=25)
+    assert numfragments == pytest.approx(1000, abs=50)
 
 
 def test_complex_genotype(capsys):
     profile = Profile(fromfile=data_file("mixture-genotype.json"))
-    markers = microhapulator.load_marker_definitions(data_file("russ4-offsets.tsv"))
-    seqs = microhapulator.load_marker_reference_sequences(data_file("russ4-refr.fasta"))
+    markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
+    seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
     sequencer = microhapulator.seq.seq(list(profile.unmix()), markers, seqs, totalreads=200)
     for n, read in enumerate(sequencer):
         pass
@@ -66,9 +66,9 @@ def test_complex_genotype(capsys):
 
 
 def test_uneven_mixture(capsys):
-    freqs = microhapulator.load_marker_frequencies(data_file("russ4-freq.tsv"))
-    markers = microhapulator.load_marker_definitions(data_file("russ4-offsets.tsv"))
-    seqs = microhapulator.load_marker_reference_sequences(data_file("russ4-refr.fasta"))
+    freqs = microhapulator.load_marker_frequencies(data_file("freq/russ4-freq.tsv"))
+    markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
+    seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
     profiles = [microhapulator.sim.sim(freqs) for _ in range(3)]
     sequencer = microhapulator.seq.seq(
         profiles, markers, seqs, totalreads=500, proportions=[0.5, 0.3, 0.2]
@@ -82,9 +82,9 @@ def test_uneven_mixture(capsys):
 
 
 def test_mixture_failure_modes():
-    freqs = microhapulator.load_marker_frequencies(data_file("russ4-freq.tsv"))
-    markers = microhapulator.load_marker_definitions(data_file("russ4-offsets.tsv"))
-    seqs = microhapulator.load_marker_reference_sequences(data_file("russ4-refr.fasta"))
+    freqs = microhapulator.load_marker_frequencies(data_file("freq/russ4-freq.tsv"))
+    markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
+    seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
     profiles = [microhapulator.sim.sim(freqs) for _ in range(3)]
     with pytest.raises(ValueError, match=r"number of profiles must match number of seeds"):
         for read in microhapulator.seq.seq(profiles, markers, seqs, seeds=[42, 1776]):
@@ -153,9 +153,9 @@ def test_main_mixture(capsys):
         "0.2",
         "--num-reads",
         "500",
-        data_file("yellow-offsets.tsv"),
-        data_file("yellow-refr.fasta"),
-        data_file("yellow-mix-gt.json"),
+        data_file("def/yellow-offsets.tsv"),
+        data_file("refr/yellow-refr.fasta.gz"),
+        data_file("prof/yellow-mix-gt.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
