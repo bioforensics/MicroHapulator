@@ -15,7 +15,7 @@ import os
 from pkg_resources import resource_filename
 import sys
 
-# Third-party librarys
+# Third-party libraries
 from Bio import SeqIO
 import pandas as pd
 
