@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - New `--base-qual` parameter for `mhpl8r type` to set the minimum required base quality when iterating over reads in a pileup (#83).
 - New `mhpl8r balance` module for calculating and visualizing interlocus balance (#85).
+- Users can now supply marker definitions, frequences, and reference sequences as TSV/FASTA files instead of MicroHapDB references (#93).
 
 ### Changed
 - Updated mybinder demo (see #69).
@@ -16,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Improved read names and choice of interleaved or paired output for `mhpl8r seq` (#80).
 - Replaced `--threshold` with `--static` and `--dynamic` in in `mhpl8r type`, disabled both by default (#82, #83).
 - Changed the default pysam pileup `max_depth` parameter, overriding 8000 with 1e6 and exposing as a hidden CLI parameter (#87).
+- Removed dependency on MicroHapDB for marker definitions, frequencies, and sequences (#93).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (#71).
