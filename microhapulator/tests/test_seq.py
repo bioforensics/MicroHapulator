@@ -114,9 +114,9 @@ def test_main(tmp_path):
         "500",
         "--signature",
         "srd6Sei",
-        data_file("orange-offsets.tsv"),
-        data_file("orange-refr.fasta"),
-        data_file("orange-sim-profile.json"),
+        data_file("def/orange-offsets.tsv"),
+        data_file("refr/orange-refr.fasta"),
+        data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
@@ -131,9 +131,9 @@ def test_main_no_seed():
             outfile.name,
             "--num-reads",
             "200",
-            data_file("orange-offsets.tsv"),
-            data_file("orange-refr.fasta"),
-            data_file("orange-sim-profile.json"),
+            data_file("def/orange-offsets.tsv"),
+            data_file("refr/orange-refr.fasta"),
+            data_file("prof/orange-sim-profile.json"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.seq.main(args)
@@ -177,9 +177,9 @@ def test_main_out_stdout(capsys):
         "seq",
         "--num-reads",
         "100",
-        data_file("orange-offsets.tsv"),
-        data_file("orange-refr.fasta"),
-        data_file("orange-sim-profile.json"),
+        data_file("def/orange-offsets.tsv"),
+        data_file("refr/orange-refr.fasta"),
+        data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
@@ -197,9 +197,9 @@ def test_main_out_one_filename(tmp_path):
         outfile,
         "--num-reads",
         "100",
-        data_file("orange-offsets.tsv"),
-        data_file("orange-refr.fasta"),
-        data_file("orange-sim-profile.json"),
+        data_file("def/orange-offsets.tsv"),
+        data_file("refr/orange-refr.fasta"),
+        data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
@@ -220,9 +220,9 @@ def test_main_out_two_filenames(tmp_path):
         f2,
         "--num-reads",
         "100",
-        data_file("orange-offsets.tsv"),
-        data_file("orange-refr.fasta"),
-        data_file("orange-sim-profile.json"),
+        data_file("def/orange-offsets.tsv"),
+        data_file("refr/orange-refr.fasta"),
+        data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.seq.main(args)
@@ -243,9 +243,9 @@ def test_main_out_three_filenames(capsys):
         "TWO",
         "THREE",
         "--",
-        data_file("orange-offsets.tsv"),
-        data_file("orange-refr.fasta"),
-        data_file("orange-sim-profile.json"),
+        data_file("def/orange-offsets.tsv"),
+        data_file("refr/orange-refr.fasta"),
+        data_file("prof/orange-sim-profile.json"),
     ]
     with pytest.raises(SystemExit):
         args = microhapulator.cli.get_parser().parse_args(arglist)

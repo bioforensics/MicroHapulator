@@ -25,7 +25,7 @@ def test_load_marker_frequencies(tsv, nrows, value):
 
 
 def test_load_marker_frequencies_extra_column_ok():
-    freqs = microhapulator.load_marker_frequencies(data_file("korea-5loc-freq-extracol.tsv"))
+    freqs = microhapulator.load_marker_frequencies(data_file("freq/korea-5loc-freq-extracol.tsv"))
     assert list(freqs.columns) == ["Marker", "Haplotype", "Frequency", "Foo"]
     assert freqs.Haplotype.iloc[1] == "C,A,G,G"
 
@@ -33,8 +33,8 @@ def test_load_marker_frequencies_extra_column_ok():
 @pytest.mark.parametrize(
     "tsv",
     [
-        "korea-5loc-freq-missingcol.tsv",
-        "korea-5loc-freq-badcol.tsv",
+        "freq/korea-5loc-freq-missingcol.tsv",
+        "freq/korea-5loc-freq-badcol.tsv",
     ],
 )
 def test_load_marker_frequencies_missing_or_bad_columns(tsv):

@@ -18,9 +18,9 @@ import tempfile
 
 
 def test_meaning_of_life():
-    freqs = pd.read_csv(data_file("ceu50-freq.tsv"), sep="\t")
+    freqs = pd.read_csv(data_file("freq/ceu50-freq.tsv"), sep="\t")
     observed = microhapulator.sim.sim(freqs, seed=42)
-    expected = SimulatedProfile(fromfile=data_file("meaning-of-life.json.gz"))
+    expected = SimulatedProfile(fromfile=data_file("prof/meaning-of-life.json.gz"))
     assert observed == expected
 
 
@@ -32,7 +32,7 @@ def test_main(tmp_path):
         outfile,
         "--seed",
         "1985",
-        data_file("ceu50-freq.tsv"),
+        data_file("freq/ceu50-freq.tsv"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.sim.main(args)
@@ -60,14 +60,14 @@ def test_main_haplo_seq(tmp_path):
         "--haplo-seq",
         hapseq,
         "--sequences",
-        data_file("orange-refr.fasta"),
+        data_file("refr/orange-refr.fasta"),
         "--markers",
-        data_file("orange-offsets.tsv"),
+        data_file("def/orange-offsets.tsv"),
         data_file("asw2-freq.tsv"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.sim.main(args)
     observed = SimulatedProfile(fromfile=profile)
-    expected = SimulatedProfile(fromfile=data_file("orange-sim-profile.json"))
+    expected = SimulatedProfile(fromfile=data_file("prof/orange-sim-profile.json"))
     assert observed == expected
     assert filecmp.cmp(hapseq, data_file("orange-haplo.fasta"))
