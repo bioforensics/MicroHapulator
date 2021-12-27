@@ -11,3 +11,4 @@ scratch/
 .ipynb_checkpoints/
 .DS_Store
 dist/
+microhapulator/tests/data/bam/sandawe-dad.bam.bai

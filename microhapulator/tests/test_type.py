@@ -68,17 +68,18 @@ def test_type_cli_simple(tmp_path):
 
 def test_type_dyn_cutoff():
     bam = data_file("bam/dyncut-test-reads.bam")
-    fasta = data_file("def/dyncut-panel.tsv")
-    rslt = microhapulator.type.type(bam, fasta, static=10, dynamic=0.25)
+    tsv = data_file("def/dyncut-panel.tsv")
+    rslt = microhapulator.type.type(bam, tsv, static=10, dynamic=0.25)
     assert rslt.alleles("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
     assert rslt.alleles("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
-    rslt = microhapulator.type.type(bam, fasta, static=4, dynamic=0.25)
+    rslt = microhapulator.type.type(bam, tsv, static=4, dynamic=0.25)
     assert rslt.alleles("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G", "C,A,C,T,A", "T,G,C,T,A"])
     assert rslt.alleles("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
 
 
-# def test_type_no_var_offsets():
-#     bam = data_file("sandawe-dad.bam")
-#     fasta = data_file("sandawe-panel.fasta.gz")
-#     with pytest.raises(ValueError, match=r"variant offsets not annotated for target amplicon:"):
-#         result = microhapulator.type.type(bam, fasta)
+def test_type_no_var_offsets():
+    bam = data_file("bam/sandawe-dad.bam")
+    tsv = data_file("def/sandawe-empty.tsv")
+    message = r"marker IDs unique to set1={mh03KK-006, mh01KK-205, mh02KK-005};"
+    with pytest.raises(ValueError, match=message):
+        result = microhapulator.type.type(bam, tsv)

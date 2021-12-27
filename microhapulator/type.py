@@ -24,10 +24,8 @@ def check_index(bamfile):
         pysam.index(bamfile)
 
 
-def tally_haplotypes(bamfile, offsets, minbasequal=10, max_depth=1e6):
+def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
-    check_index(bamfile)
-    bam = pysam.AlignmentFile(bamfile, "rb")
     for locusid in sorted(offsets):
         discarded = 0
         haplotypes = defaultdict(int)
@@ -63,11 +61,16 @@ def tally_haplotypes(bamfile, offsets, minbasequal=10, max_depth=1e6):
 def type(
     bamfile, markertsv, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None, max_depth=1e6
 ):
+    check_index(bamfile)
+    bam = pysam.AlignmentFile(bamfile, "rb")
     markers = microhapulator.load_marker_definitions(markertsv)
     offsets = defaultdict(list)
     for n, row in markers.iterrows():
         offsets[row.Marker].append(row.Offset)
-    genotyper = tally_haplotypes(bamfile, offsets, minbasequal=minbasequal, max_depth=max_depth)
+    microhapulator.cross_check_marker_ids(
+        bam.references, offsets.keys(), "read alignments", "marker definitions"
+    )
+    genotyper = tally_haplotypes(bam, offsets, minbasequal=minbasequal, max_depth=max_depth)
     profile = microhapulator.profile.ObservedProfile()
     for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
         profile.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
