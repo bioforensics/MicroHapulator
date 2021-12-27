@@ -55,7 +55,7 @@ def test_even_mixture():
 
 
 def test_complex_genotype(capsys):
-    profile = Profile(fromfile=data_file("mixture-genotype.json"))
+    profile = Profile(fromfile=data_file("prof/mixture-genotype.json"))
     markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
     sequencer = microhapulator.seq.seq(list(profile.unmix()), markers, seqs, totalreads=200)

@@ -90,7 +90,7 @@ def test_merge_sim_genotypes():
     prof3.add(0, "mh05KK-123", "G,C")
     prof3.add(1, "mh05KK-123", "G,T")
     profile = SimulatedProfile.merge([prof1, prof2, prof3])
-    markers = pd.read_csv(data_file("loc2-offsets.tsv"), sep="\t")
+    markers = pd.read_csv(data_file("def/loc2-offsets.tsv"), sep="\t")
     output = profile.bedstr(markers)
     print(output)
     assert output == (
@@ -106,6 +106,6 @@ def test_bed_error():
     p = SimulatedProfile()
     p.add(0, "BOGUS", "A,C,C")
     p.add(1, "BOGUS", "A,C,C")
-    markers = pd.read_csv(data_file("loc2-offsets.tsv"), sep="\t")
+    markers = pd.read_csv(data_file("def/loc2-offsets.tsv"), sep="\t")
     with pytest.raises(ValueError, match=r"unknown marker identifier 'BOGUS'"):
         print(p.bedstr(markers))
