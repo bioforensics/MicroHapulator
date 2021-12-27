@@ -112,9 +112,9 @@ def cross_check_marker_ids(set1, set2, label1, label2):
     uniq2 = set2 - set1
     message = f"discrepancy between {label1} (set1) and {label2} (set2):"
     if uniq1:
-        ustr1 = ", ".join(uniq1)
+        ustr1 = ", ".join(sorted(uniq1))
         message += f" marker IDs unique to set1={{{ustr1}}};"
     if uniq2:
-        ustr2 = ", ".join(uniq2)
+        ustr2 = ", ".join(sorted(uniq2))
         message += f" marker IDs unique to set2={{{ustr2}}};"
     raise ValueError(message)

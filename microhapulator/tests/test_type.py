@@ -80,6 +80,6 @@ def test_type_dyn_cutoff():
 def test_type_no_var_offsets():
     bam = data_file("bam/sandawe-dad.bam")
     tsv = data_file("def/sandawe-empty.tsv")
-    message = r"marker IDs unique to set1={mh03KK-006, mh01KK-205, mh02KK-005};"
+    message = r"marker IDs unique to set1={mh01KK-205, mh02KK-005, mh03KK-006};"
     with pytest.raises(ValueError, match=message):
         result = microhapulator.type.type(bam, tsv)
