@@ -36,6 +36,8 @@ def subparser(subparsers):
         help='write output to "FILE"; by '
         "default, output is written to the terminal (standard output)",
     )
-    cli.add_argument("population", help="indicate which allele frequencies to use")
+    cli.add_argument(
+        "freq", help="population microhaplotype frequencies in tabular (tab separated) format"
+    )
     cli.add_argument("profile1", help="profile in JSON format")
-    cli.add_argument("profile2", nargs="?", default=None, help="profile in JSON format")
+    cli.add_argument("profile2", nargs="?", default=None, help="profile in JSON format; optional")

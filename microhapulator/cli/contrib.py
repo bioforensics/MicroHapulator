@@ -26,11 +26,9 @@ def subparser(subparsers):
         "`--refr-fasta` and `--bam` flags",
     )
     cli.add_argument(
-        "-r", "--refr", metavar="FILE", help="microhap marker sequences in " "Fasta format"
+        "-t", "--tsv", metavar="FILE", help="microhap marker definitions in tabular (TSV) format"
     )
-    cli.add_argument(
-        "-b", "--bam", metavar="FILE", help="aligned and sorted reads in BAM " "format"
-    )
+    cli.add_argument("-b", "--bam", metavar="FILE", help="aligned and sorted reads in BAM format")
     cli.add_argument(
         "-s",
         "--static",

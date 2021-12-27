@@ -14,21 +14,6 @@ import pysam
 import re
 
 
-def parse_variant_offsets_from_fasta_headers(fasta):
-    offsets = dict()
-    for line in fasta:
-        if not line.startswith(">"):
-            continue
-        markerid = line[1:].split()[0]
-        if " variants=" not in line:
-            message = "variant offsets not annotated for target amplicon: " + line
-            raise ValueError(message)
-        offsetstr = re.search(r"variants=(\S+)", line).group(1)
-        varloc = [int(x) for x in offsetstr.split(",")]
-        offsets[markerid] = varloc
-    return offsets
-
-
 def check_index(bamfile):
     index1 = bamfile + ".bai"
     index2 = re.sub(r".bam$", ".bai", bamfile)
@@ -39,12 +24,8 @@ def check_index(bamfile):
         pysam.index(bamfile)
 
 
-def tally_haplotypes(bamfile, refrfasta, minbasequal=10, max_depth=1e6):
+def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
-    with microhapulator.open(refrfasta, "r") as fh:
-        offsets = parse_variant_offsets_from_fasta_headers(fh)
-    check_index(bamfile)
-    bam = pysam.AlignmentFile(bamfile, "rb")
     for locusid in sorted(offsets):
         discarded = 0
         haplotypes = defaultdict(int)
@@ -78,9 +59,18 @@ def tally_haplotypes(bamfile, refrfasta, minbasequal=10, max_depth=1e6):
 
 
 def type(
-    bamfile, refrfasta, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None, max_depth=1e6
+    bamfile, markertsv, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None, max_depth=1e6
 ):
-    genotyper = tally_haplotypes(bamfile, refrfasta, minbasequal=minbasequal, max_depth=max_depth)
+    check_index(bamfile)
+    bam = pysam.AlignmentFile(bamfile, "rb")
+    markers = microhapulator.load_marker_definitions(markertsv)
+    offsets = defaultdict(list)
+    for n, row in markers.iterrows():
+        offsets[row.Marker].append(row.Offset)
+    microhapulator.cross_check_marker_ids(
+        bam.references, offsets.keys(), "read alignments", "marker definitions"
+    )
+    genotyper = tally_haplotypes(bam, offsets, minbasequal=minbasequal, max_depth=max_depth)
     profile = microhapulator.profile.ObservedProfile()
     for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
         profile.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
@@ -93,7 +83,7 @@ def type(
 def main(args):
     profile = type(
         args.bam,
-        args.refr,
+        args.tsv,
         minbasequal=args.base_qual,
         ecthreshold=args.effcov,
         static=args.static,

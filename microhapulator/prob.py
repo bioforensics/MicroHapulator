@@ -8,27 +8,22 @@
 # -----------------------------------------------------------------------------
 
 import json
-import microhapdb
 import microhapulator
 from microhapulator.profile import Profile
 
 
-def prob(popid, prof1, prof2=None, erate=0.001):
+def prob(frequencies, prof1, prof2=None, erate=0.001):
     if prof2 is None:
-        return prof1.rand_match_prob(popid)
+        return prof1.rand_match_prob(frequencies)
     else:
-        return prof1.rmp_lr_test(prof2, popid, erate=erate)
+        return prof1.rmp_lr_test(prof2, frequencies, erate=erate)
 
 
 def main(args):
     prof1 = Profile(fromfile=args.profile1)
     prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
-    popids = microhapdb.population.standardize_ids([args.population])
-    if len(popids) != 1:
-        message = 'issue with population "{:s}"; invalid or not unique'.format(args.population)
-        raise ValueError(message)
-    popid = popids.iloc[0]
-    result = prob(popid, prof1, prof2=prof2, erate=args.erate)
+    frequencies = microhapulator.load_marker_frequencies(args.freq)
+    result = prob(frequencies, prof1, prof2=prof2, erate=args.erate)
     key = "random_match_probability" if prof2 is None else "likelihood_ratio"
     data = {
         key: "{:.3E}".format(result),

@@ -14,7 +14,7 @@ import pytest
 
 
 def test_balance_basic(capfd):
-    profile = Profile(fromfile=data_file("three-contrib-log.json"))
+    profile = Profile(fromfile=data_file("prof/three-contrib-log.json"))
     obs_data = balance(profile)
     exp_data = pandas.read_csv(data_file("three-contrib-log-balance.csv"))
     assert obs_data.equals(exp_data)
@@ -24,7 +24,7 @@ def test_balance_basic(capfd):
 
 def test_balance_cli(tmp_path, capfd):
     outfile = str(tmp_path / "balance.csv")
-    arglist = ["balance", "--csv", outfile, data_file("three-contrib-log.json")]
+    arglist = ["balance", "--csv", outfile, data_file("prof/three-contrib-log.json")]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.balance.main(args)
     obs_data = pandas.read_csv(outfile)
@@ -35,7 +35,7 @@ def test_balance_cli(tmp_path, capfd):
 
 
 def test_balance_cli_no_discard(capfd):
-    arglist = ["balance", "--no-discarded", data_file("three-contrib-log.json")]
+    arglist = ["balance", "--no-discarded", data_file("prof/three-contrib-log.json")]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.balance.main(args)
     terminal = capfd.readouterr()

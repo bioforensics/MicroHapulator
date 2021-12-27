@@ -12,10 +12,12 @@ from happer.mutate import mutate
 from io import StringIO
 import json
 import jsonschema
-import microhapdb
-from microhapdb.marker import TargetAmplicon
 import microhapulator
 from numpy.random import choice
+from pathlib import Path
+
+
+SCHEMA = None
 
 
 def load_schema():
@@ -23,39 +25,18 @@ def load_schema():
         return json.load(fh)
 
 
-schema = None
-
-
 class Profile(object):
-    def unite(mom, dad):
-        """Simulate the creation of a new profile from a mother and father."""
-        gt = SimulatedProfile(ploidy=2)
-        allmarkers = mom.markers() | dad.markers()
-        commonmarkers = mom.markers() & dad.markers()
-        if len(commonmarkers) == 0:
-            raise ValueError("mom and dad profiles have no markers in common")
-        notshared = allmarkers - commonmarkers
-        if len(notshared) > 0:
-            message = "markers not common to mom and dad profiles are excluded: "
-            message += ", ".join(notshared)
-            microhapulator.plog("[MicroHapulator::profile]", message)
-        for parent, hapid in zip((mom, dad), (0, 1)):
-            for marker in sorted(commonmarkers):
-                haploallele = choice(sorted(parent.alleles(marker)))
-                gt.add(hapid, marker, haploallele)
-        return gt
-
     def __init__(self, fromfile=None):
-        global schema
+        global SCHEMA
         if fromfile:
-            if isinstance(fromfile, str):
-                with microhapulator.open(fromfile, "r") as fh:
+            if isinstance(fromfile, str) or isinstance(fromfile, Path):
+                with microhapulator.open(str(fromfile), "r") as fh:
                     self.data = json.load(fh)
             else:
                 self.data = json.load(fromfile)
-            if schema is None:
-                schema = load_schema()
-            jsonschema.validate(instance=self.data, schema=schema)
+            if SCHEMA is None:
+                SCHEMA = load_schema()
+            jsonschema.validate(instance=self.data, schema=SCHEMA)
         else:
             self.data = self.initialize()
 
@@ -68,19 +49,18 @@ class Profile(object):
         return self.data["ploidy"]
 
     def initialize(self):
-        data = {
+        return {
             "version": microhapulator.__version__,
             "type": self.gttype,
             "ploidy": None,
             "markers": dict(),
         }
-        return data
 
     def haplotypes(self):
         hapids = set()
         for markerid, markerdata in self.data["markers"].items():
             for alleledata in markerdata["genotype"]:
-                if "haplotype" in alleledata:
+                if "haplotype" in alleledata and alleledata["haplotype"] is not None:
                     hapids.add(alleledata["haplotype"])
         assert sorted(hapids) == sorted(range(len(hapids)))
         return hapids
@@ -101,7 +81,7 @@ class Profile(object):
             )
         return set([a["allele"] for a in self.data["markers"][markerid]["genotype"]])
 
-    def rand_match_prob(self, popid):
+    def rand_match_prob(self, freqs):
         """Compute the random match probability of this profile.
 
         Given a set of population allele frequencies, the random match
@@ -113,15 +93,9 @@ class Profile(object):
             alleles = self.alleles(marker)
             diploid_consistent = 1 <= len(alleles) <= 2
             if not diploid_consistent:
-                message = "cannot compute random match prob. for marker with {:d} alleles".format(
-                    len(alleles)
-                )
-                raise RandomMatchError(message)
-            result = microhapdb.frequencies[
-                (microhapdb.frequencies.Population == popid)
-                & (microhapdb.frequencies.Marker == marker)
-                & (microhapdb.frequencies.Allele.isin(alleles))
-            ]
+                msg = f"cannot compute random match prob. for marker with {len(alleles)} alleles"
+                raise RandomMatchError(msg)
+            result = freqs[(freqs.Marker == marker) & (freqs.Haplotype.isin(alleles))]
             if len(alleles) == 1:
                 p = 0.001
                 if len(result) == 1:
@@ -142,7 +116,7 @@ class Profile(object):
                 prob *= 2 * p * q
         return prob
 
-    def rmp_lr_test(self, other, popid, erate=0.001):
+    def rmp_lr_test(self, other, freqs, erate=0.001):
         """Compute a likelihood ratio test for the random match probability.
 
         The likelihood ratio test compares the probability that the two samples
@@ -166,12 +140,12 @@ class Profile(object):
             else:
                 mismatches += 2
         numerator = erate ** mismatches
-        denominator = self.rand_match_prob(popid)
+        denominator = self.rand_match_prob(freqs)
         return numerator / denominator
 
     def dump(self, outfile):
-        if isinstance(outfile, str):
-            with microhapulator.open(outfile, "w") as fh:
+        if isinstance(outfile, str) or isinstance(outfile, Path):
+            with microhapulator.open(str(outfile), "w") as fh:
                 json.dump(self.data, fh, indent=4, sort_keys=True)
         else:
             json.dump(self.data, outfile, indent=4, sort_keys=True)
@@ -189,46 +163,55 @@ class Profile(object):
     def __str__(self):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
-    @property
-    def bedstream(self):
-        hapids = self.haplotypes()
+    def bedstream(self, markers):
         for marker in sorted(self.markers()):
-            result = microhapdb.markers[microhapdb.markers.Name == marker]
+            result = markers[markers.Marker == marker]
             if len(result) == 0:
-                raise ValueError('unknown marker identifier "{:s}"'.format(marker))
-            markerdata = result.iloc[0]
-            context = TargetAmplicon(markerdata, delta=30, minlen=350)
-            coords = list(map(int, markerdata.Offsets.split(",")))
-            coords = list(map(context.global_to_local, coords))
-            variants = [list() for _ in range(len(coords))]
-            for haplotype in sorted(hapids):
+                raise ValueError(f"unknown marker identifier '{marker}'")
+            offsets = sorted(result.Offset)
+            variants = [list() for _ in range(len(offsets))]
+            for haplotype in sorted(self.haplotypes()):
                 allele = self.alleles(marker, haplotype=haplotype).pop()
                 for var, varlist in zip(allele.split(","), variants):
                     varlist.append(var)
-            for coord, var in zip(coords, variants):
-                allelestr = "|".join(var)
-                yield "\t".join((marker, str(coord), str(coord + 1), allelestr))
+            for offset, var in zip(offsets, variants):
+                haplostr = "|".join(var)
+                yield "\t".join((marker, str(offset), str(offset + 1), haplostr))
 
-    @property
-    def seqstream(self):
+    def seqstream(self, refrseqs):
         for marker in sorted(self.markers()):
-            canonid = microhapdb.markers[microhapdb.markers.Name == marker].iloc[0]
-            amp = TargetAmplicon(canonid, delta=30, minlen=350)
-            yield amp.defline, amp.amplicon_seq
+            yield marker, refrseqs[marker]
 
-    @property
-    def bedstr(self):
+    def bedstr(self, markers):
         out = StringIO()
-        for line in self.bedstream:
+        for line in self.bedstream(markers):
             print(line, file=out)
         return out.getvalue()
 
-    @property
-    def haploseqs(self):
+    def haploseqs(self, markers, refrseqs):
         """Apply genotype to reference and construct full haplotype sequences."""
-        mutator = mutate(self.seqstream, self.bedstream)
-        for defline, sequence in mutator:
+        ss = self.seqstream(refrseqs)
+        bs = self.bedstream(markers)
+        for defline, sequence in mutate(ss, bs):
             yield defline, sequence
+
+    def unite(mom, dad):
+        """Simulate the creation of a new profile from a mother and father."""
+        gt = SimulatedProfile(ploidy=2)
+        allmarkers = mom.markers() | dad.markers()
+        commonmarkers = mom.markers() & dad.markers()
+        if len(commonmarkers) == 0:
+            raise ValueError("mom and dad profiles have no markers in common")
+        notshared = allmarkers - commonmarkers
+        if len(notshared) > 0:
+            message = "markers not common to mom and dad profiles are excluded: "
+            message += ", ".join(notshared)
+            microhapulator.plog("[MicroHapulator::profile]", message)
+        for parent, hapid in zip((mom, dad), (0, 1)):
+            for marker in sorted(commonmarkers):
+                haploallele = choice(sorted(parent.alleles(marker)))
+                gt.add(hapid, marker, haploallele)
+        return gt
 
     def unmix(self):
         assert self.ploidy % 2 == 0
@@ -251,20 +234,6 @@ class SimulatedProfile(Profile):
     haplotype/phase 0 allele and the hap/phase 1 allele. However, if the
     profile represents a mixture there may be more than 2 haplotypes, as
     indicated by the `ploidy` parameter.
-
-    >>> gt = SimulatedProfile()
-    >>> gt.add(0, 'mh21KK-315', 'G,C,T')
-    >>> gt.add(1, 'mh21KK-315', 'A,T,C')
-    >>> gt.add(0, 'mh21KK-316', 'A,C,G,T')
-    >>> gt.add(1, 'mh21KK-316', 'A,T,G,C')
-    >>> print(gt.bedstr)
-    mh21KK-315 102     103     G|A
-    mh21KK-315 207     208     C|T
-    mh21KK-315 247     248     T|C
-    mh21KK-316 108     109     A|A
-    mh21KK-316 132     133     C|T
-    mh21KK-316 179     180     G|G
-    mh21KK-316 242     243     T|C
     """
 
     def populate_from_bed(bedfile):

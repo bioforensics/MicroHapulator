@@ -8,7 +8,6 @@
 # -----------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pytest
 
@@ -16,12 +15,12 @@ import pytest
 @pytest.mark.parametrize(
     "pjson,numcontrib",
     [
-        ("single-contrib-1.json", 1),
-        ("single-contrib-2.json", 1),
-        ("single-contrib-3.json", 1),
-        ("two-contrib-even.json", 2),
-        ("three-contrib-even.json", 3),
-        ("three-contrib-log.json", 3),
+        ("prof/single-contrib-1.json", 1),
+        ("prof/single-contrib-2.json", 1),
+        ("prof/single-contrib-3.json", 1),
+        ("prof/two-contrib-even.json", 2),
+        ("prof/three-contrib-even.json", 3),
+        ("prof/three-contrib-log.json", 3),
     ],
 )
 def test_contrib_json(pjson, numcontrib):
@@ -31,19 +30,19 @@ def test_contrib_json(pjson, numcontrib):
 
 
 def test_contrib_bam():
-    bam = data_file("three-contrib-log.bam")
-    refr = data_file("default-panel.fasta.gz")
+    bam = data_file("bam/three-contrib-log.bam")
+    defn = data_file("def/default-panel-offsets.tsv")
     profile = microhapulator.contrib.load_profile(
-        bamfile=bam, refrfasta=refr, dynamic=0.25, static=10
+        bamfile=bam, markertsv=defn, dynamic=0.25, static=10
     )
     n, *data = microhapulator.contrib.contrib(profile)
     assert n == 3
 
 
 def test_contrib_main(capsys):
-    bam = data_file("three-contrib-log.bam")
-    refr = data_file("default-panel.fasta.gz")
-    arglist = ["contrib", "-b", bam, "-r", refr, "--static", "10", "--dynamic", "0.25"]
+    bam = data_file("bam/three-contrib-log.bam")
+    defn = data_file("def/default-panel-offsets.tsv")
+    arglist = ["contrib", "-b", bam, "-t", defn, "--static", "10", "--dynamic", "0.25"]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.contrib.main(args)
     out, err = capsys.readouterr()

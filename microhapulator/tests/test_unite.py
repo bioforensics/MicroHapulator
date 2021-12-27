@@ -23,17 +23,17 @@ from tempfile import NamedTemporaryFile
     ],
 )
 def test_unite_basic(momgt, dadgt, kidgt, seed):
-    mom = Profile(fromfile=data_file(momgt))
-    dad = Profile(fromfile=data_file(dadgt))
-    kid = Profile(fromfile=data_file(kidgt))
+    mom = Profile(fromfile=data_file(f"prof/{momgt}"))
+    dad = Profile(fromfile=data_file(f"prof/{dadgt}"))
+    kid = Profile(fromfile=data_file(f"prof/{kidgt}"))
     numpy.random.seed(seed)
     test = Profile.unite(mom, dad)
     assert test == kid
 
 
 def test_unite_unshared(capsys):
-    mom = Profile(fromfile=data_file("swedish-mom.json"))
-    dad = Profile(fromfile=data_file("swedish-dad.json"))
+    mom = Profile(fromfile=data_file("prof/swedish-mom.json"))
+    dad = Profile(fromfile=data_file("prof/swedish-dad.json"))
     kid = Profile.unite(mom, dad)
     terminal = capsys.readouterr()
     message = "markers not common to mom and dad profiles are excluded"
@@ -41,8 +41,8 @@ def test_unite_unshared(capsys):
 
 
 def test_unite_none_shared(capsys):
-    mom = Profile(fromfile=data_file("sandawe-mom.json"))
-    dad = Profile(fromfile=data_file("sandawe-dad.json"))
+    mom = Profile(fromfile=data_file("prof/sandawe-mom.json"))
+    dad = Profile(fromfile=data_file("prof/sandawe-dad.json"))
     with pytest.raises(ValueError, match=r"mom and dad profiles have no markers in common"):
         kid = Profile.unite(mom, dad)
 
@@ -55,11 +55,11 @@ def test_unite_cli():
             "113817",
             "--out",
             outfile.name,
-            data_file("green-mom-3-gt.json"),
-            data_file("green-dad-3-gt.json"),
+            data_file("prof/green-mom-3-gt.json"),
+            data_file("prof/green-dad-3-gt.json"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
         microhapulator.unite.main(args)
         p = Profile(fromfile=outfile.name)
-        testp = Profile(fromfile=data_file("green-kid-3-gt.json"))
+        testp = Profile(fromfile=data_file("prof/green-kid-3-gt.json"))
         assert p == testp

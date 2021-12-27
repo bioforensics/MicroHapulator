@@ -17,9 +17,9 @@ from tempfile import NamedTemporaryFile
 @pytest.mark.parametrize(
     "f1,f2,total,contained",
     [
-        ("four-brits-sim.json", "one-brit-sim.json", 38, 38),
-        ("four-brits-sim.json", "one-american-sim.json", 38, 31),
-        ("one-brit-sim.json", "one-american-sim.json", 38, 11),
+        ("prof/four-brits-sim.json", "prof/one-brit-sim.json", 38, 38),
+        ("prof/four-brits-sim.json", "prof/one-american-sim.json", 38, 31),
+        ("prof/one-brit-sim.json", "prof/one-american-sim.json", 38, 11),
     ],
 )
 def test_contain(f1, f2, total, contained):
@@ -31,7 +31,11 @@ def test_contain(f1, f2, total, contained):
 
 
 def test_contain_cli(capsys):
-    arglist = ["contain", data_file("one-brit-sim.json"), data_file("one-italian-sim.json")]
+    arglist = [
+        "contain",
+        data_file("prof/one-brit-sim.json"),
+        data_file("prof/one-italian-sim.json"),
+    ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.contain.main(args)
     terminal = capsys.readouterr()

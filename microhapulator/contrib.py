@@ -11,17 +11,16 @@ import json
 from math import ceil
 import microhapulator
 from microhapulator.profile import Profile
-import sys
 
 
-def load_profile(bamfile=None, refrfasta=None, json=None, **kwargs):
-    if not json and (not bamfile or not refrfasta):
+def load_profile(bamfile=None, markertsv=None, json=None, **kwargs):
+    if not json and (not bamfile or not markertsv):
         message = "must provide either JSON profile or BAM and refr FASTA"
         raise ValueError(message)
     if json:
-        profile = microhapulator.profile.Profile(fromfile=json)
+        profile = Profile(fromfile=json)
     else:
-        profile = microhapulator.type.type(bamfile, refrfasta, **kwargs)
+        profile = microhapulator.type.type(bamfile, markertsv, **kwargs)
     return profile
 
 
@@ -37,7 +36,7 @@ def contrib(profile):
 def main(args):
     profile = load_profile(
         bamfile=args.bam,
-        refrfasta=args.refr,
+        markertsv=args.tsv,
         json=args.json,
         static=args.static,
         dynamic=args.dynamic,
