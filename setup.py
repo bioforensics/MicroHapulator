@@ -31,7 +31,13 @@ setup(
         "microhapulator": ["microhapulator/tests/data/*", "microhapulator/tests/data/*/*"]
     },
     include_package_data=True,
-    install_requires=["insilicoseq", "numpy", "happer", "jsonschema", "termgraph"],
+    install_requires=[
+        "happer>=0.1",
+        "insilicoseq>=1.5.2",
+        "jsonschema>=4.0",
+        "numpy>=1.19",
+        "termgraph>=0.5",
+    ],
     entry_points={"console_scripts": ["mhpl8r = microhapulator.__main__:main"]},
     classifiers=[
         "Environment :: Console",
