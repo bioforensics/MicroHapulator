@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.op.balance import balance
+from microhapulator.op import balance
 from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pandas

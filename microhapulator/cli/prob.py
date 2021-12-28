@@ -12,7 +12,7 @@
 
 import json
 import microhapulator
-from microhapulator.op.prob import prob
+from microhapulator.op import prob
 from microhapulator.profile import Profile
 
 

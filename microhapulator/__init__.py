@@ -25,8 +25,8 @@ import pandas as pd
 # Internal modules
 from microhapulator import profile
 
-# Internal perations and command-line interface
-from microhapulator.op import *
+# Internal operations and command-line interface
+from microhapulator import op
 from microhapulator import __main__
 from microhapulator import cli
 

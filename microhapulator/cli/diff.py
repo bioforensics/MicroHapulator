@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.op.diff import diff
+from microhapulator.op import diff
 from microhapulator.profile import Profile
 
 

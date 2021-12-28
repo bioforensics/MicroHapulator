@@ -10,12 +10,12 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from . import balance
-from . import contain
-from . import contrib
-from . import diff
-from . import dist
-from . import prob
-from . import seq
-from . import sim
-from . import type
+from .balance import balance
+from .contain import contain
+from .contrib import contrib
+from .diff import diff
+from .dist import dist
+from .prob import prob
+from .seq import seq
+from .sim import sim
+from .type import type

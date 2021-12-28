@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from microhapulator.op.balance import balance
+from microhapulator.op import balance
 from microhapulator.profile import ObservedProfile
 
 

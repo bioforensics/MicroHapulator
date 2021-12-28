@@ -26,7 +26,7 @@ import pytest
 def test_contain(f1, f2, total, contained):
     profile1 = microhapulator.profile.Profile(data_file(f1))
     profile2 = microhapulator.profile.Profile(data_file(f2))
-    c, t = microhapulator.contain.contain(profile1, profile2)
+    c, t = microhapulator.op.contain(profile1, profile2)
     assert t == total
     assert c == contained
 

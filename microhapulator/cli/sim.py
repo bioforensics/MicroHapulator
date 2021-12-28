@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.op.sim import sim
+from microhapulator.op import sim
 
 
 def subparser(subparsers):

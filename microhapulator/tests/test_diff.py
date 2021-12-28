@@ -19,7 +19,7 @@ from tempfile import NamedTemporaryFile
 def test_diff_basic():
     gt1 = SimulatedProfile(fromfile=data_file("prof/diff-comp-1.json"))
     gt2 = SimulatedProfile(fromfile=data_file("prof/diff-comp-2.json"))
-    diff = list(microhapulator.diff.diff(gt1, gt2))
+    diff = list(microhapulator.op.diff(gt1, gt2))
     assert diff == [
         ("MHDBL000140", {"C,C,A,A"}, {"C,C,T,A"}),
         ("MHDBL000163", {"A,A,G,A,T"}, {"C,G,A,A,T"}),
@@ -29,7 +29,7 @@ def test_diff_basic():
 def test_diff_large():
     gt1 = SimulatedProfile(fromfile=data_file("prof/diff-comp-1.json"))
     gt2 = SimulatedProfile(fromfile=data_file("prof/diff-comp-3.json"))
-    diff = list(microhapulator.diff.diff(gt1, gt2))
+    diff = list(microhapulator.op.diff(gt1, gt2))
     loci = [d[0] for d in diff]
     print(diff[9], diff[17], diff[21])
     assert loci == [
@@ -96,14 +96,14 @@ def test_diff_cli():
 def test_diff2():
     gt1 = SimulatedProfile(fromfile=data_file("prof/euramer-sim-gt.json"))
     gt2 = SimulatedProfile(fromfile=data_file("prof/euramer-inf-gt.json"))
-    diff = list(microhapulator.diff.diff(gt1, gt2))
+    diff = list(microhapulator.op.diff(gt1, gt2))
     assert diff == [("MHDBL000018", set(), {"T,G,C,T,A"})]
 
 
 def test_diff_nonmatching_alleles():
     p1 = SimulatedProfile(fromfile=data_file("prof/red-strict-profile.json"))
     p2 = SimulatedProfile(fromfile=data_file("prof/red-relaxed-profile.json"))
-    diff = list(microhapulator.diff.diff(p1, p2))
+    diff = list(microhapulator.op.diff(p1, p2))
     print(diff)
     assert diff == [
         ("mh07CP-004", set(), {"T,T,T,A,T", "A,A,T,A,T"}),

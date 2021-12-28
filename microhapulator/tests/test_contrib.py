@@ -28,7 +28,7 @@ import pytest
 )
 def test_contrib_json(pjson, numcontrib):
     profile = microhapulator.cli.contrib.load_profile(json=data_file(pjson))
-    n, *data = microhapulator.contrib.contrib(profile)
+    n, *data = microhapulator.op.contrib(profile)
     assert n == numcontrib
 
 
@@ -38,7 +38,7 @@ def test_contrib_bam():
     profile = microhapulator.cli.contrib.load_profile(
         bamfile=bam, markertsv=defn, dynamic=0.25, static=10
     )
-    n, *data = microhapulator.contrib.contrib(profile)
+    n, *data = microhapulator.op.contrib(profile)
     assert n == 3
 
 

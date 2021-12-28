@@ -12,7 +12,7 @@
 
 import json
 import microhapulator
-from microhapulator.op.dist import dist
+from microhapulator.op import dist
 from microhapulator.profile import Profile
 
 

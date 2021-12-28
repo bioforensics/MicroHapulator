@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 from argparse import SUPPRESS
-from microhapulator.op.type import type as mhtype
+from microhapulator.op import type as mhtype
 import sys
 
 

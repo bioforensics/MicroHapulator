@@ -12,7 +12,7 @@
 
 from argparse import Action, SUPPRESS
 import microhapulator
-from microhapulator.op.seq import seq
+from microhapulator.op import seq
 from microhapulator.profile import Profile
 import sys
 

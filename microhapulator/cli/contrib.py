@@ -12,7 +12,7 @@
 
 import json
 import microhapulator
-from microhapulator.op.contrib import contrib
+from microhapulator.op import contrib
 from microhapulator.profile import Profile
 
 
@@ -62,7 +62,7 @@ def load_profile(bamfile=None, markertsv=None, json=None, **kwargs):
     if json:
         profile = Profile(fromfile=json)
     else:
-        profile = microhapulator.op.type.type(bamfile, markertsv, **kwargs)
+        profile = microhapulator.op.type(bamfile, markertsv, **kwargs)
     return profile
 
 
