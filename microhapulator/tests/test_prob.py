@@ -52,7 +52,7 @@ def test_rmp_lrt_2diff(altfile, lrvalue, k5freqs):
 def test_prob_cli_rmp(capsys):
     arglist = ["prob", data_file("freq/korea-5loc-freq.tsv"), data_file("prof/korea-5loc.json")]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.prob.main(args)
+    microhapulator.cli.prob.main(args)
     terminal = capsys.readouterr()
     print(terminal.out)
     assert '"random_match_probability": "7.444E-09"' in terminal.out
@@ -66,7 +66,7 @@ def test_prob_cli_lrt(capsys):
         data_file("prof/korea-5loc-1diff.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.prob.main(args)
+    microhapulator.cli.prob.main(args)
     terminal = capsys.readouterr()
     print(terminal.out)
     assert '"likelihood_ratio": "1.343E+05"' in terminal.out

@@ -13,7 +13,7 @@
 import filecmp
 import microhapulator
 from microhapulator.profile import Profile
-from microhapulator.seq import calc_n_reads_from_proportions
+from microhapulator.op.seq import calc_n_reads_from_proportions
 from microhapulator.tests import data_file
 import numpy.random
 import os
@@ -122,7 +122,7 @@ def test_main(tmp_path):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     assert filecmp.cmp(outfile, data_file("orange-reads.fastq"))
 
 
@@ -139,7 +139,7 @@ def test_main_no_seed():
             data_file("prof/orange-sim-profile.json"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.seq.main(args)
+        microhapulator.cli.seq.main(args)
         with open(outfile.name, "r") as fh:
             filelines = fh.read().strip().split("\n")
             assert len(filelines) == 800  # 200 reads * 4 lines per read = 800 lines
@@ -161,7 +161,7 @@ def test_main_mixture(capsys):
         data_file("prof/yellow-mix-gt.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     terminal = capsys.readouterr()
     outlines = terminal.out.strip().split("\n")
     nrecords = len(outlines) / 4
@@ -185,7 +185,7 @@ def test_main_out_stdout(capsys):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     terminal = capsys.readouterr()
     outlines = terminal.out.strip().split("\n")
     nrecords = len(outlines) / 4
@@ -205,7 +205,7 @@ def test_main_out_one_filename(tmp_path):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     assert os.path.isfile(outfile)
     with open(outfile, "r") as fh:
         outlines = fh.read().strip().split("\n")
@@ -228,7 +228,7 @@ def test_main_out_two_filenames(tmp_path):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     assert os.path.isfile(f1)
     assert os.path.isfile(f2)
     for fn in (f1, f2):

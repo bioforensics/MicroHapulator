@@ -10,13 +10,11 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import json
 import microhapulator
 from microhapulator.profile import ObservedProfile
 from microhapulator.tests import data_file
 import pytest
 from shutil import copyfile
-from tempfile import NamedTemporaryFile
 
 
 def test_type_simple():
@@ -63,7 +61,7 @@ def test_type_cli_simple(tmp_path):
         data_file("pashtun-sim/aligned-reads.bam"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.type.main(args)
+    microhapulator.cli.type.main(args)
     observed = ObservedProfile(fromfile=outfile)
     expected = ObservedProfile(fromfile=data_file("pashtun-sim/test-output.json"))
     assert observed == expected

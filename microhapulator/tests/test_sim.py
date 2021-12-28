@@ -16,8 +16,6 @@ from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
-import shutil
-import tempfile
 
 
 def test_meaning_of_life():
@@ -38,7 +36,7 @@ def test_main(tmp_path):
         data_file("freq/ceu50-freq.tsv"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.sim.main(args)
+    microhapulator.cli.sim.main(args)
     observed = SimulatedProfile(fromfile=outfile)
     expected = SimulatedProfile(fromfile=data_file("prof/bitusa-profile.json"))
     assert observed == expected
@@ -69,7 +67,7 @@ def test_main_haplo_seq(tmp_path):
         data_file("freq/asw2-freq.tsv"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.sim.main(args)
+    microhapulator.cli.sim.main(args)
     observed = SimulatedProfile(fromfile=profile)
     expected = SimulatedProfile(fromfile=data_file("prof/orange-sim-profile.json"))
     assert observed == expected

@@ -13,7 +13,6 @@
 import microhapulator
 from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
-import pytest
 from tempfile import NamedTemporaryFile
 
 
@@ -28,7 +27,7 @@ def test_mix_main():
             data_file("prof/green-sim-gt-3.json.gz"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.mix.main(args)
+        microhapulator.cli.mix.main(args)
         p = SimulatedProfile(fromfile=outfile.name)
         testp = SimulatedProfile(fromfile=data_file("prof/green-sim-gt-combined.json.gz"))
         assert p == testp

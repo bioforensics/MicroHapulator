@@ -27,7 +27,7 @@ import pytest
     ],
 )
 def test_contrib_json(pjson, numcontrib):
-    profile = microhapulator.contrib.load_profile(json=data_file(pjson))
+    profile = microhapulator.cli.contrib.load_profile(json=data_file(pjson))
     n, *data = microhapulator.contrib.contrib(profile)
     assert n == numcontrib
 
@@ -35,7 +35,7 @@ def test_contrib_json(pjson, numcontrib):
 def test_contrib_bam():
     bam = data_file("bam/three-contrib-log.bam")
     defn = data_file("def/default-panel-offsets.tsv")
-    profile = microhapulator.contrib.load_profile(
+    profile = microhapulator.cli.contrib.load_profile(
         bamfile=bam, markertsv=defn, dynamic=0.25, static=10
     )
     n, *data = microhapulator.contrib.contrib(profile)
@@ -47,7 +47,7 @@ def test_contrib_main(capsys):
     defn = data_file("def/default-panel-offsets.tsv")
     arglist = ["contrib", "-b", bam, "-t", defn, "--static", "10", "--dynamic", "0.25"]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.contrib.main(args)
+    microhapulator.cli.contrib.main(args)
     out, err = capsys.readouterr()
     assert '"min_num_contrib": 3' in out
 
@@ -57,4 +57,4 @@ def test_main_no_op():
     args = microhapulator.cli.get_parser().parse_args(arglist)
     pattern = r"must provide either JSON profile or BAM and refr FASTA"
     with pytest.raises(ValueError, match=pattern) as ve:
-        microhapulator.contrib.main(args)
+        microhapulator.cli.contrib.main(args)

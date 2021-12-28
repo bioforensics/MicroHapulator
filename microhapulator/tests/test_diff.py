@@ -10,11 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import json
 import microhapulator
 from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
-import pytest
 from tempfile import NamedTemporaryFile
 
 
@@ -87,7 +85,7 @@ def test_diff_cli():
     with NamedTemporaryFile(suffix=".json") as outfile:
         arglist = ["diff", "-o", outfile.name, f1, f2]
         args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.diff.main(args)
+        microhapulator.cli.diff.main(args)
         with microhapulator.open(outfile.name, "r") as fh:
             output = fh.read().strip()
         with microhapulator.open(data_file("diff-comp-1-3.txt"), "r") as fh:
