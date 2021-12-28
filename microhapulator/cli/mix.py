@@ -10,6 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import microhapulator
+from microhapulator.profile import SimulatedProfile
+
 
 def subparser(subparsers):
     cli = subparsers.add_parser("mix")
@@ -21,3 +24,10 @@ def subparser(subparsers):
         "default, output is written to the terminal (standard output)",
     )
     cli.add_argument("profiles", nargs="+", help="simulated genotype profiles in JSON format")
+
+
+def main(args):
+    profiles = [SimulatedProfile(pfile) for pfile in args.profiles]
+    combined = SimulatedProfile.merge(profiles)
+    with microhapulator.open(args.out, "w") as fh:
+        combined.dump(fh)

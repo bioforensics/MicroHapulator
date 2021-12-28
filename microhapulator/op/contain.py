@@ -10,10 +10,6 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import json
-import microhapulator
-from microhapulator.profile import Profile
-
 
 def contain(p1, p2):
     """Compute the proportion of alleles from p2 present in p1."""
@@ -25,14 +21,3 @@ def contain(p1, p2):
         total += len(allele2)
         contained += len(allele2 & allele1)
     return contained, total
-
-
-def main(args):
-    contained, total = contain(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
-    data = {
-        "containment": round(contained / total, 4),
-        "contained_alleles": contained,
-        "total_alleles": total,
-    }
-    with microhapulator.open(args.out, "w") as fh:
-        json.dump(data, fh, indent=4)

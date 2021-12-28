@@ -12,17 +12,16 @@
 
 import filecmp
 import microhapulator
+from microhapulator.op import sim
 from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
-import shutil
-import tempfile
 
 
 def test_meaning_of_life():
     freqs = pd.read_csv(data_file("freq/ceu50-freq.tsv"), sep="\t")
-    observed = microhapulator.sim.sim(freqs, seed=42)
+    observed = sim(freqs, seed=42)
     expected = SimulatedProfile(fromfile=data_file("prof/meaning-of-life.json.gz"))
     assert observed == expected
 
@@ -38,7 +37,7 @@ def test_main(tmp_path):
         data_file("freq/ceu50-freq.tsv"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.sim.main(args)
+    microhapulator.cli.sim.main(args)
     observed = SimulatedProfile(fromfile=outfile)
     expected = SimulatedProfile(fromfile=data_file("prof/bitusa-profile.json"))
     assert observed == expected
@@ -46,7 +45,7 @@ def test_main(tmp_path):
 
 def test_no_seed():
     freqs = pd.read_csv(data_file("freq/asw2-freq.tsv"), sep="\t")
-    genotype = microhapulator.sim.sim(freqs)
+    genotype = sim(freqs)
     assert len(genotype.data["markers"]) == 2
     assert sorted(genotype.data["markers"]) == ["mh07CP-004", "mh14CP-003"]
 
@@ -69,7 +68,7 @@ def test_main_haplo_seq(tmp_path):
         data_file("freq/asw2-freq.tsv"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.sim.main(args)
+    microhapulator.cli.sim.main(args)
     observed = SimulatedProfile(fromfile=profile)
     expected = SimulatedProfile(fromfile=data_file("prof/orange-sim-profile.json"))
     assert observed == expected

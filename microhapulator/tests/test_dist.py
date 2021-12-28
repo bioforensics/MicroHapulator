@@ -33,7 +33,7 @@ from tempfile import NamedTemporaryFile
 def test_dist_gujarati(gt1, gt2, dist):
     g1 = ObservedProfile(data_file(gt1))
     g2 = ObservedProfile(data_file(gt2))
-    assert microhapulator.dist.dist(g1, g2) == dist
+    assert microhapulator.op.dist(g1, g2) == dist
 
 
 def test_dist_log_mixture():
@@ -41,7 +41,7 @@ def test_dist_log_mixture():
     g1 = ObservedProfile(f1)
     f2 = data_file("murica/y-sim-genotype.bed")
     g2 = SimulatedProfile.populate_from_bed(f2)
-    assert microhapulator.dist.dist(g1, g2) == 19
+    assert microhapulator.op.dist(g1, g2) == 19
     assert g1 != g2
 
 
@@ -50,7 +50,7 @@ def test_dist_even_mixture():
         g1 = ObservedProfile(fh)
     f2 = data_file("murica/x-sim-genotype.bed")
     g2 = SimulatedProfile.populate_from_bed(f2)
-    assert microhapulator.dist.dist(g1, g2) == 0
+    assert microhapulator.op.dist(g1, g2) == 0
     assert g1 == g2
 
 
@@ -66,7 +66,7 @@ def test_dist_sim_vs_obs(hdist):
             data_file("murica/z-sim-genotype.json"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.dist.main(args)
+        microhapulator.cli.dist.main(args)
         with open(outfile.name, "r") as fh:
             assert json.load(fh) == {"hamming_distance": hdist}
 
@@ -81,6 +81,6 @@ def test_dist_cli():
             data_file("prof/gujarati-ind3-gt.json"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.dist.main(args)
+        microhapulator.cli.dist.main(args)
         with open(outfile.name, "r") as fh:
             assert json.load(fh) == {"hamming_distance": 3}

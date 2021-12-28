@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2019, DHS.
+# Copyright (c) 2021, DHS.
 #
 # This file is part of MicroHapulator (https://github.com/bioforensics/microhapulator) and is
 # licensed under the BSD license: see LICENSE.txt.
@@ -10,12 +10,12 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import microhapulator
-from microhapulator.profile import SimulatedProfile
-
-
-def main(args):
-    profiles = [SimulatedProfile(pfile) for pfile in args.profiles]
-    combined = SimulatedProfile.merge(profiles)
-    with microhapulator.open(args.out, "w") as fh:
-        combined.dump(fh)
+from .balance import balance
+from .contain import contain
+from .contrib import contrib
+from .diff import diff
+from .dist import dist
+from .prob import prob
+from .seq import seq
+from .sim import sim
+from .type import type

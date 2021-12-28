@@ -10,6 +10,10 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import numpy.random
+import microhapulator
+from microhapulator.profile import Profile
+
 
 def subparser(subparsers):
     cli = subparsers.add_parser("unite")
@@ -30,3 +34,14 @@ def subparser(subparsers):
     )
     cli.add_argument("mom", help="simulated or inferred genotype in JSON format")
     cli.add_argument("dad", help="simulated or inferred genotype in JSON format")
+
+
+def main(args):
+    if args.seed:
+        numpy.random.seed(args.seed)
+    profile = Profile.unite(
+        Profile(fromfile=args.mom),
+        Profile(fromfile=args.dad),
+    )
+    with microhapulator.open(args.out, "w") as fh:
+        profile.dump(fh)

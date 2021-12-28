@@ -10,11 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import json
 import microhapulator
 from microhapulator.tests import data_file
 import pytest
-from tempfile import NamedTemporaryFile
 
 
 @pytest.mark.parametrize(
@@ -28,7 +26,7 @@ from tempfile import NamedTemporaryFile
 def test_contain(f1, f2, total, contained):
     profile1 = microhapulator.profile.Profile(data_file(f1))
     profile2 = microhapulator.profile.Profile(data_file(f2))
-    c, t = microhapulator.contain.contain(profile1, profile2)
+    c, t = microhapulator.op.contain(profile1, profile2)
     assert t == total
     assert c == contained
 
@@ -40,6 +38,6 @@ def test_contain_cli(capsys):
         data_file("prof/one-italian-sim.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.contain.main(args)
+    microhapulator.cli.contain.main(args)
     terminal = capsys.readouterr()
     assert '"containment": 0.4444' in terminal.out

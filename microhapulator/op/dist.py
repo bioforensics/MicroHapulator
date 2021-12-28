@@ -10,10 +10,6 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import json
-import microhapulator
-from microhapulator.profile import Profile
-
 
 def dist(p1, p2):
     hammdist = 0
@@ -23,12 +19,3 @@ def dist(p1, p2):
         if allele1 != allele2:
             hammdist += 1
     return hammdist
-
-
-def main(args):
-    d = dist(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
-    data = {
-        "hamming_distance": d,
-    }
-    with microhapulator.open(args.out, "w") as fh:
-        json.dump(data, fh, indent=4)

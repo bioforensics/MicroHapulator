@@ -62,7 +62,7 @@ def test_unite_cli():
             data_file("prof/green-dad-3-gt.json"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.unite.main(args)
+        microhapulator.cli.unite.main(args)
         p = Profile(fromfile=outfile.name)
         testp = Profile(fromfile=data_file("prof/green-kid-3-gt.json"))
         assert p == testp

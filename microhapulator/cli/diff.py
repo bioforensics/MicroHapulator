@@ -10,6 +10,10 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import microhapulator
+from microhapulator.op import diff
+from microhapulator.profile import Profile
+
 
 def subparser(subparsers):
     cli = subparsers.add_parser("diff")
@@ -22,3 +26,16 @@ def subparser(subparsers):
     )
     cli.add_argument("profile1", help="simulated or inferred genotype profile in JSON format")
     cli.add_argument("profile2", help="simulated or inferred genotype profile in JSON format")
+
+
+def main(args):
+    differ = diff(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
+    with microhapulator.open(args.out, "w") as fh:
+        for marker, diff1, diff2 in differ:
+            print(marker, file=fh)
+            if len(diff1) > 0:
+                for haplotype in sorted(diff1):
+                    print(">>>", haplotype, file=fh)
+            if len(diff2) > 0:
+                for haplotype in sorted(diff2):
+                    print("<<<", haplotype, file=fh)

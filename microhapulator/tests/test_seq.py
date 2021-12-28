@@ -13,7 +13,8 @@
 import filecmp
 import microhapulator
 from microhapulator.profile import Profile
-from microhapulator.seq import calc_n_reads_from_proportions
+from microhapulator.op.seq import calc_n_reads_from_proportions
+from microhapulator.op import sim
 from microhapulator.tests import data_file
 import numpy.random
 import os
@@ -48,9 +49,9 @@ def test_even_mixture():
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/acb-dozen-refr.fasta"))
     profiles = list()
     for _ in range(numpy.random.randint(2, 6)):
-        p = microhapulator.sim.sim(freqs)
+        p = sim(freqs)
         profiles.append(p)
-    sequencer = microhapulator.seq.seq(profiles, markers, seqs, totalreads=1000)
+    sequencer = microhapulator.op.seq(profiles, markers, seqs, totalreads=1000)
     for n, read1, read2 in sequencer:
         pass
     numfragments = n * 2
@@ -61,7 +62,7 @@ def test_complex_genotype(capsys):
     profile = Profile(fromfile=data_file("prof/mixture-genotype.json"))
     markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
-    sequencer = microhapulator.seq.seq(list(profile.unmix()), markers, seqs, totalreads=200)
+    sequencer = microhapulator.op.seq(list(profile.unmix()), markers, seqs, totalreads=200)
     for n, read in enumerate(sequencer):
         pass
     terminal = capsys.readouterr()
@@ -72,8 +73,8 @@ def test_uneven_mixture(capsys):
     freqs = microhapulator.load_marker_frequencies(data_file("freq/russ4-freq.tsv"))
     markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
-    profiles = [microhapulator.sim.sim(freqs) for _ in range(3)]
-    sequencer = microhapulator.seq.seq(
+    profiles = [sim(freqs) for _ in range(3)]
+    sequencer = microhapulator.op.seq(
         profiles, markers, seqs, totalreads=500, proportions=[0.5, 0.3, 0.2]
     )
     for read in sequencer:
@@ -88,18 +89,18 @@ def test_mixture_failure_modes():
     freqs = microhapulator.load_marker_frequencies(data_file("freq/russ4-freq.tsv"))
     markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
-    profiles = [microhapulator.sim.sim(freqs) for _ in range(3)]
+    profiles = [sim(freqs) for _ in range(3)]
     with pytest.raises(ValueError, match=r"number of profiles must match number of seeds"):
-        for read in microhapulator.seq.seq(profiles, markers, seqs, seeds=[42, 1776]):
+        for read in microhapulator.op.seq(profiles, markers, seqs, seeds=[42, 1776]):
             pass
     with pytest.raises(ValueError, match=r"mismatch between contributor number and proportions"):
-        for read in microhapulator.seq.seq(
+        for read in microhapulator.op.seq(
             profiles, markers, seqs, proportions=[0.5, 0.3, 0.1, 0.1]
         ):
             pass
     message = r"specified proportions result in 0 reads for 1 or more individuals"
     with pytest.raises(ValueError, match=message):
-        for read in microhapulator.seq.seq(
+        for read in microhapulator.op.seq(
             profiles, markers, seqs, totalreads=500, proportions=[1, 100, 10000]
         ):
             pass
@@ -122,7 +123,7 @@ def test_main(tmp_path):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     assert filecmp.cmp(outfile, data_file("orange-reads.fastq"))
 
 
@@ -139,7 +140,7 @@ def test_main_no_seed():
             data_file("prof/orange-sim-profile.json"),
         ]
         args = microhapulator.cli.get_parser().parse_args(arglist)
-        microhapulator.seq.main(args)
+        microhapulator.cli.seq.main(args)
         with open(outfile.name, "r") as fh:
             filelines = fh.read().strip().split("\n")
             assert len(filelines) == 800  # 200 reads * 4 lines per read = 800 lines
@@ -161,7 +162,7 @@ def test_main_mixture(capsys):
         data_file("prof/yellow-mix-gt.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     terminal = capsys.readouterr()
     outlines = terminal.out.strip().split("\n")
     nrecords = len(outlines) / 4
@@ -185,7 +186,7 @@ def test_main_out_stdout(capsys):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     terminal = capsys.readouterr()
     outlines = terminal.out.strip().split("\n")
     nrecords = len(outlines) / 4
@@ -205,7 +206,7 @@ def test_main_out_one_filename(tmp_path):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     assert os.path.isfile(outfile)
     with open(outfile, "r") as fh:
         outlines = fh.read().strip().split("\n")
@@ -228,7 +229,7 @@ def test_main_out_two_filenames(tmp_path):
         data_file("prof/orange-sim-profile.json"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.seq.main(args)
+    microhapulator.cli.seq.main(args)
     assert os.path.isfile(f1)
     assert os.path.isfile(f2)
     for fn in (f1, f2):
