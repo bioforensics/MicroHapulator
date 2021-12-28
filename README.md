@@ -38,7 +38,7 @@ Click the badge below to launch a quick interactive demo of MicroHapulator.
 ## Usage
 
 ```
-usage: mhpl8r [-h] [-v] [-l F] [--tee] subcmd ...
+usage: mhpl8r [-h] [-v] subcmd ...
 
 ≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
   __  __ _            _  _                _      _
@@ -51,14 +51,12 @@ Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
 subcommands listed below to see instructions for that operation.
 
 Subcommands:
-  subcmd             balance, contain, contrib, diff, dist, mix, prob, seq,
-                     sim, type, unite
+  subcmd         balance, contain, contrib, diff, dist, mix, prob, seq, sim,
+                 type, unite
 
 Global arguments:
-  -h, --help         show this help message and exit
-  -v, --version      show program's version number and exit
-  -l F, --logfile F  log file for diagnostic messages, warnings, and errors
-  --tee              write diagnostic output to logfile AND terminal (stderr)
+  -h, --help     show this help message and exit
+  -v, --version  show program's version number and exit
 
 ```
 
