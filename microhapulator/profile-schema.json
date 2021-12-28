@@ -26,7 +26,7 @@
             "enum": [
                 "base",
                 "SimulatedProfile",
-                "ObservedProfile"
+                "TypingResult"
             ]
         },
         "markers": {

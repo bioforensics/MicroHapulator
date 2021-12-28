@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.profile import SimulatedProfile, ObservedProfile
+from microhapulator.profile import SimulatedProfile, TypingResult
 from microhapulator.tests import data_file
 import numpy
 import pandas as pd
@@ -30,28 +30,28 @@ def test_profile_roundtrip(tmp_path):
 
 def test_alleles():
     simprof = SimulatedProfile.populate_from_bed(data_file("gttest.bed.gz"))
-    obsprof = ObservedProfile(fromfile=data_file("prof/gttest.json"))
+    typeprof = TypingResult(fromfile=data_file("prof/gttest.json"))
     assert simprof.alleles("BoGuSlOcUs") == set()
-    assert obsprof.alleles("BoGuSlOcUs") == set()
+    assert typeprof.alleles("BoGuSlOcUs") == set()
     assert simprof.alleles("MHDBL000135") == set(["G,C,T", "G,T,C"])
-    assert obsprof.alleles("MHDBL000135") == set(["G,C,T", "G,T,C"])
+    assert typeprof.alleles("MHDBL000135") == set(["G,C,T", "G,T,C"])
     assert simprof.alleles("MHDBL000135", haplotype=0) == set(["G,C,T"])
     assert simprof.alleles("MHDBL000135", haplotype=1) == set(["G,T,C"])
-    assert obsprof.alleles("MHDBL000135", haplotype=0) == set()
+    assert typeprof.alleles("MHDBL000135", haplotype=0) == set()
 
 
 def test_haplotypes():
     simprof = SimulatedProfile.populate_from_bed(data_file("gttest-mismatch1.bed.gz"))
     assert simprof.haplotypes() == set([0, 1])
-    obsprof = ObservedProfile(data_file("pashtun-sim/test-output.json"))
-    assert obsprof.haplotypes() == set()
+    typeprof = TypingResult(data_file("pashtun-sim/test-output.json"))
+    assert typeprof.haplotypes() == set()
 
 
 def test_sim_obs_profile_equality():
     simprof = SimulatedProfile.populate_from_bed(data_file("gttest.bed.gz"))
-    obsprof = ObservedProfile(fromfile=data_file("prof/gttest.json"))
-    assert simprof == obsprof
-    assert obsprof == simprof
+    typeprof = TypingResult(fromfile=data_file("prof/gttest.json"))
+    assert simprof == typeprof
+    assert typeprof == simprof
 
 
 def test_sim_obs_profile_not_equal():
@@ -61,19 +61,19 @@ def test_sim_obs_profile_not_equal():
     assert simprof1 != 3.14159
     assert simprof1 != "A,C,C,T"
 
-    obsprof1 = ObservedProfile(fromfile=data_file("prof/gttest.json"))
-    assert simprof1 != obsprof1
-    assert obsprof1 != simprof1
-    assert obsprof1 != 1985
-    assert obsprof1 != 98.6
+    typeprof1 = TypingResult(fromfile=data_file("prof/gttest.json"))
+    assert simprof1 != typeprof1
+    assert typeprof1 != simprof1
+    assert typeprof1 != 1985
+    assert typeprof1 != 98.6
 
     simprof2 = SimulatedProfile.populate_from_bed(data_file("gttest-mismatch2.bed.gz"))
     assert simprof1 != simprof2
-    assert simprof2 != obsprof1
-    assert obsprof1 != simprof2
+    assert simprof2 != typeprof1
+    assert typeprof1 != simprof2
 
-    obsprof2 = ObservedProfile(fromfile=data_file("prof/gttest-altered.json"))
-    assert obsprof1 != obsprof2
+    typeprof2 = TypingResult(fromfile=data_file("prof/gttest-altered.json"))
+    assert typeprof1 != typeprof2
 
 
 def test_merge_sim_genotypes():

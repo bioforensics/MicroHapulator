@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 from microhapulator.op import balance
-from microhapulator.profile import ObservedProfile
+from microhapulator.profile import TypingResult
 
 
 def subparser(subparsers):
@@ -30,7 +30,7 @@ def subparser(subparsers):
 
 
 def main(args):
-    profile = ObservedProfile(fromfile=args.input)
-    data = balance(profile, include_discarded=args.discarded)
+    result = TypingResult(fromfile=args.input)
+    data = balance(result, include_discarded=args.discarded)
     if args.csv:
         data.to_csv(args.csv, index=False)

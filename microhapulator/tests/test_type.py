@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.profile import ObservedProfile
+from microhapulator.profile import TypingResult
 from microhapulator.tests import data_file
 import pytest
 from shutil import copyfile
@@ -21,7 +21,7 @@ def test_type_simple():
     bam = data_file("pashtun-sim/aligned-reads.bam")
     tsv = data_file("pashtun-sim/tiny-panel.tsv")
     observed = microhapulator.op.type(bam, tsv, static=10, dynamic=0.25)
-    expected = ObservedProfile(fromfile=data_file("pashtun-sim/test-output.json"))
+    expected = TypingResult(fromfile=data_file("pashtun-sim/test-output.json"))
     assert observed == expected
 
 
@@ -29,7 +29,7 @@ def test_type_simpler():
     bam = data_file("pashtun-sim/aligned-reads.bam")
     tsv = data_file("pashtun-sim/tiny-panel.tsv")
     observed = microhapulator.op.type(bam, tsv)
-    expected = ObservedProfile(fromfile=data_file("pashtun-sim/test-output-sans-genotype.json"))
+    expected = TypingResult(fromfile=data_file("pashtun-sim/test-output-sans-genotype.json"))
     assert observed == expected
 
 
@@ -62,8 +62,8 @@ def test_type_cli_simple(tmp_path):
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.type.main(args)
-    observed = ObservedProfile(fromfile=outfile)
-    expected = ObservedProfile(fromfile=data_file("pashtun-sim/test-output.json"))
+    observed = TypingResult(fromfile=outfile)
+    expected = TypingResult(fromfile=data_file("pashtun-sim/test-output.json"))
     assert observed == expected
 
 
