@@ -37,10 +37,6 @@ __version__ = get_versions()["version"]
 del get_versions
 
 
-logstream = None
-teelog = False
-
-
 def package_file(path):
     return resource_filename("microhapulator", path)
 
@@ -59,16 +55,6 @@ def open(filename, mode):
             mode += "t"
         with openfunc(filename, mode) as filehandle:
             yield filehandle
-
-
-def plog(*args, **kwargs):
-    """Print logging output."""
-    global logstream
-    global teelog
-    if logstream is not None:
-        print(*args, **kwargs, file=logstream)
-    if logstream is None or teelog:
-        print(*args, **kwargs, file=sys.stderr)
 
 
 def load_marker_frequencies(tsvfile):

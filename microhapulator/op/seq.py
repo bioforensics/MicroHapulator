@@ -136,7 +136,7 @@ def seq(
     reads_sequenced = 0
     for profile, seed, nreads in zip(profiles, seeds, numreads):
         message = "Individual seed={seed} numreads={n}".format(seed=seed, n=nreads)
-        microhapulator.plog("[MicroHapulator::seq]", message)
+        print("[MicroHapulator::seq]", message, file=sys.stderr)
         sequencer = sequencing(
             profile,
             markers,

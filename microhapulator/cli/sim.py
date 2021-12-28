@@ -12,6 +12,7 @@
 
 import microhapulator
 from microhapulator.op import sim
+import sys
 
 
 def subparser(subparsers):
@@ -74,10 +75,10 @@ def main(args):
     with microhapulator.open(args.out, "w") as fh:
         profile.dump(fh)
         message = "profile JSON written to {:s}".format(fh.name)
-        microhapulator.plog("[MicroHapulator::sim]", message)
+        print("[MicroHapulator::sim]", message, file=sys.stderr)
     if args.haplo_seq:
         with microhapulator.open(args.haplo_seq, "w") as fh:
             for defline, sequence in profile.haploseqs(markers, sequences):
                 print(">", defline, "\n", sequence, sep="", file=fh)
             message = "haplotype sequences written to {:s}".format(fh.name)
-            microhapulator.plog("[MicroHapulator::sim]", message)
+            print("[MicroHapulator::sim]", message, file=sys.stderr)

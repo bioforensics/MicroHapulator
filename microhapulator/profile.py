@@ -18,7 +18,7 @@ import jsonschema
 import microhapulator
 from numpy.random import choice
 from pathlib import Path
-
+import sys
 
 SCHEMA = None
 
@@ -209,7 +209,7 @@ class Profile(object):
         if len(notshared) > 0:
             message = "markers not common to mom and dad profiles are excluded: "
             message += ", ".join(notshared)
-            microhapulator.plog("[MicroHapulator::profile]", message)
+            print("[MicroHapulator::profile]", message, file=sys.stderr)
         for parent, hapid in zip((mom, dad), (0, 1)):
             for marker in sorted(commonmarkers):
                 haploallele = choice(sorted(parent.alleles(marker)))
