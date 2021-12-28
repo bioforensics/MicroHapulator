@@ -287,9 +287,9 @@ class SimulatedProfile(Profile):
         return "SimulatedProfile"
 
 
-class ObservedProfile(Profile):
+class TypingResult(Profile):
     def __init__(self, fromfile=None):
-        super(ObservedProfile, self).__init__(fromfile=fromfile)
+        super(TypingResult, self).__init__(fromfile=fromfile)
 
     def record_coverage(self, marker, cov_by_pos, ndiscarded=0):
         self.data["markers"][marker] = {
@@ -336,4 +336,4 @@ class ObservedProfile(Profile):
 
     @property
     def gttype(self):
-        return "ObservedProfile"
+        return "TypingResult"

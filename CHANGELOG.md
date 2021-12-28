@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Changed the default pysam pileup `max_depth` parameter, overriding 8000 with 1e6 and exposing as a hidden CLI parameter (#87).
 - Removed dependency on MicroHapDB for marker definitions, frequencies, and sequences (#93).
 - Refactored CLI and Python API and added new `microhapulator.op` subpackage to serve as main API entry point (#98).
+- Replaced the "ObservedProfile" terminology with the more appropriate "TypingResult" (#99).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (#71).

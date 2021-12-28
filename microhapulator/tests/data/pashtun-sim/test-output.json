@@ -71,6 +71,6 @@
         }
     },
     "ploidy": null,
-    "type": "ObservedProfile",
+    "type": "TypingResult",
     "version": "0.4.1+32.g3f663a8.dirty"
 }

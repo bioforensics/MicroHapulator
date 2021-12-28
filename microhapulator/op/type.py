@@ -74,10 +74,10 @@ def type(
         bam.references, offsets.keys(), "read alignments", "marker definitions"
     )
     genotyper = tally_haplotypes(bam, offsets, minbasequal=minbasequal, max_depth=max_depth)
-    profile = microhapulator.profile.ObservedProfile()
+    result = microhapulator.profile.TypingResult()
     for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
-        profile.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
+        result.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for allele, count in htcounts.items():
-            profile.record_allele(locusid, allele, count)
-    profile.infer(ecthreshold=ecthreshold, static=static, dynamic=dynamic)
-    return profile
+            result.record_allele(locusid, allele, count)
+    result.infer(ecthreshold=ecthreshold, static=static, dynamic=dynamic)
+    return result
