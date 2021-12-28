@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Replaced `--threshold` with `--static` and `--dynamic` in in `mhpl8r type`, disabled both by default (#82, #83).
 - Changed the default pysam pileup `max_depth` parameter, overriding 8000 with 1e6 and exposing as a hidden CLI parameter (#87).
 - Removed dependency on MicroHapDB for marker definitions, frequencies, and sequences (#93).
+- Refactored CLI and Python API and added new `microhapulator.op` subpackage to serve as main API entry point (#98).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (#71).
