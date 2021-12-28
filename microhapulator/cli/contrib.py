@@ -11,10 +11,9 @@
 # -------------------------------------------------------------------------------------------------
 
 import json
-from microhapulator import open as mhopen
+import microhapulator
 from microhapulator.op.contrib import contrib
 from microhapulator.profile import Profile
-from microhapulator.op.type import type as mhtype
 
 
 def subparser(subparsers):
@@ -63,7 +62,7 @@ def load_profile(bamfile=None, markertsv=None, json=None, **kwargs):
     if json:
         profile = Profile(fromfile=json)
     else:
-        profile = mhtype(bamfile, markertsv, **kwargs)
+        profile = microhapulator.op.type.type(bamfile, markertsv, **kwargs)
     return profile
 
 
@@ -81,5 +80,5 @@ def main(args):
         "num_loci_max_alleles": nloci,
         "perc_loci_max_alleles": ploci,
     }
-    with mhopen(args.out, "w") as fh:
+    with microhapulator.open(args.out, "w") as fh:
         json.dump(data, fh, indent=4)

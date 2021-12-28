@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import json
-from microhapulator import open as mhopen
+import microhapulator
 from microhapulator.op.contain import contain
 from microhapulator.profile import Profile
 
@@ -36,5 +36,5 @@ def main(args):
         "contained_alleles": contained,
         "total_alleles": total,
     }
-    with mhopen(args.out, "w") as fh:
+    with microhapulator.open(args.out, "w") as fh:
         json.dump(data, fh, indent=4)

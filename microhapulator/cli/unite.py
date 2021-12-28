@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import numpy.random
-from microhapulator import open as mhopen
+import microhapulator
 from microhapulator.profile import Profile
 
 
@@ -43,5 +43,5 @@ def main(args):
         Profile(fromfile=args.mom),
         Profile(fromfile=args.dad),
     )
-    with mhopen(args.out, "w") as fh:
+    with microhapulator.open(args.out, "w") as fh:
         profile.dump(fh)

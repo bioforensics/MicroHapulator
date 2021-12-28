@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import json
-from microhapulator import open as mhopen
+import microhapulator
 from microhapulator.op.dist import dist
 from microhapulator.profile import Profile
 
@@ -34,5 +34,5 @@ def main(args):
     data = {
         "hamming_distance": d,
     }
-    with mhopen(args.out, "w") as fh:
+    with microhapulator.open(args.out, "w") as fh:
         json.dump(data, fh, indent=4)

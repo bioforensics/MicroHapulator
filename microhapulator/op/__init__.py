@@ -15,9 +15,7 @@ from . import contain
 from . import contrib
 from . import diff
 from . import dist
-from . import mix
 from . import prob
 from . import seq
 from . import sim
 from . import type
-from . import unite
