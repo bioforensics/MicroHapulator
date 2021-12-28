@@ -80,17 +80,6 @@ subcommands listed below to see instructions for that operation.
         action="version",
         version="MicroHapulator v{}".format(microhapulator.__version__),
     )
-    parser.add_argument(
-        "-l",
-        "--logfile",
-        metavar="F",
-        help="log file for " "diagnostic messages, warnings, and errors",
-    )
-    parser.add_argument(
-        "--tee",
-        action="store_true",
-        help="write diagnostic " "output to logfile AND terminal (stderr)",
-    )
     subparsers = parser.add_subparsers(dest="subcmd", metavar="subcmd", help=subcommandstr)
     for func in subparser_funcs.values():
         func(subparsers)

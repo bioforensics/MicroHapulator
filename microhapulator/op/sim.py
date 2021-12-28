@@ -13,6 +13,7 @@
 import microhapulator
 from microhapulator.profile import SimulatedProfile
 import numpy.random
+import sys
 
 
 def sim(frequencies, seed=None):
@@ -34,5 +35,5 @@ def sim(frequencies, seed=None):
             sampled_haplotype = numpy.random.choice(haplotypes, p=freqs)
             profile.add(haploindex, marker, sampled_haplotype)
     message = f"simulated microhaplotype variation at {len(markers)} markers"
-    microhapulator.plog("[MicroHapulator::sim]", message)
+    print("[MicroHapulator::sim]", message, file=sys.stderr)
     return profile

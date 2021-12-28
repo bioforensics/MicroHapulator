@@ -15,6 +15,7 @@ import microhapulator
 import os.path
 import pysam
 import re
+import sys
 
 
 def check_index(bamfile):
@@ -54,10 +55,11 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
             haplotypes[htstr] += 1
         yield locusid, cov_pos, haplotypes, discarded
         totaldiscarded += discarded
-    microhapulator.plog(
+    print(
         "[MicroHapulator::type] discarded",
         totaldiscarded,
         "reads with gaps or missing data at positions of interest",
+        file=sys.stderr,
     )
 
 
