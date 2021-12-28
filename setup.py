@@ -36,6 +36,7 @@ setup(
         "insilicoseq>=1.5.2",
         "jsonschema>=4.0",
         "numpy>=1.19",
+        "pandas>1.0",
         "termgraph>=0.5",
     ],
     entry_points={"console_scripts": ["mhpl8r = microhapulator.__main__:main"]},

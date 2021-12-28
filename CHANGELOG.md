@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (#71).
 - Corrected a bug resulting from attempting to do set operations on `None` (#75).
 - Corrected a bug with RMP implementation (#86).
+- Set minimum versions for runtime dependencies (#97).
 
 ## [0.4] 2019-11-05
 
