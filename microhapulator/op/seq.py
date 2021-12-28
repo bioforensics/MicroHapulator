@@ -20,12 +20,10 @@ import sys
 from tempfile import mkdtemp
 
 # Third-party library imports
-from happer.mutate import mutate
 from numpy.random import choice, randint
 
 # Internal imports
 import microhapulator
-from microhapulator.profile import Profile
 
 
 SimulatedRead = namedtuple("SimulatedRead", ["identifier", "sequence", "quality"])
@@ -152,39 +150,3 @@ def seq(
         for data in sequencer:
             yield data
         reads_sequenced = data[0]
-
-
-def resolve_profiles(gtfiles):
-    profiles = list()
-    for gtfile in gtfiles:
-        profile = Profile(fromfile=gtfile)
-        for p in profile.unmix():
-            profiles.append(p)
-    return profiles
-
-
-def main(args):
-    if len(args.out) not in (1, 2):
-        raise ValueError(f"expected 1 or 2 output files, found {len(args.out)}")
-    fh1 = fh2 = args.out[0]
-    if len(args.out) == 2:
-        fh2 = args.out[1]
-    profiles = resolve_profiles(args.profiles)
-    markers = microhapulator.load_marker_definitions(args.tsv)
-    refrseqs = microhapulator.load_marker_reference_sequences(args.refrseqs)
-    sequencer = seq(
-        profiles,
-        markers,
-        refrseqs,
-        seeds=args.seeds,
-        threads=args.threads,
-        totalreads=args.num_reads,
-        proportions=args.proportions,
-        sig=args.signature,
-    )
-    for n, read1, read2 in sequencer:
-        print(read1.identifier, read1.sequence, "+\n", read1.quality, sep="", end="", file=fh1)
-        print(read2.identifier, read2.sequence, "+\n", read2.quality, sep="", end="", file=fh2)
-    for fh in args.out:
-        if fh != sys.stdout:
-            fh.close()

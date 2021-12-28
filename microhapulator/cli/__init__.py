@@ -26,17 +26,17 @@ from . import type
 from . import unite
 
 mains = {
-    "balance": microhapulator.balance.main,
-    "contain": microhapulator.contain.main,
-    "contrib": microhapulator.contrib.main,
-    "diff": microhapulator.diff.main,
-    "dist": microhapulator.dist.main,
-    "mix": microhapulator.mix.main,
-    "prob": microhapulator.prob.main,
-    "seq": microhapulator.seq.main,
-    "sim": microhapulator.sim.main,
-    "type": microhapulator.type.main,
-    "unite": microhapulator.unite.main,
+    "balance": balance.main,
+    "contain": contain.main,
+    "contrib": contrib.main,
+    "diff": diff.main,
+    "dist": dist.main,
+    "mix": mix.main,
+    "prob": prob.main,
+    "seq": seq.main,
+    "sim": sim.main,
+    "type": type.main,
+    "unite": unite.main,
 }
 
 subparser_funcs = {

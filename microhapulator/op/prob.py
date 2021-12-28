@@ -10,12 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import microhapulator
-from microhapulator.profile import SimulatedProfile
 
-
-def main(args):
-    profiles = [SimulatedProfile(pfile) for pfile in args.profiles]
-    combined = SimulatedProfile.merge(profiles)
-    with microhapulator.open(args.out, "w") as fh:
-        combined.dump(fh)
+def prob(frequencies, prof1, prof2=None, erate=0.001):
+    if prof2 is None:
+        return prof1.rand_match_prob(frequencies)
+    else:
+        return prof1.rmp_lr_test(prof2, frequencies, erate=erate)

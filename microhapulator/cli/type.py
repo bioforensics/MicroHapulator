@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 from argparse import SUPPRESS
+from microhapulator.op.type import type as mhtype
 import sys
 
 
@@ -70,3 +71,16 @@ def subparser(subparsers):
     cli.add_argument("-m", "--max-depth", metavar="M", type=float, default=1e6, help=SUPPRESS)
     cli.add_argument("tsv", help="microhap marker definitions in TSV format")
     cli.add_argument("bam", help="aligned and sorted reads in BAM format")
+
+
+def main(args):
+    profile = mhtype(
+        args.bam,
+        args.tsv,
+        minbasequal=args.base_qual,
+        ecthreshold=args.effcov,
+        static=args.static,
+        dynamic=args.dynamic,
+        max_depth=args.max_depth,
+    )
+    profile.dump(args.out)

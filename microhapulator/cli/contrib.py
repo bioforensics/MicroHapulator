@@ -10,6 +10,12 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import json
+from microhapulator import open as mhopen
+from microhapulator.op.contrib import contrib
+from microhapulator.profile import Profile
+from microhapulator.op.type import type as mhtype
+
 
 def subparser(subparsers):
     cli = subparsers.add_parser("contrib")
@@ -48,3 +54,32 @@ def subparser(subparsers):
         default=None,
         help="apply a dynamic threshold for calling genotypes; see `mhpl8r type --help`",
     )
+
+
+def load_profile(bamfile=None, markertsv=None, json=None, **kwargs):
+    if not json and (not bamfile or not markertsv):
+        message = "must provide either JSON profile or BAM and refr FASTA"
+        raise ValueError(message)
+    if json:
+        profile = Profile(fromfile=json)
+    else:
+        profile = mhtype(bamfile, markertsv, **kwargs)
+    return profile
+
+
+def main(args):
+    profile = load_profile(
+        bamfile=args.bam,
+        markertsv=args.tsv,
+        json=args.json,
+        static=args.static,
+        dynamic=args.dynamic,
+    )
+    ncontrib, nloci, ploci = contrib(profile)
+    data = {
+        "min_num_contrib": ncontrib,
+        "num_loci_max_alleles": nloci,
+        "perc_loci_max_alleles": ploci,
+    }
+    with mhopen(args.out, "w") as fh:
+        json.dump(data, fh, indent=4)

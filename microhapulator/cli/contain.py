@@ -10,6 +10,11 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import json
+from microhapulator import open as mhopen
+from microhapulator.op.contain import contain
+from microhapulator.profile import Profile
+
 
 def subparser(subparsers):
     cli = subparsers.add_parser("contain")
@@ -22,3 +27,14 @@ def subparser(subparsers):
     )
     cli.add_argument("profile1", help="simulated or inferred genotype profile in JSON format")
     cli.add_argument("profile2", help="simulated or inferred genotype profile in JSON format")
+
+
+def main(args):
+    contained, total = contain(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
+    data = {
+        "containment": round(contained / total, 4),
+        "contained_alleles": contained,
+        "total_alleles": total,
+    }
+    with mhopen(args.out, "w") as fh:
+        json.dump(data, fh, indent=4)

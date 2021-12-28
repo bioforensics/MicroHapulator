@@ -81,16 +81,3 @@ def type(
             profile.record_allele(locusid, allele, count)
     profile.infer(ecthreshold=ecthreshold, static=static, dynamic=dynamic)
     return profile
-
-
-def main(args):
-    profile = type(
-        args.bam,
-        args.tsv,
-        minbasequal=args.base_qual,
-        ecthreshold=args.effcov,
-        static=args.static,
-        dynamic=args.dynamic,
-        max_depth=args.max_depth,
-    )
-    profile.dump(args.out)

@@ -10,7 +10,8 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import sys
+from microhapulator.op.balance import balance
+from microhapulator.profile import ObservedProfile
 
 
 def subparser(subparsers):
@@ -26,3 +27,10 @@ def subparser(subparsers):
         "marker are included",
     )
     cli.add_argument("input", help="typing result in JSON format")
+
+
+def main(args):
+    profile = ObservedProfile(fromfile=args.input)
+    data = balance(profile, include_discarded=args.discarded)
+    if args.csv:
+        data.to_csv(args.csv, index=False)

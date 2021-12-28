@@ -10,6 +10,14 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from microhapulator import open as mhopen
+from microhapulator import plog
+from microhapulator import cross_check_marker_ids
+from microhapulator import load_marker_frequencies
+from microhapulator import load_marker_definitions
+from microhapulator import load_marker_reference_sequences
+from microhapulator.op.sim import sim
+
 
 def subparser(subparsers):
     desc = "Simulate a diploid genotype using the given population microhaplotype frequencies"
@@ -46,3 +54,35 @@ def subparser(subparsers):
         metavar="FILE",
         help="microhaplotype marker definitions in tabular (tab separated) format; required if `--haplo-seq` enabled, ignored if not",
     )
+
+
+def load_inputs(freqfile, markerfile, seqfile, haploseqs=False):
+    frequencies = load_marker_frequencies(freqfile)
+    if not haploseqs:
+        return frequencies, None, None
+    markers = load_marker_definitions(markerfile)
+    sequences = load_marker_reference_sequences(seqfile)
+    cross_check_marker_ids(
+        frequencies.Marker, markers.Marker, "marker frequencies", "marker definitions"
+    )
+    cross_check_marker_ids(
+        frequencies.Marker, sequences.keys(), "marker frequencies", "marker reference sequences"
+    )
+    return frequencies, markers, sequences
+
+
+def main(args):
+    frequencies, markers, sequences = load_inputs(
+        args.freq, args.markers, args.sequences, haploseqs=args.haplo_seq
+    )
+    profile = sim(frequencies, seed=args.seed)
+    with mhopen(args.out, "w") as fh:
+        profile.dump(fh)
+        message = "profile JSON written to {:s}".format(fh.name)
+        plog("[MicroHapulator::sim]", message)
+    if args.haplo_seq:
+        with mhopen(args.haplo_seq, "w") as fh:
+            for defline, sequence in profile.haploseqs(markers, sequences):
+                print(">", defline, "\n", sequence, sep="", file=fh)
+            message = "haplotype sequences written to {:s}".format(fh.name)
+            plog("[MicroHapulator::sim]", message)

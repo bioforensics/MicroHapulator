@@ -25,22 +25,12 @@ import pandas as pd
 # Internal modules
 from microhapulator import profile
 
-# Subcommands and command-line interface
-from microhapulator import balance
-from microhapulator import contain
-from microhapulator import contrib
-from microhapulator import dist
-from microhapulator import diff
-from microhapulator import mix
-from microhapulator import prob
-from microhapulator import seq
-from microhapulator import sim
-from microhapulator import type
-from microhapulator import unite
+# Internal perations and command-line interface
+from microhapulator.op import *
 from microhapulator import __main__
 from microhapulator import cli
 
-
+# Version handling
 from ._version import get_versions
 
 __version__ = get_versions()["version"]

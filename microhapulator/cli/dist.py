@@ -10,6 +10,11 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import json
+from microhapulator import open as mhopen
+from microhapulator.op.dist import dist
+from microhapulator.profile import Profile
+
 
 def subparser(subparsers):
     cli = subparsers.add_parser("dist")
@@ -22,3 +27,12 @@ def subparser(subparsers):
     )
     cli.add_argument("profile1", help="simulated or inferred profile in JSON format")
     cli.add_argument("profile2", help="simulated or inferred profile in JSON format")
+
+
+def main(args):
+    d = dist(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
+    data = {
+        "hamming_distance": d,
+    }
+    with mhopen(args.out, "w") as fh:
+        json.dump(data, fh, indent=4)
