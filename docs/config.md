@@ -51,9 +51,11 @@ The **Marker** column contains the name/label/designator of a microhaplotype in 
 For example, if a SNP of interest is the very first nucleotide in the reference, it has a distance of 0 from the beginning of the sequence and thus its **Offset** is `0`.
 If a SNP is the 10th nucleotide, its offset is `9`.
 
-The marker definition table corresponding to the mock three-marker panel shown in the previous section is below.
+[MicroHapDB](https://github.com/bioforensics/MicroHapDB) (version 0.7 or greater) can also be used to prepare marker definition files.
+Simply change the `--format=fasta` setting to `--format=offsets`.
 
 ```
+$ microhapdb marker --format=offsets --delta=25 --min-length=200 mh02USC-2pA mh08USC-8qA mh17USC-17qA
 Marker	Offset
 mh02USC-2pA	61
 mh02USC-2pA	105
@@ -68,6 +70,12 @@ mh17USC-17qA	94
 mh17USC-17qA	143
 ```
 
+As before, you probably want to write the result directly to a TSV file.
+
+```
+$ microhapdb marker --format=offsets --delta=25 --min-length=200 --panel=mypanel.txt > panel-def.tsv
+```
+
 
 ## Population frequencies
 
@@ -75,9 +83,12 @@ Simulating mock profiles and performing forensic interpretation depends on relia
 These are also provied as a tab-separated tabular plain text (TSV) file.
 The **Marker** column contains the name/label/designator of a microhaplotype in the panel, the **Haplotype** column contains a comma-separated list of SNP alleles, and the **Frequency** column contains the relative prevalance of that haplotype in the population of interest.
 
-The population frequency table corresponding to the mock three-marker panel discussed in the previous sections might look something like this.
+[MicroHapDB](https://github.com/bioforensics/MicroHapDB) contains population frequency estimates for a comprehensive set of published microhaplotype markers, including 26 global populations from the [1000 Genomes Project](https://www.internationalgenome.org/).
+MicroHapDB (version 0.7 or greater) can format this frequency data for use with MicroHapulator.
+Using the correct population identifier (running `microhapdb population` beforehand if needed), haplotype frequencies can be retrieved and formatted as follows.
 
 ```
+$ microhapdb frequency --format mhpl8r --population PUR --marker mh02USC-2pA mh08USC-8qA mh17USC-17qA
 Marker	Haplotype	Frequency
 mh02USC-2pA	A,A,G,A	0.038
 mh02USC-2pA	T,A,A,T	0.428
@@ -95,5 +106,14 @@ mh17USC-17qA	G,A,T,T	0.197
 mh17USC-17qA	G,C,C,C	0.298
 ```
 
-> **NOTE**: It should go without saying, but just to be clear: A microhaplotype must use a single name/label/designator across all files.
-> Using one name for the microhaplotype in the marker definition file and a different name for the microhaplotype in the population frequency file or reference sequence file will lead to issues.
+And of course, it's always a good idea to write the results directly to a file.
+
+```
+$ microhapdb frequency --format=mhpl8r --population=PUR --panel=mypanel.txt > freqs.tsv
+```
+
+## Footnote
+
+If the marker and/or frequency data data for your panel is not available in MicroHapDB, you should be able prepare the files manually, using the examples above as a reference for formatting.
+In any case, it should go without saying, but just to be clear: a microhaplotype must use a single name/label/designator across *all* configuration files.
+Using one name for the microhaplotype in the marker definition file and a different name for the microhaplotype in the population frequency file or reference sequence file will lead to issues.
