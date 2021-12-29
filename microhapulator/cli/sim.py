@@ -10,8 +10,14 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import microhapulator
-from microhapulator.op import sim
+
+import microhapulator.api as mhapi
+from microhapulator.parsers import (
+    load_marker_reference_sequences,
+    load_marker_definitions,
+    load_marker_frequencies,
+    cross_check_marker_ids,
+)
 import sys
 
 
@@ -53,15 +59,15 @@ def subparser(subparsers):
 
 
 def load_inputs(freqfile, markerfile, seqfile, haploseqs=False):
-    frequencies = microhapulator.load_marker_frequencies(freqfile)
+    frequencies = load_marker_frequencies(freqfile)
     if not haploseqs:
         return frequencies, None, None
-    markers = microhapulator.load_marker_definitions(markerfile)
-    sequences = microhapulator.load_marker_reference_sequences(seqfile)
-    microhapulator.cross_check_marker_ids(
+    markers = load_marker_definitions(markerfile)
+    sequences = load_marker_reference_sequences(seqfile)
+    cross_check_marker_ids(
         frequencies.Marker, markers.Marker, "marker frequencies", "marker definitions"
     )
-    microhapulator.cross_check_marker_ids(
+    cross_check_marker_ids(
         frequencies.Marker, sequences.keys(), "marker frequencies", "marker reference sequences"
     )
     return frequencies, markers, sequences
@@ -71,13 +77,13 @@ def main(args):
     frequencies, markers, sequences = load_inputs(
         args.freq, args.markers, args.sequences, haploseqs=args.haplo_seq
     )
-    profile = sim(frequencies, seed=args.seed)
-    with microhapulator.open(args.out, "w") as fh:
+    profile = mhapi.sim(frequencies, seed=args.seed)
+    with open(args.out, "w") as fh:
         profile.dump(fh)
         message = "profile JSON written to {:s}".format(fh.name)
         print("[MicroHapulator::sim]", message, file=sys.stderr)
     if args.haplo_seq:
-        with microhapulator.open(args.haplo_seq, "w") as fh:
+        with open(args.haplo_seq, "w") as fh:
             for defline, sequence in profile.haploseqs(markers, sequences):
                 print(">", defline, "\n", sequence, sep="", file=fh)
             message = "haplotype sequences written to {:s}".format(fh.name)

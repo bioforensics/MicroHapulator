@@ -10,9 +10,10 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 from argparse import Action, SUPPRESS
-import microhapulator
-from microhapulator.op import seq
+import microhapulator.api as mhapi
+from microhapulator.parsers import load_marker_definitions, load_marker_reference_sequences
 from microhapulator.profile import Profile
 import sys
 
@@ -95,9 +96,9 @@ def main(args):
     if len(args.out) == 2:
         fh2 = args.out[1]
     profiles = resolve_profiles(args.profiles)
-    markers = microhapulator.load_marker_definitions(args.tsv)
-    refrseqs = microhapulator.load_marker_reference_sequences(args.refrseqs)
-    sequencer = seq(
+    markers = load_marker_definitions(args.tsv)
+    refrseqs = load_marker_reference_sequences(args.refrseqs)
+    sequencer = mhapi.seq(
         profiles,
         markers,
         refrseqs,

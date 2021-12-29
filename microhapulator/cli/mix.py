@@ -10,7 +10,8 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import microhapulator
+
+from microhapulator.parsers import open as mhopen
 from microhapulator.profile import SimulatedProfile
 
 
@@ -29,5 +30,5 @@ def subparser(subparsers):
 def main(args):
     profiles = [SimulatedProfile(pfile) for pfile in args.profiles]
     combined = SimulatedProfile.merge(profiles)
-    with microhapulator.open(args.out, "w") as fh:
+    with mhopen(args.out, "w") as fh:
         combined.dump(fh)

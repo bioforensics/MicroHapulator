@@ -10,8 +10,8 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 import numpy.random
-import microhapulator
 from microhapulator.profile import Profile
 
 
@@ -43,5 +43,5 @@ def main(args):
         Profile(fromfile=args.mom),
         Profile(fromfile=args.dad),
     )
-    with microhapulator.open(args.out, "w") as fh:
+    with open(args.out, "w") as fh:
         profile.dump(fh)

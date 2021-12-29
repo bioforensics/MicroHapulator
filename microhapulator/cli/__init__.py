@@ -10,9 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
-import microhapulator
-import sys
+from microhapulator import __version__
 from . import balance
 from . import contain
 from . import contrib
@@ -24,6 +24,7 @@ from . import seq
 from . import sim
 from . import type
 from . import unite
+import sys
 
 mains = {
     "balance": balance.main,
@@ -78,7 +79,7 @@ subcommands listed below to see instructions for that operation.
         "-v",
         "--version",
         action="version",
-        version="MicroHapulator v{}".format(microhapulator.__version__),
+        version="MicroHapulator v{}".format(__version__),
     )
     subparsers = parser.add_subparsers(dest="subcmd", metavar="subcmd", help=subcommandstr)
     for func in subparser_funcs.values():
@@ -86,15 +87,18 @@ subcommands listed below to see instructions for that operation.
     return parser
 
 
-def parse_args(arglist=None):  # pragma: no cover
-    """Parse arguments from the command line and configure logging.
+def main(arglist=None):  # pragma: no cover
+    """Entry point for the MicroHapulator CLI.
 
-    Calling this function in a testing context has proven problematic. Please
-    use only in a runtime context.
+    Isolated as a method so that the CLI can be called by other Python code
+    (e.g. for testing), in which case the arguments are passed to the function.
+    If no arguments are passed to the function, parse them from the command
+    line.
     """
     args = get_parser().parse_args(arglist)
-    microhapulator.logstream = sys.stderr
-    if args.logfile and args.logfile != "-":
-        microhapulator.logstream = open(args.logfile, "w")
-    microhapulator.teelog = args.tee
-    return args
+    if args.subcmd is None:
+        get_parser().parse_args(["-h"])
+    assert args.subcmd in mains
+    mainmethod = mains[args.subcmd]
+    print("[MicroHapulator] running version", __version__, file=sys.stderr)
+    mainmethod(args)

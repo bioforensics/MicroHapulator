@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator.op import balance
+import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pandas
@@ -20,7 +20,7 @@ import pytest
 
 def test_balance_basic(capfd):
     profile = Profile(fromfile=data_file("prof/three-contrib-log.json"))
-    obs_data = balance(profile)
+    obs_data = mhapi.balance(profile)
     exp_data = pandas.read_csv(data_file("three-contrib-log-balance.csv"))
     assert obs_data.equals(exp_data)
     terminal = capfd.readouterr()

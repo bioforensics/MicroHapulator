@@ -12,7 +12,7 @@
 
 import filecmp
 import microhapulator
-from microhapulator.op import sim
+import microhapulator.api as mhapi
 from microhapulator.profile import SimulatedProfile
 from microhapulator.tests import data_file
 import pandas as pd
@@ -21,7 +21,7 @@ import pytest
 
 def test_meaning_of_life():
     freqs = pd.read_csv(data_file("freq/ceu50-freq.tsv"), sep="\t")
-    observed = sim(freqs, seed=42)
+    observed = mhapi.sim(freqs, seed=42)
     expected = SimulatedProfile(fromfile=data_file("prof/meaning-of-life.json.gz"))
     assert observed == expected
 
@@ -45,7 +45,7 @@ def test_main(tmp_path):
 
 def test_no_seed():
     freqs = pd.read_csv(data_file("freq/asw2-freq.tsv"), sep="\t")
-    genotype = sim(freqs)
+    genotype = mhapi.sim(freqs)
     assert len(genotype.data["markers"]) == 2
     assert sorted(genotype.data["markers"]) == ["mh07CP-004", "mh14CP-003"]
 

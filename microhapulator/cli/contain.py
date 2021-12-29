@@ -10,9 +10,10 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 import json
-import microhapulator
-from microhapulator.op import contain
+from microhapulator.parsers import open as mhopen
+import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 
 
@@ -30,11 +31,13 @@ def subparser(subparsers):
 
 
 def main(args):
-    contained, total = contain(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
+    contained, total = mhapi.contain(
+        Profile(fromfile=args.profile1), Profile(fromfile=args.profile2)
+    )
     data = {
         "containment": round(contained / total, 4),
         "contained_alleles": contained,
         "total_alleles": total,
     }
-    with microhapulator.open(args.out, "w") as fh:
+    with mhopen(args.out, "w") as fh:
         json.dump(data, fh, indent=4)

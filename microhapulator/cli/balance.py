@@ -10,7 +10,8 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from microhapulator.op import balance
+
+import microhapulator.api as mhapi
 from microhapulator.profile import TypingResult
 
 
@@ -31,6 +32,6 @@ def subparser(subparsers):
 
 def main(args):
     result = TypingResult(fromfile=args.input)
-    data = balance(result, include_discarded=args.discarded)
+    data = mhapi.balance(result, include_discarded=args.discarded)
     if args.csv:
         data.to_csv(args.csv, index=False)

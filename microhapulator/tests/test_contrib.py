@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
+import microhapulator.api as mhapi
 from microhapulator.tests import data_file
 import pytest
 
@@ -28,7 +29,7 @@ import pytest
 )
 def test_contrib_json(pjson, numcontrib):
     profile = microhapulator.cli.contrib.load_profile(json=data_file(pjson))
-    n, *data = microhapulator.op.contrib(profile)
+    n, *data = mhapi.contrib(profile)
     assert n == numcontrib
 
 
@@ -38,7 +39,7 @@ def test_contrib_bam():
     profile = microhapulator.cli.contrib.load_profile(
         bamfile=bam, markertsv=defn, dynamic=0.25, static=10
     )
-    n, *data = microhapulator.op.contrib(profile)
+    n, *data = mhapi.contrib(profile)
     assert n == 3
 
 

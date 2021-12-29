@@ -6,24 +6,23 @@
 
 # MicroHapulator
 
-Daniel Standage, 2018-2021  
+Daniel Standage, 2018-2021
 https://github.com/bioforensics/microhapulator
 
-**MicroHapulator** is a package for analyzing and interpreting microhaplotype sequence data for forensic analysis.
-It provides tools for genotyping as well as deterministic and probabilistic interpretation of simple and complex samples.
-It also provides tools for constructing mock genotypes and simulating MPS sequencing of single- and multiple-contributor samples.
-MicroHapulator relies on microhap marker definitions and population allele frequencies from [MicroHapDB](https://github.com/bioforensics/microhapdb) and the MPS error models included with [InSilicoSeq](https://github.com/HadrienG/InSilicoSeq/).
+**MicroHapulator** is software for empirical haplotype calling, analysis, and basic forensic interpretation of microhaplotypes from Illumina sequence data.
+Also included are tools for constructing mock genotypes and simulating Illumina sequencing of single- and multiple-contributor samples for testing and development purposes.
+MicroHapulator can be configured for use with any published or custom panel.
+[MicroHapDB](https://github.com/bioforensics/microhapdb) can be used to prepare marker definitions, population frequencies, and reference sequences—see [the configuration documentation](google.com) for more details.
 
 
 ## Installation
 
-Installation with bioconda is recommended.
+Installation with the [Conda package manager](https://docs.conda.io/en/latest/) is recommended.
+Full installation instructions are available [here](google.com).
 
 ```
 conda install -c bioconda microhapulator
 ```
-
-> ***NOTE**: If you'd prefer to install with pip, see [.travis.yml](.travis.yml) and [setup.py](setup.py) for hints.*
 
 
 ## Interactive demo
@@ -63,10 +62,11 @@ Global arguments:
 
 ## Contributing
 
-We welcome contributions from the community!
+MicroHapulator was created by Daniel Standage, with the support of the National Bioforensic Analysis Center (NBFAC).
+But we welcome contributions from the broader community!
 Feel free to ask questions, make suggestions, or report bugs using the [issue tracker](https://github.com/bioforensics/MicroHapulator/issues).
-If you are interested in submitting patches, [docs/DEVEL.md](docs/DEVEL.md) contains a few suggestions for a development setup.
-All contributors are expected to abide by the project's [Code of Conduct](docs/CONDUCT.md).
+If you are interested in submitting patches, [the developer documentation](google.com) contains a few suggestions for a development setup.
+All contributors are expected to abide by the project's [Code of Conduct](google.com).
 
 
 [travisbadge]: https://img.shields.io/travis/bioforensics/MicroHapulator.svg

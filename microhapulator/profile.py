@@ -10,12 +10,15 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 from collections import defaultdict
 from happer.mutate import mutate
 from io import StringIO
 import json
 import jsonschema
-import microhapulator
+from microhapulator import __version__
+from microhapulator.parsers import open as mhopen
+from microhapulator.parsers import package_file
 from numpy.random import choice
 from pathlib import Path
 import sys
@@ -24,7 +27,7 @@ SCHEMA = None
 
 
 def load_schema():
-    with microhapulator.open(microhapulator.package_file("profile-schema.json"), "r") as fh:
+    with mhopen(package_file("profile-schema.json"), "r") as fh:
         return json.load(fh)
 
 
@@ -33,7 +36,7 @@ class Profile(object):
         global SCHEMA
         if fromfile:
             if isinstance(fromfile, str) or isinstance(fromfile, Path):
-                with microhapulator.open(str(fromfile), "r") as fh:
+                with mhopen(str(fromfile), "r") as fh:
                     self.data = json.load(fh)
             else:
                 self.data = json.load(fromfile)
@@ -53,7 +56,7 @@ class Profile(object):
 
     def initialize(self):
         return {
-            "version": microhapulator.__version__,
+            "version": __version__,
             "type": self.gttype,
             "ploidy": None,
             "markers": dict(),
@@ -148,7 +151,7 @@ class Profile(object):
 
     def dump(self, outfile):
         if isinstance(outfile, str) or isinstance(outfile, Path):
-            with microhapulator.open(str(outfile), "w") as fh:
+            with mhopen(str(outfile), "w") as fh:
                 json.dump(self.data, fh, indent=4, sort_keys=True)
         else:
             json.dump(self.data, outfile, indent=4, sort_keys=True)
@@ -240,7 +243,7 @@ class SimulatedProfile(Profile):
     """
 
     def populate_from_bed(bedfile):
-        with microhapulator.open(bedfile, "r") as fh:
+        with mhopen(bedfile, "r") as fh:
             line = next(fh)
             ploidy = line.count("|") + 1
             fh.seek(0)

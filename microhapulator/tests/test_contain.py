@@ -11,6 +11,8 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
+import microhapulator.api as mhapi
+from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pytest
 
@@ -24,9 +26,9 @@ import pytest
     ],
 )
 def test_contain(f1, f2, total, contained):
-    profile1 = microhapulator.profile.Profile(data_file(f1))
-    profile2 = microhapulator.profile.Profile(data_file(f2))
-    c, t = microhapulator.op.contain(profile1, profile2)
+    profile1 = Profile(data_file(f1))
+    profile2 = Profile(data_file(f2))
+    c, t = mhapi.contain(profile1, profile2)
     assert t == total
     assert c == contained
 

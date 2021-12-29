@@ -10,9 +10,10 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 import json
-import microhapulator
-from microhapulator.op import contrib
+from microhapulator.parsers import open as mhopen
+import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 
 
@@ -62,7 +63,7 @@ def load_profile(bamfile=None, markertsv=None, json=None, **kwargs):
     if json:
         profile = Profile(fromfile=json)
     else:
-        profile = microhapulator.op.type(bamfile, markertsv, **kwargs)
+        profile = mhapi.type(bamfile, markertsv, **kwargs)
     return profile
 
 
@@ -74,11 +75,11 @@ def main(args):
         static=args.static,
         dynamic=args.dynamic,
     )
-    ncontrib, nloci, ploci = contrib(profile)
+    ncontrib, nloci, ploci = mhapi.contrib(profile)
     data = {
         "min_num_contrib": ncontrib,
         "num_loci_max_alleles": nloci,
         "perc_loci_max_alleles": ploci,
     }
-    with microhapulator.open(args.out, "w") as fh:
+    with mhopen(args.out, "w") as fh:
         json.dump(data, fh, indent=4)

@@ -10,9 +10,11 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 import json
-import microhapulator
-from microhapulator.op import prob
+from microhapulator.parsers import load_marker_frequencies
+from microhapulator.parsers import open as mhopen
+import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 
 
@@ -54,11 +56,11 @@ def subparser(subparsers):
 def main(args):
     prof1 = Profile(fromfile=args.profile1)
     prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
-    frequencies = microhapulator.load_marker_frequencies(args.freq)
-    result = prob(frequencies, prof1, prof2=prof2, erate=args.erate)
+    frequencies = load_marker_frequencies(args.freq)
+    result = mhapi.prob(frequencies, prof1, prof2=prof2, erate=args.erate)
     key = "random_match_probability" if prof2 is None else "likelihood_ratio"
     data = {
         key: "{:.3E}".format(result),
     }
-    with microhapulator.open(args.out, "w") as fh:
+    with mhopen(args.out, "w") as fh:
         json.dump(data, fh, indent=4)

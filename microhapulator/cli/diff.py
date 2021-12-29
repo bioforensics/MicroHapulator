@@ -10,8 +10,8 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import microhapulator
-from microhapulator.op import diff
+
+import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 
 
@@ -29,8 +29,8 @@ def subparser(subparsers):
 
 
 def main(args):
-    differ = diff(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
-    with microhapulator.open(args.out, "w") as fh:
+    differ = mhapi.diff(Profile(fromfile=args.profile1), Profile(fromfile=args.profile2))
+    with open(args.out, "w") as fh:
         for marker, diff1, diff2 in differ:
             print(marker, file=fh)
             if len(diff1) > 0:

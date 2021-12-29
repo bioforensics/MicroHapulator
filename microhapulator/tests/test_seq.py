@@ -12,9 +12,8 @@
 
 import filecmp
 import microhapulator
+import microhapulator.api as mhapi
 from microhapulator.profile import Profile
-from microhapulator.op.seq import calc_n_reads_from_proportions
-from microhapulator.op import sim
 from microhapulator.tests import data_file
 import numpy.random
 import os
@@ -31,13 +30,13 @@ from tempfile import NamedTemporaryFile
     ],
 )
 def test_proportions(n, totalreads, prop, result):
-    assert calc_n_reads_from_proportions(n, totalreads, prop) == result
+    assert mhapi.calc_n_reads_from_proportions(n, totalreads, prop) == result
 
 
 def test_proportions_failure_modes():
     message = r"mismatch between contributor number and proportions"
     with pytest.raises(ValueError, match=message) as ve:
-        calc_n_reads_from_proportions(3, 1000, [0.6, 0.4])
+        mhapi.calc_n_reads_from_proportions(3, 1000, [0.6, 0.4])
 
 
 def test_even_mixture():
@@ -49,9 +48,9 @@ def test_even_mixture():
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/acb-dozen-refr.fasta"))
     profiles = list()
     for _ in range(numpy.random.randint(2, 6)):
-        p = sim(freqs)
+        p = mhapi.sim(freqs)
         profiles.append(p)
-    sequencer = microhapulator.op.seq(profiles, markers, seqs, totalreads=1000)
+    sequencer = mhapi.seq(profiles, markers, seqs, totalreads=1000)
     for n, read1, read2 in sequencer:
         pass
     numfragments = n * 2
@@ -62,7 +61,7 @@ def test_complex_genotype(capsys):
     profile = Profile(fromfile=data_file("prof/mixture-genotype.json"))
     markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
-    sequencer = microhapulator.op.seq(list(profile.unmix()), markers, seqs, totalreads=200)
+    sequencer = mhapi.seq(list(profile.unmix()), markers, seqs, totalreads=200)
     for n, read in enumerate(sequencer):
         pass
     terminal = capsys.readouterr()
@@ -73,10 +72,8 @@ def test_uneven_mixture(capsys):
     freqs = microhapulator.load_marker_frequencies(data_file("freq/russ4-freq.tsv"))
     markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
-    profiles = [sim(freqs) for _ in range(3)]
-    sequencer = microhapulator.op.seq(
-        profiles, markers, seqs, totalreads=500, proportions=[0.5, 0.3, 0.2]
-    )
+    profiles = [mhapi.sim(freqs) for _ in range(3)]
+    sequencer = mhapi.seq(profiles, markers, seqs, totalreads=500, proportions=[0.5, 0.3, 0.2])
     for read in sequencer:
         pass
     terminal = capsys.readouterr()
@@ -89,18 +86,16 @@ def test_mixture_failure_modes():
     freqs = microhapulator.load_marker_frequencies(data_file("freq/russ4-freq.tsv"))
     markers = microhapulator.load_marker_definitions(data_file("def/russ4-offsets.tsv"))
     seqs = microhapulator.load_marker_reference_sequences(data_file("refr/russ4-refr.fasta.gz"))
-    profiles = [sim(freqs) for _ in range(3)]
+    profiles = [mhapi.sim(freqs) for _ in range(3)]
     with pytest.raises(ValueError, match=r"number of profiles must match number of seeds"):
-        for read in microhapulator.op.seq(profiles, markers, seqs, seeds=[42, 1776]):
+        for read in mhapi.seq(profiles, markers, seqs, seeds=[42, 1776]):
             pass
     with pytest.raises(ValueError, match=r"mismatch between contributor number and proportions"):
-        for read in microhapulator.op.seq(
-            profiles, markers, seqs, proportions=[0.5, 0.3, 0.1, 0.1]
-        ):
+        for read in mhapi.seq(profiles, markers, seqs, proportions=[0.5, 0.3, 0.1, 0.1]):
             pass
     message = r"specified proportions result in 0 reads for 1 or more individuals"
     with pytest.raises(ValueError, match=message):
-        for read in microhapulator.op.seq(
+        for read in mhapi.seq(
             profiles, markers, seqs, totalreads=500, proportions=[1, 100, 10000]
         ):
             pass

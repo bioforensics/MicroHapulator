@@ -39,7 +39,7 @@ setup(
         "pandas>1.0",
         "termgraph>=0.5",
     ],
-    entry_points={"console_scripts": ["mhpl8r = microhapulator.__main__:main"]},
+    entry_points={"console_scripts": ["mhpl8r = microhapulator.cli:main"]},
     classifiers=[
         "Environment :: Console",
         "Framework :: IPython",

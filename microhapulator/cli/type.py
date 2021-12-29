@@ -10,8 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+
 from argparse import SUPPRESS
-from microhapulator.op import type as mhtype
+import microhapulator.api as mhapi
 import sys
 
 
@@ -74,7 +75,7 @@ def subparser(subparsers):
 
 
 def main(args):
-    profile = mhtype(
+    profile = mhapi.type(
         args.bam,
         args.tsv,
         minbasequal=args.base_qual,

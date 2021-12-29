@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import microhapulator
+import microhapulator.api as mhapi
 from microhapulator.profile import SimulatedProfile, TypingResult
 from microhapulator.tests import data_file
 import numpy
@@ -21,7 +21,7 @@ import pytest
 def test_profile_roundtrip(tmp_path):
     seed = numpy.random.randint(1, 2 ** 32 - 1)
     freqs = pd.read_csv(data_file("freq/asw5-freq.tsv"), sep="\t")
-    profile = microhapulator.op.sim(freqs, seed=seed)
+    profile = mhapi.sim(freqs, seed=seed)
     profile.dump(tmp_path / "profile.json")
     test = SimulatedProfile(fromfile=tmp_path / "profile.json")
     assert profile == test
