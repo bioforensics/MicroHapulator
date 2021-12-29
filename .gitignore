@@ -12,5 +12,5 @@ scratch/
 .DS_Store
 dist/
 microhapulator/tests/data/bam/sandawe-dad.bam.bai
-public/
+docs/_build/
 build/

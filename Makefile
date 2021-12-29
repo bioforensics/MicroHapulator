@@ -22,7 +22,7 @@ devdeps:
 
 ## doc:       build HTML documentation
 doc:
-	sphinx-build -b html docs/ public
+	sphinx-build -b html docs/ docs/_build/
 
 ## devhooks:  install development hooks
 devhooks:
