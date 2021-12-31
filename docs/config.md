@@ -8,38 +8,32 @@ Not every piece of metadata is used for each operation, but it is recommended th
 - microhaplotype marker definitions
 - population haplotype frequencies
 
+This document will demonstrate how to prepare these files using the [MicroHapDB](https://github.com/bioforensics/MicroHapDB) database, which contains a comprehensive collection of published microhaplotypes.
+A trivially small panel composed of three arbitrary markers (identifiers: mh01KK-205, mh03USC-3qC, mh18CP-005) will be used as an example to show how the data is formatted.
+When preparing a full panel composed of dozens of markers, it is recommended that marker identifiers be placed in a plain text file, one identifier per line, and that the configuration data be written to directly to files rather than printed to the terminal screen.
+This will also be demonstrated.
+
 
 ## Reference sequences
 
 A reference sequence must be provided for each marker, and aggregated into a single FASTA file.
 At a minimum, each reference sequence must contain the SNPs associated with the microhaplotype, but additional flanking sequence can also be included.
-
-The [MicroHapDB](https://github.com/bioforensics/MicroHapDB) database contains a comprehensive collection of published microhaplotypes and can be used to retrieve reference sequences for published or custom panels.
-The example below shows how to use MicroHapDB retrieve reference sequences for a (trivially small) three-marker panel.
+The following command demonstrates how to use MicroHapDB to retrieve these reference sequences.
 
 ```
-$ microhapdb marker --format=fasta --delta=25 --min-length=200 mh02USC-2pA mh08USC-8qA mh17USC-17qA
->mh02USC-2pA PermID=MHDBM-1734fe04 GRCh38:chr2:10810991-10811069 variants=61,105,112,139
-TGTGAGCAGATGGCTCTGCCATCTGTGGTTTTCCATTCCTCCATGGCAGTTAAGGATGCTATAAATTCACATCAGTAACA
-TCTCTGTCCCACATCTGCTAGGAGGAGTCTACAGTCCCAGAGCAGTCATCTAGAAACCATGAGGTTTCCCAGAAAGGCTG
-CCATTTATTAAAATGAGTTAATTAATAGACTCACGGACTCT
->mh08USC-8qA PermID=MHDBM-d80aad76 GRCh38:chr8:62032395-62032463 variants=66,96,134
-AGCCACTTGCAATGGTTATCTTGAAAATTGGAGGAATGTCCTCAGGATCCATTGAGTAGCAACAACATGAATGATAATTT
-TTGCATCCCAAGTTCAGAAGAAGCAACCGACATTGAGTTTTTCTTGAATCCTTCTAAGAGAGACCTTCAGATAAATATTC
-CAGACTGGCTTATCTCCTCTCTATCTCATCTATAATTTTGT
->mh17USC-17qA PermID=MHDBM-cd7a9041 GRCh38:chr17:27762200-27762287 variants=56,60,94,143
-CCTGCTCTGCTTCCCTCAGTGACCCTGACCTTTCCTTCTTGGCTTCAGCACAATGAAAATCATCTAATTATTTCTATGCC
-TATCTCTCCACTGCCGCCTCTAGATGCTCCCTGAGGGCAGGGCTGATCTCTGTTGTATTTCCATACCCACCCCAGTGCCA
-GGCACCCACTGAATAGCTGAGTGAGTGAATGAATAATCAA
-```
-
-For larger / full-sized panels, you may want to place the marker names one per line in a text file (e.g. `mypanel.txt`) and write the reference sequences directly to a FASTA file (e.g. `refrseqs.fasta`) like so.
-
-```
-$ microhapdb marker --format=fasta --delta=25 --min-length=200 --panel=mypanel.txt > refrseqs.fasta
-$ # Count the number of entries in the FASTA file as a sanity check
-$ grep -c '^>' refrseqs.fasta
-26
+$ microhapdb marker --format=fasta --delta=25 --min-length=200 mh01KK-205 mh03USC-3qC mh18CP-005
+>mh01KK-205 PermID=MHDBM-1f7eaca2 GRCh38:chr1:18396197-18396351 variants=25,46,134,179 Xref=SI664550A
+CACCAGTTCTCATGAATCTGAGGAATTCTTCCTCCTAGCTACTTCCTTCCTTTTCCCTCATTACATCCCTGCCAAGGACA
+AATTCTGCCATTTGCATGGCAGGACTCCTCCAAAAAGGGGCTTCCTCCCTTTCCGTTAGTAAAGGAAGAGGTTACCTGAG
+ACTTGACTTAACCTCCTTGGGAGGGAACATGCTTTCACTGTTGCG
+>mh03USC-3qC PermID=MHDBM-eacabfd9 GRCh38:chr3:196653025-196653121 variants=52,61,71,111,148
+TAGCATTGAAATGATGCCTTGTAATTTACTAAATCTGCAACTATGCAGCCTTATTTCATGGCGGGCAGTGGTGGTGATCC
+CAGGTTTCAGGGGCGGGGAAGGGTGCTGGGGGGATCCTGAGGTCAGGAACCCGTACACCTCTGCTTCTGCCCTCTCTTCC
+CTGTGCCGGCCACAAGGCAATGACTCCTGTGTGGGTGCAGA
+>mh18CP-005 PermID=MHDBM-a85754d3 GRCh38:chr18:8892864-8892907 variants=78,107,110,121 Xref=SI664898P
+GAGATTCTGTCTCAAAAAATAAAAAATTAAAAAAAATTTTTTTAAACCCAAAATATTACTGCAGATGTCCTTATACGCAG
+TGGTGTTAGTTTTAGAAACTGATTCTACGGGTATGCTTGCTCGTGTGTAAAATTATTCATATACAAATTATTTATGACAG
+TATTGTTTCTAGTAGTAAAATATCGGAAATATTCTAAATG
 ```
 
 
@@ -47,73 +41,95 @@ $ grep -c '^>' refrseqs.fasta
 
 MicroHapulator needs to know the location of every SNP of interest in the corresponding reference sequence.
 The list of SNP positions for a microhaplotype is its *marker definition*, and this information is provided in a tab-separated tabular plain text (TSV) file.
-The **Marker** column contains the name/label/designator of a microhaplotype in the panel, and the **Offset** column contains the distance of one SNP from the beginning of the reference sequence.
-For example, if a SNP of interest is the very first nucleotide in the reference, it has a distance of 0 from the beginning of the sequence and thus its **Offset** is `0`.
+The **Marker** column contains the identifier (name, label, or designator) of a microhaplotype in the panel, and the **Offset** column contains the distance of one SNP from the beginning of the reference sequence.
+For example, if a SNP of interest is the very first nucleotide in the reference, it has a distance of 0 from the beginning of the sequence and thus its offset is `0`.
 If a SNP is the 10th nucleotide, its offset is `9`.
 
-[MicroHapDB](https://github.com/bioforensics/MicroHapDB) (version 0.7 or greater) can also be used to prepare marker definition files.
-Simply change the `--format=fasta` setting to `--format=offsets`.
+The following command shows how to use MicroHapDB (version 0.7 or greater) to prepare a marker definition file.
+Note that it is identical to the previous command, except that the `--format=fasta` setting was changed to `--format=offsets`.
 
 ```
-$ microhapdb marker --format=offsets --delta=25 --min-length=200 mh02USC-2pA mh08USC-8qA mh17USC-17qA
+$ microhapdb marker --format=offsets --delta=25 --min-length=200 mh01KK-205 mh03USC-3qC mh18CP-005
 Marker	Offset
-mh02USC-2pA	61
-mh02USC-2pA	105
-mh02USC-2pA	112
-mh02USC-2pA	139
-mh08USC-8qA	66
-mh08USC-8qA	96
-mh08USC-8qA	134
-mh17USC-17qA	56
-mh17USC-17qA	60
-mh17USC-17qA	94
-mh17USC-17qA	143
-```
-
-As before, you probably want to write the result directly to a TSV file.
-
-```
-$ microhapdb marker --format=offsets --delta=25 --min-length=200 --panel=mypanel.txt > panel-def.tsv
+mh01KK-205	25
+mh01KK-205	46
+mh01KK-205	134
+mh01KK-205	179
+mh03USC-3qC	52
+mh03USC-3qC	61
+mh03USC-3qC	71
+mh03USC-3qC	111
+mh03USC-3qC	148
+mh18CP-005	78
+mh18CP-005	107
+mh18CP-005	110
+mh18CP-005	121
 ```
 
 
 ## Population frequencies
 
-Simulating mock profiles and performing forensic interpretation depends on reliable estimates of population microhaplotype frequencies.
-These are also provied as a tab-separated tabular plain text (TSV) file.
+Performing forensic interpretation or simulating mock profiles depends on reliable estimates of population microhaplotype frequencies.
+These must also be provided to MicroHapulator as a tab-separated tabular plain text (TSV) file.
 The **Marker** column contains the name/label/designator of a microhaplotype in the panel, the **Haplotype** column contains a comma-separated list of SNP alleles, and the **Frequency** column contains the relative prevalance of that haplotype in the population of interest.
 
-[MicroHapDB](https://github.com/bioforensics/MicroHapDB) contains population frequency estimates for a comprehensive set of published microhaplotype markers, including 26 global populations from the [1000 Genomes Project](https://www.internationalgenome.org/).
+MicroHapDB contains population frequency estimates from 26 global populations in the [1000 Genomes Project](https://www.internationalgenome.org/) for most of its markers.
 MicroHapDB (version 0.7 or greater) can format this frequency data for use with MicroHapulator.
 Using the correct population identifier (running `microhapdb population` beforehand if needed), haplotype frequencies can be retrieved and formatted as follows.
+(The "PUR" population, "Puerto Ricans from Puerto Rico", is used for this example.)
 
 ```
-$ microhapdb frequency --format mhpl8r --population PUR --marker mh02USC-2pA mh08USC-8qA mh17USC-17qA
+$ microhapdb frequency --format mhpl8r --population PUR --marker mh01KK-205 mh03USC-3qC mh18CP-005
 Marker	Haplotype	Frequency
-mh02USC-2pA	A,A,G,A	0.038
-mh02USC-2pA	T,A,A,T	0.428
-mh02USC-2pA	T,A,G,A	0.144
-mh02USC-2pA	T,A,G,T	0.125
-mh02USC-2pA	T,C,G,A	0.255
-mh02USC-2pA	T,C,G,T	0.01
-mh08USC-8qA	A,A,C	0.154
-mh08USC-8qA	A,A,T	0.308
-mh08USC-8qA	A,G,T	0.351
-mh08USC-8qA	C,A,C	0.188
-mh17USC-17qA	A,C,C,T	0.26
-mh17USC-17qA	A,C,T,T	0.245
-mh17USC-17qA	G,A,T,T	0.197
-mh17USC-17qA	G,C,C,C	0.298
+mh01KK-205	C,C,A,G	0.149
+mh01KK-205	T,C,A,G	0.361
+mh01KK-205	T,T,A,A	0.183
+mh01KK-205	T,T,A,G	0.13
+mh01KK-205	T,T,G,G	0.178
+mh03USC-3qC	A,C,C,A,G	0.043
+mh03USC-3qC	A,C,C,G,G	0.12
+mh03USC-3qC	A,C,C,G,T	0.034
+mh03USC-3qC	A,C,T,G,G	0.269
+mh03USC-3qC	A,C,T,G,T	0.212
+mh03USC-3qC	G,C,C,A,G	0.005
+mh03USC-3qC	G,C,C,G,G	0.014
+mh03USC-3qC	G,C,T,G,T	0.005
+mh03USC-3qC	G,T,C,A,G	0.226
+mh03USC-3qC	G,T,C,G,G	0.067
+mh03USC-3qC	G,T,C,G,T	0.005
+mh18CP-005	A,C,A,T	0.38
+mh18CP-005	A,C,G,C	0.255
+mh18CP-005	A,T,A,C	0.255
+mh18CP-005	A,T,G,C	0.043
+mh18CP-005	G,C,A,C	0.01
+mh18CP-005	G,T,A,C	0.058
 ```
 
-And of course, it's always a good idea to write the results directly to a file.
+
+## Summary
+
+As mentioned at the beginning of this document, you're much better off writing the config data directly to files rather than printing it to your screen.
+If you have the marker identifiers for your panel (one identifier per line) in a plain text file named, say, `mypanel.txt`, you would create your config files like so.
+(Replace "PUR" with the appropriate population.)
 
 ```
-$ microhapdb frequency --format=mhpl8r --population=PUR --panel=mypanel.txt > freqs.tsv
+$ microhapdb marker --format=fasta --delta=25 --min-length=200 --panel=mypanel.txt > mypanel-refr.fasta
+$ microhapdb marker --format=offsets --delta=25 --min-length=200 --panel=mypanel.txt > mypanel-defn.tsv
+$ microhapdb frequency --format=mhpl8r --population=PUR --marker --panel=mypanel.txt > mypanel-freq-pr.tsv
 ```
 
-## Footnote
+These commands will create three files: `mypanel-refr.fasta` with the reference sequences, `mypanel-defn.tsv` with the marker definitions, and `mypanel-freq-pr.tsv` with the haplotype frequencies.
 
-If the marker and/or frequency data data for your panel is not available in MicroHapDB, you should be able prepare the files manually, using the examples above as a reference for formatting.
-In any case, it should go without saying, but just to be clear: a microhaplotype must use a single name/label/designator across *all* configuration files.
-Using one name for the microhaplotype in the marker definition file and a different name for the microhaplotype in the population frequency file or reference sequence file will lead to issues.
+
+## Example configuration files
+
+The [`microhapulator/data/configs/`](https://github.com/bioforensics/MicroHapulator/tree/master/microhapulator/data/configs/) directory in the MicroHapulator source code distribution contains example configuration files for a published panel.
+
+
+## What if my data isn't in MicroHapDB?
+
+If you have marker and/or frequency data that you would like to submit to MicroHapDB, that is always welcome!
+See [this page](https://github.com/bioforensics/MicroHapDB#adding-markers-to-microhapdb) for details.
+
+In any case, the examples above show how the reference sequences, marker definitions, and haplotype frequencies should be formatted.
+So if your data is not included in MicroHapDB, you should still be able to configure MicroHapulator correctly, it will just take some extra time to prepare the files manually.
