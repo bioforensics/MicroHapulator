@@ -36,34 +36,14 @@ Click the badge below to launch a quick interactive demo of MicroHapulator.
 
 ## Usage
 
-```
-usage: mhpl8r [-h] [-v] subcmd ...
-
-≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
-  __  __ _            _  _                _      _
- |  \/  (_)__ _ _ ___| || |__ _ _ __ _  _| |__ _| |_ ___ _ _
- | |\/| | / _| '_/ _ \ __ / _` | '_ \ || | / _` |  _/ _ \ '_|
- |_|  |_|_\__|_| \___/_||_\__,_| .__/\_,_|_\__,_|\__\___/_|
-                               |_|
-≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠
-Invoke `mhpl8r <subcmd> --help` and replace `<subcmd>` with one of the
-subcommands listed below to see instructions for that operation.
-
-Subcommands:
-  subcmd         balance, contain, contrib, diff, dist, mix, prob, seq, sim,
-                 type, unite
-
-Global arguments:
-  -h, --help     show this help message and exit
-  -v, --version  show program's version number and exit
-
-```
+The [MicroHapulator user manual](https://microhapulator.readthedocs.io/en/latest/manual.html) is a good place to start.
+There is also a reference for the [command line interface](https://microhapulator.readthedocs.io/en/latest/cli.html) and the [Python API](https://microhapulator.readthedocs.io/en/latest/api.html).
 
 
 ## Contributing
 
 MicroHapulator was created by Daniel Standage, with the support of the National Bioforensic Analysis Center (NBFAC).
-But we welcome contributions from the broader community!
+Contributions from the broader community are welcomed!
 Feel free to ask questions, make suggestions, or report bugs using the [issue tracker](https://github.com/bioforensics/MicroHapulator/issues).
 If you are interested in submitting patches, [the developer documentation](google.com) contains a few suggestions for a development setup.
 All contributors are expected to abide by the project's [Code of Conduct](google.com).
