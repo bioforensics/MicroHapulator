@@ -58,7 +58,8 @@ mhpl8r contrib --json evid-repl1-typing-result.json
 mhpl8r prob frequencies.tsv evid-repl1-typing-result.json
 mhpl8r diff evid-repl1-typing-result.json evid-repl2-typing-result.json
 mhpl8r dist evid-repl1-typing-result.json evid-repl2-typing-result.json
-mhpl8r prob frequencies.tsv evid-repl1-typing-result.json reference-typing-result.json
+mhpl8r prob frequencies.tsv evid-repl1-typing-result.json reference1-typing-result.json
+mhpl8r contain evid-repl1-typing-result.json reference1-typing-result.json
 ```
 
 ## Appendix: simulated data

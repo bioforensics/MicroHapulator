@@ -21,7 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Removed dependency on MicroHapDB for marker definitions, frequencies, and sequences (#93).
 - Refactored CLI and Python API, adding new `microhapulator.api` module to serve as main entry point (#98, c98bf6c78ef4).
 - Replaced the "ObservedProfile" terminology with the more appropriate "TypingResult" (#99).
-- Documentation now uses Sphinx to render markdown as HTML (c98bf6c78e, #101, #102, #105).
+- Documentation now uses Sphinx to render markdown as HTML (c98bf6c78e, #101, #102, #105, #106).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (#71).
