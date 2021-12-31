@@ -15,6 +15,8 @@ install
 manual
 config
 devel
+api
+cli
 conduct
 ```
 
