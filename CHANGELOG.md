@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New `--base-qual` parameter for `mhpl8r type` to set the minimum required base quality when iterating over reads in a pileup (#83).
 - New `mhpl8r balance` module for calculating and visualizing interlocus balance (#85).
 - Users can now supply marker definitions, frequences, and reference sequences as TSV/FASTA files instead of MicroHapDB references (#93).
+- Configuration file examples in `microhapulator/data/configs/` (#105).
 
 ### Changed
 - Updated mybinder demo (see #69).
@@ -20,7 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Removed dependency on MicroHapDB for marker definitions, frequencies, and sequences (#93).
 - Refactored CLI and Python API, adding new `microhapulator.api` module to serve as main entry point (#98, c98bf6c78ef4).
 - Replaced the "ObservedProfile" terminology with the more appropriate "TypingResult" (#99).
-- Documentation now uses Sphinx to render markdown as HTML (c98bf6c78e, #101, #102).
+- Documentation now uses Sphinx to render markdown as HTML (c98bf6c78e, #101, #102, #105).
 
 ### Fixed
 - Corrected a bug with Fastq headers in `mhpl8r seq` module (#71).

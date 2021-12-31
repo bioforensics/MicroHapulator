@@ -27,7 +27,7 @@ SCHEMA = None
 
 
 def load_schema():
-    with mhopen(package_file("profile-schema.json"), "r") as fh:
+    with mhopen(package_file("data/profile-schema.json"), "r") as fh:
         return json.load(fh)
 
 
