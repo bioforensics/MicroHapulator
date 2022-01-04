@@ -1,7 +1,7 @@
 {
     "markers": {
         "mh13KK-218": {
-            "allele_counts": {
+            "typing_result": {
                 "G,T,C,T": 1,
                 "T,G,C,T": 1,
                 "T,G,T,T": 2,
@@ -20,7 +20,7 @@
             "num_discarded_reads": 413
         },
         "mh21KK-320": {
-            "allele_counts": {
+            "typing_result": {
                 "G,A,C,A": 1,
                 "G,A,G,A": 2,
                 "G,A,T,A": 923,

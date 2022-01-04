@@ -3,36 +3,36 @@
         "mh01KK-205": {
             "genotype": [
                 {
-                    "allele": "T,T,A,G",
-                    "haplotype": 0
+                    "haplotype": "T,T,A,G",
+                    "index": 0
                 },
                 {
-                    "allele": "T,T,G,G",
-                    "haplotype": 1
+                    "haplotype": "T,T,G,G",
+                    "index": 1
                 }
             ]
         },
         "mh02KK-005": {
             "genotype": [
                 {
-                    "allele": "G,A",
-                    "haplotype": 0
+                    "haplotype": "G,A",
+                    "index": 0
                 },
                 {
-                    "allele": "A,G",
-                    "haplotype": 1
+                    "haplotype": "A,G",
+                    "index": 1
                 }
             ]
         },
         "mh03KK-006": {
             "genotype": [
                 {
-                    "allele": "A,A",
-                    "haplotype": 0
+                    "haplotype": "A,A",
+                    "index": 0
                 },
                 {
-                    "allele": "A,A",
-                    "haplotype": 1
+                    "haplotype": "A,A",
+                    "index": 1
                 }
             ]
         }

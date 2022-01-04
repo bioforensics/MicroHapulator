@@ -3,24 +3,24 @@
         "mh07CP-004": {
             "genotype": [
                 {
-                    "allele": "A,A,T,A,T",
-                    "haplotype": 0
+                    "haplotype": "A,A,T,A,T",
+                    "index": 0
                 },
                 {
-                    "allele": "T,T,A,T,C",
-                    "haplotype": 1
+                    "haplotype": "T,T,A,T,C",
+                    "index": 1
                 }
             ]
         },
         "mh14CP-003": {
             "genotype": [
                 {
-                    "allele": "A,G,G",
-                    "haplotype": 0
+                    "haplotype": "A,G,G",
+                    "index": 0
                 },
                 {
-                    "allele": "G,A,A",
-                    "haplotype": 1
+                    "haplotype": "G,A,A",
+                    "index": 1
                 }
             ]
         }

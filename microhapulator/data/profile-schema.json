@@ -21,7 +21,7 @@
             "type": "string"
         },
         "type": {
-            "description": "Whether the profile is simulated directly, observed (inferred from read mappings) or undetermined.",
+            "description": "Whether the profile is a mock simulated profile, a typing result determined from read mappings, or undetermined.",
             "type": "string",
             "enum": [
                 "base",
@@ -37,11 +37,11 @@
                         "genotype"
                     ],
                     "properties": {
-                        "LocusID": {
+                        "MarkerID": {
                             "description": "A microhaplotype marker identifier.",
                             "type": "string"
                         },
-                        "allele_counts": {
+                        "typing_result": {
                             "type": "object",
                             "patternProperties": {
                                 "^[ACGT,]+$": {
@@ -55,13 +55,14 @@
                             "items": {
                                 "type": "object",
                                 "required": [
-                                    "allele"
+                                    "haplotype"
                                 ],
                                 "properties": {
-                                    "allele": {
+                                    "haplotype": {
                                         "type": "string"
                                     },
-                                    "haplotype": {
+                                    "index": {
+                                        "description": "Indicates a haplotype of origin when it is known (e.g. simulated) or estimated (e.g. by deconvolution).",
                                         "anyOf": [
                                             {
                                                 "type": "integer"
@@ -90,7 +91,7 @@
                             "minimum": 0
                         },
                         "num_discarded_reads": {
-                            "description": "Number of reads discarded due to missing information: either they did not span all variants in the microhap, or they had gaps at one or more variants.",
+                            "description": "Number of reads discarded due to missing information: those that did not span all SNPs in the microhap, and those with gaps at one or more SNPs.",
                             "type": "integer",
                             "minimum": 0
                         }

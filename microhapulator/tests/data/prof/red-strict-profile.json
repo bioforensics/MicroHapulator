@@ -3,24 +3,24 @@
         "mh01KK-117": {
             "genotype": [
                 {
-                    "allele": "A,G,G,C",
-                    "haplotype": 0
+                    "haplotype": "A,G,G,C",
+                    "index": 0
                 },
                 {
-                    "allele": "A,G,C,C",
-                    "haplotype": 1
+                    "haplotype": "A,G,C,C",
+                    "index": 1
                 }
             ]
         },
         "mh09KK-157": {
             "genotype": [
                 {
-                    "allele": "G,C,C,A,C",
-                    "haplotype": 0
+                    "haplotype": "G,C,C,A,C",
+                    "index": 0
                 },
                 {
-                    "allele": "G,C,C,A,C",
-                    "haplotype": 1
+                    "haplotype": "G,C,C,A,C",
+                    "index": 1
                 }
             ]
         }
