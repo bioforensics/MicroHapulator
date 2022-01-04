@@ -1,7 +1,7 @@
 {
     "markers": {
         "mh06KK-080": {
-            "allele_counts": {
+            "typing_result": {
                 "A,A": 2,
                 "A,G": 1694,
                 "C,A": 2,
@@ -10,12 +10,12 @@
             },
             "genotype": [
                 {
-                    "allele": "A,G",
-                    "haplotype": null
+                    "haplotype": "A,G",
+                    "index": null
                 },
                 {
-                    "allele": "C,G",
-                    "haplotype": null
+                    "haplotype": "C,G",
+                    "index": null
                 }
             ],
             "max_coverage": 3744,
@@ -24,7 +24,7 @@
             "num_discarded_reads": 345
         },
         "mh06KK-026": {
-            "allele_counts": {
+            "typing_result": {
                 "A,C,G": 1,
                 "G,A,G": 3,
                 "G,C,A": 1,
@@ -36,8 +36,8 @@
             },
             "genotype": [
                 {
-                    "allele": "G,C,G",
-                    "haplotype": null
+                    "haplotype": "G,C,G",
+                    "index": null
                 }
             ],
             "max_coverage": 3754,
@@ -46,7 +46,7 @@
             "num_discarded_reads": 395
         },
         "mh06KK-101": {
-            "allele_counts": {
+            "typing_result": {
                 "G,A": 3,
                 "G,C": 5,
                 "G,G": 3120,
@@ -54,8 +54,8 @@
             },
             "genotype": [
                 {
-                    "allele": "G,G",
-                    "haplotype": null
+                    "haplotype": "G,G",
+                    "index": null
                 }
             ],
             "max_coverage": 3754,
@@ -64,18 +64,18 @@
             "num_discarded_reads": 609
         },
         "mh07KK-030": {
-            "allele_counts": {
+            "typing_result": {
                 "A,C,C": 1663,
                 "G,C,C": 1687
             },
             "genotype": [
                 {
-                    "allele": "A,C,C",
-                    "haplotype": null
+                    "haplotype": "A,C,C",
+                    "index": null
                 },
                 {
-                    "allele": "G,C,C",
-                    "haplotype": null
+                    "haplotype": "G,C,C",
+                    "index": null
                 }
             ],
             "max_coverage": 3744,

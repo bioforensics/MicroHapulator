@@ -62,30 +62,30 @@ class Profile(object):
             "markers": dict(),
         }
 
-    def haplotypes(self):
+    def haploindexes(self):
         hapids = set()
         for markerid, markerdata in self.data["markers"].items():
             for alleledata in markerdata["genotype"]:
-                if "haplotype" in alleledata and alleledata["haplotype"] is not None:
-                    hapids.add(alleledata["haplotype"])
+                if "index" in alleledata and alleledata["index"] is not None:
+                    hapids.add(alleledata["index"])
         assert sorted(hapids) == sorted(range(len(hapids)))
         return hapids
 
     def markers(self):
-        return set(list(self.data["markers"]))
+        return set(self.data["markers"])
 
-    def alleles(self, markerid, haplotype=None):
+    def haplotypes(self, markerid, index=None):
         if markerid not in self.data["markers"]:
             return set()
-        if haplotype is not None:
+        if index is not None:
             return set(
                 [
-                    a["allele"]
+                    a["haplotype"]
                     for a in self.data["markers"][markerid]["genotype"]
-                    if "haplotype" in a and a["haplotype"] == haplotype
+                    if "index" in a and a["index"] == index
                 ]
             )
-        return set([a["allele"] for a in self.data["markers"][markerid]["genotype"]])
+        return set([a["haplotype"] for a in self.data["markers"][markerid]["genotype"]])
 
     def rand_match_prob(self, freqs):
         """Compute the random match probability of this profile.
@@ -96,13 +96,14 @@ class Profile(object):
         """
         prob = 1.0
         for marker in sorted(self.markers()):
-            alleles = self.alleles(marker)
-            diploid_consistent = 1 <= len(alleles) <= 2
+            haplotypes = self.haplotypes(marker)
+            diploid_consistent = 1 <= len(haplotypes) <= 2
             if not diploid_consistent:
-                msg = f"cannot compute random match prob. for marker with {len(alleles)} alleles"
+                nhaps = len(haplotypes)
+                msg = f"cannot compute random match prob. for marker with {nhaps} haplotypes"
                 raise RandomMatchError(msg)
-            result = freqs[(freqs.Marker == marker) & (freqs.Haplotype.isin(alleles))]
-            if len(alleles) == 1:
+            result = freqs[(freqs.Marker == marker) & (freqs.Haplotype.isin(haplotypes))]
+            if len(haplotypes) == 1:
                 p = 0.001
                 if len(result) == 1:
                     pp = list(result.Frequency)[0]
@@ -137,11 +138,11 @@ class Profile(object):
         assert other.data["ploidy"] in (2, None)
         mismatches = 0
         for marker in self.markers():
-            selfalleles = self.alleles(marker)
-            otheralleles = other.alleles(marker)
-            if selfalleles == otheralleles:
+            selfhaps = self.haplotypes(marker)
+            otherhaps = other.haplotypes(marker)
+            if selfhaps == otherhaps:
                 pass
-            elif len(selfalleles & otheralleles) == 1:
+            elif len(selfhaps & otherhaps) == 1:
                 mismatches += 1
             else:
                 mismatches += 2
@@ -162,7 +163,7 @@ class Profile(object):
         if self.markers() != other.markers():
             return False
         for marker in self.markers():
-            if self.alleles(marker) != other.alleles(marker):
+            if self.haplotypes(marker) != other.haplotypes(marker):
                 return False
         return True
 
@@ -176,12 +177,12 @@ class Profile(object):
                 raise ValueError(f"unknown marker identifier '{marker}'")
             offsets = sorted(result.Offset)
             variants = [list() for _ in range(len(offsets))]
-            for haplotype in sorted(self.haplotypes()):
-                allele = self.alleles(marker, haplotype=haplotype).pop()
-                for var, varlist in zip(allele.split(","), variants):
-                    varlist.append(var)
-            for offset, var in zip(offsets, variants):
-                haplostr = "|".join(var)
+            for index in sorted(self.haploindexes()):
+                haplotype = self.haplotypes(marker, index=index).pop()
+                for snp, allelelist in zip(haplotype.split(","), variants):
+                    allelelist.append(snp)
+            for offset, snps in zip(offsets, variants):
+                haplostr = "|".join(snps)
                 yield "\t".join((marker, str(offset), str(offset + 1), haplostr))
 
     def seqstream(self, refrseqs):
@@ -203,7 +204,7 @@ class Profile(object):
 
     def unite(mom, dad):
         """Simulate the creation of a new profile from a mother and father."""
-        gt = SimulatedProfile(ploidy=2)
+        prof = SimulatedProfile(ploidy=2)
         allmarkers = mom.markers() | dad.markers()
         commonmarkers = mom.markers() & dad.markers()
         if len(commonmarkers) == 0:
@@ -215,9 +216,9 @@ class Profile(object):
             print("[MicroHapulator::profile]", message, file=sys.stderr)
         for parent, hapid in zip((mom, dad), (0, 1)):
             for marker in sorted(commonmarkers):
-                haploallele = choice(sorted(parent.alleles(marker)))
-                gt.add(hapid, marker, haploallele)
-        return gt
+                haplotype = choice(sorted(parent.haplotypes(marker)))
+                prof.add(hapid, marker, haplotype)
+        return prof
 
     def unmix(self):
         assert self.ploidy % 2 == 0
@@ -225,10 +226,10 @@ class Profile(object):
         profiles = [SimulatedProfile() for _ in range(ncontrib)]
         for marker in self.markers():
             for contrib in range(ncontrib):
-                for hap in range(2):
-                    haplotype = (2 * contrib) + hap
-                    allele = self.alleles(marker, haplotype=haplotype).pop()
-                    profiles[contrib].add(hap, marker, allele)
+                for subindex in range(2):
+                    index = (2 * contrib) + subindex
+                    haplotype = self.haplotypes(marker, index=index).pop()
+                    profiles[contrib].add(subindex, marker, haplotype)
         return profiles
 
 
@@ -258,32 +259,32 @@ class SimulatedProfile(Profile):
                     marker_alleles[marker][i].append(a)
             profile = SimulatedProfile(ploidy=ploidy)
             for marker, allele_list in marker_alleles.items():
-                for i, allele in enumerate(allele_list):
-                    profile.add(i, marker, ",".join(allele))
+                for i, haplotype in enumerate(allele_list):
+                    profile.add(i, marker, ",".join(haplotype))
             return profile
 
     def merge(profiles):
         ploidy = 2 * len(profiles)
-        gt = SimulatedProfile(ploidy=ploidy)
+        prof = SimulatedProfile(ploidy=ploidy)
         offset = 0
         for profile in profiles:
             for markerid, markerdata in sorted(profile.data["markers"].items()):
-                for allele in markerdata["genotype"]:
-                    gt.add(offset + allele["haplotype"], markerid, allele["allele"])
+                for haplotype in markerdata["genotype"]:
+                    prof.add(offset + haplotype["index"], markerid, haplotype["haplotype"])
             offset += 2
-        return gt
+        return prof
 
     def __init__(self, fromfile=None, ploidy=0):
         super(SimulatedProfile, self).__init__(fromfile=fromfile)
         if ploidy:
             self.data["ploidy"] = ploidy
 
-    def add(self, hapid, marker, allele):
+    def add(self, hapid, marker, haplotype):
         if self.data["ploidy"] is not None and self.data["ploidy"] > 0:
             assert hapid in range(self.data["ploidy"])
         if marker not in self.data["markers"]:
             self.data["markers"][marker] = {"genotype": list()}
-        self.data["markers"][marker]["genotype"].append({"allele": allele, "haplotype": hapid})
+        self.data["markers"][marker]["genotype"].append({"haplotype": haplotype, "index": hapid})
 
     @property
     def gttype(self):
@@ -300,7 +301,7 @@ class TypingResult(Profile):
             "min_coverage": 0,
             "max_coverage": 0,
             "num_discarded_reads": ndiscarded,
-            "allele_counts": dict(),
+            "typing_result": dict(),
         }
         if len(cov_by_pos) > 0:
             avgcov = sum(cov_by_pos) / len(cov_by_pos)
@@ -308,8 +309,8 @@ class TypingResult(Profile):
             self.data["markers"][marker]["min_coverage"] = min(cov_by_pos)
             self.data["markers"][marker]["max_coverage"] = max(cov_by_pos)
 
-    def record_allele(self, marker, allele, count):
-        self.data["markers"][marker]["allele_counts"][allele] = count
+    def record_haplotype(self, marker, haplotype, count):
+        self.data["markers"][marker]["typing_result"][haplotype] = count
 
     def infer(self, ecthreshold=0.25, static=None, dynamic=None):
         for marker, mdata in self.data["markers"].items():
@@ -318,8 +319,8 @@ class TypingResult(Profile):
                 self.data["markers"][marker]["genotype"] = list()
                 continue
             gt = set()
-            allelecounts = mdata["allele_counts"]
-            for allele, count in allelecounts.items():
+            hapcounts = mdata["typing_result"]
+            for haplotype, count in hapcounts.items():
                 eff_cov = 1.0 - (mdata["num_discarded_reads"] / mdata["max_coverage"])
                 if dynamic is None or (static is not None and eff_cov < ecthreshold):
                     # Use static cutoff (low effective coverage, or dynamic cutoff undefined)
@@ -327,14 +328,14 @@ class TypingResult(Profile):
                         continue
                 else:
                     # Use dynamic cutoff (high effective coverage, or static cutoff undefined)
-                    if len(allelecounts.values()) == 0:
+                    if len(hapcounts.values()) == 0:
                         continue
-                    avgcount = sum(allelecounts.values()) / len(allelecounts.values())
+                    avgcount = sum(hapcounts.values()) / len(hapcounts.values())
                     if count < avgcount * dynamic:
                         continue
-                gt.add(allele)
+                gt.add(haplotype)
             self.data["markers"][marker]["genotype"] = [
-                {"allele": a, "haplotype": None} for a in sorted(gt)
+                {"haplotype": a, "index": None} for a in sorted(gt)
             ]
 
     @property

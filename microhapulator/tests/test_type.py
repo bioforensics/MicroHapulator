@@ -42,8 +42,8 @@ def test_type_missing_bam_index(tmp_path):
     copyfile(bam, tmp_bam)
     copyfile(tsv, tmp_tsv)
     result = mhapi.type(tmp_bam, tmp_tsv, minbasequal=13)
-    ac30 = result.data["markers"]["MHDBL000030"]["allele_counts"]
-    ac197 = result.data["markers"]["MHDBL000197"]["allele_counts"]
+    ac30 = result.data["markers"]["MHDBL000030"]["typing_result"]
+    ac197 = result.data["markers"]["MHDBL000197"]["typing_result"]
     assert ac30 == {"A,A,T,C": 3, "A,C,C,C": 2, "A,C,C,G": 18, "G,C,C,C": 1, "G,C,C,G": 34}
     assert ac197 == {"A,A,T,T,T": 30, "A,A,T,T,C": 39, "A,A,T,A,T": 1, "A,A,T,A,C": 1}
 
@@ -72,11 +72,13 @@ def test_type_dyn_cutoff():
     bam = data_file("bam/dyncut-test-reads.bam")
     tsv = data_file("def/dyncut-panel.tsv")
     rslt = mhapi.type(bam, tsv, static=10, dynamic=0.25)
-    assert rslt.alleles("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
-    assert rslt.alleles("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
+    assert rslt.haplotypes("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
+    assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
     rslt = mhapi.type(bam, tsv, static=4, dynamic=0.25)
-    assert rslt.alleles("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G", "C,A,C,T,A", "T,G,C,T,A"])
-    assert rslt.alleles("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
+    assert rslt.haplotypes("MHDBL000018") == set(
+        ["C,A,C,T,G", "T,G,C,T,G", "C,A,C,T,A", "T,G,C,T,A"]
+    )
+    assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
 
 
 def test_type_no_var_offsets():

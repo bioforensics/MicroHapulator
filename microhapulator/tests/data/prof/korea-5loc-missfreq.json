@@ -3,60 +3,60 @@
         "mh10KK-163": {
             "genotype": [
                 {
-                    "allele": "T,A,G,C,T",
-                    "haplotype": 0
+                    "haplotype": "T,A,G,C,T",
+                    "index": 0
                 },
                 {
-                    "allele": "T,G,G,T,C",
-                    "haplotype": 1
+                    "haplotype": "T,G,G,T,C",
+                    "index": 1
                 }
             ]
         },
         "mh10KK-169": {
             "genotype": [
                 {
-                    "allele": "T,G,C,T,G",
-                    "haplotype": 0
+                    "haplotype": "T,G,C,T,G",
+                    "index": 0
                 },
                 {
-                    "allele": "T,G,C,T,G",
-                    "haplotype": 1
+                    "haplotype": "T,G,C,T,G",
+                    "index": 1
                 }
             ]
         },
         "mh13KK-218": {
             "genotype": [
                 {
-                    "allele": "C,T,T,C",
-                    "haplotype": 0
+                    "haplotype": "C,T,T,C",
+                    "index": 0
                 },
                 {
-                    "allele": "C,T,C,T",
-                    "haplotype": 1
+                    "haplotype": "C,T,C,T",
+                    "index": 1
                 }
             ]
         },
         "mh21KK-320": {
             "genotype": [
                 {
-                    "allele": "G,G,C,A",
-                    "haplotype": 0
+                    "haplotype": "G,G,C,A",
+                    "index": 0
                 },
                 {
-                    "allele": "A,A,C,G",
-                    "haplotype": 1
+                    "haplotype": "A,A,C,G",
+                    "index": 1
                 }
             ]
         },
         "mh05KK-170": {
             "genotype": [
                 {
-                    "allele": "C,G,G,G",
-                    "haplotype": 0
+                    "haplotype": "C,G,G,G",
+                    "index": 0
                 },
                 {
-                    "allele": "T,A,T,A",
-                    "haplotype": 1
+                    "haplotype": "T,A,T,A",
+                    "index": 1
                 }
             ]
         }
