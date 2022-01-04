@@ -39,7 +39,7 @@ def count_and_sort(profile, include_discarded=True):
         readcount = 0
         if include_discarded:
             readcount += mdata["num_discarded_reads"]
-        for haplotype, count in mdata["allele_counts"].items():
+        for haplotype, count in mdata["typing_result"].items():
             readcount += count
         counts["Marker"].append(marker)
         counts["ReadCount"].append(readcount)
@@ -57,33 +57,33 @@ def balance(profile, include_discarded=True):
 
 
 def contain(p1, p2):
-    """Compute the proportion of alleles from p2 present in p1."""
+    """Compute the proportion of haplotypes from p2 present in p1."""
     total = 0
     contained = 0
     for marker in p2.markers():
-        allele1 = p1.alleles(marker)
-        allele2 = p2.alleles(marker)
-        total += len(allele2)
-        contained += len(allele2 & allele1)
+        hap1 = p1.haplotypes(marker)
+        hap2 = p2.haplotypes(marker)
+        total += len(hap2)
+        contained += len(hap2 & hap1)
     return contained, total
 
 
 def contrib(profile):
-    num_alleles_per_marker = [len(profile.alleles(marker)) for marker in profile.markers()]
-    max_num_alleles = max(num_alleles_per_marker)
-    max_thresh = max_num_alleles - 1 if max_num_alleles % 2 == 0 else max_num_alleles
-    max_loci = sum([1 for n in num_alleles_per_marker if n >= max_thresh])
-    max_perc = round(max_loci / len(num_alleles_per_marker), 4)
-    return ceil(max_num_alleles / 2), max_loci, max_perc
+    num_haps_per_marker = [len(profile.haplotypes(marker)) for marker in profile.markers()]
+    max_num_haps = max(num_haps_per_marker)
+    max_thresh = max_num_haps - 1 if max_num_haps % 2 == 0 else max_num_haps
+    max_loci = sum([1 for n in num_haps_per_marker if n >= max_thresh])
+    max_perc = round(max_loci / len(num_haps_per_marker), 4)
+    return ceil(max_num_haps / 2), max_loci, max_perc
 
 
 def diff(prof1, prof2):
     allmarkers = set(prof1.markers()).union(prof2.markers())
     for marker in sorted(allmarkers):
-        allele1 = prof1.alleles(marker)
-        allele2 = prof2.alleles(marker)
-        diff1 = allele1 - allele2
-        diff2 = allele2 - allele1
+        haps1 = prof1.haplotypes(marker)
+        haps2 = prof2.haplotypes(marker)
+        diff1 = haps1 - haps2
+        diff2 = haps2 - haps1
         if len(diff1) > 0 or len(diff2) > 0:
             yield marker, diff1, diff2
 
@@ -91,9 +91,9 @@ def diff(prof1, prof2):
 def dist(p1, p2):
     hammdist = 0
     for marker in set(p1.markers()).union(p2.markers()):
-        allele1 = p1.alleles(marker)
-        allele2 = p2.alleles(marker)
-        if allele1 != allele2:
+        haps1 = p1.haplotypes(marker)
+        haps2 = p2.haplotypes(marker)
+        if haps1 != haps2:
             hammdist += 1
     return hammdist
 
@@ -305,7 +305,7 @@ def type(
     result = TypingResult()
     for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
         result.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
-        for allele, count in htcounts.items():
-            result.record_allele(locusid, allele, count)
+        for haplotype, count in htcounts.items():
+            result.record_haplotype(locusid, haplotype, count)
     result.infer(ecthreshold=ecthreshold, static=static, dynamic=dynamic)
     return result

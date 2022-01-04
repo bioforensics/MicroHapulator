@@ -1,7 +1,7 @@
 {
     "markers": {
         "mh13KK-218": {
-            "allele_counts": {
+            "typing_result": {
                 "C,T,C,G": 1,
                 "C,T,T,T": 1,
                 "G,T,C,T": 1,
@@ -20,12 +20,12 @@
             },
             "genotype": [
                 {
-                    "allele": "T,T,C,T",
-                    "haplotype": null
+                    "haplotype": "T,T,C,T",
+                    "index": null
                 },
                 {
-                    "allele": "T,T,T,T",
-                    "haplotype": null
+                    "haplotype": "T,T,T,T",
+                    "index": null
                 }
             ],
             "max_coverage": 2500,
@@ -34,7 +34,7 @@
             "num_discarded_reads": 123
         },
         "mh21KK-320": {
-            "allele_counts": {
+            "typing_result": {
                 "G,A,A,A": 1,
                 "G,A,C,A": 3,
                 "G,A,G,A": 3,
@@ -56,12 +56,12 @@
             },
             "genotype": [
                 {
-                    "allele": "G,A,T,A",
-                    "haplotype": null
+                    "haplotype": "G,A,T,A",
+                    "index": null
                 },
                 {
-                    "allele": "G,G,C,A",
-                    "haplotype": null
+                    "haplotype": "G,G,C,A",
+                    "index": null
                 }
             ],
             "max_coverage": 2500,

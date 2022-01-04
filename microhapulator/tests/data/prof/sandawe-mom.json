@@ -3,12 +3,12 @@
         "mh08KK-032": {
             "genotype": [
                 {
-                    "allele": "T,G",
-                    "haplotype": 0
+                    "haplotype": "T,G",
+                    "index": 0
                 },
                 {
-                    "allele": "T,G",
-                    "haplotype": 1
+                    "haplotype": "T,G",
+                    "index": 1
                 }
             ]
         }

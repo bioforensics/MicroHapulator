@@ -28,23 +28,23 @@ def test_profile_roundtrip(tmp_path):
     assert str(profile) == str(test)
 
 
-def test_alleles():
+def test_haplotypes():
     simprof = SimulatedProfile.populate_from_bed(data_file("gttest.bed.gz"))
     typeprof = TypingResult(fromfile=data_file("prof/gttest.json"))
-    assert simprof.alleles("BoGuSlOcUs") == set()
-    assert typeprof.alleles("BoGuSlOcUs") == set()
-    assert simprof.alleles("MHDBL000135") == set(["G,C,T", "G,T,C"])
-    assert typeprof.alleles("MHDBL000135") == set(["G,C,T", "G,T,C"])
-    assert simprof.alleles("MHDBL000135", haplotype=0) == set(["G,C,T"])
-    assert simprof.alleles("MHDBL000135", haplotype=1) == set(["G,T,C"])
-    assert typeprof.alleles("MHDBL000135", haplotype=0) == set()
+    assert simprof.haplotypes("BoGuSlOcUs") == set()
+    assert typeprof.haplotypes("BoGuSlOcUs") == set()
+    assert simprof.haplotypes("MHDBL000135") == set(["G,C,T", "G,T,C"])
+    assert typeprof.haplotypes("MHDBL000135") == set(["G,C,T", "G,T,C"])
+    assert simprof.haplotypes("MHDBL000135", index=0) == set(["G,C,T"])
+    assert simprof.haplotypes("MHDBL000135", index=1) == set(["G,T,C"])
+    assert typeprof.haplotypes("MHDBL000135", index=0) == set()
 
 
-def test_haplotypes():
+def test_haploindexes():
     simprof = SimulatedProfile.populate_from_bed(data_file("gttest-mismatch1.bed.gz"))
-    assert simprof.haplotypes() == set([0, 1])
+    assert simprof.haploindexes() == set([0, 1])
     typeprof = TypingResult(data_file("pashtun-sim/test-output.json"))
-    assert typeprof.haplotypes() == set()
+    assert typeprof.haploindexes() == set()
 
 
 def test_sim_obs_profile_equality():

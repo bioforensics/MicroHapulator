@@ -3,36 +3,36 @@
         "mh01AT-04": {
             "genotype": [
                 {
-                    "allele": "G,T,G",
-                    "haplotype": 0
+                    "haplotype": "G,T,G",
+                    "index": 0
                 },
                 {
-                    "allele": "G,G,G",
-                    "haplotype": 1
+                    "haplotype": "G,G,G",
+                    "index": 1
                 }
             ]
         },
         "mh11AT-22": {
             "genotype": [
                 {
-                    "allele": "T,A",
-                    "haplotype": 0
+                    "haplotype": "T,A",
+                    "index": 0
                 },
                 {
-                    "allele": "T,G",
-                    "haplotype": 1
+                    "haplotype": "T,G",
+                    "index": 1
                 }
             ]
         },
         "mh16AT-33": {
             "genotype": [
                 {
-                    "allele": "A,C,A",
-                    "haplotype": 0
+                    "haplotype": "A,C,A",
+                    "index": 0
                 },
                 {
-                    "allele": "A,C,A",
-                    "haplotype": 1
+                    "haplotype": "A,C,A",
+                    "index": 1
                 }
             ]
         }
