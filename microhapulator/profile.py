@@ -334,9 +334,7 @@ class TypingResult(Profile):
                     if count < avgcount * dynamic:
                         continue
                 gt.add(haplotype)
-            self.data["markers"][marker]["genotype"] = [
-                {"haplotype": a, "index": None} for a in sorted(gt)
-            ]
+            self.data["markers"][marker]["genotype"] = [{"haplotype": a} for a in sorted(gt)]
 
     @property
     def gttype(self):

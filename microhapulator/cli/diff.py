@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 
+from microhapulator import open
 import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 
