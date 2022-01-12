@@ -2,9 +2,14 @@ name: microhapulator-demo
 channels:
   - conda-forge
   - bioconda
+  - defaults
 dependencies:
   - bash_kernel
-  - microhapulator >=0.4.1
   - bwa
-  - samtools
   - curl
+  - flash
+  - git
+  - pip
+  - pip:
+    - git+https://github.com/bioforensics/MicroHapulator.git
+  - samtools
