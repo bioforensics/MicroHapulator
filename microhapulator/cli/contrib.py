@@ -26,56 +26,11 @@ def subparser(subparsers):
         help='write output to "FILE"; by '
         "default, output is written to the terminal (standard output)",
     )
-    cli.add_argument(
-        "-j",
-        "--json",
-        metavar="FILE",
-        help="precomputed genotype profile in "
-        "JSON format; if not specified, must supply arguments for "
-        "`--refr-fasta` and `--bam` flags",
-    )
-    cli.add_argument(
-        "-t", "--tsv", metavar="FILE", help="microhap marker definitions in tabular (TSV) format"
-    )
-    cli.add_argument("-b", "--bam", metavar="FILE", help="aligned and sorted reads in BAM format")
-    cli.add_argument(
-        "-s",
-        "--static",
-        metavar="ST",
-        type=int,
-        default=None,
-        help="apply a static threshold for calling genotypes; see `mhpl8r type --help`",
-    )
-    cli.add_argument(
-        "-d",
-        "--dynamic",
-        metavar="DT",
-        type=float,
-        default=None,
-        help="apply a dynamic threshold for calling genotypes; see `mhpl8r type --help`",
-    )
-
-
-def load_profile(bamfile=None, markertsv=None, json=None, **kwargs):
-    if not json and (not bamfile or not markertsv):
-        message = "must provide either JSON profile or BAM and refr FASTA"
-        raise ValueError(message)
-    if json:
-        profile = Profile(fromfile=json)
-    else:
-        profile = mhapi.type(bamfile, markertsv, **kwargs)
-    return profile
+    cli.add_argument("result", help="MicroHapulator typing result in JSON format")
 
 
 def main(args):
-    profile = load_profile(
-        bamfile=args.bam,
-        markertsv=args.tsv,
-        json=args.json,
-        static=args.static,
-        dynamic=args.dynamic,
-    )
-    ncontrib, nloci, ploci = mhapi.contrib(profile)
+    ncontrib, nloci, ploci = mhapi.contrib(Profile(fromfile=args.result))
     data = {
         "min_num_contrib": ncontrib,
         "num_loci_max_alleles": nloci,

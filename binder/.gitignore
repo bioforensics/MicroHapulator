@@ -1,6 +1,10 @@
-beta-panel.fasta*
-reads-*.bam*
-reads-*.fastq.gz
-genotype-*.json
-profile-*.json
-profile.json
+refr-seqs.fasta.*
+*.bam*
+*-reads-R?.fastq.gz
+*.extendedFrags.fastq
+*.notCombined_?.fastq
+*.histogram*
+*.hist
+*.hist.innie
+*.hist.outie
+*-result.json
