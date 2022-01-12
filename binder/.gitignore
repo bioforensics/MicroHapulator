@@ -1,4 +1,4 @@
-refr-seqs.fasta*
+refr-seqs.fasta.*
 *.bam*
 *-reads-R?.fastq.gz
 *.extendedFrags.fastq
