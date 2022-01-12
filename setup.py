@@ -28,7 +28,11 @@ setup(
     author_email="daniel.standage@nbacc.dhs.gov",
     packages=["microhapulator", "microhapulator.cli", "microhapulator.tests"],
     package_data={
-        "microhapulator": ["microhapulator/tests/data/*", "microhapulator/tests/data/*/*"]
+        "microhapulator": [
+            "microhapulator/data/*",
+            "microhapulator/tests/data/*",
+            "microhapulator/tests/data/*/*",
+        ]
     },
     include_package_data=True,
     install_requires=[
