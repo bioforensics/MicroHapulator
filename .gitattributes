@@ -1,4 +1,5 @@
 microhapulator/_version.py export-subst
 microhapulator/_version.py linguist-vendored
 binder/*.ipynb linguist-documentation
+binder/*.html linguist-documentation
 notebook/*/*.ipynb linguist-documentation
