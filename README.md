@@ -31,7 +31,7 @@ The [MicroHapulator user manual](https://microhapulator.readthedocs.io/en/latest
 There is also a reference for the [command line interface](https://microhapulator.readthedocs.io/en/latest/cli.html) and the [Python API](https://microhapulator.readthedocs.io/en/latest/api.html).
 For a quick interactive demo, click the badge below.
 
-- [![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo.ipynb) MicroHapulator CLI (`mhpl8r --help`)
+[![Binder][binderbadge]](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/master?filepath=binder%2Fdemo.ipynb)
 
 
 ## Contributing
