@@ -14515,12 +14515,13 @@ a.anchor-link {
 
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="MicroHapulator:-Interactive-Demo">MicroHapulator: Interactive Demo<a class="anchor-link" href="#MicroHapulator:-Interactive-Demo">&#182;</a></h1><p><small>Daniel Standage, 2022-01-12</small></p>
+<h1 id="MicroHapulator:-Interactive-Demo">MicroHapulator: Interactive Demo<a class="anchor-link" href="#MicroHapulator:-Interactive-Demo">&#182;</a></h1><p><small>Daniel Standage, 2022-01-13</small></p>
 <p><strong>MicroHapulator</strong> is an application for empirical haplotype calling, analysis, and basic forensic interpretation of microhaplotypes with NGS data.
 This notebook is designed to introduce MicroHapulator to new users and demonstrate its features.
 The software is normally run by entering commands in a shell terminal window.
 For convenience, however, this notebook provides an interactive environment that interleaves narrative text, shell commands that the reader can execute and re-execute, the output of those commands, and additional explanatory commentary.
-To execute a block of code in the notebook, select the corresponding notebook cell and then click the <code>[&gt; Run]</code> button at the top of the page (or as a keyboard shortcut, simultaneously press <code>[shift]</code> and <code>[enter]</code>).</p>
+To execute a block of code in the notebook, select the corresponding notebook cell and then click the <code>[&gt; Run]</code> button at the top of the page (or as a keyboard shortcut, simultaneously press <code>[shift]</code> and <code>[enter]</code>).
+As you execute each code block, the notebook will display output from the corresponding command(s).</p>
 
 </div>
 </div>
@@ -14714,7 +14715,7 @@ The indexing task only needs to be performed once for any given reference sequen
 [bwa_index] Construct SA from BWT and Occ... 0.00 sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa index refr-seqs.fasta
-[main] Real time: 0.007 sec; CPU: 0.006 sec
+[main] Real time: 0.014 sec; CPU: 0.013 sec
 </pre>
 </div>
 </div>
@@ -14732,7 +14733,7 @@ The indexing task only needs to be performed once for any given reference sequen
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>curl -sL https://osf.io/2m3bq/download &gt; EVD1-reads-R1.fastq.gz
@@ -14766,7 +14767,7 @@ The paired-end reads generated for each sample by the Illumina MiSeq instrument 
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>ls -1 EVD1-reads-R*.fastq.gz
@@ -14810,7 +14811,7 @@ For this we use the FLASH program.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>flash EVD1-reads-R1.fastq.gz EVD1-reads-R2.fastq.gz --allow-outies -m <span class="m">100</span> -M <span class="m">325</span> -o EVD1
@@ -14872,7 +14873,7 @@ For this we use the FLASH program.</p>
 [FLASH] Writing histogram files.
 [FLASH]  
 [FLASH] FLASH v1.2.11 complete!
-[FLASH] 0.031 seconds elapsed
+[FLASH] 0.032 seconds elapsed
 </pre>
 </div>
 </div>
@@ -14893,7 +14894,7 @@ We also use <code>samtools</code> to convert the plain text alignments in SAM fo
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>bwa mem refr-seqs.fasta EVD1.extendedFrags.fastq <span class="p">|</span> samtools view -b <span class="p">|</span> samtools sort -o EVD1-reads.bam
@@ -14919,10 +14920,10 @@ samtools index EVD1-reads.bam
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>[M::bwa_idx_load_from_disk] read 0 ALT contigs
 [M::process] read 2472 sequences (765992 bp)...
-[M::mem_process_seqs] Processed 2472 reads in 0.223 CPU sec, 0.223 real sec
+[M::mem_process_seqs] Processed 2472 reads in 0.217 CPU sec, 0.217 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem refr-seqs.fasta EVD1.extendedFrags.fastq
-[main] Real time: 0.247 sec; CPU: 0.235 sec
+[main] Real time: 0.241 sec; CPU: 0.230 sec
 </pre>
 </div>
 </div>
@@ -14934,21 +14935,22 @@ samtools index EVD1-reads.bam
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>With the aligned reads stored in <code>EVD1-reads.bam</code>, we can now compute the typing result for this sample with MicroHapulator.
-In addition to the BAM file containing read alignments, we also need to specify the configuration file containing marker definitions for the 23-plex panel.
-We'll store the result in <code>EVD1-result.json</code> and then peek at the first several lines of this file.</p>
+<p>With the aligned reads stored in <code>EVD1-reads.bam</code>, we can now use <code>mhpl8r type</code> to compute the typing result for this sample.
+In addition to the BAM file containing read alignments, we also need to specify the configuration file containing marker definitions for the 23-plex panel.</p>
 <p>Due to sequencing errors, some of the haplotypes observed in a typing result will be technical artifacts.
-While computing a typing result, the <code>mhpl8r type</code> command can also apply naïve static and/or dynamic filters to distinguish true haplotypes from false and determine the genotype of the sample.
+While computing a typing result, the <code>mhpl8r filter</code> command can apply naïve static and/or dynamic filters to distinguish true and false haplotypes and determine the sample's genotype.
 We call the filtered typing result a <em>genotype call</em>.</p>
+<p>We'll store the typing results and genotype calls in <code>EVD1-result.json</code> and then peek at the first several lines of this file.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-bash"><pre><span></span>mhpl8r <span class="nb">type</span> marker-defn.tsv EVD1-reads.bam --dynamic <span class="m">0</span>.1 --out EVD1-result.json
+<div class=" highlight hl-bash"><pre><span></span>mhpl8r <span class="nb">type</span> marker-defn.tsv EVD1-reads.bam --out EVD1-result-raw.json
+mhpl8r filter EVD1-result-raw.json --dynamic <span class="m">0</span>.1 --out EVD1-result.json
 cat EVD1-result.json <span class="p">|</span> head -n <span class="m">38</span>
 </pre></div>
 
@@ -14969,8 +14971,9 @@ cat EVD1-result.json <span class="p">|</span> head -n <span class="m">38</span>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [MicroHapulator::type] discarded 12 reads with gaps or missing data at positions of interest
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;markers&#34;: {
         &#34;mh01USC-1pD&#34;: {
@@ -15033,7 +15036,7 @@ With the application of appropriate thresholds, interlocus imbalance shouldn't c
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r balance EVD1-result.json
@@ -15056,7 +15059,7 @@ With the application of appropriate thresholds, interlocus imbalance shouldn't c
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 
 mh01USC-1pD : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 109.00
 mh03USC-3qC : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 109.00
@@ -15110,7 +15113,7 @@ All three samples were assayed with our 23-plex NGS panel, and the reads were st
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>ls -1 EVD1-reads-R*.fastq.gz EVD2-reads-R*.fastq.gz REF1-reads-R*.fastq.gz
@@ -15157,18 +15160,20 @@ Let us repeat the process for <strong>EVD2</strong> and <strong>REF1</strong>.</
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>flash EVD2-reads-R1.fastq.gz EVD2-reads-R2.fastq.gz --allow-outies -m <span class="m">100</span> -M <span class="m">325</span> -o EVD2
 bwa mem refr-seqs.fasta EVD2.extendedFrags.fastq <span class="p">|</span> samtools view -b <span class="p">|</span> samtools sort -o EVD2-reads.bam
 samtools index EVD2-reads.bam
-mhpl8r <span class="nb">type</span> marker-defn.tsv EVD2-reads.bam --dynamic <span class="m">0</span>.1 --out EVD2-result.json
+mhpl8r <span class="nb">type</span> marker-defn.tsv EVD2-reads.bam --out EVD2-result-raw.json
+mhpl8r filter EVD2-result-raw.json --dynamic <span class="m">0</span>.1 --out EVD2-result.json
 
 flash REF1-reads-R1.fastq.gz REF1-reads-R2.fastq.gz --allow-outies -m <span class="m">100</span> -M <span class="m">325</span> -o REF1
 bwa mem refr-seqs.fasta REF1.extendedFrags.fastq <span class="p">|</span> samtools view -b <span class="p">|</span> samtools sort -o REF1-reads.bam
 samtools index REF1-reads.bam
-mhpl8r <span class="nb">type</span> marker-defn.tsv REF1-reads.bam --dynamic <span class="m">0</span>.1 --out REF1-result.json
+mhpl8r <span class="nb">type</span> marker-defn.tsv REF1-reads.bam --out REF1-result-raw.json
+mhpl8r filter REF1-result-raw.json --dynamic <span class="m">0</span>.1 --out REF1-result.json
 </pre></div>
 
      </div>
@@ -15227,15 +15232,16 @@ mhpl8r <span class="nb">type</span> marker-defn.tsv REF1-reads.bam --dynamic <sp
 [FLASH] Writing histogram files.
 [FLASH]  
 [FLASH] FLASH v1.2.11 complete!
-[FLASH] 0.033 seconds elapsed
+[FLASH] 0.030 seconds elapsed
 [M::bwa_idx_load_from_disk] read 0 ALT contigs
 [M::process] read 2500 sequences (772154 bp)...
-[M::mem_process_seqs] Processed 2500 reads in 0.228 CPU sec, 0.228 real sec
+[M::mem_process_seqs] Processed 2500 reads in 0.209 CPU sec, 0.210 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem refr-seqs.fasta EVD2.extendedFrags.fastq
-[main] Real time: 0.248 sec; CPU: 0.237 sec
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[main] Real time: 0.230 sec; CPU: 0.218 sec
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [MicroHapulator::type] discarded 12 reads with gaps or missing data at positions of interest
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [FLASH] Starting FLASH v1.2.11
 [FLASH] Fast Length Adjustment of SHort reads
 [FLASH]  
@@ -15276,15 +15282,16 @@ mhpl8r <span class="nb">type</span> marker-defn.tsv REF1-reads.bam --dynamic <sp
 [FLASH] Writing histogram files.
 [FLASH]  
 [FLASH] FLASH v1.2.11 complete!
-[FLASH] 0.169 seconds elapsed
+[FLASH] 0.189 seconds elapsed
 [M::bwa_idx_load_from_disk] read 0 ALT contigs
 [M::process] read 24366 sequences (7534476 bp)...
-[M::mem_process_seqs] Processed 24366 reads in 2.181 CPU sec, 2.188 real sec
+[M::mem_process_seqs] Processed 24366 reads in 2.304 CPU sec, 2.320 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem refr-seqs.fasta REF1.extendedFrags.fastq
-[main] Real time: 2.429 sec; CPU: 2.247 sec
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[main] Real time: 2.540 sec; CPU: 2.363 sec
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [MicroHapulator::type] discarded 96 reads with gaps or missing data at positions of interest
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 </pre>
 </div>
 </div>
@@ -15302,7 +15309,7 @@ mhpl8r <span class="nb">type</span> marker-defn.tsv REF1-reads.bam --dynamic <sp
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r balance EVD2-result.json
@@ -15326,7 +15333,7 @@ mhpl8r balance REF1-result.json
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 
 mh01USC-1pD : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 109.00
 mh0XUSC-XqH : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 109.00
@@ -15352,7 +15359,7 @@ mh17USC-17pA: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 mh04USC-4pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 108.00
 mh21USC-21qA: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 108.00
 
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 
 mh01USC-1pD : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 1.06 K
 mh09USC-9pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 1.06 K
@@ -15411,7 +15418,7 @@ $$<p>We begin by applying this to the three profiles in our mock scenario.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r contrib EVD1-result.json
@@ -15436,17 +15443,17 @@ mhpl8r contrib REF1-result.json
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;min_num_contrib&#34;: 1,
     &#34;num_loci_max_alleles&#34;: 23,
     &#34;perc_loci_max_alleles&#34;: 1.0
-}[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+}[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;min_num_contrib&#34;: 1,
     &#34;num_loci_max_alleles&#34;: 23,
     &#34;perc_loci_max_alleles&#34;: 1.0
-}[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+}[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;min_num_contrib&#34;: 1,
     &#34;num_loci_max_alleles&#34;: 23,
@@ -15472,7 +15479,7 @@ Given two MicroHapulator typing results, the <code>mhpl8r diff</code> command wi
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r diff EVD1-result.json REF1-result.json
@@ -15495,7 +15502,7 @@ Given two MicroHapulator typing results, the <code>mhpl8r diff</code> command wi
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 </pre>
 </div>
 </div>
@@ -15507,7 +15514,7 @@ Given two MicroHapulator typing results, the <code>mhpl8r diff</code> command wi
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r diff EVD1-result.json EVD2-result.json
@@ -15530,7 +15537,7 @@ Given two MicroHapulator typing results, the <code>mhpl8r diff</code> command wi
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 mh01USC-1pD
 &gt;&gt;&gt; C,C,C
 mh02USC-2pC
@@ -15632,7 +15639,7 @@ Note that in cases of a perfect profile match, $P(H_p) = 1$ and the LR is then s
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r prob frequencies.tsv EVD1-result.json
@@ -15656,10 +15663,10 @@ mhpl8r prob frequencies.tsv EVD1-result.json REF1-result.json
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;random_match_probability&#34;: &#34;1.394E-23&#34;
-}[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+}[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;likelihood_ratio&#34;: &#34;7.176E+22&#34;
 }</pre>
@@ -15684,7 +15691,7 @@ mhpl8r prob frequencies.tsv EVD1-result.json REF1-result.json
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r prob frequencies.tsv EVD2-result.json
@@ -15708,10 +15715,10 @@ mhpl8r prob frequencies.tsv EVD2-result.json REF1-result.json
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;random_match_probability&#34;: &#34;1.066E-23&#34;
-}[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+}[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;likelihood_ratio&#34;: &#34;9.384E-59&#34;
 }</pre>
@@ -15742,7 +15749,7 @@ Reads are available in the following files.</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>ls -1 EVD3-reads-R*.fastq.gz REF2-reads-R*.fastq.gz REF3-reads-R*.fastq.gz REF4-reads-R*.fastq.gz
@@ -15790,28 +15797,32 @@ REF4-reads-R2.fastq.gz
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[19]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>flash EVD3-reads-R1.fastq.gz EVD3-reads-R2.fastq.gz --allow-outies -m <span class="m">100</span> -M <span class="m">325</span> -o EVD3 --quiet
 bwa mem refr-seqs.fasta EVD3.extendedFrags.fastq <span class="p">|</span> samtools view -b <span class="p">|</span> samtools sort -o EVD3-reads.bam
 samtools index EVD3-reads.bam
-mhpl8r <span class="nb">type</span> marker-defn.tsv EVD3-reads.bam --dynamic <span class="m">0</span>.1 --out EVD3-result.json
+mhpl8r <span class="nb">type</span> marker-defn.tsv EVD3-reads.bam --out EVD3-result-raw.json
+mhpl8r filter EVD3-result-raw.json --dynamic <span class="m">0</span>.1 --out EVD3-result.json
 
 flash REF2-reads-R1.fastq.gz REF2-reads-R2.fastq.gz --allow-outies -m <span class="m">100</span> -M <span class="m">325</span> -o REF2 --quiet
 bwa mem refr-seqs.fasta REF2.extendedFrags.fastq <span class="p">|</span> samtools view -b <span class="p">|</span> samtools sort -o REF2-reads.bam
 samtools index REF2-reads.bam
-mhpl8r <span class="nb">type</span> marker-defn.tsv REF2-reads.bam --dynamic <span class="m">0</span>.1 --out REF2-result.json
+mhpl8r <span class="nb">type</span> marker-defn.tsv REF2-reads.bam --out REF2-result-raw.json
+mhpl8r filter REF2-result-raw.json --dynamic <span class="m">0</span>.1 --out REF2-result.json
 
 flash REF3-reads-R1.fastq.gz REF3-reads-R2.fastq.gz --allow-outies -m <span class="m">100</span> -M <span class="m">325</span> -o REF3 --quiet
 bwa mem refr-seqs.fasta REF3.extendedFrags.fastq <span class="p">|</span> samtools view -b <span class="p">|</span> samtools sort -o REF3-reads.bam
 samtools index REF3-reads.bam
-mhpl8r <span class="nb">type</span> marker-defn.tsv REF3-reads.bam --dynamic <span class="m">0</span>.1 --out REF3-result.json
+mhpl8r <span class="nb">type</span> marker-defn.tsv REF3-reads.bam --out REF3-result-raw.json
+mhpl8r filter REF3-result-raw.json --dynamic <span class="m">0</span>.1 --out REF3-result.json
 
 flash REF4-reads-R1.fastq.gz REF4-reads-R2.fastq.gz --allow-outies -m <span class="m">100</span> -M <span class="m">325</span> -o REF4 --quiet
 bwa mem refr-seqs.fasta REF4.extendedFrags.fastq <span class="p">|</span> samtools view -b <span class="p">|</span> samtools sort -o REF4-reads.bam
 samtools index REF4-reads.bam
-mhpl8r <span class="nb">type</span> marker-defn.tsv REF4-reads.bam --dynamic <span class="m">0</span>.1 --out REF4-result.json
+mhpl8r <span class="nb">type</span> marker-defn.tsv REF4-reads.bam --out REF4-result-raw.json
+mhpl8r filter REF4-result-raw.json --dynamic <span class="m">0</span>.1 --out REF4-result.json
 </pre></div>
 
      </div>
@@ -15833,42 +15844,46 @@ mhpl8r <span class="nb">type</span> marker-defn.tsv REF4-reads.bam --dynamic <sp
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>[M::bwa_idx_load_from_disk] read 0 ALT contigs
 [M::process] read 4976 sequences (1538831 bp)...
-[M::mem_process_seqs] Processed 4976 reads in 0.428 CPU sec, 0.429 real sec
+[M::mem_process_seqs] Processed 4976 reads in 0.408 CPU sec, 0.408 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem refr-seqs.fasta EVD3.extendedFrags.fastq
-[main] Real time: 0.466 sec; CPU: 0.446 sec
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[main] Real time: 0.450 sec; CPU: 0.431 sec
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [MicroHapulator::type] discarded 26 reads with gaps or missing data at positions of interest
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [M::bwa_idx_load_from_disk] read 0 ALT contigs
-[M::process] read 32352 sequences (10000421 bp)...
-[M::process] read 16695 sequences (5162136 bp)...
-[M::mem_process_seqs] Processed 32352 reads in 2.611 CPU sec, 2.599 real sec
-[M::mem_process_seqs] Processed 16695 reads in 1.414 CPU sec, 1.385 real sec
+[M::process] read 32352 sequences (10000463 bp)...
+[M::process] read 16695 sequences (5162094 bp)...
+[M::mem_process_seqs] Processed 32352 reads in 2.572 CPU sec, 2.559 real sec
+[M::mem_process_seqs] Processed 16695 reads in 1.486 CPU sec, 1.463 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem refr-seqs.fasta REF2.extendedFrags.fastq
-[main] Real time: 4.152 sec; CPU: 4.089 sec
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[main] Real time: 4.196 sec; CPU: 4.131 sec
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [MicroHapulator::type] discarded 258 reads with gaps or missing data at positions of interest
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [M::bwa_idx_load_from_disk] read 0 ALT contigs
-[M::process] read 32348 sequences (10000306 bp)...
-[M::process] read 17071 sequences (5277947 bp)...
-[M::mem_process_seqs] Processed 32348 reads in 3.035 CPU sec, 3.024 real sec
-[M::mem_process_seqs] Processed 17071 reads in 1.645 CPU sec, 1.615 real sec
+[M::process] read 32348 sequences (10000343 bp)...
+[M::process] read 17071 sequences (5277910 bp)...
+[M::mem_process_seqs] Processed 32348 reads in 3.175 CPU sec, 3.176 real sec
+[M::mem_process_seqs] Processed 17071 reads in 1.803 CPU sec, 1.776 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem refr-seqs.fasta REF3.extendedFrags.fastq
-[main] Real time: 4.816 sec; CPU: 4.739 sec
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[main] Real time: 5.128 sec; CPU: 5.041 sec
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [MicroHapulator::type] discarded 200 reads with gaps or missing data at positions of interest
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [M::bwa_idx_load_from_disk] read 0 ALT contigs
-[M::process] read 32354 sequences (10000125 bp)...
-[M::process] read 16869 sequences (5214139 bp)...
-[M::mem_process_seqs] Processed 32354 reads in 2.443 CPU sec, 2.426 real sec
-[M::mem_process_seqs] Processed 16869 reads in 1.335 CPU sec, 1.294 real sec
+[M::process] read 32354 sequences (10000171 bp)...
+[M::process] read 16869 sequences (5214093 bp)...
+[M::mem_process_seqs] Processed 32354 reads in 2.648 CPU sec, 2.634 real sec
+[M::mem_process_seqs] Processed 16869 reads in 1.368 CPU sec, 1.335 real sec
 [main] Version: 0.7.17-r1188
 [main] CMD: bwa mem refr-seqs.fasta REF4.extendedFrags.fastq
-[main] Real time: 3.892 sec; CPU: 3.845 sec
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[main] Real time: 4.141 sec; CPU: 4.084 sec
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 [MicroHapulator::type] discarded 202 reads with gaps or missing data at positions of interest
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 </pre>
 </div>
 </div>
@@ -15886,7 +15901,7 @@ mhpl8r <span class="nb">type</span> marker-defn.tsv REF4-reads.bam --dynamic <sp
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[20]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r balance EVD3-result.json
@@ -15912,7 +15927,7 @@ mhpl8r balance REF4-result.json
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 
 mh09USC-9pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 219.00
 mh0XUSC-XqH : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 219.00
@@ -15938,7 +15953,7 @@ mh05USC-5pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 mh03USC-3qC : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 214.00
 mh22USC-22qB: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 214.00
 
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 
 mh19USC-19qB: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.14 K
 mh11USC-11pB: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.14 K
@@ -15964,7 +15979,7 @@ mh02USC-2pC : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 mh15USC-15qA: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.13 K
 mh04USC-4pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.12 K
 
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 
 mh09USC-9pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.15 K
 mh17USC-17pA: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.15 K
@@ -15990,7 +16005,7 @@ mh03USC-3qC : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 mh22USC-22qB: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.14 K
 mh04USC-4pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.14 K
 
-[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 
 mh01USC-1pD : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.15 K
 mh05USC-5pA : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 2.15 K
@@ -16033,7 +16048,7 @@ mh06USC-6pB : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[21]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[20]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r contrib EVD3-result.json
@@ -16056,7 +16071,7 @@ mh06USC-6pB : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;min_num_contrib&#34;: 3,
     &#34;num_loci_max_alleles&#34;: 2,
@@ -16072,8 +16087,9 @@ mh06USC-6pB : ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>In this sample, we observe three loci that have evidence for at least three DNA contributors (i.e. five or more distinct haplotypes).
-We can then test whether any of the reference samples is a contributor to the evidentiary mixture.
+<p>In this sample, we observe two loci that provide evidence for at least three DNA contributors, i.e. five or more distinct haplotypes.
+If you examine <code>EVD3-result.json</code>, there are numerous markers with three or four haplotypes, but the two markers with 5 haplotypes are strong evidence for three DNA contributors.</p>
+<p>We can then test whether any of the reference samples is a contributor to the evidentiary mixture.
 MicroHapulator implements a simple containment test to investigate this question.
 In brief, the containment test examines each marker and determines whether the genotype in a profile of interest is compatible with the genotype of a mixture profile.
 For example, if a reference sample <strong>REF99</strong> has a <code>A,C,T / A,T,T</code> genotype at a marker and an evidentiary mixture sample <strong>EVD99</strong> has a <code>A,C,G / A,C,T / A,T,T</code> genotype, <strong>REF99</strong> is compatible, e.g. a plausible contributor to <strong>EVD99</strong>.
@@ -16085,7 +16101,7 @@ In the end, the containment test reports the percentage of markers in one profil
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[22]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[21]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r contain EVD3-result.json REF2-result.json
@@ -16108,7 +16124,7 @@ In the end, the containment test reports the percentage of markers in one profil
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;containment&#34;: 1.0,
     &#34;contained_alleles&#34;: 39,
@@ -16131,7 +16147,7 @@ What can we say about <strong>REF3</strong> and <strong>REF4</strong>?</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[23]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[22]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-bash"><pre><span></span>mhpl8r contain EVD3-result.json REF3-result.json
@@ -16155,12 +16171,12 @@ mhpl8r contain EVD3-result.json REF4-result.json
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+<pre>[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;containment&#34;: 0.7297,
     &#34;contained_alleles&#34;: 27,
     &#34;total_alleles&#34;: 37
-}[MicroHapulator] running version 0.4.1+49.g6b288fd.dirty
+}[MicroHapulator] running version 0.4.1+46.g77dfbef.dirty
 {
     &#34;containment&#34;: 0.8649,
     &#34;contained_alleles&#34;: 32,

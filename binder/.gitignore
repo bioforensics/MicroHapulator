@@ -8,3 +8,4 @@ refr-seqs.fasta.*
 *.hist.innie
 *.hist.outie
 *-result.json
+*-result-raw.json
