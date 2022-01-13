@@ -21,17 +21,46 @@ from shutil import copyfile
 def test_type_simple():
     bam = data_file("pashtun-sim/aligned-reads.bam")
     tsv = data_file("pashtun-sim/tiny-panel.tsv")
-    observed = mhapi.type(bam, tsv, static=10, dynamic=0.25)
-    expected = TypingResult(fromfile=data_file("pashtun-sim/test-output.json"))
-    assert observed == expected
-
-
-def test_type_simpler():
-    bam = data_file("pashtun-sim/aligned-reads.bam")
-    tsv = data_file("pashtun-sim/tiny-panel.tsv")
-    observed = mhapi.type(bam, tsv)
-    expected = TypingResult(fromfile=data_file("pashtun-sim/test-output-sans-genotype.json"))
-    assert observed == expected
+    result = mhapi.type(bam, tsv)
+    assert result.haplotypes("mh13KK-218") == set()
+    assert result.data["markers"]["mh13KK-218"]["typing_result"] == {
+        "C,T,C,G": 1,
+        "C,T,T,T": 1,
+        "G,T,C,T": 1,
+        "T,A,C,T": 1,
+        "T,G,C,T": 3,
+        "T,G,T,T": 2,
+        "T,T,A,T": 5,
+        "T,T,C,A": 1,
+        "T,T,C,C": 2,
+        "T,T,C,G": 2,
+        "T,T,C,T": 1178,
+        "T,T,G,T": 2,
+        "T,T,T,A": 2,
+        "T,T,T,G": 6,
+        "T,T,T,T": 1170,
+    }
+    assert result.haplotypes("mh21KK-320") == set()
+    assert result.data["markers"]["mh21KK-320"]["typing_result"] == {
+        "G,A,A,A": 1,
+        "G,A,C,A": 3,
+        "G,A,G,A": 3,
+        "G,A,T,A": 1075,
+        "G,A,T,C": 1,
+        "G,A,T,G": 1,
+        "G,A,T,T": 2,
+        "G,C,C,A": 1,
+        "G,C,T,A": 4,
+        "G,G,A,A": 2,
+        "G,G,A,T": 1,
+        "G,G,C,A": 1075,
+        "G,G,C,C": 3,
+        "G,G,C,G": 12,
+        "G,G,C,T": 5,
+        "G,G,T,A": 4,
+        "G,T,C,A": 1,
+        "T,G,C,A": 1,
+    }
 
 
 def test_type_missing_bam_index(tmp_path):
@@ -54,27 +83,62 @@ def test_type_cli_simple(tmp_path):
         "type",
         "--out",
         outfile,
-        "--static",
-        "5",
-        "--dynamic",
-        "0.25",
         data_file("pashtun-sim/tiny-panel.tsv"),
         data_file("pashtun-sim/aligned-reads.bam"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.type.main(args)
-    observed = TypingResult(fromfile=outfile)
-    expected = TypingResult(fromfile=data_file("pashtun-sim/test-output.json"))
-    assert observed == expected
+    result = TypingResult(fromfile=outfile)
+    assert result.haplotypes("mh13KK-218") == set()
+    assert result.data["markers"]["mh13KK-218"]["typing_result"] == {
+        "C,T,C,G": 1,
+        "C,T,T,T": 1,
+        "G,T,C,T": 1,
+        "T,A,C,T": 1,
+        "T,G,C,T": 3,
+        "T,G,T,T": 2,
+        "T,T,A,T": 5,
+        "T,T,C,A": 1,
+        "T,T,C,C": 2,
+        "T,T,C,G": 2,
+        "T,T,C,T": 1178,
+        "T,T,G,T": 2,
+        "T,T,T,A": 2,
+        "T,T,T,G": 6,
+        "T,T,T,T": 1170,
+    }
+    assert result.haplotypes("mh21KK-320") == set()
+    assert result.data["markers"]["mh21KK-320"]["typing_result"] == {
+        "G,A,A,A": 1,
+        "G,A,C,A": 3,
+        "G,A,G,A": 3,
+        "G,A,T,A": 1075,
+        "G,A,T,C": 1,
+        "G,A,T,G": 1,
+        "G,A,T,T": 2,
+        "G,C,C,A": 1,
+        "G,C,T,A": 4,
+        "G,G,A,A": 2,
+        "G,G,A,T": 1,
+        "G,G,C,A": 1075,
+        "G,G,C,C": 3,
+        "G,G,C,G": 12,
+        "G,G,C,T": 5,
+        "G,G,T,A": 4,
+        "G,T,C,A": 1,
+        "T,G,C,A": 1,
+    }
 
 
-def test_type_dyn_cutoff():
+def test_type_filter_dyn_threshold():
     bam = data_file("bam/dyncut-test-reads.bam")
     tsv = data_file("def/dyncut-panel.tsv")
-    rslt = mhapi.type(bam, tsv, static=10, dynamic=0.25)
+    rslt = mhapi.type(bam, tsv)
+    rslt.infer(static=10, dynamic=0.25)
     assert rslt.haplotypes("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
     assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
-    rslt = mhapi.type(bam, tsv, static=4, dynamic=0.25)
+    rslt = mhapi.type(bam, tsv)
+    rslt.infer(static=4, dynamic=0.25)
     assert rslt.haplotypes("MHDBL000018") == set(
         ["C,A,C,T,G", "T,G,C,T,G", "C,A,C,T,A", "T,G,C,T,A"]
     )
@@ -86,4 +150,4 @@ def test_type_no_var_offsets():
     tsv = data_file("def/sandawe-empty.tsv")
     message = r"marker IDs unique to set1={mh01KK-205, mh02KK-005, mh03KK-006};"
     with pytest.raises(ValueError, match=message):
-        result = mhapi.type(bam, tsv)
+        mhapi.type(bam, tsv)

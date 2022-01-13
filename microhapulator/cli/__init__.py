@@ -18,6 +18,7 @@ from . import contain
 from . import contrib
 from . import diff
 from . import dist
+from . import filter
 from . import mix
 from . import prob
 from . import seq
@@ -32,6 +33,7 @@ mains = {
     "contrib": contrib.main,
     "diff": diff.main,
     "dist": dist.main,
+    "filter": filter.main,
     "mix": mix.main,
     "prob": prob.main,
     "seq": seq.main,
@@ -46,6 +48,7 @@ subparser_funcs = {
     "contrib": contrib.subparser,
     "diff": diff.subparser,
     "dist": dist.subparser,
+    "filter": filter.subparser,
     "mix": mix.subparser,
     "prob": prob.subparser,
     "seq": seq.subparser,
