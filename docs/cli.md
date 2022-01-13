@@ -19,6 +19,16 @@ In brief, this means that every stable version of the MicroHapulator software is
 :nodefault:
 ```
 
+### `mhpl8r type`
+
+```{argparse}
+:module: microhapulator.cli
+:func: get_parser
+:prog: mhpl8r
+:path: filter
+:nodefault:
+```
+
 
 ## Analysis and interpretation
 

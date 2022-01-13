@@ -311,6 +311,8 @@ class TypingResult(Profile):
 
     def record_haplotype(self, marker, haplotype, count):
         self.data["markers"][marker]["typing_result"][haplotype] = count
+        if "genotype" not in self.data["markers"][marker]:
+            self.data["markers"][marker]["genotype"] = list()
 
     def infer(self, ecthreshold=0.25, static=None, dynamic=None):
         for marker, mdata in self.data["markers"].items():

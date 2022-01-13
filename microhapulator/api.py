@@ -291,9 +291,7 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     )
 
 
-def type(
-    bamfile, markertsv, minbasequal=10, ecthreshold=0.25, static=None, dynamic=None, max_depth=1e6
-):
+def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     check_index(bamfile)
     bam = pysam.AlignmentFile(bamfile, "rb")
     markers = load_marker_definitions(markertsv)
@@ -301,11 +299,10 @@ def type(
     for n, row in markers.iterrows():
         offsets[row.Marker].append(row.Offset)
     cross_check_marker_ids(bam.references, offsets.keys(), "read alignments", "marker definitions")
-    genotyper = tally_haplotypes(bam, offsets, minbasequal=minbasequal, max_depth=max_depth)
+    haplotype_caller = tally_haplotypes(bam, offsets, minbasequal=minbasequal, max_depth=max_depth)
     result = TypingResult()
-    for locusid, cov_by_pos, htcounts, ndiscarded in genotyper:
+    for locusid, cov_by_pos, htcounts, ndiscarded in haplotype_caller:
         result.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
         for haplotype, count in htcounts.items():
             result.record_haplotype(locusid, haplotype, count)
-    result.infer(ecthreshold=ecthreshold, static=static, dynamic=dynamic)
     return result

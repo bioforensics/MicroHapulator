@@ -6,18 +6,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - New `--base-qual` parameter for `mhpl8r type` to set the minimum required base quality when iterating over reads in a pileup (#83).
-- New `mhpl8r balance` module for calculating and visualizing interlocus balance (#85).
+- New `mhpl8r balance` subcommand for calculating and visualizing interlocus balance (#85).
 - Users can now supply marker definitions, frequences, and reference sequences as TSV/FASTA files instead of MicroHapDB references (#93).
 - Configuration file examples in `microhapulator/data/configs/` (#105).
+- New `mhpl8r filter` subcommand (#113).
 
 ### Changed
-- Updated mybinder demo (see #69, #110).
+- Updated mybinder demo (see #69, #110, #113).
 - Simulated Illumina sequencing now uses 1 thread by default, which paradoxically leads to better performance (#71).
 - Moved panel definition code moved out of the core code and into dedicated notebooks (#74).
 - Replaced `MissingBAMIndexError` with BAM auto-indexing code (#78).
 - Improved read names and choice of interleaved or paired output for `mhpl8r seq` (#80).
-- Replaced `--threshold` with `--static` and `--dynamic` in in `mhpl8r type`, disabled both by default (#82, #83).
-- Changed the default pysam pileup `max_depth` parameter, overriding 8000 with 1e6 and exposing as a hidden CLI parameter (#87).
+- Updated filtering of haplotype calls / typing results
+    - Replaced `--threshold` argument with `--static` and `--dynamic`, disabled both by default (#82, #83).
+    - Split `mhpl8r type` subcommand into `type` and `filter`, with `--static` and `--dynamic` arguments only relevant to the latter (#113).
+- Changed the default pysam pileup `max_depth` parameter, overriding 8000 with 1e6 and exposing as a CLI parameter (#87, #113).
 - Removed dependency on MicroHapDB for marker definitions, frequencies, and sequences (#93).
 - Refactored CLI and Python API, adding new `microhapulator.api` module to serve as main entry point (#98, c98bf6c78ef4).
 - Replaced the "ObservedProfile" terminology with the more appropriate "TypingResult" (#99).
