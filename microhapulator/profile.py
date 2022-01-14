@@ -314,7 +314,7 @@ class TypingResult(Profile):
         if "genotype" not in self.data["markers"][marker]:
             self.data["markers"][marker]["genotype"] = list()
 
-    def infer(self, static=None, dynamic=None):
+    def filter(self, static=None, dynamic=None):
         for marker, mdata in self.data["markers"].items():
             self.data["markers"][marker]["genotype"] = list()
             if static is None and dynamic is None:

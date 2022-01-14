@@ -134,11 +134,11 @@ def test_type_filter_threshold():
     bam = data_file("bam/dyncut-test-reads.bam")
     tsv = data_file("def/dyncut-panel.tsv")
     rslt = mhapi.type(bam, tsv)
-    rslt.infer(static=10, dynamic=0.005)
+    rslt.filter(static=10, dynamic=0.005)
     assert rslt.haplotypes("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
     assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
     rslt = mhapi.type(bam, tsv)
-    rslt.infer(static=4, dynamic=0.005)
+    rslt.filter(static=4, dynamic=0.005)
     assert rslt.haplotypes("MHDBL000018") == set(
         ["C,A,C,T,G", "T,G,C,T,G", "C,A,C,T,A", "T,G,C,T,A"]
     )

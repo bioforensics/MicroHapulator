@@ -21,7 +21,7 @@ def test_filter_simple():
     bam = data_file("pashtun-sim/aligned-reads.bam")
     tsv = data_file("pashtun-sim/tiny-panel.tsv")
     observed = mhapi.type(bam, tsv)
-    observed.infer(static=10, dynamic=0.05)
+    observed.filter(static=10, dynamic=0.05)
     expected = TypingResult(fromfile=data_file("pashtun-sim/test-output.json"))
     assert observed == expected
 

@@ -55,5 +55,5 @@ def subparser(subparsers):
 
 def main(args):
     result = TypingResult(fromfile=args.result)
-    result.infer(static=args.static, dynamic=args.dynamic)
+    result.filter(static=args.static, dynamic=args.dynamic)
     result.dump(args.out)
