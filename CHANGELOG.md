@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New `mhpl8r balance` subcommand for calculating and visualizing interlocus balance (#85).
 - Users can now supply marker definitions, frequences, and reference sequences as TSV/FASTA files instead of MicroHapDB references (#93).
 - Configuration file examples in `microhapulator/data/configs/` (#105).
-- New `mhpl8r filter` subcommand (#113).
+- New `mhpl8r filter` subcommand with support for marker-specific thresholds (#113, #114).
 
 ### Changed
 - Updated mybinder demo (see #69, #110, #113).
@@ -32,6 +32,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Corrected a bug resulting from attempting to do set operations on `None` (#75).
 - Corrected a bug with RMP implementation (#86).
 - Set minimum versions for runtime dependencies (#97).
+- Corrected the `--dynamic` filter to operate on total haplotype counts rather than average counts (#114).
 
 ## [0.4] 2019-11-05
 

@@ -13,6 +13,7 @@
 
 import microhapulator.api as mhapi
 from microhapulator.profile import TypingResult
+import pandas as pd
 import sys
 
 
@@ -27,17 +28,6 @@ def subparser(subparsers):
         "default, output is written to the terminal (standard output)",
     )
     cli.add_argument(
-        "-e",
-        "--effcov",
-        metavar="EC",
-        type=float,
-        default=0.25,
-        help="only reads that span all SNPs in a microhaplotype are retained, all others are "
-        "discarded; if most of the reads related to a marker are discarded, it has low *effective "
-        "coverage*; this parameter sets that threshold, i.e., if the fraction of retained reads "
-        "is < EC it is considered low effective coverage; by default EC=0.25 (or 25%%)",
-    )
-    cli.add_argument(
         "-s",
         "--static",
         metavar="ST",
@@ -46,7 +36,7 @@ def subparser(subparsers):
         help="apply a static threshold for calling genotypes, i.e., discard any haplotype whose "
         "count is less than ST; by default, ST is undefined, the static filter is not applied, "
         "and only raw haplotype counts are reported, not genotype calls; if --dynamic is also "
-        "defined, --static is only applied to markers with low effective coverage",
+        "defined, --static is applied first",
     )
     cli.add_argument(
         "-d",
@@ -54,16 +44,31 @@ def subparser(subparsers):
         metavar="DT",
         type=float,
         default=None,
-        help="apply a dynamic threshold for calling genotypes, i.e., if AC is the average count "
+        help="apply a dynamic threshold for calling genotypes, i.e., if C is the total count "
         "of all haplotypes observed at the marker, discard any haplotypes whose count is less "
-        "than DT * AC; by default, DT is undefined, the dynamic filter is not applied, and only "
+        "than C * DT; by default, DT is undefined, the dynamic filter is not applied, and only "
         "raw haplotype counts are reported, not genotype calls; if --static is also defined, "
-        "--dynamic is only applied to markers with high effective coverage",
+        "it is applied first, and the counts of any haplotypes that do not pass the --static "
+        "filter are deducted from the total count C",
+    )
+    cli.add_argument(
+        "-c",
+        "--config",
+        metavar="FILE",
+        default=None,
+        help="CSV file with marker-specific static and dynamic thresholds; the file should "
+        "contain 3 columns named Marker, Static, and Dynamic; there should be at most one row per "
+        "marker; if --static and/or --dynamic are specified, these serve as default values, while "
+        "any thresholds defined in the config file will override these values for the specified "
+        "markers",
     )
     cli.add_argument("result", help="MicroHapulator typing result in JSON format")
 
 
 def main(args):
     result = TypingResult(fromfile=args.result)
-    result.infer(ecthreshold=args.effcov, static=args.static, dynamic=args.dynamic)
+    config = None
+    if args.config:
+        config = pd.read_csv(args.config, sep=None, engine="python")
+    result.filter(static=args.static, dynamic=args.dynamic, config=config)
     result.dump(args.out)

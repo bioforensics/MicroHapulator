@@ -31,6 +31,18 @@ def load_schema():
         return json.load(fh)
 
 
+def check_filter_config(config):
+    if config is None:
+        return
+    expected = set(["Marker", "Static", "Dynamic"])
+    missing = expected - set(config)
+    if len(missing) > 0:
+        missingstr = ",".join(sorted(missing))
+        raise ValueError(f"filter config file missing column(s): {missingstr}")
+    if len(config.Marker) != len(config.Marker.unique()):
+        raise ValueError("filter config file contains duplicate entries for some markers")
+
+
 class Profile(object):
     def __init__(self, fromfile=None):
         global SCHEMA
@@ -314,29 +326,42 @@ class TypingResult(Profile):
         if "genotype" not in self.data["markers"][marker]:
             self.data["markers"][marker]["genotype"] = list()
 
-    def infer(self, ecthreshold=0.25, static=None, dynamic=None):
+    def filter(self, static=None, dynamic=None, config=None):
+        check_filter_config(config)
         for marker, mdata in self.data["markers"].items():
-            if static is None and dynamic is None:
+            markerstatic = static
+            markerdynamic = dynamic
+            if config is not None:
+                thresh = config[config.Marker == marker]
+                assert len(thresh) in (0, 1)
+                if len(thresh) == 1:
+                    markerstatic = thresh.Static.iloc[0]
+                    markerdynamic = thresh.Dynamic.iloc[0]
+            self.data["markers"][marker]["genotype"] = list()
+            if markerstatic is None and markerdynamic is None:
                 # No thresholds for calling haplotypes, just report raw haplotype counts
-                self.data["markers"][marker]["genotype"] = list()
                 continue
-            gt = set()
             hapcounts = mdata["typing_result"]
-            for haplotype, count in hapcounts.items():
-                eff_cov = 1.0 - (mdata["num_discarded_reads"] / mdata["max_coverage"])
-                if dynamic is None or (static is not None and eff_cov < ecthreshold):
-                    # Use static cutoff (low effective coverage, or dynamic cutoff undefined)
-                    if count < static:
+            genotype_call = set()
+            filtered = set()
+            totalcount = sum(hapcounts.values())
+            filteredcount = 0
+            if markerstatic is not None and markerstatic > 0:
+                for haplotype, count in hapcounts.items():
+                    if count < markerstatic:
+                        filtered.add(haplotype)
+                        filteredcount += count
+            if markerdynamic is not None and markerdynamic > 0.0:
+                for haplotype, count in hapcounts.items():
+                    if haplotype in filtered:
                         continue
-                else:
-                    # Use dynamic cutoff (high effective coverage, or static cutoff undefined)
-                    if len(hapcounts.values()) == 0:
-                        continue
-                    avgcount = sum(hapcounts.values()) / len(hapcounts.values())
-                    if count < avgcount * dynamic:
-                        continue
-                gt.add(haplotype)
-            self.data["markers"][marker]["genotype"] = [{"haplotype": a} for a in sorted(gt)]
+                    if count < (totalcount - filteredcount) * markerdynamic:
+                        filtered.add(haplotype)
+                    else:
+                        genotype_call.add(haplotype)
+            self.data["markers"][marker]["genotype"] = [
+                {"haplotype": ht} for ht in sorted(genotype_call)
+            ]
 
     @property
     def gttype(self):
