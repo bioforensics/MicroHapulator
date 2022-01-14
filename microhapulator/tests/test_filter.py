@@ -21,7 +21,7 @@ def test_filter_simple():
     bam = data_file("pashtun-sim/aligned-reads.bam")
     tsv = data_file("pashtun-sim/tiny-panel.tsv")
     observed = mhapi.type(bam, tsv)
-    observed.infer(static=10, dynamic=0.25)
+    observed.infer(static=10, dynamic=0.05)
     expected = TypingResult(fromfile=data_file("pashtun-sim/test-output.json"))
     assert observed == expected
 
@@ -38,7 +38,7 @@ def test_filter_cli(tmp_path):
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.type.main(args)
-    arglist = ["filter", "--out", filtered, "--static", "5", "--dynamic", "0.25", unfiltered]
+    arglist = ["filter", "--out", filtered, "--static", "5", "--dynamic", "0.05", unfiltered]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.filter.main(args)
     observed = TypingResult(fromfile=filtered)

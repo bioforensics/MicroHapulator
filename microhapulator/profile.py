@@ -316,27 +316,31 @@ class TypingResult(Profile):
 
     def infer(self, ecthreshold=0.25, static=None, dynamic=None):
         for marker, mdata in self.data["markers"].items():
+            self.data["markers"][marker]["genotype"] = list()
             if static is None and dynamic is None:
                 # No thresholds for calling haplotypes, just report raw haplotype counts
-                self.data["markers"][marker]["genotype"] = list()
                 continue
-            gt = set()
             hapcounts = mdata["typing_result"]
-            for haplotype, count in hapcounts.items():
-                eff_cov = 1.0 - (mdata["num_discarded_reads"] / mdata["max_coverage"])
-                if dynamic is None or (static is not None and eff_cov < ecthreshold):
-                    # Use static cutoff (low effective coverage, or dynamic cutoff undefined)
+            genotype_call = set()
+            filtered = set()
+            totalcount = sum(hapcounts.values())
+            filteredcount = 0
+            if static is not None and static > 0:
+                for haplotype, count in hapcounts.items():
                     if count < static:
+                        filtered.add(haplotype)
+                        filteredcount += count
+            if dynamic is not None and dynamic > 0.0:
+                for haplotype, count in hapcounts.items():
+                    if haplotype in filtered:
                         continue
-                else:
-                    # Use dynamic cutoff (high effective coverage, or static cutoff undefined)
-                    if len(hapcounts.values()) == 0:
-                        continue
-                    avgcount = sum(hapcounts.values()) / len(hapcounts.values())
-                    if count < avgcount * dynamic:
-                        continue
-                gt.add(haplotype)
-            self.data["markers"][marker]["genotype"] = [{"haplotype": a} for a in sorted(gt)]
+                    if count < (totalcount - filteredcount) * dynamic:
+                        filtered.add(haplotype)
+                    else:
+                        genotype_call.add(haplotype)
+            self.data["markers"][marker]["genotype"] = [
+                {"haplotype": ht} for ht in sorted(genotype_call)
+            ]
 
     @property
     def gttype(self):
