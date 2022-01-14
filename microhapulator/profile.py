@@ -31,6 +31,18 @@ def load_schema():
         return json.load(fh)
 
 
+def check_filter_config(config):
+    if config is None:
+        return
+    expected = set(["Marker", "Static", "Dynamic"])
+    missing = expected - set(config)
+    if len(missing) > 0:
+        missingstr = ",".join(sorted(missing))
+        raise ValueError(f"filter config file missing column(s): {missingstr}")
+    if len(config.Marker) != len(config.Marker.unique()):
+        raise ValueError("filter config file contains duplicate entries for some markers")
+
+
 class Profile(object):
     def __init__(self, fromfile=None):
         global SCHEMA
@@ -314,10 +326,19 @@ class TypingResult(Profile):
         if "genotype" not in self.data["markers"][marker]:
             self.data["markers"][marker]["genotype"] = list()
 
-    def filter(self, static=None, dynamic=None):
+    def filter(self, static=None, dynamic=None, config=None):
+        check_filter_config(config)
         for marker, mdata in self.data["markers"].items():
+            markerstatic = static
+            markerdynamic = dynamic
+            if config is not None:
+                thresh = config[config.Marker == marker]
+                assert len(thresh) in (0, 1)
+                if len(thresh) == 1:
+                    markerstatic = thresh.Static.iloc[0]
+                    markerdynamic = thresh.Dynamic.iloc[0]
             self.data["markers"][marker]["genotype"] = list()
-            if static is None and dynamic is None:
+            if markerstatic is None and markerdynamic is None:
                 # No thresholds for calling haplotypes, just report raw haplotype counts
                 continue
             hapcounts = mdata["typing_result"]
@@ -325,16 +346,16 @@ class TypingResult(Profile):
             filtered = set()
             totalcount = sum(hapcounts.values())
             filteredcount = 0
-            if static is not None and static > 0:
+            if markerstatic is not None and markerstatic > 0:
                 for haplotype, count in hapcounts.items():
-                    if count < static:
+                    if count < markerstatic:
                         filtered.add(haplotype)
                         filteredcount += count
-            if dynamic is not None and dynamic > 0.0:
+            if markerdynamic is not None and markerdynamic > 0.0:
                 for haplotype, count in hapcounts.items():
                     if haplotype in filtered:
                         continue
-                    if count < (totalcount - filteredcount) * dynamic:
+                    if count < (totalcount - filteredcount) * markerdynamic:
                         filtered.add(haplotype)
                     else:
                         genotype_call.add(haplotype)

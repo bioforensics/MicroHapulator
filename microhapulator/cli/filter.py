@@ -13,6 +13,7 @@
 
 import microhapulator.api as mhapi
 from microhapulator.profile import TypingResult
+import pandas as pd
 import sys
 
 
@@ -50,10 +51,24 @@ def subparser(subparsers):
         "it is applied first, and the counts of any haplotypes that do not pass the --static "
         "filter are deducted from the total count C",
     )
+    cli.add_argument(
+        "-c",
+        "--config",
+        metavar="FILE",
+        default=None,
+        help="CSV file with marker-specific static and dynamic thresholds; the file should "
+        "contain 3 columns named Marker, Static, and Dynamic; there should be at most one row per "
+        "marker; if --static and/or --dynamic are specified, these serve as default values, while "
+        "any thresholds defined in the config file will override these values for the specified "
+        "markers",
+    )
     cli.add_argument("result", help="MicroHapulator typing result in JSON format")
 
 
 def main(args):
     result = TypingResult(fromfile=args.result)
-    result.filter(static=args.static, dynamic=args.dynamic)
+    config = None
+    if args.config:
+        config = pd.read_csv(args.config, sep=None, engine="python")
+    result.filter(static=args.static, dynamic=args.dynamic, config=config)
     result.dump(args.out)
