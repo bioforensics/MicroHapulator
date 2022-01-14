@@ -6,9 +6,6 @@
 
 # MicroHapulator
 
-Daniel Standage, 2018-2021
-https://github.com/bioforensics/microhapulator
-
 **MicroHapulator** is software for empirical haplotype calling, analysis, and basic forensic interpretation of microhaplotypes from Illumina sequence data.
 Also included are tools for constructing mock genotypes and simulating Illumina sequencing of single- and multiple-contributor samples for testing and development purposes.
 MicroHapulator can be configured for use with any published or custom panel.

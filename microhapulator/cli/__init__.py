@@ -16,6 +16,7 @@ from microhapulator import __version__
 from . import balance
 from . import contain
 from . import contrib
+from . import convert
 from . import diff
 from . import dist
 from . import filter
@@ -31,6 +32,7 @@ mains = {
     "balance": balance.main,
     "contain": contain.main,
     "contrib": contrib.main,
+    "convert": convert.main,
     "diff": diff.main,
     "dist": dist.main,
     "filter": filter.main,
@@ -46,6 +48,7 @@ subparser_funcs = {
     "balance": balance.subparser,
     "contain": contain.subparser,
     "contrib": contrib.subparser,
+    "convert": convert.subparser,
     "diff": diff.subparser,
     "dist": dist.subparser,
     "filter": filter.subparser,

@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Users can now supply marker definitions, frequences, and reference sequences as TSV/FASTA files instead of MicroHapDB references (#93).
 - Configuration file examples in `microhapulator/data/configs/` (#105).
 - New `mhpl8r filter` subcommand with support for marker-specific thresholds (#113, #114).
+- New `mhpl8r convert` subcommand for converting genotype calls into a format compatible with probgen tools such as LRMix Studio and EuroForMix (#115).
 
 ### Changed
 - Updated mybinder demo (see #69, #110, #113).

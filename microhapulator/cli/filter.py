@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2019, DHS.
+# Copyright (c) 2022, DHS.
 #
 # This file is part of MicroHapulator (https://github.com/bioforensics/microhapulator) and is
 # licensed under the BSD license: see LICENSE.txt.
