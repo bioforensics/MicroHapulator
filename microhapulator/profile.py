@@ -20,6 +20,7 @@ from microhapulator import __version__
 from microhapulator.parsers import open as mhopen
 from microhapulator.parsers import package_file
 from numpy.random import choice
+import pandas as pd
 from pathlib import Path
 import sys
 
@@ -362,6 +363,34 @@ class TypingResult(Profile):
             self.data["markers"][marker]["genotype"] = [
                 {"haplotype": ht} for ht in sorted(genotype_call)
             ]
+
+    def dump_csv(self, outfile, samplename, counts=True, fix_homo=False):
+        max_haps = 0
+        for marker in sorted(self.markers()):
+            max_haps = max(max_haps, len(self.haplotypes(marker)))
+        entries = list()
+        column_names = ["SampleName", "Marker"]
+        column_names += [f"Allele{i+1}" for i in range(max_haps)]
+        if counts is True:
+            column_names += [f"Height{i+1}" for i in range(max_haps)]
+        for marker in sorted(self.markers()):
+            haplotypes = sorted(self.haplotypes(marker))
+            if counts is False and len(haplotypes) == 1 and fix_homo:
+                haplotypes = haplotypes * 2
+            hapcounts = list()
+            if counts is True:
+                for ht in haplotypes:
+                    count = self.data["markers"][marker]["typing_result"][ht]
+                    hapcounts.append(count)
+                while len(hapcounts) < max_haps:
+                    hapcounts.append(None)
+            haplotypes = [ht.replace(",", "-") for ht in haplotypes]
+            while len(haplotypes) < max_haps:
+                haplotypes.append(None)
+            entry = [samplename, marker, *haplotypes, *hapcounts]
+            entries.append(entry)
+        table = pd.DataFrame(entries, columns=column_names)
+        table.to_csv(outfile, index=False)
 
     @property
     def gttype(self):
