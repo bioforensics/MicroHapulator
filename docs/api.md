@@ -10,6 +10,10 @@ In brief, this means that every stable version of the MicroHapulator software is
 .. autofunction:: microhapulator.api.type
 ```
 
+```{eval-rst}
+.. autofunction:: microhapulator.profile.TypingResult.filter
+```
+
 
 ## Analysis and interpretation
 

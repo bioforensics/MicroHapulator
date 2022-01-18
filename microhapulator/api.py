@@ -47,8 +47,15 @@ def count_and_sort(profile, include_discarded=True):
     return data
 
 
-def balance(profile, include_discarded=True):
-    data = count_and_sort(profile, include_discarded=include_discarded)
+def balance(result, include_discarded=True):
+    """Compute interlocus balance
+
+    :param microhapulator.profile.TypingResult result: A typing result including haplotype counts
+    :param bool included_discarded: Flag indicating whether to include in each marker's total read count reads that are successfully aligned but discarded because they do not span all SNPs at the marker
+    :return: Total read counts for each marker in a two-column tabular data structure
+    :rtype: pandas DataFrame
+    """
+    data = count_and_sort(result, include_discarded=include_discarded)
     with TemporaryDirectory() as tempdir:
         tfile = os.path.join(tempdir, "data.tsv")
         data.to_csv(tfile, index=False, header=False)
@@ -292,6 +299,15 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
 
 
 def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
+    """Perform haplotype calling
+
+    :param str bamfile: Path of a BAM file containing reads aligned to marker reference sequences
+    :param str markertsv: Path of a TSV file containing marker metadata, specifically the offset of each SNP for every marker in the panel
+    :param int minbasequal: Minimum base quality (PHRED score) to be considered reliable for haplotype calling
+    :param float max_depth: Maximum permitted read depth
+    :returns: An unfiltered catalog of haplotype counts for each marker (a *typing result*)
+    :rtype: microhapulator.profile.TypingResult
+    """
     check_index(bamfile)
     bam = pysam.AlignmentFile(bamfile, "rb")
     markers = load_marker_definitions(markertsv)
