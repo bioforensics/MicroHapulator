@@ -16,7 +16,7 @@ import sys
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("type")
+    cli = subparsers.add_parser("type", description="Perform haplotype calling")
     cli.add_argument(
         "-o",
         "--out",

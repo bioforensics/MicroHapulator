@@ -17,7 +17,8 @@ from microhapulator.profile import Profile
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("diff")
+    desc = "Compare two profiles and determine the markers at which their genotypes differ"
+    cli = subparsers.add_parser("diff", description=desc)
     cli.add_argument(
         "-o",
         "--out",
@@ -25,8 +26,8 @@ def subparser(subparsers):
         help='write output to "FILE"; by '
         "default, output is written to the terminal (standard output)",
     )
-    cli.add_argument("profile1", help="simulated or inferred genotype profile in JSON format")
-    cli.add_argument("profile2", help="simulated or inferred genotype profile in JSON format")
+    cli.add_argument("profile1", help="typing result or simulated profile in JSON format")
+    cli.add_argument("profile2", help="typing result or simulated profile in JSON format")
 
 
 def main(args):

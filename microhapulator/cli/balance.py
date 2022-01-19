@@ -16,7 +16,7 @@ from microhapulator.profile import TypingResult
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("balance")
+    cli = subparsers.add_parser("balance", description="Compute interlocus balance")
     cli.add_argument("-c", "--csv", metavar="FILE", help="write read counts to FILE in CSV format")
     cli.add_argument(
         "-D",

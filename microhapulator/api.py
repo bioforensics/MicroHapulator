@@ -268,7 +268,7 @@ def seq(
     proportions=None,
     sig=None,
 ):
-    """Simulate paired-end Illumina MiSeq sequencing of the given profile(s).
+    """Simulate paired-end Illumina MiSeq sequencing of the given profile(s)
 
     This generator function accepts any combination of simple (single-source) or complex
     (multi-source mixture) profiles as input. Each profile is "sequenced" separately, and then all

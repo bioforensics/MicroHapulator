@@ -18,7 +18,7 @@ from microhapulator.profile import Profile
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("contain")
+    cli = subparsers.add_parser("contain", description="Perform a simple containment test")
     cli.add_argument(
         "-o",
         "--out",

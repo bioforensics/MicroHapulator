@@ -18,7 +18,8 @@ import sys
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("filter")
+    desc = "Apply static and/or dynamic thresholds to distinguish true and false haplotypes"
+    cli = subparsers.add_parser("filter", description=desc)
     cli.add_argument(
         "-o",
         "--out",

@@ -18,7 +18,8 @@ from microhapulator.profile import Profile
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("contrib")
+    desc = "Estimate the minimum number of DNA contributors to a suspected mixture"
+    cli = subparsers.add_parser("contrib", description=desc)
     cli.add_argument(
         "-o",
         "--out",

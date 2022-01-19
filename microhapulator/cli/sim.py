@@ -22,7 +22,7 @@ import sys
 
 
 def subparser(subparsers):
-    desc = "Simulate a diploid genotype using the given population microhaplotype frequencies"
+    desc = "Simulate a diploid genotype from the specified microhaplotype frequencies"
     cli = subparsers.add_parser("sim", description=desc)
     cli.add_argument(
         "freq", help="population microhaplotype frequencies in tabular (tab separated) format"

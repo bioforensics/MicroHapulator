@@ -29,10 +29,7 @@ class OutfilesAction(Action):
 
 
 def subparser(subparsers):
-    desc = (
-        "Given one or more diploid genotype profiles, simulate Illumina MiSeq "
-        'sequencing of the given "sample."'
-    )
+    desc = "Simulate paired-end Illumina MiSeq sequencing of the given profile(s)"
     cli = subparsers.add_parser("seq", description=desc)
     cli.add_argument(
         "-o",
