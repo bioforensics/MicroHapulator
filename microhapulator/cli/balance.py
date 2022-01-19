@@ -27,7 +27,7 @@ def subparser(subparsers):
         "are mapped to the marker but discarded because they do not span all variants at the "
         "marker are included",
     )
-    cli.add_argument("input", help="typing result in JSON format")
+    cli.add_argument("input", help="a typing result including haplotype counts in JSON format")
 
 
 def main(args):

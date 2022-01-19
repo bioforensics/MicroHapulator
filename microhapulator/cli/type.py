@@ -22,8 +22,7 @@ def subparser(subparsers):
         "--out",
         metavar="FILE",
         default=sys.stdout,
-        help='write output to "FILE"; by '
-        "default, output is written to the terminal (standard output)",
+        help="write output to FILE; by default, output is written to the terminal (standard output)",
     )
     cli.add_argument(
         "-b",
@@ -31,8 +30,7 @@ def subparser(subparsers):
         metavar="B",
         type=int,
         default=10,
-        help="minimum base quality required for haplotype calling; by default B=10, "
-        "corresponding to Q10, i.e., 90%% probability that base call is correct",
+        help="minimum base quality (PHRED score) to be considered reliable for haplotype calling; by default B=10, corresponding to Q10, i.e., 90%% probability that the base call is correct",
     )
     cli.add_argument(
         "-m",
@@ -42,8 +40,14 @@ def subparser(subparsers):
         default=1e6,
         help="maximum permitted read depth; by default M=1000000",
     )
-    cli.add_argument("tsv", help="microhap marker definitions in TSV format")
-    cli.add_argument("bam", help="aligned and sorted reads in BAM format")
+    cli.add_argument(
+        "tsv",
+        help="path of a TSV file containing marker metadata, specifically the offset of each SNP for every marker in the panel",
+    )
+    cli.add_argument(
+        "bam",
+        help="path of a BAM file containing NGS reads aligned to marker reference sequences and sorted",
+    )
 
 
 def main(args):

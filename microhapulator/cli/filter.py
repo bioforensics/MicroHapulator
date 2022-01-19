@@ -18,15 +18,14 @@ import sys
 
 
 def subparser(subparsers):
-    desc = "Apply static and/or dynamic thresholds to distinguish true and false haplotypes"
+    desc = "Apply static and/or dynamic thresholds to distinguish true and false haplotypes. Thresholds are applied to the haplotype read counts of a raw typing result. Static integer thresholds are commonly used as detection thresholds, below which any haplotype count is considered noise. Dynamic thresholds are commonly used as analytical thresholds and represent a percentage of the total read count at the marker, after any haplotypes failing a static threshold are discarded."
     cli = subparsers.add_parser("filter", description=desc)
     cli.add_argument(
         "-o",
         "--out",
         metavar="FILE",
         default=sys.stdout,
-        help='write output to "FILE"; by '
-        "default, output is written to the terminal (standard output)",
+        help="write output to FILE; by default, output is written to the terminal (standard output)",
     )
     cli.add_argument(
         "-s",
@@ -34,10 +33,7 @@ def subparser(subparsers):
         metavar="ST",
         type=int,
         default=None,
-        help="apply a static threshold for calling genotypes, i.e., discard any haplotype whose "
-        "count is less than ST; by default, ST is undefined, the static filter is not applied, "
-        "and only raw haplotype counts are reported, not genotype calls; if --dynamic is also "
-        "defined, --static is applied first",
+        help="global fixed read count threshold",
     )
     cli.add_argument(
         "-d",
@@ -45,23 +41,14 @@ def subparser(subparsers):
         metavar="DT",
         type=float,
         default=None,
-        help="apply a dynamic threshold for calling genotypes, i.e., if C is the total count "
-        "of all haplotypes observed at the marker, discard any haplotypes whose count is less "
-        "than C * DT; by default, DT is undefined, the dynamic filter is not applied, and only "
-        "raw haplotype counts are reported, not genotype calls; if --static is also defined, "
-        "it is applied first, and the counts of any haplotypes that do not pass the --static "
-        "filter are deducted from the total count C",
+        help=r"global percentage of total read count; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold",
     )
     cli.add_argument(
         "-c",
         "--config",
         metavar="FILE",
         default=None,
-        help="CSV file with marker-specific static and dynamic thresholds; the file should "
-        "contain 3 columns named Marker, Static, and Dynamic; there should be at most one row per "
-        "marker; if --static and/or --dynamic are specified, these serve as default values, while "
-        "any thresholds defined in the config file will override these values for the specified "
-        "markers",
+        help="CSV file specifying marker-specific thresholds to override global thresholds; three required columns: 'Marker' for the marker name; 'Static' and 'Dynamic' for marker-specific thresholds",
     )
     cli.add_argument("result", help="MicroHapulator typing result in JSON format")
 

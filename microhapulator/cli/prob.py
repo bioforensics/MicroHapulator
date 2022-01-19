@@ -27,20 +27,22 @@ def subparser(subparsers):
         type=float,
         metavar="ε",
         default=0.001,
-        help="rate " "at which errors in genotyping are expected; default is 0.001",
+        help="rate of genotyping error; by default ε=0.001",
     )
     cli.add_argument(
         "-o",
         "--out",
         metavar="FILE",
-        help='write output to "FILE"; by '
-        "default, output is written to the terminal (standard output)",
+        help="write output to FILE; by default, output is written to the terminal (standard output)",
     )
+    cli.add_argument("freq", help="population haplotype frequencies in tabular (TSV) format")
+    cli.add_argument("profile1", help="typing result or simulated genotype in JSON format")
     cli.add_argument(
-        "freq", help="population microhaplotype frequencies in tabular (tab separated) format"
+        "profile2",
+        nargs="?",
+        default=None,
+        help="typing result or simulated genotype in JSON format; optional",
     )
-    cli.add_argument("profile1", help="profile in JSON format")
-    cli.add_argument("profile2", nargs="?", default=None, help="profile in JSON format; optional")
 
 
 def main(args):
