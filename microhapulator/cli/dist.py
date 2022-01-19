@@ -17,7 +17,8 @@ from microhapulator.profile import Profile
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("dist")
+    desc = "Compute a simple Hamming distance between two profiles"
+    cli = subparsers.add_parser("dist", description=desc)
     cli.add_argument(
         "-o",
         "--out",
@@ -25,8 +26,8 @@ def subparser(subparsers):
         help='write output to "FILE"; by '
         "default, output is written to the terminal (standard output)",
     )
-    cli.add_argument("profile1", help="simulated or inferred profile in JSON format")
-    cli.add_argument("profile2", help="simulated or inferred profile in JSON format")
+    cli.add_argument("profile1", help="typing result or simulated profile in JSON format")
+    cli.add_argument("profile2", help="typing result or simulated profile in JSON format")
 
 
 def main(args):

@@ -18,15 +18,15 @@ from microhapulator.profile import Profile
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("contrib")
+    desc = "Estimate the minimum number of DNA contributors to a suspected mixture"
+    cli = subparsers.add_parser("contrib", description=desc)
     cli.add_argument(
         "-o",
         "--out",
         metavar="FILE",
-        help='write output to "FILE"; by '
-        "default, output is written to the terminal (standard output)",
+        help="write output to FILE; by default, output is written to the terminal (standard output)",
     )
-    cli.add_argument("result", help="MicroHapulator typing result in JSON format")
+    cli.add_argument("result", help="typing result in JSON format")
 
 
 def main(args):

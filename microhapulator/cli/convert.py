@@ -18,7 +18,8 @@ import sys
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("convert")
+    desc = "Convert a typing result to a format compatible with probabilistic genotyping software applications"
+    cli = subparsers.add_parser("convert", description=desc)
     cli.add_argument(
         "-o",
         "--out",

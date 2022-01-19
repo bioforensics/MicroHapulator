@@ -16,7 +16,7 @@ from microhapulator.profile import TypingResult
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("balance")
+    cli = subparsers.add_parser("balance", description="Compute interlocus balance")
     cli.add_argument("-c", "--csv", metavar="FILE", help="write read counts to FILE in CSV format")
     cli.add_argument(
         "-D",
@@ -27,7 +27,7 @@ def subparser(subparsers):
         "are mapped to the marker but discarded because they do not span all variants at the "
         "marker are included",
     )
-    cli.add_argument("input", help="typing result in JSON format")
+    cli.add_argument("input", help="a typing result including haplotype counts in JSON format")
 
 
 def main(args):

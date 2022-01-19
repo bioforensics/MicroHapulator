@@ -16,7 +16,8 @@ from microhapulator.profile import Profile
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("unite")
+    desc = "Simulate the creation of a new profile from a mother and father"
+    cli = subparsers.add_parser("unite", description=desc)
     cli.add_argument(
         "-o",
         "--out",

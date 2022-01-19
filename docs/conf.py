@@ -34,6 +34,10 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinxarg.ext',
 ]
+myst_enable_extensions = [
+    "dollarmath",
+]
+smartquotes = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

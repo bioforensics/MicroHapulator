@@ -216,7 +216,13 @@ class Profile(object):
             yield defline, sequence
 
     def unite(mom, dad):
-        """Simulate the creation of a new profile from a mother and father."""
+        """Simulate the creation of a new profile from a mother and father
+
+        :param microhapulator.profile.Profile mom: typing result or simulated profile
+        :param microhapulator.profile.Profile dad: typing result or simulated profile
+        :returns: a simulated offspring
+        :rtype: microhapulator.profile.SimulatedProfile
+        """
         prof = SimulatedProfile(ploidy=2)
         allmarkers = mom.markers() | dad.markers()
         commonmarkers = mom.markers() & dad.markers()
@@ -277,6 +283,12 @@ class SimulatedProfile(Profile):
             return profile
 
     def merge(profiles):
+        """Combine simulated profiles into a mock DNA mixture
+
+        :param list profiles: list of simulated profiles
+        :returns: a combined profile
+        :rtype: microhapulator.profile.SimulatedProfile
+        """
         ploidy = 2 * len(profiles)
         prof = SimulatedProfile(ploidy=ploidy)
         offset = 0
@@ -328,6 +340,18 @@ class TypingResult(Profile):
             self.data["markers"][marker]["genotype"] = list()
 
     def filter(self, static=None, dynamic=None, config=None):
+        """Apply static and/or dynamic thresholds to distinguish true and false haplotypes
+
+        Thresholds are applied to the haplotype read counts of a raw typing result. Static integer
+        thresholds are commonly used as detection thresholds, below which any haplotype count is
+        considered noise. Dynamic thresholds are commonly used as analytical thresholds and
+        represent a percentage of the total read count at the marker, after any haplotypes failing
+        a static threshold are discarded.
+
+        :param int static: global fixed read count threshold
+        :param float dynamic: global percentage of total read count; e.g. use `dynamic=0.02` to apply a 2% analytical threshold
+        :param pandas.DataFrame config: tabular data structure specifying marker-specific thresholds to override global thresholds; three required columns: **Marker** for the marker name; **Static** and **Dynamic** for marker-specific thresholds
+        """
         check_filter_config(config)
         for marker, mdata in self.data["markers"].items():
             markerstatic = static

@@ -16,7 +16,8 @@ from microhapulator.profile import SimulatedProfile
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("mix")
+    desc = "Combine simulated profiles into a mock DNA mixture"
+    cli = subparsers.add_parser("mix", description=desc)
     cli.add_argument(
         "-o",
         "--out",
