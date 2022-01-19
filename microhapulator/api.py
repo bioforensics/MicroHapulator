@@ -53,7 +53,7 @@ def balance(result, include_discarded=True):
     :param microhapulator.profile.TypingResult result: A typing result including haplotype counts
     :param bool included_discarded: Flag indicating whether to include in each marker's total read count reads that are successfully aligned but discarded because they do not span all SNPs at the marker
     :return: Total read counts for each marker in a two-column tabular data structure
-    :rtype: pandas DataFrame
+    :rtype: pandas.DataFrame
     """
     data = count_and_sort(result, include_discarded=include_discarded)
     with TemporaryDirectory() as tempdir:
@@ -63,19 +63,40 @@ def balance(result, include_discarded=True):
     return data
 
 
-def contain(p1, p2):
-    """Compute the proportion of haplotypes from p2 present in p1."""
+def contain(prof1, prof2):
+    """Perform a simple containment test
+
+    Calculate a simple containment statistic C, representing the number of markers whose haplotypes
+    in *prof1* are a subset of the haplotypes in *prof2*. Dividing by the total number of markers
+    provides a rudimentary measure of containment, the proportion of *prof1* "contained" in
+    *prof2*. Note that this statistic does not accommodate allelic drop-in or drop-out.
+
+    :param microhapulator.profile.Profile prof1: a typing result or simulated genotype
+    :param microhapulator.profile.Profile prof2: a typing result or simulated genotype
+    :returns: a tuple (C, T), where C is the containment statistic and T is the total number of markers
+    """
     total = 0
     contained = 0
-    for marker in p2.markers():
-        hap1 = p1.haplotypes(marker)
-        hap2 = p2.haplotypes(marker)
+    for marker in prof2.markers():
+        hap1 = prof1.haplotypes(marker)
+        hap2 = prof2.haplotypes(marker)
         total += len(hap2)
         contained += len(hap2 & hap1)
     return contained, total
 
 
 def contrib(profile):
+    r"""Estimate the minimum number of DNA contributors to a suspected mixture
+
+    Let :math:`N_{\text{al}}` represent the largest number of haplotypes observed at any marker. We
+    then estimate the minimum number of DNA contributors as follows.
+
+    :math:`C_{\text{min}} = \left\lceil\frac{N_{\text{al}}}{2}\right\rceil`
+
+    :param microhapulator.profile.Profile profile: a typing result or a simulated genotype
+    :returns: a tuple (E, N, P), where E is the estimate for the minimum number of DNA contributors, N is the number of markers supporting the estimate, and P is the percentage of markers supporting the estimate
+    :rtype: tuple(int, int, float)
+    """
     num_haps_per_marker = [len(profile.haplotypes(marker)) for marker in profile.markers()]
     max_num_haps = max(num_haps_per_marker)
     max_thresh = max_num_haps - 1 if max_num_haps % 2 == 0 else max_num_haps
@@ -85,6 +106,14 @@ def contrib(profile):
 
 
 def diff(prof1, prof2):
+    """Compare two profiles and determine the markers at which their genotypes differ
+
+    Note: this is a generator function.
+
+    :param microhapulator.profile.Profile prof1: typing result or simulated profile
+    :param microhapulator.profile.Profile prof2: typing result or simulated profile
+    :yields: for each discordant marker, a tuple (M, X, Y), where M is the marker name, X is the set of haplotypes unique to *prof1*, and Y is the set of haplotypes unique to *prof2*
+    """
     allmarkers = set(prof1.markers()).union(prof2.markers())
     for marker in sorted(allmarkers):
         haps1 = prof1.haplotypes(marker)
@@ -95,17 +124,54 @@ def diff(prof1, prof2):
             yield marker, diff1, diff2
 
 
-def dist(p1, p2):
+def dist(prof1, prof2):
+    """Compute a simple Hamming distance between two profiles
+
+    :param microhapulator.profile.Profile prof1: typing result or simulated profile
+    :param microhapulator.profile.Profile prof2: typing result or simulated profile
+    :returns: the number of markers with a discordant genotype between the two profiles
+    :rtype: int
+    """
     hammdist = 0
-    for marker in set(p1.markers()).union(p2.markers()):
-        haps1 = p1.haplotypes(marker)
-        haps2 = p2.haplotypes(marker)
+    for marker in set(prof1.markers()).union(prof2.markers()):
+        haps1 = prof1.haplotypes(marker)
+        haps2 = prof2.haplotypes(marker)
         if haps1 != haps2:
             hammdist += 1
     return hammdist
 
 
 def prob(frequencies, prof1, prof2=None, erate=0.001):
+    r"""Compute a profile random match probability (RMP) or an RMP-based likelihood ratio (LR) test
+
+    The LR test, when performed, assesses the relative weight of two competing propositions.
+
+    - :math:`H_p`: the genetic profiles *prof1* and *prof2* originated from the same individuals
+    - :math:`H_d`: *prof1* and *prof2* originated from two unrelated individuals in the population
+
+    The test statistic is computed as follows.
+
+    .. math::
+
+        LR = \frac{P(H_p)}{P(H_d)}
+
+    The probability :math:`P(H_p) = \epsilon^R`, where :math:`\epsilon` is the per-marker rate of
+    genotyping error (*erate*) and :math:`R` is the number of markers with discordant genotypes
+    between profiles. The probability :math:`P(H_d)` is the RMP of *prof1*. Note that when there is
+    a perfect match between *prof1* and *prof2*, :math:`P(H_p) = 1` and the LR statistic is simply
+    the reciprocal of the RMP.
+
+    Note that the LR test as formulated assumes that *prof1* and *prof2* are close matches. The
+    error rate accommodates a small amount of allelic drop-out or drop-in but is not designed to
+    accommodate profiles with substantial differences.
+
+    :param pandas.DataFrame frequencies: table of population haplotype frequencies
+    :param microhapulator.profile.Profile prof1: a typing result or simulated genotype
+    :param microhapulator.profile.Profile prof2: a typing result or simulated genotype; *optional*
+    :param float erate: rate of genotyping error
+    :returns: the RMP of `prof1` if `prof2` is undefined, or the LR test statistic if `prof2` is defined
+    :rtype: float
+    """
     if prof2 is None:
         return prof1.rand_match_prob(frequencies)
     else:
@@ -202,6 +268,22 @@ def seq(
     proportions=None,
     sig=None,
 ):
+    """Simulate paired-end Illumina MiSeq sequencing of the given profile(s).
+
+    This generator function accepts any combination of simple (single-source) or complex
+    (multi-source mixture) profiles as input. Each profile is "sequenced" separately, and then all
+    reads are aggregated.
+
+    :param list profiles: list of mock profiles
+    :param pandas.DataFrame markers: marker definitions, provided as a table of SNP offsets, one row per SNP; required columns: **Marker** and **Offset**, representing the distance of the SNP from the first nucleotide in the reference sequence
+    :param dict refrseqs: a dictionary with marker names as the keys and marker reference sequences as the values
+    :param list seeds: optional list of random seeds, one per profile
+    :param int threads: number of threads to use for each sequencing task; note that optimal performance is typically achieved with a single thread
+    :param int totalreads: total number of reads to generate across all profiles
+    :param list proportions: optional list of relative proportions, equal to the number of profiles; by default, each profile contributes an equal number of reads
+    :param str sig: an optional signature (prefix) to apply to all simulated reads
+    :yields: for each read pair, a tuple (I, X, Y) where I is a serial index, X is the forward read (R1), and Y is the reverse read (R2)
+    """
     n = len(profiles)
     if seeds is None:
         seeds = [np.random.randint(1, 2 ** 32 - 1) for _ in range(n)]
@@ -231,7 +313,13 @@ def seq(
 
 
 def sim(frequencies, seed=None):
-    """Simulate a diploid genotype from the specified microhaplotype frequencies."""
+    """Simulate a diploid genotype from the specified microhaplotype frequencies
+
+    :param pandas.DataFrame frequencies: population haplotype frequencies
+    :param int seed: seed for random number generator
+    :returns: a simulated genotype profile for all markers specified in the haplotype frequencies
+    :rtype: microhapulator.profile.SimulatedProfile
+    """
     profile = SimulatedProfile(ploidy=2)
     if seed is None:
         seed = np.random.randint(2 ** 32 - 1)
