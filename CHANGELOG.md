@@ -2,7 +2,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+
+## [0.5] 2022-01-20
 
 ### Added
 - New `--base-qual` parameter for `mhpl8r type` to set the minimum required base quality when iterating over reads in a pileup (#83).
@@ -34,6 +35,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Corrected a bug with RMP implementation (#86).
 - Set minimum versions for runtime dependencies (#97).
 - Corrected the `--dynamic` filter to operate on total haplotype counts rather than average counts (#114).
+
+
+## [0.4.1] 2019-11-06
+
+Fix minor metadata typo
+
 
 ## [0.4] 2019-11-05
 
