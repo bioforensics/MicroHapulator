@@ -408,7 +408,9 @@ class TypingResult(Profile):
                     hapcounts.append(count)
                 while len(hapcounts) < max_haps:
                     hapcounts.append(None)
-            haplotypes = [ht.replace(",", "-") for ht in haplotypes]
+            # May need to convert , to - pending a test of LRMix and EuroForMix's ability to read
+            # CSV files with quoted strings containing "," characters.
+            # haplotypes = [ht.replace(",", "-") for ht in haplotypes]
             while len(haplotypes) < max_haps:
                 haplotypes.append(None)
             entry = [samplename, marker, *haplotypes, *hapcounts]

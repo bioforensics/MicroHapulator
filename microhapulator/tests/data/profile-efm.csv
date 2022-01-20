@@ -1,4 +1,4 @@
 SampleName,Marker,Allele1,Allele2,Height1,Height2
-MySample,mh01XYZ-1,C-G-C-C-G-G-C-T-T-C-C,G-G-C-C-G-G-T-T-T-C-T,8915,8638
-MySample,mh02XYZ-2,G-T-A-G-C-A-T-A-G-G-C,G-T-A-G-C-G-T-A-G-G-C,10020,10118
-MySample,mh02XYZ-3,C-C-G-G-A-C-C-G-A,C-T-A-A-G-C-C-A-A,10390,10573
+MySample,mh01XYZ-1,"C,G,C,C,G,G,C,T,T,C,C","G,G,C,C,G,G,T,T,T,C,T",8915,8638
+MySample,mh02XYZ-2,"G,T,A,G,C,A,T,A,G,G,C","G,T,A,G,C,G,T,A,G,G,C",10020,10118
+MySample,mh02XYZ-3,"C,C,G,G,A,C,C,G,A","C,T,A,A,G,C,C,A,A",10390,10573
