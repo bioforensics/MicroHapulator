@@ -9,7 +9,5 @@ dependencies:
   - curl
   - flash
   - git
-  - pip
-  - pip:
-    - git+https://github.com/bioforensics/MicroHapulator.git
+  - microhapulator >=0.5
   - samtools
