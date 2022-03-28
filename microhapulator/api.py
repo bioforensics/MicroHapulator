@@ -13,6 +13,7 @@
 
 from collections import namedtuple, defaultdict
 from math import ceil
+from matplotlib import pyplot as plt
 from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
 from microhapulator.profile import SimulatedProfile, TypingResult
 import numpy as np
@@ -20,6 +21,7 @@ import os
 import pandas as pd
 import pysam
 import re
+import seaborn
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call, run
@@ -47,19 +49,46 @@ def count_and_sort(profile, include_discarded=True):
     return data
 
 
-def balance(result, include_discarded=True):
+def balance(
+    result,
+    include_discarded=True,
+    terminal=True,
+    tofile=None,
+    figsize=(6, 4),
+    dpi=200,
+    color="#1f77b4",
+):
     """Compute interlocus balance
 
     :param microhapulator.profile.TypingResult result: a typing result including haplotype counts
     :param bool included_discarded: flag indicating whether to include in each marker's total read count reads that are successfully aligned but discarded because they do not span all SNPs at the marker
+    :param bool terminal: flag indicating whether to print the interlocus balance histogram to standard output; enabled by default
+    :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
+    :param int dpi: resolution (in dots per inch) of the image file to be generated
+    :param str color: color of the histogram to be generated in the image file
     :return: total read counts for each marker in a two-column tabular data structure
     :rtype: pandas.DataFrame
     """
     data = count_and_sort(result, include_discarded=include_discarded)
-    with TemporaryDirectory() as tempdir:
-        tfile = os.path.join(tempdir, "data.tsv")
-        data.to_csv(tfile, index=False, header=False)
-        run(["termgraph", tfile])
+    if terminal:
+        with TemporaryDirectory() as tempdir:
+            tfile = os.path.join(tempdir, "data.tsv")
+            data.to_csv(tfile, index=False, header=False)
+            run(["termgraph", tfile])
+    if tofile:
+        plt.figure(figsize=figsize, dpi=dpi)
+        x = range(len(data))
+        y = [c / 1000 for c in data.ReadCount]
+        plt.bar(x, y, color=color)
+        plt.xticks([])
+        plt.xlabel("Marker")
+        if include_discarded:
+            plt.ylabel("Reads Mapped (× 1000)")
+        else:
+            plt.ylabel("Reads Mapped and Typed (× 1000)")
+        plt.title("Interlocus Balance", color=color)
+        plt.savefig(tofile)
     return data
 
 
