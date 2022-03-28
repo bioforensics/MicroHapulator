@@ -21,7 +21,6 @@ import os
 import pandas as pd
 import pysam
 import re
-import seaborn
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call, run

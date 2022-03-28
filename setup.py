@@ -39,6 +39,7 @@ setup(
         "happer>=0.1",
         "insilicoseq>=1.5.2",
         "jsonschema>=4.0",
+        "matplotlib>=3.0",
         "numpy>=1.19",
         "pandas>1.0",
         "termgraph>=0.5",
