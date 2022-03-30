@@ -42,7 +42,7 @@ setup(
         "matplotlib>=3.0",
         "numpy>=1.19",
         "pandas>1.0",
-        "scipy>=1.8",
+        "scipy>=1.7",
         "termgraph>=0.5",
     ],
     entry_points={"console_scripts": ["mhpl8r = microhapulator.cli:main"]},
