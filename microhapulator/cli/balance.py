@@ -16,7 +16,16 @@ from microhapulator.profile import TypingResult
 
 
 def subparser(subparsers):
-    cli = subparsers.add_parser("balance", description="Compute interlocus balance")
+    desc = (
+        "Plot interlocus balance in the terminal and/or a high-resolution graphic. Also normalize "
+        "read counts and perform a chi-square goodness-of-fit test assuming uniform read coverage "
+        "across markers. The reported chi-square statistic measures the extent of imbalance, and "
+        "can be compared among samples sequenced using the same panel: the minimum value of 0 "
+        "represents perfectly uniform coverage, while the maximum value of D occurs when all "
+        "reads map to a single marker (D represents the degrees of freedom, or the number of "
+        "markers minus 1)."
+    )
+    cli = subparsers.add_parser("balance", description=desc)
     cli.add_argument("-c", "--csv", metavar="FILE", help="write read counts to FILE in CSV format")
     cli.add_argument(
         "-D",
@@ -65,7 +74,7 @@ def subparser(subparsers):
 
 def main(args):
     result = TypingResult(fromfile=args.input)
-    data = mhapi.balance(
+    chisq, data = mhapi.balance(
         result,
         include_discarded=args.discarded,
         terminal=not args.quiet,
@@ -74,5 +83,6 @@ def main(args):
         dpi=args.dpi,
         color=args.color,
     )
+    print(f"Extent of imbalance (chi-square statistic): {chisq:.4f}")
     if args.csv:
         data.to_csv(args.csv, index=False)

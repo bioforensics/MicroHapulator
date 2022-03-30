@@ -21,6 +21,7 @@ import os
 import pandas as pd
 import pysam
 import re
+from scipy.stats import chisquare
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call, run
@@ -59,6 +60,13 @@ def balance(
 ):
     """Compute interlocus balance
 
+    Plot interlocus balance in the terminal and/or a high-resolution graphic. Also normalize read
+    counts and perform a chi-square goodness-of-fit test assuming uniform read coverage across
+    markers. The reported chi-square statistic measures the extent of imbalance, and can be compared
+    among samples sequenced using the same panel: the minimum value of 0 represents perfectly
+    uniform coverage, while the maximum value of *D* occurs when all reads map to a single marker
+    (*D* represents the degrees of freedom, or the number of markers minus 1).
+
     :param microhapulator.profile.TypingResult result: a typing result including haplotype counts
     :param bool included_discarded: flag indicating whether to include in each marker's total read count reads that are successfully aligned but discarded because they do not span all SNPs at the marker
     :param bool terminal: flag indicating whether to print the interlocus balance histogram to standard output; enabled by default
@@ -66,10 +74,12 @@ def balance(
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
     :param str color: color of the histogram to be generated in the image file
-    :return: total read counts for each marker in a two-column tabular data structure
-    :rtype: pandas.DataFrame
+    :return: a tuple (S, C) where S is the chi-square statistic, and C is a table of total read counts for each marker
+    :rtype: tuple(float, pandas.DataFrame)
     """
     data = count_and_sort(result, include_discarded=include_discarded)
+    normalized_read_counts = [c / sum(data.ReadCount) for c in data.ReadCount]
+    chisq, pval = chisquare(normalized_read_counts)
     if terminal:
         with TemporaryDirectory() as tempdir:
             tfile = os.path.join(tempdir, "data.tsv")
@@ -88,7 +98,7 @@ def balance(
             plt.ylabel("Reads Mapped and Typed (× 1000)")
         plt.title("Interlocus Balance", color=color)
         plt.savefig(tofile)
-    return data
+    return chisq, data
 
 
 def contain(prof1, prof2):
@@ -102,6 +112,7 @@ def contain(prof1, prof2):
     :param microhapulator.profile.Profile prof1: a typing result or simulated genotype
     :param microhapulator.profile.Profile prof2: a typing result or simulated genotype
     :returns: a tuple (C, T), where C is the containment statistic and T is the total number of markers
+    :rtype: tuple(float, int)
     """
     total = 0
     contained = 0

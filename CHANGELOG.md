@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## Unreleased
+
+### Changed
+- Interlocus balance code updated to support generating high-resolution graphics and performing a chid-square goodness-of-fit test (#121).
+
+
 ## [0.5] 2022-01-20
 
 ### Added
