@@ -314,7 +314,7 @@ def seq(
     """
     n = len(profiles)
     if seeds is None:
-        seeds = [np.random.randint(1, 2 ** 32 - 1) for _ in range(n)]
+        seeds = [np.random.randint(1, 2**32 - 1) for _ in range(n)]
     if len(seeds) != n:
         raise ValueError("number of profiles must match number of seeds")
     numreads = calc_n_reads_from_proportions(n, totalreads, proportions)
@@ -350,7 +350,7 @@ def sim(frequencies, seed=None):
     """
     profile = SimulatedProfile(ploidy=2)
     if seed is None:
-        seed = np.random.randint(2 ** 32 - 1)
+        seed = np.random.randint(2**32 - 1)
     profile.data["metadata"] = {
         "HaploSeed": seed,
     }

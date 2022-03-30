@@ -40,7 +40,7 @@ def test_proportions_failure_modes():
 
 
 def test_even_mixture():
-    seed = numpy.random.randint(1, 2 ** 32 - 1)
+    seed = numpy.random.randint(1, 2**32 - 1)
     print("Seed:", seed)
     numpy.random.seed(seed)
     freqs = microhapulator.load_marker_frequencies(data_file("freq/acb-dozen-freq.tsv"))

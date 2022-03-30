@@ -159,7 +159,7 @@ class Profile(object):
                 mismatches += 1
             else:
                 mismatches += 2
-        numerator = erate ** mismatches
+        numerator = erate**mismatches
         denominator = self.rand_match_prob(freqs)
         return numerator / denominator
 

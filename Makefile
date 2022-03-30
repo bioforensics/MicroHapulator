@@ -39,6 +39,6 @@ clean:
 style:
 	black --line-length=99 --check microhapulator/*.py microhapulator/*/*.py setup.py
 
-## format:     autoformat Python code
+## format:    autoformat Python code
 format:
 	black --line-length=99 microhapulator/*.py microhapulator/*/*.py setup.py
