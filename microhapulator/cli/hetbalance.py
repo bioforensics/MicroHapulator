@@ -40,13 +40,20 @@ def subparser(subparsers):
         default=200,
         help="resolution (in dots per inch) of the image file to be generated; DPI=200 by default",
     )
+    cli.add_argument(
+        "--labels", action="store_true", help="include labels showing marker names and read counts"
+    )
     cli.add_argument("input", help="a typing result including haplotype counts in JSON format")
 
 
 def main(args):
     result = TypingResult(fromfile=args.input)
     data = mhapi.heterozygote_balance(
-        result, tofile=args.figure, figsize=args.figsize, dpi=args.dpi
+        result,
+        tofile=args.figure,
+        figsize=args.figsize,
+        dpi=args.dpi,
+        dolabels=args.labels,
     )
     if args.csv:
         data.to_csv(args.csv, index=False)

@@ -142,7 +142,7 @@ def genotype_counts(profile):
     return data
 
 
-def heterozygote_balance(result, tofile=None, figsize=None, dpi=200):
+def heterozygote_balance(result, tofile=None, figsize=None, dpi=200, dolabels=False):
     """Compute heterozygote balance
 
     Compute heterozygote balance and plot in a high-resolution graphic. Implementation adapted from
@@ -152,13 +152,15 @@ def heterozygote_balance(result, tofile=None, figsize=None, dpi=200):
     :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
+    :param bool dolabels: flag indicating whether marker labels and read counts should be added to the figure
     :return: a table of read counts and percentages for each heterozygous marker
     :rtype: pandas.DataFrame
     """
     data = genotype_counts(result)
     if tofile:
         if figsize is None:
-            figsize = (len(data) / 2, 8)
+            width = len(data) / 2 if dolabels else len(data) / 4
+            figsize = (width, 8)
         fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
         barwidth = 0.4
         x1 = range(len(data.Marker))
@@ -166,8 +168,11 @@ def heterozygote_balance(result, tofile=None, figsize=None, dpi=200):
         x = [_x + barwidth / 2 for _x in x1]
         ax.bar(x1, data.Allele1Perc, width=barwidth)
         ax.bar(x2, data.Allele2Perc, width=barwidth)
-        ax.set_xticks(x)
-        ax.set_xticklabels(data.Marker, rotation=90)
+        if dolabels:
+            ax.set_xticks(x)
+            ax.set_xticklabels(data.Marker, rotation=90)
+        else:
+            ax.set_xticks([])
         ax.yaxis.grid(True, color="#DDDDDD")
         ax.set_axisbelow(True)
         ax.spines["top"].set_visible(False)
@@ -178,9 +183,10 @@ def heterozygote_balance(result, tofile=None, figsize=None, dpi=200):
         ax.set_xlabel("Marker", labelpad=15, fontsize=16)
         ax.set_ylabel("Percentage of Read Count", labelpad=15, fontsize=16)
         ax.set_title("Heterozygote Balance", pad=25, fontsize=18)
-        counts = data.Allele1Count + data.Allele2Count
-        for m, height, count in zip(x, data.Allele1Perc, counts):
-            ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
+        if dolabels:
+            counts = data.Allele1Count + data.Allele2Count
+            for m, height, count in zip(x, data.Allele1Perc, counts):
+                ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
         ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
         plt.savefig(tofile, bbox_inches="tight")
     return data
