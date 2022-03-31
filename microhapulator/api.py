@@ -97,7 +97,15 @@ def interlocus_balance(
             plt.ylabel("Reads Mapped (× 1000)")
         else:
             plt.ylabel("Reads Mapped and Typed (× 1000)")
-        plt.title("Interlocus Balance", color=color)
+        ax = plt.gca()
+        ax.yaxis.grid(True, color="#DDDDDD")
+        ax.set_axisbelow(True)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+        ax.spines["bottom"].set_color("#CCCCCC")
+        ax.tick_params(left=False)
+        plt.title("Interlocus Balance")
         plt.savefig(tofile)
     return chisq, data
 
