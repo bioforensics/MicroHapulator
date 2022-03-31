@@ -27,6 +27,7 @@ from string import ascii_letters, digits
 from subprocess import check_call, run
 import sys
 from tempfile import mkdtemp, TemporaryDirectory
+from warnings import warn
 
 
 SimulatedRead = namedtuple("SimulatedRead", ["identifier", "sequence", "quality"])
@@ -49,7 +50,7 @@ def count_and_sort(profile, include_discarded=True):
     return data
 
 
-def balance(
+def interlocus_balance(
     result,
     include_discarded=True,
     terminal=True,
@@ -99,6 +100,82 @@ def balance(
         plt.title("Interlocus Balance", color=color)
         plt.savefig(tofile)
     return chisq, data
+
+
+def genotype_counts(profile):
+    counts = dict(
+        Marker=list(),
+        Allele1Count=list(),
+        Allele2Count=list(),
+        Allele1Perc=list(),
+        Allele2Perc=list(),
+        TotalCount=list(),
+    )
+    for marker, mdata in profile.data["markers"].items():
+        if "genotype" not in mdata:
+            warn(f"Missing genotype call for marker {marker}", UserWarning)
+            continue
+        genotype = {d["haplotype"] for d in mdata["genotype"]}
+        if len(genotype) > 2:
+            warn(f"More than two alleles found for marker {marker}", UserWarning)
+            continue
+        if len(genotype) < 2:
+            continue
+        count2, count1 = sorted([mdata["typing_result"][mhallele] for mhallele in genotype])
+        totalcount = count1 + count2
+        counts["Marker"].append(marker)
+        counts["Allele1Count"].append(count1)
+        counts["Allele2Count"].append(count2)
+        counts["Allele1Perc"].append(count1 / totalcount)
+        counts["Allele2Perc"].append(count2 / totalcount)
+        counts["TotalCount"].append(totalcount)
+    data = pd.DataFrame(counts).sort_values(["TotalCount"], ascending=False).round(decimals=4)
+    data = data.drop(columns=["TotalCount"]).reset_index(drop=True)
+    return data
+
+
+def heterozygote_balance(result, tofile=None, figsize=None, dpi=200):
+    """Compute heterozygote balance
+
+    Compute heterozygote balance and plot in a high-resolution graphic. Implementation adapted from
+    https://www.pythoncharts.com/matplotlib/grouped-bar-charts-matplotlib/.
+
+    :param microhapulator.profile.TypingResult result: a filtered typing result including haplotype counts and genotype calls
+    :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
+    :param int dpi: resolution (in dots per inch) of the image file to be generated
+    :return: a table of read counts and percentages for each heterozygous marker
+    :rtype: pandas.DataFrame
+    """
+    data = genotype_counts(result)
+    if tofile:
+        if figsize is None:
+            figsize = (len(data) / 2, 8)
+        fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+        barwidth = 0.4
+        x1 = range(len(data.Marker))
+        x2 = [_x + barwidth for _x in x1]
+        x = [_x + barwidth / 2 for _x in x1]
+        ax.bar(x1, data.Allele1Perc, width=barwidth)
+        ax.bar(x2, data.Allele2Perc, width=barwidth)
+        ax.set_xticks(x)
+        ax.set_xticklabels(data.Marker, rotation=90)
+        ax.yaxis.grid(True, color="#DDDDDD")
+        ax.set_axisbelow(True)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+        ax.spines["bottom"].set_color("#CCCCCC")
+        ax.tick_params(bottom=False, left=False)
+        ax.set_xlabel("Marker", labelpad=15, fontsize=16)
+        ax.set_ylabel("Percentage of Read Count", labelpad=15, fontsize=16)
+        ax.set_title("Heterozygote Balance", pad=25, fontsize=18)
+        counts = data.Allele1Count + data.Allele2Count
+        for m, height, count in zip(x, data.Allele1Perc, counts):
+            ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
+        ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
+        plt.savefig(tofile, bbox_inches="tight")
+    return data
 
 
 def contain(prof1, prof2):

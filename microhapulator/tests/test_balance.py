@@ -18,9 +18,9 @@ import pandas
 import pytest
 
 
-def test_balance_basic(capfd):
+def test_interlocus_balance_basic(capfd):
     profile = Profile(fromfile=data_file("prof/three-contrib-log.json"))
-    chisq, obs_data = mhapi.balance(profile)
+    chisq, obs_data = mhapi.interlocus_balance(profile)
     exp_data = pandas.read_csv(data_file("three-contrib-log-balance.csv"))
     assert obs_data.equals(exp_data)
     assert chisq == pytest.approx(0.00928395)
@@ -28,11 +28,11 @@ def test_balance_basic(capfd):
     assert "MHDBL000212: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 50.00" in terminal.out
 
 
-def test_balance_cli(tmp_path, capfd):
+def test_locbalance_cli(tmp_path, capfd):
     outfile = str(tmp_path / "balance.csv")
-    arglist = ["balance", "--csv", outfile, data_file("prof/three-contrib-log.json")]
+    arglist = ["locbalance", "--csv", outfile, data_file("prof/three-contrib-log.json")]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.cli.balance.main(args)
+    microhapulator.cli.locbalance.main(args)
     obs_data = pandas.read_csv(outfile)
     exp_data = pandas.read_csv(data_file("three-contrib-log-balance.csv"))
     assert obs_data.equals(exp_data)
@@ -42,10 +42,10 @@ def test_balance_cli(tmp_path, capfd):
     assert "MHDBL000212: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 50.00" in terminal.out
 
 
-def test_balance_cli_no_discard(capfd):
-    arglist = ["balance", "--no-discarded", data_file("prof/three-contrib-log.json")]
+def test_locbalance_cli_no_discard(capfd):
+    arglist = ["locbalance", "--no-discarded", data_file("prof/three-contrib-log.json")]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.cli.balance.main(args)
+    microhapulator.cli.locbalance.main(args)
     terminal = capfd.readouterr()
     print(terminal.out)
     assert "Extent of imbalance (chi-square statistic): 0.0221" in terminal.out

@@ -30,15 +30,25 @@ In brief, this means that every stable version of the MicroHapulator software is
 ```
 
 
-## Analysis and interpretation
+## Analysis, QA/QC, and interpretation
 
-### `mhpl8r balance`
+### `mhpl8r locbalance`
 
 ```{argparse}
 :module: microhapulator.cli
 :func: get_parser
 :prog: mhpl8r
-:path: balance
+:path: locbalance
+:nodefault:
+```
+
+### `mhpl8r hetbalance`
+
+```{argparse}
+:module: microhapulator.cli
+:func: get_parser
+:prog: mhpl8r
+:path: hetbalance
 :nodefault:
 ```
 

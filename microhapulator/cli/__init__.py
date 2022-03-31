@@ -13,13 +13,14 @@
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from microhapulator import __version__
-from . import balance
 from . import contain
 from . import contrib
 from . import convert
 from . import diff
 from . import dist
 from . import filter
+from . import hetbalance
+from . import locbalance
 from . import mix
 from . import prob
 from . import seq
@@ -29,13 +30,14 @@ from . import unite
 import sys
 
 mains = {
-    "balance": balance.main,
     "contain": contain.main,
     "contrib": contrib.main,
     "convert": convert.main,
     "diff": diff.main,
     "dist": dist.main,
     "filter": filter.main,
+    "hetbalance": hetbalance.main,
+    "locbalance": locbalance.main,
     "mix": mix.main,
     "prob": prob.main,
     "seq": seq.main,
@@ -45,13 +47,14 @@ mains = {
 }
 
 subparser_funcs = {
-    "balance": balance.subparser,
     "contain": contain.subparser,
     "contrib": contrib.subparser,
     "convert": convert.subparser,
     "diff": diff.subparser,
     "dist": dist.subparser,
     "filter": filter.subparser,
+    "hetbalance": hetbalance.subparser,
+    "locbalance": locbalance.subparser,
     "mix": mix.subparser,
     "prob": prob.subparser,
     "seq": seq.subparser,
