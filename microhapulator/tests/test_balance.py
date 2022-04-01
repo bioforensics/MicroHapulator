@@ -20,9 +20,10 @@ import pytest
 
 def test_balance_basic(capfd):
     profile = Profile(fromfile=data_file("prof/three-contrib-log.json"))
-    obs_data = mhapi.balance(profile)
+    chisq, obs_data = mhapi.balance(profile)
     exp_data = pandas.read_csv(data_file("three-contrib-log-balance.csv"))
     assert obs_data.equals(exp_data)
+    assert chisq == pytest.approx(0.00928395)
     terminal = capfd.readouterr()
     assert "MHDBL000212: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 50.00" in terminal.out
 
@@ -36,6 +37,8 @@ def test_balance_cli(tmp_path, capfd):
     exp_data = pandas.read_csv(data_file("three-contrib-log-balance.csv"))
     assert obs_data.equals(exp_data)
     terminal = capfd.readouterr()
+    print(terminal.out)
+    assert "Extent of imbalance (chi-square statistic): 0.0093" in terminal.out
     assert "MHDBL000212: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 50.00" in terminal.out
 
 
@@ -45,4 +48,5 @@ def test_balance_cli_no_discard(capfd):
     microhapulator.cli.balance.main(args)
     terminal = capfd.readouterr()
     print(terminal.out)
+    assert "Extent of imbalance (chi-square statistic): 0.0221" in terminal.out
     assert "MHDBL000212: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 40.00" in terminal.out

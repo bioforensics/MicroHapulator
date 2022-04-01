@@ -13,6 +13,7 @@
 
 from collections import namedtuple, defaultdict
 from math import ceil
+from matplotlib import pyplot as plt
 from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
 from microhapulator.profile import SimulatedProfile, TypingResult
 import numpy as np
@@ -20,6 +21,7 @@ import os
 import pandas as pd
 import pysam
 import re
+from scipy.stats import chisquare
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call, run
@@ -47,20 +49,64 @@ def count_and_sort(profile, include_discarded=True):
     return data
 
 
-def balance(result, include_discarded=True):
+def balance(
+    result,
+    include_discarded=True,
+    terminal=True,
+    tofile=None,
+    figsize=(6, 4),
+    dpi=200,
+    color="#1f77b4",
+):
     """Compute interlocus balance
+
+    Plot interlocus balance in the terminal and/or a high-resolution graphic. Also normalize read
+    counts and perform a chi-square goodness-of-fit test assuming uniform read coverage across
+    markers. The reported chi-square statistic measures the extent of imbalance, and can be compared
+    among samples sequenced using the same panel: the minimum value of 0 represents perfectly
+    uniform coverage, while the maximum value of *D* occurs when all reads map to a single marker
+    (*D* represents the degrees of freedom, or the number of markers minus 1).
 
     :param microhapulator.profile.TypingResult result: a typing result including haplotype counts
     :param bool included_discarded: flag indicating whether to include in each marker's total read count reads that are successfully aligned but discarded because they do not span all SNPs at the marker
-    :return: total read counts for each marker in a two-column tabular data structure
-    :rtype: pandas.DataFrame
+    :param bool terminal: flag indicating whether to print the interlocus balance histogram to standard output; enabled by default
+    :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
+    :param int dpi: resolution (in dots per inch) of the image file to be generated
+    :param str color: color of the histogram to be generated in the image file
+    :return: a tuple (S, C) where S is the chi-square statistic, and C is a table of total read counts for each marker
+    :rtype: tuple(float, pandas.DataFrame)
     """
     data = count_and_sort(result, include_discarded=include_discarded)
-    with TemporaryDirectory() as tempdir:
-        tfile = os.path.join(tempdir, "data.tsv")
-        data.to_csv(tfile, index=False, header=False)
-        run(["termgraph", tfile])
-    return data
+    normalized_read_counts = [c / sum(data.ReadCount) for c in data.ReadCount]
+    chisq, pval = chisquare(normalized_read_counts)
+    if terminal:
+        with TemporaryDirectory() as tempdir:
+            tfile = os.path.join(tempdir, "data.tsv")
+            data.to_csv(tfile, index=False, header=False)
+            run(["termgraph", tfile])
+    if tofile:
+        plt.figure(figsize=figsize, dpi=dpi)
+        x = range(len(data))
+        y = [c / 1000 for c in data.ReadCount]
+        plt.bar(x, y, color=color)
+        plt.xticks([])
+        plt.xlabel("Marker")
+        if include_discarded:
+            plt.ylabel("Reads Mapped (× 1000)")
+        else:
+            plt.ylabel("Reads Mapped and Typed (× 1000)")
+        ax = plt.gca()
+        ax.yaxis.grid(True, color="#DDDDDD")
+        ax.set_axisbelow(True)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+        ax.spines["bottom"].set_color("#CCCCCC")
+        ax.tick_params(left=False)
+        plt.title("Interlocus Balance")
+        plt.savefig(tofile)
+    return chisq, data
 
 
 def contain(prof1, prof2):
@@ -74,6 +120,7 @@ def contain(prof1, prof2):
     :param microhapulator.profile.Profile prof1: a typing result or simulated genotype
     :param microhapulator.profile.Profile prof2: a typing result or simulated genotype
     :returns: a tuple (C, T), where C is the containment statistic and T is the total number of markers
+    :rtype: tuple(float, int)
     """
     total = 0
     contained = 0
@@ -286,7 +333,7 @@ def seq(
     """
     n = len(profiles)
     if seeds is None:
-        seeds = [np.random.randint(1, 2 ** 32 - 1) for _ in range(n)]
+        seeds = [np.random.randint(1, 2**32 - 1) for _ in range(n)]
     if len(seeds) != n:
         raise ValueError("number of profiles must match number of seeds")
     numreads = calc_n_reads_from_proportions(n, totalreads, proportions)
@@ -322,7 +369,7 @@ def sim(frequencies, seed=None):
     """
     profile = SimulatedProfile(ploidy=2)
     if seed is None:
-        seed = np.random.randint(2 ** 32 - 1)
+        seed = np.random.randint(2**32 - 1)
     profile.data["metadata"] = {
         "HaploSeed": seed,
     }
