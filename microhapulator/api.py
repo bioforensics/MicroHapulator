@@ -21,7 +21,7 @@ import os
 import pandas as pd
 import pysam
 import re
-from scipy.stats import chisquare
+from scipy.stats import chisquare, ttest_rel
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call, run
@@ -145,7 +145,10 @@ def genotype_counts(profile):
 def heterozygote_balance(result, tofile=None, figsize=None, dpi=200, dolabels=False):
     """Compute heterozygote balance
 
-    Compute heterozygote balance and plot in a high-resolution graphic. Implementation adapted from
+    Compute heterozygote balance and plot in a high-resolution graphic. Also perform a one-sided
+    paired t-test and report the t-statistic as a measure of heterozygote imbalance.
+
+    Graphics implementation adapted from
     https://www.pythoncharts.com/matplotlib/grouped-bar-charts-matplotlib/.
 
     :param microhapulator.profile.TypingResult result: a filtered typing result including haplotype counts and genotype calls
@@ -153,10 +156,11 @@ def heterozygote_balance(result, tofile=None, figsize=None, dpi=200, dolabels=Fa
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
     :param bool dolabels: flag indicating whether marker labels and read counts should be added to the figure
-    :return: a table of read counts and percentages for each heterozygous marker
+    :return: a tuple (T, C) where T is the t-statistic, and C is the table of read counts and percentages for each heterozygous marker
     :rtype: pandas.DataFrame
     """
     data = genotype_counts(result)
+    tstat, pval = ttest_rel(data.Allele1Perc, data.Allele2Perc, alternative="greater")
     if tofile:
         if figsize is None:
             width = len(data) / 2 if dolabels else len(data) / 4
@@ -189,7 +193,7 @@ def heterozygote_balance(result, tofile=None, figsize=None, dpi=200, dolabels=Fa
                 ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
         ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
         plt.savefig(tofile, bbox_inches="tight")
-    return data
+    return tstat, data
 
 
 def contain(prof1, prof2):

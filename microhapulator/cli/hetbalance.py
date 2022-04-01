@@ -48,12 +48,13 @@ def subparser(subparsers):
 
 def main(args):
     result = TypingResult(fromfile=args.input)
-    data = mhapi.heterozygote_balance(
+    tstat, data = mhapi.heterozygote_balance(
         result,
         tofile=args.figure,
         figsize=args.figsize,
         dpi=args.dpi,
         dolabels=args.labels,
     )
+    print(f"Extent of imbalance (t-statistic): {tstat:.4f}")
     if args.csv:
         data.to_csv(args.csv, index=False)
