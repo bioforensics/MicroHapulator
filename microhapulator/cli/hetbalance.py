@@ -43,6 +43,9 @@ def subparser(subparsers):
     cli.add_argument(
         "--labels", action="store_true", help="include labels showing marker names and read counts"
     )
+    cli.add_argument(
+        "--absolute", action="store_true", help="plot absolute rather than relative read counts"
+    )
     cli.add_argument("input", help="a typing result including haplotype counts in JSON format")
 
 
@@ -54,6 +57,7 @@ def main(args):
         figsize=args.figsize,
         dpi=args.dpi,
         dolabels=args.labels,
+        absolute=args.absolute,
     )
     print(f"Extent of imbalance (t-statistic): {tstat:.4f}")
     if args.csv:
