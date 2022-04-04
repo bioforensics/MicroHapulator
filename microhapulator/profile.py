@@ -322,6 +322,7 @@ class TypingResult(Profile):
 
     def record_coverage(self, marker, cov_by_pos, ndiscarded=0):
         self.data["markers"][marker] = {
+            "genotype": list(),
             "mean_coverage": 0.0,
             "min_coverage": 0,
             "max_coverage": 0,
@@ -336,8 +337,6 @@ class TypingResult(Profile):
 
     def record_haplotype(self, marker, haplotype, count):
         self.data["markers"][marker]["typing_result"][haplotype] = count
-        if "genotype" not in self.data["markers"][marker]:
-            self.data["markers"][marker]["genotype"] = list()
 
     def filter(self, static=None, dynamic=None, config=None):
         """Apply static and/or dynamic thresholds to distinguish true and false haplotypes

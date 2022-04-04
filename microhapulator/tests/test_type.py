@@ -151,3 +151,11 @@ def test_type_no_var_offsets():
     message = r"marker IDs unique to set1={mh01KK-205, mh02KK-005, mh03KK-006};"
     with pytest.raises(ValueError, match=message):
         mhapi.type(bam, tsv)
+
+
+def test_type_marker_with_no_coverage():
+    bam = data_file("bam/nocov.bam")
+    tsv = data_file("def/nocov-offsets.tsv")
+    result = mhapi.type(bam, tsv)
+    for marker, mdata in result.data["markers"].items():
+        assert "genotype" in mdata
