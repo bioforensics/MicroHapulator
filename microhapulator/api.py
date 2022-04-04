@@ -168,6 +168,7 @@ def heterozygote_balance(
     if tofile:
         if figsize is None:
             width = len(data) / 2 if dolabels else len(data) / 4
+            width = max(8, width)
             figsize = (width, 8)
         fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
         barwidth = 0.4
