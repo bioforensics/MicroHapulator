@@ -5,8 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+- New API and CLI entry points for computing and visualizing heterozygote balance (#122).
+
 ### Changed
-- Interlocus balance code updated to support generating high-resolution graphics and performing a chid-square goodness-of-fit test (#121).
+- Interlocus balance code updated to support generating high-resolution graphics and performing a chi-square goodness-of-fit test (#121).
 
 
 ## [0.5] 2022-01-20
