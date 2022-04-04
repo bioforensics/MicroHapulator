@@ -11,6 +11,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Interlocus balance code updated to support generating high-resolution graphics and performing a chi-square goodness-of-fit test (#121).
 
+### Fixed
+- Bug with filtering/genotype calling for markers with no valid reads (#123).
+
 
 ## [0.5] 2022-01-20
 

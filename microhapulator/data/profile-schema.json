@@ -78,7 +78,7 @@
                         "max_coverage": {
                             "description": "Max per-base coverage",
                             "type": "integer",
-                            "minimum": 1
+                            "minimum": 0
                         },
                         "mean_coverage": {
                             "description": "Average per-base coverage",
