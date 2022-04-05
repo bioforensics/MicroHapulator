@@ -21,12 +21,13 @@ import os
 import pandas as pd
 import pysam
 import re
-from scipy.stats import chisquare
+from scipy.stats import chisquare, ttest_rel
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call, run
 import sys
 from tempfile import mkdtemp, TemporaryDirectory
+from warnings import warn
 
 
 SimulatedRead = namedtuple("SimulatedRead", ["identifier", "sequence", "quality"])
@@ -49,7 +50,7 @@ def count_and_sort(profile, include_discarded=True):
     return data
 
 
-def balance(
+def interlocus_balance(
     result,
     include_discarded=True,
     terminal=True,
@@ -107,6 +108,105 @@ def balance(
         plt.title("Interlocus Balance")
         plt.savefig(tofile)
     return chisq, data
+
+
+def genotype_counts(profile):
+    counts = dict(
+        Marker=list(),
+        Allele1Count=list(),
+        Allele2Count=list(),
+        Allele1Perc=list(),
+        Allele2Perc=list(),
+        TotalCount=list(),
+    )
+    for marker, mdata in profile.data["markers"].items():
+        if "genotype" not in mdata:
+            warn(f"Missing genotype call for marker {marker}", UserWarning)
+            continue
+        genotype = {d["haplotype"] for d in mdata["genotype"]}
+        if len(genotype) > 2:
+            warn(f"More than two alleles found for marker {marker}", UserWarning)
+            continue
+        if len(genotype) < 2:
+            continue
+        count2, count1 = sorted([mdata["typing_result"][mhallele] for mhallele in genotype])
+        totalcount = count1 + count2
+        counts["Marker"].append(marker)
+        counts["Allele1Count"].append(count1)
+        counts["Allele2Count"].append(count2)
+        counts["Allele1Perc"].append(count1 / totalcount)
+        counts["Allele2Perc"].append(count2 / totalcount)
+        counts["TotalCount"].append(totalcount)
+    data = pd.DataFrame(counts).sort_values(["TotalCount"], ascending=False).round(decimals=4)
+    data = data.drop(columns=["TotalCount"]).reset_index(drop=True)
+    return data
+
+
+def heterozygote_balance(
+    result, tofile=None, figsize=None, dpi=200, dolabels=False, absolute=False
+):
+    """Compute heterozygote balance
+
+    Compute absolute and relative abundance of major and minor alleles at heterozygote loci and plot
+    abundances in a high-resolution graphic. Also perform a one-sided paired t-test and report the
+    t-statistic as a measure of heterozygote imbalance.
+
+    Graphics implementation adapted from
+    https://www.pythoncharts.com/matplotlib/grouped-bar-charts-matplotlib/.
+
+    :param microhapulator.profile.TypingResult result: a filtered typing result including haplotype counts and genotype calls
+    :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
+    :param int dpi: resolution (in dots per inch) of the image file to be generated
+    :param bool dolabels: flag indicating whether marker labels and read counts should be added to the figure
+    :param bool absolute: plot absolute read counts rather than relative abundances
+    :return: a tuple (T, C) where T is the t-statistic, and C is the table of read counts and percentages for each heterozygous marker
+    :rtype: pandas.DataFrame
+    """
+    data = genotype_counts(result)
+    tstat, pval = ttest_rel(data.Allele1Perc, data.Allele2Perc, alternative="greater")
+    if tofile:
+        if figsize is None:
+            width = len(data) / 2 if dolabels else len(data) / 4
+            width = max(8, width)
+            figsize = (width, 8)
+        fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+        barwidth = 0.4
+        x1 = range(len(data.Marker))
+        x2 = [_x + barwidth for _x in x1]
+        x = [_x + barwidth / 2 for _x in x1]
+        if absolute:
+            y1 = data.Allele1Count / 1000
+            y2 = data.Allele2Count / 1000
+            ylabel = "Read Count (× 1000)"
+        else:
+            y1 = data.Allele1Perc
+            y2 = data.Allele2Perc
+            ylabel = "Percentage of Read Count"
+        ax.bar(x1, y1, width=barwidth)
+        ax.bar(x2, y2, width=barwidth)
+        if dolabels:
+            ax.set_xticks(x)
+            ax.set_xticklabels(data.Marker, rotation=90)
+        else:
+            ax.set_xticks([])
+        ax.yaxis.grid(True, color="#DDDDDD")
+        ax.set_axisbelow(True)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+        ax.spines["bottom"].set_color("#CCCCCC")
+        ax.tick_params(bottom=False, left=False)
+        ax.set_xlabel("Marker", labelpad=15, fontsize=16)
+        ax.set_ylabel(ylabel, labelpad=15, fontsize=16)
+        ax.set_title("Heterozygote Balance", pad=25, fontsize=18)
+        if dolabels:
+            counts = data.Allele1Count + data.Allele2Count
+            for m, height, count in zip(x, y1, counts):
+                ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
+        ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
+        plt.savefig(tofile, bbox_inches="tight")
+    return tstat, data
 
 
 def contain(prof1, prof2):

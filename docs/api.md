@@ -15,10 +15,14 @@ In brief, this means that every stable version of the MicroHapulator software is
 ```
 
 
-## Analysis and interpretation
+## Analysis, QA/QC, and interpretation
 
 ```{eval-rst}
-.. autofunction:: microhapulator.api.balance
+.. autofunction:: microhapulator.api.interlocus_balance
+```
+
+```{eval-rst}
+.. autofunction:: microhapulator.api.heterozygote_balance
 ```
 
 ```{eval-rst}

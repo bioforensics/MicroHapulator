@@ -25,7 +25,7 @@ def subparser(subparsers):
         "reads map to a single marker (D represents the degrees of freedom, or the number of "
         "markers minus 1)."
     )
-    cli = subparsers.add_parser("balance", description=desc)
+    cli = subparsers.add_parser("locbalance", description=desc)
     cli.add_argument("-c", "--csv", metavar="FILE", help="write read counts to FILE in CSV format")
     cli.add_argument(
         "-D",
@@ -74,7 +74,7 @@ def subparser(subparsers):
 
 def main(args):
     result = TypingResult(fromfile=args.input)
-    chisq, data = mhapi.balance(
+    chisq, data = mhapi.interlocus_balance(
         result,
         include_discarded=args.discarded,
         terminal=not args.quiet,
