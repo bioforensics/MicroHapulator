@@ -112,3 +112,14 @@ def test_bed_error():
     markers = pd.read_csv(data_file("def/loc2-offsets.tsv"), sep="\t")
     with pytest.raises(ValueError, match=r"unknown marker identifier 'BOGUS'"):
         print(p.bedstr(markers))
+
+
+def test_typing_rate():
+    result = TypingResult(fromfile=data_file("prof/two-contrib-even.json"))
+    rates = result.typing_rate()
+    assert rates.TypedReads.head(5).to_list() == [3427, 2653, 3241, 4105, 3819]
+    assert rates.TotalReads.head(5).to_list() == [4550, 4540, 4539, 4531, 4538]
+    expected = [0.753187, 0.584361, 0.714034, 0.905981, 0.841560]
+    observed = rates.TypingRate.head(5).to_list()
+    for exp, obs in zip(expected, observed):
+        assert exp == pytest.approx(obs)
