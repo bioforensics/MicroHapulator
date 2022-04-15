@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - New API and CLI entry points for computing and visualizing heterozygote balance (#122).
+- New API function for plotting distribution of read lengths (#128).
 
 ### Changed
 - Interlocus balance code updated to support generating high-resolution graphics and performing a chi-square goodness-of-fit test (#121).
