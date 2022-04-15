@@ -417,6 +417,27 @@ class TypingResult(Profile):
         table = pd.DataFrame(entries, columns=column_names)
         table.to_csv(outfile, index=False)
 
+    def typing_rate(self):
+        data = {
+            "Marker": list(),
+            "TypedReads": list(),
+            "TotalReads": list(),
+            "TypingRate": list(),
+        }
+        for marker, mdata in self.data["markers"].items():
+            num_typed_reads = 0
+            for mhallele, count in mdata["typing_result"].items():
+                num_typed_reads += count
+            total_reads = num_typed_reads + mdata["num_discarded_reads"]
+            rate = 0.0
+            if total_reads > 0:
+                rate = num_typed_reads / total_reads
+            data["Marker"].append(marker)
+            data["TypedReads"].append(num_typed_reads)
+            data["TotalReads"].append(total_reads)
+            data["TypingRate"].append(rate)
+        return pd.DataFrame(data)
+
     @property
     def gttype(self):
         return "TypingResult"
