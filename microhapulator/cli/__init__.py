@@ -22,6 +22,7 @@ from . import filter
 from . import hetbalance
 from . import locbalance
 from . import mix
+from . import pipe
 from . import prob
 from . import seq
 from . import sim
@@ -39,6 +40,7 @@ mains = {
     "hetbalance": hetbalance.main,
     "locbalance": locbalance.main,
     "mix": mix.main,
+    "pipe": pipe.main,
     "prob": prob.main,
     "seq": seq.main,
     "sim": sim.main,
@@ -56,6 +58,7 @@ subparser_funcs = {
     "hetbalance": hetbalance.subparser,
     "locbalance": locbalance.subparser,
     "mix": mix.subparser,
+    "pipe": pipe.subparser,
     "prob": prob.subparser,
     "seq": seq.subparser,
     "sim": sim.subparser,

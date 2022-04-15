@@ -1,0 +1,285 @@
+from base64 import b64encode
+from datetime import datetime
+from jinja2 import Template
+import json
+from matplotlib import pyplot as plt
+import microhapulator
+from pkg_resources import resource_filename
+import pandas as pd
+import sys
+
+
+def parse_flash_summary(logfile):
+    with open(logfile, "r") as fh:
+        data = fh.read()
+        tp = re.search(r"Total pairs:\s+(\d+)", data).group(1)
+        cp = re.search(r"Combined pairs:\s+(\d+)", data).group(1)
+        ip = re.search(r"Innie pairs:\s+(\d+)", data).group(1)
+        op = re.search(r"Outie pairs:\s+(\d+)", data).group(1)
+        up = re.search(r"Uncombined pairs:\s+(\d+)", data).group(1)
+        return int(tp), int(cp), int(ip), int(op), int(up)
+
+
+def parse_read_counts(logfile):
+    with open(logfile, "r") as fh:
+        line = next(fh)
+        totalreads = line.strip().split()[-1]
+        line = next(fh)
+        mappedreads = line.strip().split()[-1]
+        return int(totalreads), int(mappedreads)
+
+
+def parse_balance_stat(logfile):
+    with open(logfile, "r") as fh:
+        line = next(fh)
+        stat = line.strip().split()[-1]
+        return float(stat)
+
+
+rule report:
+    input:
+        "analysis/summary.tsv",
+        expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-read-lengths.png", sample=config["samples"]),
+        resource_filename("microhapulator", "data/template.html"),
+    output:
+        "report.html",
+    run:
+        summary = pd.read_csv("analysis/summary.tsv", sep="\t")
+        readlenplots = list()
+        locbalanceplots = list()
+        hetbalanceplots = list()
+        for sample in config["samples"]:
+            with open(f"analysis/{sample}/{sample}-read-lengths.png", "rb") as fh:
+                data = b64encode(fh.read()).decode("ascii")
+                readlenplots.append(data)
+            with open(f"analysis/{sample}/{sample}-interlocus-balance.png", "rb") as fh:
+                data = b64encode(fh.read()).decode("ascii")
+                locbalanceplots.append(data)
+            with open(f"analysis/{sample}/{sample}-heterozygote-balance.png", "rb") as fh:
+                data = b64encode(fh.read()).decode("ascii")
+                hetbalanceplots.append(data)
+        template_file = resource_filename("microhapulator", "data/template.html")
+        with open(template_file, "r") as infh, open("report.html", "w") as outfh:
+            template = Template(infh.read())
+            output = template.render(
+                date=datetime.now().replace(microsecond=0).isoformat(),
+                mhpl8rversion=microhapulator.__version__,
+                samples=config["samples"],
+                summary=summary,
+                readlenplots=readlenplots,
+                locbalanceplots=locbalanceplots,
+                hetbalanceplots=hetbalanceplots,
+                static=5,
+                dynamic=0.02,
+            )
+            print(output, file=outfh, end="")
+
+
+rule summary:
+    input:
+        expand("analysis/{sample}/flash.log", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-mapped-reads.txt", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-fullrefr-mapped-reads.txt", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-interlocus-balance-chisq.txt", sample=config["samples"]),
+        expand(
+            "analysis/{sample}/{sample}-heterozygote-balance-pttest.txt",
+            sample=config["samples"],
+        ),
+    output:
+        tsv="analysis/summary.tsv",
+    run:
+        columns = (
+            "Sample",
+            "TotalReads",
+            "Merged",
+            "MergeRate",
+            "Mapped",
+            "MappingRate",
+            "MappedFullRefr",
+            "MappingRateFullRefr",
+            "Typed",
+            "TypingRate",
+            "InterlocChiSq",
+            "HetTstat",
+        )
+        data = {colname: [] for colname in columns}
+        for sample in sorted(config["samples"]):
+            print(f"[Compiling summary] Sample={sample}", file=sys.stderr)
+            totalreads, mergedreads, *_ = parse_flash_summary(f"analysis/{sample}/flash.log")
+            maptotal, mapped = parse_read_counts(f"analysis/{sample}/{sample}-mapped-reads.txt")
+            assert maptotal == mergedreads, (sample, maptotal, mergedreads)
+            frmaptotal, frmapped = parse_read_counts(
+        f"analysis/{sample}/{sample}-fullrefr-mapped-reads.txt"
+            )
+            assert (
+                frmaptotal == maptotal
+            ), f"Sample={sample} fullrefr map total={frmaptotal} map total={maptotal}"
+            typing = pd.read_csv(f"analysis/{sample}/{sample}-typing-rate.tsv", sep="\t")
+            num_typed_reads = typing.TypedReads.sum()
+            typing_total_reads = typing.TotalReads.sum()
+            # assert typing_total_reads == mapped, f"Sample={sample} type total={typing_total_reads} mapped={mapped}"
+            typing_rate = num_typed_reads / typing_total_reads
+            chisq = parse_balance_stat(f"analysis/{sample}/{sample}-interlocus-balance-chisq.txt")
+            tstat = parse_balance_stat(
+                f"analysis/{sample}/{sample}-heterozygote-balance-pttest.txt"
+            )
+            data["Sample"].append(sample)
+            data["TotalReads"].append(totalreads)
+            data["Merged"].append(mergedreads)
+            data["MergeRate"].append(mergedreads / totalreads)
+            data["Mapped"].append(mapped)
+            data["MappingRate"].append(mapped / maptotal)
+            data["MappedFullRefr"].append(frmapped)
+            data["MappingRateFullRefr"].append(frmapped / frmaptotal)
+            data["Typed"].append(num_typed_reads)
+            data["TypingRate"].append(typing_rate)
+            data["InterlocChiSq"].append(chisq)
+            data["HetTstat"].append(tstat)
+        df = pd.DataFrame(data)
+        df.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+
+
+rule merge:
+    input: lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq])
+    output:
+        mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
+        log="analysis/{sample}/flash.log",
+    threads: 8
+    shell:
+        """
+        flash --min-overlap=25 --max-overlap=300 --allow-outies \
+            --threads={threads} --max-mismatch-density=0.25 \
+            --output-prefix analysis/{wildcards.sample}/{wildcards.sample} \
+            {input} \
+            2>&1 | tee {output.log}
+        """
+
+
+rule merged_read_length_distribution:
+    input:
+        fastq=rules.merge.output.mergedfq,
+    output:
+        plot="analysis/{sample}/{sample}-read-lengths.png",
+    run:
+        microhapulator.api.read_length_dist(input.fastq, output.plot, title=wildcards.sample)
+
+
+rule map_sort_and_index:
+    input:
+        refr=config["mhrefr"],
+        fastq=rules.merge.output.mergedfq,
+    output:
+        bam="analysis/{sample}/{sample}.bam",
+        bai="analysis/{sample}/{sample}.bam.bai",
+        counts="analysis/{sample}/{sample}-mapped-reads.txt",
+    wildcard_constraints:
+        sample="\w+-\d_S\d",
+    threads: 32
+    shell:
+        """
+        bwa mem -t {threads} {input} | samtools view -b | samtools sort -o {output.bam}
+        samtools index {output.bam}
+        echo -n "Total reads: " > {output.counts}
+        samtools view -c -F 2304 {output.bam} >> {output.counts}
+        echo -n "Mapped reads: " >> {output.counts}
+        samtools view -c -F 2308 {output.bam} >> {output.counts}
+        """
+
+
+rule call_haplotypes:
+    input:
+        marker_defn=config["mhdefn"],
+        bam=rules.map_sort_and_index.output.bam,
+    output:
+        typing_result="analysis/{sample}/{sample}-type-raw.json",
+    shell:
+        "mhpl8r type {input} --out {output}"
+
+
+rule check_typing_rate:
+    input:
+        json=rules.call_haplotypes.output.typing_result,
+    output:
+        tsv="analysis/{sample}/{sample}-typing-rate.tsv",
+    run:
+        with open(input.json, "r") as fh:
+            result = json.load(fh)
+        data = {
+            "Marker": list(),
+            "TypedReads": list(),
+            "TotalReads": list(),
+            "TypingRate": list(),
+        }
+        for marker, mdata in result["markers"].items():
+            num_typed_reads = 0
+            for mhallele, count in mdata["typing_result"].items():
+                num_typed_reads += count
+            total_reads = num_typed_reads + mdata["num_discarded_reads"]
+            rate = 0.0
+            if total_reads > 0:
+                rate = num_typed_reads / total_reads
+            data["Marker"].append(marker)
+            data["TypedReads"].append(num_typed_reads)
+            data["TotalReads"].append(total_reads)
+            data["TypingRate"].append(rate)
+        df = pd.DataFrame(data)
+        df.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+
+
+rule apply_filters:
+    input:
+        json=rules.call_haplotypes.output.typing_result,
+    output:
+        genotype_call="analysis/{sample}/{sample}-type.json",
+    shell:
+        "mhpl8r filter {input} --out {output} --static 5 --dynamic 0.02"
+
+
+rule interlocus_balance:
+    input:
+        result=rules.apply_filters.output.genotype_call,
+    output:
+        counts="analysis/{sample}/{sample}-marker-read-counts.csv",
+        plot="analysis/{sample}/{sample}-interlocus-balance.png",
+        log="analysis/{sample}/{sample}-interlocus-balance-chisq.txt",
+    shell:
+        """
+        mhpl8r locbalance {input} --csv {output.counts} --figure {output.plot} --quiet \
+            | tee {output.log}
+        """
+
+
+rule heterozygote_balance:
+    input:
+        result=rules.apply_filters.output.genotype_call,
+    output:
+        counts="analysis/{sample}/{sample}-het-marker-allele-counts.csv",
+        plot="analysis/{sample}/{sample}-heterozygote-balance.png",
+        log="analysis/{sample}/{sample}-heterozygote-balance-pttest.txt",
+    shell:
+        """
+        mhpl8r hetbalance {input} --csv {output.counts} --figure {output.plot} --labels \
+            | tee {output.log}
+        """
+
+
+rule map_full_reference:
+    input:
+        refr=resource_filename("microhapulator", "data/hg38.fasta.gz"),
+        fastq=rules.merge.output.mergedfq,
+    output:
+        bam="analysis/{sample}/{sample}-fullrefr.bam",
+        bai="analysis/{sample}/{sample}-fullrefr.bam.bai",
+        counts="analysis/{sample}/{sample}-fullrefr-mapped-reads.txt",
+    threads: 32
+    shell:
+        """
+        bwa mem -t {threads} {input} | samtools view -b | samtools sort -o {output.bam}
+        samtools index {output.bam}
+        echo -n "Total reads: " > {output.counts}
+        samtools view -c -F 2304 {output.bam} >> {output.counts}
+        echo -n "Mapped reads: " >> {output.counts}
+        samtools view -c -F 2308 {output.bam} >> {output.counts}
+        """
