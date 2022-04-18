@@ -59,8 +59,9 @@ def subparser(subparsers):
 
 def main(args):
     url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz"
+    checksum = "70fb7af4dff26bffdf27dbef80caf1f0359d488f"
     hg38path = Path(resource_filename("microhapulator", "data/hg38.fasta.gz"))
-    if download_is_needed(url, hg38path, "70fb7af4dff26bffdf27dbef80caf1f0359d488f"):
+    if download_is_needed(url, hg38path, checksum):
         print("[MicroHapulator] downloading GRCh38 reference genome", file=sys.stderr)
         with ProgressBar(unit="B", unit_scale=True, miniters=1, desc=hg38path.name) as pb:
             urlretrieve(url, hg38path, reporthook=pb.update_to)
@@ -69,7 +70,7 @@ def main(args):
             f"[MicroHapulator] file {str(hg38path)} already present, skipping download",
             file=sys.stderr,
         )
-    if compute_shasum(hg38path) != "70fb7af4dff26bffdf27dbef80caf1f0359d488f":
+    if compute_shasum(hg38path) != checksum:
         raise ValueError(f"checksum failed for {str(hg38path)}")
     index_present = True
     for suffix in ("amb", "ann", "bwt", "pac", "sa"):
