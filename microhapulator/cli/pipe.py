@@ -136,6 +136,10 @@ def subparser(subparsers):
         action="store_true",
         help="copy input files to working directory; by default, input files are symlinked",
     )
+    cli.add_argument(
+        "markerrefr", help="path to a FASTA file containing marker reference sequences"
+    )
+    cli.add_argument("markerdefn", help="path to a TSV file containing marker definitions")
     cli.add_argument("seqpath", help="path to a directory containing FASTQ files")
     cli.add_argument(
         "samples",

@@ -9,6 +9,15 @@ import pandas as pd
 import sys
 
 
+def full_reference_index_files():
+    filename = resource_filename("microhapulator", "data/hg38.fasta.gz")
+    filenames = [filename]
+    for suffix in ("amb", "ann", "bwt", "pac", "sa"):
+        idxfile = f"{filename}.{suffix}"
+        filenames.append(idxfile)
+    return filenames
+
+
 def parse_flash_summary(logfile):
     with open(logfile, "r") as fh:
         data = fh.read()
@@ -261,6 +270,11 @@ rule heterozygote_balance:
         mhpl8r hetbalance {input} --csv {output.counts} --figure {output.plot} --labels \
             | tee {output.log}
         """
+
+
+rule download_full_reference:
+    output: full_reference_index_files()
+    shell: "mhpl8r getrefr"
 
 
 rule map_full_reference:
