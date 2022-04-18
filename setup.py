@@ -36,6 +36,7 @@ setup(
     },
     include_package_data=True,
     install_requires=[
+        "biopython",
         "happer>=0.1",
         "insilicoseq>=1.5.2",
         "jsonschema>=4.0",
