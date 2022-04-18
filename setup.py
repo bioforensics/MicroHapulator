@@ -45,6 +45,7 @@ setup(
         "pandas>1.0",
         "scipy>=1.7",
         "termgraph>=0.5",
+        "tqdm>=4.0",
     ],
     entry_points={"console_scripts": ["mhpl8r = microhapulator.cli:main"]},
     classifiers=[
