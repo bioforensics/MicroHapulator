@@ -80,7 +80,7 @@ rule summary:
     input:
         expand("analysis/{sample}/flash.log", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-mapped-reads.txt", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-fullrefr-mapped-reads.txt", sample=config["samples"]),
+        expand("analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-interlocus-balance-chisq.txt", sample=config["samples"]),
         expand(
@@ -174,8 +174,6 @@ rule map_sort_and_index:
         bam="analysis/{sample}/{sample}.bam",
         bai="analysis/{sample}/{sample}.bam.bai",
         counts="analysis/{sample}/{sample}-mapped-reads.txt",
-    wildcard_constraints:
-        sample="\w+-\d_S\d",
     threads: 32
     shell:
         """
@@ -270,9 +268,9 @@ rule map_full_reference:
         refr=resource_filename("microhapulator", "data/hg38.fasta.gz"),
         fastq=rules.merge.output.mergedfq,
     output:
-        bam="analysis/{sample}/{sample}-fullrefr.bam",
-        bai="analysis/{sample}/{sample}-fullrefr.bam.bai",
-        counts="analysis/{sample}/{sample}-fullrefr-mapped-reads.txt",
+        bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
+        bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
+        counts="analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
     threads: 32
     shell:
         """
