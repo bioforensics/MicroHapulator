@@ -150,8 +150,8 @@ def main(args):
     config = dict(
         samples=sorted(args.samples),
         readfiles=workingfiles,
-        mhrefr="/Users/daniel.standage/Software/MicroHapulator/README.md",
-        mhdefn="/Users/daniel.standage/Software/MicroHapulator/README.md",
+        mhrefr=Path.cwd() / "README.md",
+        mhdefn=Path.cwd() / "README.md",
     )
     snakefile = resource_filename("microhapulator", "Snakefile")
     snakemake(
