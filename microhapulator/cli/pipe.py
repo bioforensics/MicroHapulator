@@ -115,6 +115,7 @@ def subparser(subparsers):
         "-w",
         "--workdir",
         metavar="D",
+        default=".",
         help="pipeline working directory; default is current directory",
     )
     cli.add_argument(
@@ -154,10 +155,10 @@ def main(args):
     config = dict(
         samples=sorted(args.samples),
         readfiles=workingfiles,
-        mhrefr=Path.cwd() / "README.md",
-        mhdefn=Path.cwd() / "README.md",
+        mhrefr=Path(args.markerrefr).resolve(),
+        mhdefn=Path(args.markerdefn).resolve(),
     )
     snakefile = resource_filename("microhapulator", "Snakefile")
     snakemake(
-        snakefile, cores=args.threads, dryrun=args.dryrun, config=config, workdir=args.workdir
+        snakefile, cores=args.threads, printshellcmds=True, dryrun=args.dryrun, config=config, workdir=args.workdir
     )

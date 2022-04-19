@@ -51,14 +51,14 @@ def parse_balance_stat(logfile):
 rule report:
     input:
         "analysis/summary.tsv",
-        expand("analysis/{sample}/{sample}-type.json", sample=SAMPLES),
-        expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=SAMPLES),
-        expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=SAMPLES),
-        expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=SAMPLES),
-        expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=SAMPLES),
-        expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=SAMPLES),
-        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=SAMPLES, end=(1, 2)),
-        "template.html",
+        expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
+        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
+        resource_filename("microhapulator", "data/template.html"),
     output:
         "report.html",
     run:
@@ -68,7 +68,7 @@ rule report:
         mergedreadlenplots = list()
         locbalanceplots = list()
         hetbalanceplots = list()
-        for sample in SAMPLES:
+        for sample in config["samples"]:
             with open(f"analysis/{sample}/{sample}-r1-read-lengths.png", "rb") as fh:
                 data = b64encode(fh.read()).decode("ascii")
                 r1readlenplots.append(data)
@@ -213,10 +213,6 @@ rule read_length_distributions:
         r2="analysis/{sample}/{sample}-r2-read-lengths.png",
         merged="analysis/{sample}/{sample}-merged-read-lengths.png",
     run:
-        r1 = ("analysis/{sample}/{sample}-r1-read-lengths.png",)
-        r2 = ("analysis/{sample}/{sample}-r2-read-lengths.png",)
-        merged = ("analysis/{sample}/{sample}-merged-read-lengths.png",)
-    run:
         microhapulator.api.read_length_dist(
             input[0],
             output.r1,
@@ -238,10 +234,27 @@ rule read_length_distributions:
         )
 
 
+rule copy_and_index_marker_data:
+    input:
+        tsv=config["mhdefn"],
+        fasta=config["mhrefr"],
+    output:
+        expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
+        fasta="marker-refr.fasta",
+        tsv="marker-definitions.tsv",
+    shell:
+        """
+        cp {input.tsv} {output.tsv}
+        cp {input.fasta} {output.fasta}
+        bwa index {output.fasta}
+        """
+
+
 rule map_sort_and_index:
     input:
-        refr=config["mhrefr"],
         fastq=rules.merge.output.mergedfq,
+        fasta="marker-refr.fasta",
+        idx=expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
     output:
         bam="analysis/{sample}/{sample}.bam",
         bai="analysis/{sample}/{sample}.bam.bai",
@@ -249,7 +262,7 @@ rule map_sort_and_index:
     threads: 32
     shell:
         """
-        bwa mem -t {threads} {input} | samtools view -b | samtools sort -o {output.bam}
+        bwa mem -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
         echo -n "Total reads: " > {output.counts}
         samtools view -c -F 2304 {output.bam} >> {output.counts}
