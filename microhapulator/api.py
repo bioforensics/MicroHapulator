@@ -11,8 +11,10 @@
 # -------------------------------------------------------------------------------------------------
 
 
+from Bio import SeqIO
 from collections import namedtuple, defaultdict
 from math import ceil
+import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
 from microhapulator.profile import SimulatedProfile, TypingResult
@@ -557,3 +559,36 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
         for haplotype, count in htcounts.items():
             result.record_haplotype(locusid, haplotype, count)
     return result
+
+
+def read_length_dist(fastq, outfile, scale=1000, title=None):
+    """Plot distribution of read lengths
+
+    :param str fastq: path of a FASTQ file containing NGS reads
+    :param str outfile: path of a graphic file to create
+    :param float scale: scaling factor for the Y axis
+    :param str title: title for the plot
+    """
+    backend = matplotlib.get_backend()
+    plt.switch_backend("Agg")
+    lengths = list()
+    with open(fastq, "r") as fh:
+        for record in SeqIO.parse(fh, "fastq"):
+            lengths.append(len(record))
+    fig = plt.figure(figsize=(6, 4), dpi=200)
+    plt.hist(lengths, bins=25, weights=[1 / scale] * len(lengths), edgecolor="#000099")
+    plt.xlim(0, 500)
+    ax = plt.gca()
+    ax.yaxis.grid(True, color="#DDDDDD")
+    ax.set_axisbelow(True)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+    ax.spines["bottom"].set_color("#CCCCCC")
+    ax.tick_params(left=False)
+    ax.set_xlabel("Length of Merged Read Pair (bp)", labelpad=15, fontsize=16)
+    ax.set_ylabel(f"Frequency (× {scale})", labelpad=15, fontsize=16)
+    if title:
+        ax.set_title(title, pad=25, fontsize=18)
+    plt.savefig(outfile, bbox_inches="tight")
+    plt.switch_backend(backend)

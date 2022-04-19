@@ -18,6 +18,10 @@ In brief, this means that every stable version of the MicroHapulator software is
 ## Analysis, QA/QC, and interpretation
 
 ```{eval-rst}
+.. autofunction:: microhapulator.api.read_length_dist
+```
+
+```{eval-rst}
 .. autofunction:: microhapulator.api.interlocus_balance
 ```
 
