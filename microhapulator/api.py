@@ -74,6 +74,7 @@ def interlocus_balance(
     :param bool included_discarded: flag indicating whether to include in each marker's total read count reads that are successfully aligned but discarded because they do not span all SNPs at the marker
     :param bool terminal: flag indicating whether to print the interlocus balance histogram to standard output; enabled by default
     :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param str title: add a title (such as a sample name) to the histogram plot
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
     :return: a tuple (S, C) where S is the chi-square statistic, and C is a table of total read counts for each marker
@@ -161,6 +162,7 @@ def heterozygote_balance(
 
     :param microhapulator.profile.TypingResult result: a filtered typing result including haplotype counts and genotype calls
     :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param str title: add a title (such as a sample name) to the histogram plot
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
     :param bool dolabels: flag indicating whether marker labels and read counts should be added to the figure
