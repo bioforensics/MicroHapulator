@@ -148,7 +148,7 @@ def genotype_counts(profile):
 
 
 def heterozygote_balance(
-    result, tofile=None, figsize=None, dpi=200, dolabels=False, absolute=False
+    result, tofile=None, title=None, figsize=None, dpi=200, dolabels=False, absolute=False
 ):
     """Compute heterozygote balance
 
@@ -171,6 +171,8 @@ def heterozygote_balance(
     data = genotype_counts(result)
     tstat, pval = ttest_rel(data.Allele1Perc, data.Allele2Perc, alternative="greater")
     if tofile:
+        backend = matplotlib.get_backend()
+        plt.switch_backend("Agg")
         if figsize is None:
             width = len(data) / 2 if dolabels else len(data) / 4
             width = max(8, width)
@@ -204,13 +206,15 @@ def heterozygote_balance(
         ax.tick_params(bottom=False, left=False)
         ax.set_xlabel("Marker", labelpad=15, fontsize=16)
         ax.set_ylabel(ylabel, labelpad=15, fontsize=16)
-        ax.set_title("Heterozygote Balance", pad=25, fontsize=18)
+        if title is not None:
+            ax.set_title(title, pad=25, fontsize=18)
         if dolabels:
             counts = data.Allele1Count + data.Allele2Count
             for m, height, count in zip(x, y1, counts):
                 ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
         ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
         plt.savefig(tofile, bbox_inches="tight")
+        plt.switch_backend(backend)
     return tstat, data
 
 
