@@ -19,6 +19,7 @@ from . import convert
 from . import diff
 from . import dist
 from . import filter
+from . import getrefr
 from . import hetbalance
 from . import locbalance
 from . import mix
@@ -37,6 +38,7 @@ mains = {
     "diff": diff.main,
     "dist": dist.main,
     "filter": filter.main,
+    "getrefr": getrefr.main,
     "hetbalance": hetbalance.main,
     "locbalance": locbalance.main,
     "mix": mix.main,
@@ -55,6 +57,7 @@ subparser_funcs = {
     "diff": diff.subparser,
     "dist": dist.subparser,
     "filter": filter.subparser,
+    "getrefr": getrefr.subparser,
     "hetbalance": hetbalance.subparser,
     "locbalance": locbalance.subparser,
     "mix": mix.subparser,
