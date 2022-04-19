@@ -1,10 +1,12 @@
 from base64 import b64encode
 from datetime import datetime
+from glob import glob
 from jinja2 import Template
 import json
 from matplotlib import pyplot as plt
 import microhapulator
 from microhapulator.profile import TypingResult
+from os import symlink
 from pkg_resources import resource_filename
 import pandas as pd
 import sys
@@ -49,39 +51,54 @@ def parse_balance_stat(logfile):
 rule report:
     input:
         "analysis/summary.tsv",
-        expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-read-lengths.png", sample=config["samples"]),
-        resource_filename("microhapulator", "data/template.html"),
+        expand("analysis/{sample}/{sample}-type.json", sample=SAMPLES),
+        expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=SAMPLES),
+        expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=SAMPLES),
+        expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=SAMPLES),
+        expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=SAMPLES),
+        expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=SAMPLES),
+        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=SAMPLES, end=(1, 2)),
+        "template.html",
     output:
         "report.html",
     run:
         summary = pd.read_csv("analysis/summary.tsv", sep="\t")
-        readlenplots = list()
+        r1readlenplots = list()
+        r2readlenplots = list()
+        mergedreadlenplots = list()
         locbalanceplots = list()
         hetbalanceplots = list()
-        for sample in config["samples"]:
-            with open(f"analysis/{sample}/{sample}-read-lengths.png", "rb") as fh:
+        for sample in SAMPLES:
+            with open(f"analysis/{sample}/{sample}-r1-read-lengths.png", "rb") as fh:
                 data = b64encode(fh.read()).decode("ascii")
-                readlenplots.append(data)
+                r1readlenplots.append(data)
+            with open(f"analysis/{sample}/{sample}-r2-read-lengths.png", "rb") as fh:
+                data = b64encode(fh.read()).decode("ascii")
+                r2readlenplots.append(data)
+            with open(f"analysis/{sample}/{sample}-merged-read-lengths.png", "rb") as fh:
+                data = b64encode(fh.read()).decode("ascii")
+                mergedreadlenplots.append(data)
             with open(f"analysis/{sample}/{sample}-interlocus-balance.png", "rb") as fh:
                 data = b64encode(fh.read()).decode("ascii")
                 locbalanceplots.append(data)
             with open(f"analysis/{sample}/{sample}-heterozygote-balance.png", "rb") as fh:
                 data = b64encode(fh.read()).decode("ascii")
                 hetbalanceplots.append(data)
-        template_file = resource_filename("microhapulator", "data/template.html")
-        with open(template_file, "r") as infh, open("report.html", "w") as outfh:
+        with open("template.html", "r") as infh, open("report.html", "w") as outfh:
             template = Template(infh.read())
             output = template.render(
                 date=datetime.now().replace(microsecond=0).isoformat(),
                 mhpl8rversion=microhapulator.__version__,
-                samples=config["samples"],
+                samples=SAMPLES,
                 summary=summary,
-                readlenplots=readlenplots,
+                r1readlenplots=r1readlenplots,
+                r2readlenplots=r2readlenplots,
+                mergedreadlenplots=mergedreadlenplots,
                 locbalanceplots=locbalanceplots,
                 hetbalanceplots=hetbalanceplots,
                 static=5,
                 dynamic=0.02,
+                zip=zip,
             )
             print(output, file=outfh, end="")
 
@@ -90,7 +107,10 @@ rule summary:
     input:
         expand("analysis/{sample}/flash.log", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-mapped-reads.txt", sample=config["samples"]),
-        expand("analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt", sample=config["samples"]),
+        expand(
+            "analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
+            sample=config["samples"],
+        ),
         expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-interlocus-balance-chisq.txt", sample=config["samples"]),
         expand(
@@ -151,8 +171,25 @@ rule summary:
         df.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
 
 
+rule fastqc:
+    input:
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+    output:
+        r1="analysis/{sample}/fastqc/R1-fastqc.html",
+        r2="analysis/{sample}/fastqc/R2-fastqc.html",
+    threads: 2
+    run:
+        shell("fastqc --outdir analysis/{wildcards.sample}/fastqc/ --threads {threads} {input}")
+        outfiles = sorted(glob(f"analysis/{wildcards.sample}/fastqc/*.html"))
+        for end, outfile in enumerate(outfiles, 1):
+            outfile = Path(outfile)
+            linkfile = f"analysis/{wildcards.sample}/fastqc/R{end}-fastqc.html"
+            symlink(outfile.name, linkfile)
+
+
 rule merge:
-    input: lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq])
+    input:
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
         mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
         log="analysis/{sample}/flash.log",
@@ -167,13 +204,38 @@ rule merge:
         """
 
 
-rule merged_read_length_distribution:
+rule read_length_distributions:
     input:
-        fastq=rules.merge.output.mergedfq,
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        rules.merge.output.mergedfq,
     output:
-        plot="analysis/{sample}/{sample}-read-lengths.png",
+        r1="analysis/{sample}/{sample}-r1-read-lengths.png",
+        r2="analysis/{sample}/{sample}-r2-read-lengths.png",
+        merged="analysis/{sample}/{sample}-merged-read-lengths.png",
     run:
-        microhapulator.api.read_length_dist(input.fastq, output.plot, title=wildcards.sample)
+        r1 = ("analysis/{sample}/{sample}-r1-read-lengths.png",)
+        r2 = ("analysis/{sample}/{sample}-r2-read-lengths.png",)
+        merged = ("analysis/{sample}/{sample}-merged-read-lengths.png",)
+    run:
+        microhapulator.api.read_length_dist(
+            input[0],
+            output.r1,
+            xlim=(0, 300),
+            title=f"{wildcards.sample} R1",
+        )
+        microhapulator.api.read_length_dist(
+            input[1],
+            output.r2,
+            xlim=(0, 300),
+            title=f"{wildcards.sample} R2",
+        )
+        microhapulator.api.read_length_dist(
+            input[2],
+            output.merged,
+            xlabel="Length of Merged Read Pair (bp)",
+            xlim=(0, 500),
+            title=wildcards.sample,
+        )
 
 
 rule map_sort_and_index:
@@ -255,8 +317,10 @@ rule heterozygote_balance:
 
 
 rule download_full_reference:
-    output: full_reference_index_files()
-    shell: "mhpl8r getrefr"
+    output:
+        full_reference_index_files(),
+    shell:
+        "mhpl8r getrefr"
 
 
 rule map_full_reference:

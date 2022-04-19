@@ -16,6 +16,9 @@
                 margin: 10px auto;
                 width: 48%;
             }
+            img.small {
+                width: 24.5%;
+            }
             .fullwidth {
                 width: 100%;
             }
@@ -38,12 +41,34 @@
 
             <h2>Table of Contents</h2>
             <ol>
+                <li><a href="#readqc">Read QA/QC</a></li>
                 <li><a href="#readmerging">Read Merging</a></li>
                 <li><a href="#readmapping">Read Mapping</a></li>
                 <li><a href="#typing">Haplotype Calling</a></li>
                 <li><a href="#filters">Genotype Calling</a></li>
             </ol>
             <p>All statistics presented in this report are aggregated in a single table available at <code>analysis/summary.tsv</code> in the working directory. Full-resolution graphics for each figure are also available in each <code>analysis/{samplename}/</code> subdirectory.</p>
+
+            <a name="readqc"></a>
+            <h2>Read QA/QC</h2>
+            <p>QC reports for the input reads are generated using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a>. Links to reports for each sample are provided below.</p>
+            <blockquote><strong>NOTE</strong>: FastQC was designed for QC of whole-genome shotgun NGS reads prior to genome asssembly. A QC warning or failure for some modules (such as per-base sequence content or sequence duplication levels) may or may not be a concern with MH reads. Interpret results with care!</blockquote>
+            <table>
+                <tr><th>Sample</th><th>R1 Report</th><th>R2 Report</th></tr>
+                {% for sample in samples %}
+                <tr>
+                    <td>{{sample}}</td>
+                    <td><a href="analysis/{{sample}}/fastqc/R1-fastqc.html" target="_blank">Click here to open in a new tab</a></td>
+                    <td><a href="analysis/{{sample}}/fastqc/R2-fastqc.html" target="_blank">Click here to open in a new tab</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            <p>The following histograms show the distribution of R1 and R2 read lengths for each sample.</p>
+            {% for r1plot, r2plot in zip(r1readlenplots, r2readlenplots) %}
+            <img src="data:image/png;base64,{{r1plot}}" class="small" />
+            <img src="data:image/png;base64,{{r2plot}}" class="small" />
+            {% endfor %}
+
 
             <a name="readmerging"></a>
             <h2>Read Merging</h2>
@@ -65,7 +90,7 @@
                 {% endfor %}
             </table>
             <p>The following histograms show the distribution of merged read lengths for each sample.</p>
-            {% for plot in readlenplots %}
+            {% for plot in mergedreadlenplots %}
             <img src="data:image/png;base64,{{plot}}" />
             {% endfor %}
 
