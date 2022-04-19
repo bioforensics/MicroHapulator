@@ -64,10 +64,11 @@ def subparser(subparsers):
         help="resolution (in dots per inch) of the image file to be generated; DPI=200 by default",
     )
     cli.add_argument(
-        "--color",
-        metavar="COL",
-        default="#1f77b4",
-        help="color of the histogram to be generated in the image file; COL='#1f77b4' by default",
+        "-t",
+        "--title",
+        metavar="T",
+        default=None,
+        help="add a title (such as a sample name) to the histogram plot",
     )
     cli.add_argument("input", help="a typing result including haplotype counts in JSON format")
 
@@ -79,9 +80,9 @@ def main(args):
         include_discarded=args.discarded,
         terminal=not args.quiet,
         tofile=args.figure,
+        title=args.title,
         figsize=args.figsize,
         dpi=args.dpi,
-        color=args.color,
     )
     print(f"Extent of imbalance (chi-square statistic): {chisq:.4f}")
     if args.csv:

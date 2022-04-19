@@ -57,9 +57,9 @@ def interlocus_balance(
     include_discarded=True,
     terminal=True,
     tofile=None,
+    title=None,
     figsize=(6, 4),
     dpi=200,
-    color="#1f77b4",
 ):
     """Compute interlocus balance
 
@@ -76,7 +76,6 @@ def interlocus_balance(
     :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
-    :param str color: color of the histogram to be generated in the image file
     :return: a tuple (S, C) where S is the chi-square statistic, and C is a table of total read counts for each marker
     :rtype: tuple(float, pandas.DataFrame)
     """
@@ -89,16 +88,18 @@ def interlocus_balance(
             data.to_csv(tfile, index=False, header=False)
             run(["termgraph", tfile])
     if tofile:
+        backend = matplotlib.get_backend()
+        plt.switch_backend("Agg")
         plt.figure(figsize=figsize, dpi=dpi)
         x = range(len(data))
         y = [c / 1000 for c in data.ReadCount]
-        plt.bar(x, y, color=color)
+        plt.bar(x, y)
         plt.xticks([])
-        plt.xlabel("Marker")
+        plt.xlabel("Marker", labelpad=15, fontsize=16)
         if include_discarded:
-            plt.ylabel("Reads Mapped (× 1000)")
+            plt.ylabel("Reads Mapped (× 1000)", labelpad=15, fontsize=16)
         else:
-            plt.ylabel("Reads Mapped and Typed (× 1000)")
+            plt.ylabel("Reads Mapped and Typed (× 1000)", labelpad=15, fontsize=16)
         ax = plt.gca()
         ax.yaxis.grid(True, color="#DDDDDD")
         ax.set_axisbelow(True)
@@ -107,8 +108,10 @@ def interlocus_balance(
         ax.spines["left"].set_visible(False)
         ax.spines["bottom"].set_color("#CCCCCC")
         ax.tick_params(left=False)
-        plt.title("Interlocus Balance")
-        plt.savefig(tofile)
+        if title is not None:
+            plt.title(title, pad=25, fontsize=18)
+        plt.savefig(tofile, bbox_inches="tight")
+        plt.switch_backend(backend)
     return chisq, data
 
 
