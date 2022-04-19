@@ -84,12 +84,13 @@ rule report:
             with open(f"analysis/{sample}/{sample}-heterozygote-balance.png", "rb") as fh:
                 data = b64encode(fh.read()).decode("ascii")
                 hetbalanceplots.append(data)
-        with open("template.html", "r") as infh, open("report.html", "w") as outfh:
+        templatefile = resource_filename("microhapulator", "data/template.html")
+        with open(templatefile, "r") as infh, open("report.html", "w") as outfh:
             template = Template(infh.read())
             output = template.render(
                 date=datetime.now().replace(microsecond=0).isoformat(),
                 mhpl8rversion=microhapulator.__version__,
-                samples=SAMPLES,
+                samples=config["samples"],
                 summary=summary,
                 r1readlenplots=r1readlenplots,
                 r2readlenplots=r2readlenplots,
@@ -141,7 +142,7 @@ rule summary:
             maptotal, mapped = parse_read_counts(f"analysis/{sample}/{sample}-mapped-reads.txt")
             assert maptotal == mergedreads, (sample, maptotal, mergedreads)
             frmaptotal, frmapped = parse_read_counts(
-        f"analysis/{sample}/{sample}-fullrefr-mapped-reads.txt"
+        f"analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt"
             )
             assert (
                 frmaptotal == maptotal

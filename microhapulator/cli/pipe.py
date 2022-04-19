@@ -160,5 +160,10 @@ def main(args):
     )
     snakefile = resource_filename("microhapulator", "Snakefile")
     snakemake(
-        snakefile, cores=args.threads, printshellcmds=True, dryrun=args.dryrun, config=config, workdir=args.workdir
+        snakefile,
+        cores=args.threads,
+        printshellcmds=True,
+        dryrun=args.dryrun,
+        config=config,
+        workdir=args.workdir,
     )
