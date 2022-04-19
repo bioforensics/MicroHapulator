@@ -14,3 +14,4 @@ dist/
 microhapulator/tests/data/bam/sandawe-dad.bam.bai
 docs/_build/
 build/
+.vscode/
