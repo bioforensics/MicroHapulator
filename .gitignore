@@ -16,3 +16,4 @@ docs/_build/
 build/
 microhapulator/data/hg38.fasta.gz*
 .snakemake/
+.vscode/

@@ -4,6 +4,7 @@ from jinja2 import Template
 import json
 from matplotlib import pyplot as plt
 import microhapulator
+from microhapulator.profile import TypingResult
 from pkg_resources import resource_filename
 import pandas as pd
 import sys
@@ -211,28 +212,9 @@ rule check_typing_rate:
     output:
         tsv="analysis/{sample}/{sample}-typing-rate.tsv",
     run:
-        with open(input.json, "r") as fh:
-            result = json.load(fh)
-        data = {
-            "Marker": list(),
-            "TypedReads": list(),
-            "TotalReads": list(),
-            "TypingRate": list(),
-        }
-        for marker, mdata in result["markers"].items():
-            num_typed_reads = 0
-            for mhallele, count in mdata["typing_result"].items():
-                num_typed_reads += count
-            total_reads = num_typed_reads + mdata["num_discarded_reads"]
-            rate = 0.0
-            if total_reads > 0:
-                rate = num_typed_reads / total_reads
-            data["Marker"].append(marker)
-            data["TypedReads"].append(num_typed_reads)
-            data["TotalReads"].append(total_reads)
-            data["TypingRate"].append(rate)
-        df = pd.DataFrame(data)
-        df.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+        result = TypingResult(fromfile=input.json)
+        rates = result.typing_rate()
+        rates.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
 
 
 rule apply_filters:
@@ -253,7 +235,7 @@ rule interlocus_balance:
         log="analysis/{sample}/{sample}-interlocus-balance-chisq.txt",
     shell:
         """
-        mhpl8r locbalance {input} --csv {output.counts} --figure {output.plot} --quiet \
+        mhpl8r locbalance {input} --csv {output.counts} --figure {output.plot} --title {wildcards.sample} --quiet \
             | tee {output.log}
         """
 
@@ -267,7 +249,7 @@ rule heterozygote_balance:
         log="analysis/{sample}/{sample}-heterozygote-balance-pttest.txt",
     shell:
         """
-        mhpl8r hetbalance {input} --csv {output.counts} --figure {output.plot} --labels \
+        mhpl8r hetbalance {input} --csv {output.counts} --figure {output.plot} --title {wildcards.sample} --labels \
             | tee {output.log}
         """
 
