@@ -12,14 +12,14 @@
 
 
 from collections import defaultdict
-import json
-import microhapulator.api as mhapi
-from microhapulator.profile import Profile
+from microhapulator.parsers import cross_check_marker_ids
+from microhapulator.parsers import load_marker_reference_sequences, load_marker_definitions
 from os import cpu_count, symlink
 from pathlib import Path
 from pkg_resources import resource_filename
 from shutil import copy
 from snakemake import snakemake
+import sys
 from warnings import warn
 
 
@@ -149,11 +149,21 @@ def subparser(subparsers):
     )
 
 
+def validate_panel_config(markerseqs, markerdefn):
+    defn = load_marker_definitions(markerdefn)
+    seqs = load_marker_reference_sequences(markerseqs)
+    print("[MicroHapulator] validating panel configuration", file=sys.stderr)
+    cross_check_marker_ids(
+        seqs.keys(), defn.Marker, "marker reference sequences", "marker definitions"
+    )
+
+
 def main(args):
+    validate_panel_config(args.markerrefr, args.markerdefn)
     samples, filenames = get_input_files(args.samples, args.seqpath)
     workingfiles = link_or_copy_input(filenames, args.workdir, docopy=args.copy_input)
     config = dict(
-        samples=sorted(args.samples),
+        samples=samples,
         readfiles=workingfiles,
         mhrefr=Path(args.markerrefr).resolve(),
         mhdefn=Path(args.markerdefn).resolve(),
