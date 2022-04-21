@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New `typing_rate` method for the TypingResult class (#127).
 - New API function for plotting distribution of read lengths (#128).
 - New CLI entry point for downloading GRCh38 (#130).
+- New end-to-end microhap analysis pipeline and report (#129).
 
 ### Changed
 - Interlocus balance code updated to support generating high-resolution graphics and performing a chi-square goodness-of-fit test (#121, #131).
