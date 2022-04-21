@@ -11,6 +11,8 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
+import microhapulator.api as mhapi
+from microhapulator.profile import SimulatedProfile, TypingResult
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
@@ -54,6 +56,10 @@ def test_pipe_gbr_usc10(tmp_path):
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.pipe.main(args)
+    expected = SimulatedProfile(fromfile=data_file("prof/gbr-usc10-sim.json"))
+    observed = TypingResult(fromfile=tmp_path / "analysis" / "gbr-usc" / "gbr-usc-type.json")
+    diff = list(mhapi.diff(observed, expected))
+    assert len(diff) == 0
     assert (tmp_path / "report.html").is_file()
     expected = pd.read_csv(data_file("gbr-usc-summary.tsv"), sep="\t")
     observed = pd.read_csv(tmp_path / "analysis" / "summary.tsv", sep="\t")
