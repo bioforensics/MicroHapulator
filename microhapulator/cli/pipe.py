@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 
+from argparse import SUPPRESS
 from collections import defaultdict
 from microhapulator.parsers import cross_check_marker_ids
 from microhapulator.parsers import load_marker_reference_sequences, load_marker_definitions
@@ -20,7 +21,6 @@ from pkg_resources import resource_filename
 from shutil import copy
 from snakemake import snakemake
 import sys
-from warnings import warn
 
 
 def check_sample_names(samples):
@@ -80,14 +80,13 @@ def get_input_files(sample_names, seqpath, suffixes=None):
             if sample in filepath.name:
                 files[sample].append(filepath)
     final_file_list = list()
-    for sample, filelist in sorted(files.items()):
+    for sample in sample_names:
+        filelist = files[sample]
         if len(filelist) == 2:
             final_file_list.extend(sorted(filelist))
         else:
-            warn(
-                f"skipping sample {sample}: expected 2 FASTQ files, found {len(filelist)}",
-                UserWarning,
-            )
+            message = f"sample {sample}: expected 2 FASTQ files, found {len(filelist)}"
+            raise FileNotFoundError(message)
     unique_file_names = set([filepath.name for filepath in final_file_list])
     if len(unique_file_names) != len(final_file_list):
         raise ValueError("duplicate FASTQ file names found; refusing to proceed")
@@ -138,6 +137,12 @@ def subparser(subparsers):
         help="copy input files to working directory; by default, input files are symlinked",
     )
     cli.add_argument(
+        "--hg38",
+        default=resource_filename("microhapulator", "data/hg38.fasta.gz"),
+        help=SUPPRESS,
+        # Hidden option for testing purposes
+    )
+    cli.add_argument(
         "markerrefr", help="path to a FASTA file containing marker reference sequences"
     )
     cli.add_argument("markerdefn", help="path to a TSV file containing marker definitions")
@@ -167,6 +172,7 @@ def main(args):
         readfiles=workingfiles,
         mhrefr=Path(args.markerrefr).resolve(),
         mhdefn=Path(args.markerdefn).resolve(),
+        hg38path=args.hg38,
     )
     snakefile = resource_filename("microhapulator", "Snakefile")
     snakemake(

@@ -1,0 +1,130 @@
+{
+    "markers": {
+        "mh01USC-1pA": {
+            "genotype": [
+                {
+                    "haplotype": "A,T,G,C",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,T,G,C",
+                    "index": 1
+                }
+            ]
+        },
+        "mh02USC-2pA": {
+            "genotype": [
+                {
+                    "haplotype": "T,C,G,A",
+                    "index": 0
+                },
+                {
+                    "haplotype": "T,A,A,T",
+                    "index": 1
+                }
+            ]
+        },
+        "mh03USC-3pA": {
+            "genotype": [
+                {
+                    "haplotype": "C,C,G,T",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,C,G,T",
+                    "index": 1
+                }
+            ]
+        },
+        "mh04USC-4pA": {
+            "genotype": [
+                {
+                    "haplotype": "C,T,C,A",
+                    "index": 0
+                },
+                {
+                    "haplotype": "G,G,C,A",
+                    "index": 1
+                }
+            ]
+        },
+        "mh05USC-5pA": {
+            "genotype": [
+                {
+                    "haplotype": "A,C,T,G",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,C,A,G",
+                    "index": 1
+                }
+            ]
+        },
+        "mh06USC-6pA": {
+            "genotype": [
+                {
+                    "haplotype": "G,C,T",
+                    "index": 0
+                },
+                {
+                    "haplotype": "C,C,A",
+                    "index": 1
+                }
+            ]
+        },
+        "mh07USC-7pA": {
+            "genotype": [
+                {
+                    "haplotype": "A,G,T,C",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,G,T,C",
+                    "index": 1
+                }
+            ]
+        },
+        "mh08USC-8pA": {
+            "genotype": [
+                {
+                    "haplotype": "A,G,T,G",
+                    "index": 0
+                },
+                {
+                    "haplotype": "G,G,T,A",
+                    "index": 1
+                }
+            ]
+        },
+        "mh09USC-9pA": {
+            "genotype": [
+                {
+                    "haplotype": "A,T,C,A,A",
+                    "index": 0
+                },
+                {
+                    "haplotype": "G,T,C,A,C",
+                    "index": 1
+                }
+            ]
+        },
+        "mh10USC-10pA": {
+            "genotype": [
+                {
+                    "haplotype": "T,G,G",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,G,G",
+                    "index": 1
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "HaploSeed": 1222112076
+    },
+    "ploidy": 2,
+    "type": "SimulatedProfile",
+    "version": "0.5+37.gdc4369e"
+}

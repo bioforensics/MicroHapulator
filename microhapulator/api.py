@@ -58,9 +58,9 @@ def interlocus_balance(
     include_discarded=True,
     terminal=True,
     tofile=None,
+    title=None,
     figsize=(6, 4),
     dpi=200,
-    color="#1f77b4",
 ):
     """Compute interlocus balance
 
@@ -75,9 +75,9 @@ def interlocus_balance(
     :param bool included_discarded: flag indicating whether to include in each marker's total read count reads that are successfully aligned but discarded because they do not span all SNPs at the marker
     :param bool terminal: flag indicating whether to print the interlocus balance histogram to standard output; enabled by default
     :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param str title: add a title (such as a sample name) to the histogram plot
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
-    :param str color: color of the histogram to be generated in the image file
     :return: a tuple (S, C) where S is the chi-square statistic, and C is a table of total read counts for each marker
     :rtype: tuple(float, pandas.DataFrame)
     """
@@ -90,16 +90,18 @@ def interlocus_balance(
             data.to_csv(tfile, index=False, header=False)
             run(["termgraph", tfile])
     if tofile:
+        backend = matplotlib.get_backend()
+        plt.switch_backend("Agg")
         plt.figure(figsize=figsize, dpi=dpi)
         x = range(len(data))
         y = [c / 1000 for c in data.ReadCount]
-        plt.bar(x, y, color=color)
+        plt.bar(x, y)
         plt.xticks([])
-        plt.xlabel("Marker")
+        plt.xlabel("Marker", labelpad=15, fontsize=16)
         if include_discarded:
-            plt.ylabel("Reads Mapped (× 1000)")
+            plt.ylabel("Reads Mapped (× 1000)", labelpad=15, fontsize=16)
         else:
-            plt.ylabel("Reads Mapped and Typed (× 1000)")
+            plt.ylabel("Reads Mapped and Typed (× 1000)", labelpad=15, fontsize=16)
         ax = plt.gca()
         ax.yaxis.grid(True, color="#DDDDDD")
         ax.set_axisbelow(True)
@@ -108,8 +110,10 @@ def interlocus_balance(
         ax.spines["left"].set_visible(False)
         ax.spines["bottom"].set_color("#CCCCCC")
         ax.tick_params(left=False)
-        plt.title("Interlocus Balance")
-        plt.savefig(tofile)
+        if title is not None:
+            plt.title(title, pad=25, fontsize=18)
+        plt.savefig(tofile, bbox_inches="tight")
+        plt.switch_backend(backend)
     return chisq, data
 
 
@@ -146,7 +150,7 @@ def genotype_counts(profile):
 
 
 def heterozygote_balance(
-    result, tofile=None, figsize=None, dpi=200, dolabels=False, absolute=False
+    result, tofile=None, title=None, figsize=None, dpi=200, dolabels=False, absolute=False
 ):
     """Compute heterozygote balance
 
@@ -159,6 +163,7 @@ def heterozygote_balance(
 
     :param microhapulator.profile.TypingResult result: a filtered typing result including haplotype counts and genotype calls
     :param str tofile: name of image file to which the interlocus balance histogram will be written using Matplotlib; image format is inferred from file extension; by default, no image file is generated
+    :param str title: add a title (such as a sample name) to the histogram plot
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
     :param bool dolabels: flag indicating whether marker labels and read counts should be added to the figure
@@ -169,6 +174,8 @@ def heterozygote_balance(
     data = genotype_counts(result)
     tstat, pval = ttest_rel(data.Allele1Perc, data.Allele2Perc, alternative="greater")
     if tofile:
+        backend = matplotlib.get_backend()
+        plt.switch_backend("Agg")
         if figsize is None:
             width = len(data) / 2 if dolabels else len(data) / 4
             width = max(8, width)
@@ -202,13 +209,15 @@ def heterozygote_balance(
         ax.tick_params(bottom=False, left=False)
         ax.set_xlabel("Marker", labelpad=15, fontsize=16)
         ax.set_ylabel(ylabel, labelpad=15, fontsize=16)
-        ax.set_title("Heterozygote Balance", pad=25, fontsize=18)
+        if title is not None:
+            ax.set_title(title, pad=25, fontsize=18)
         if dolabels:
             counts = data.Allele1Count + data.Allele2Count
             for m, height, count in zip(x, y1, counts):
                 ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
         ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
         plt.savefig(tofile, bbox_inches="tight")
+        plt.switch_backend(backend)
     return tstat, data
 
 
@@ -562,13 +571,13 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     return result
 
 
-def read_length_dist(
-    fastq, outfile, xlabel="Read Length (bp)", xlim=(0, 500), scale=1000, title=None
-):
+def read_length_dist(fastq, outfile, xlabel="Read Length (bp)", xlim=None, scale=1000, title=None):
     """Plot distribution of read lengths
 
     :param str fastq: path of a FASTQ file containing NGS reads
     :param str outfile: path of a graphic file to create
+    :param str xlabel: label for the X axis
+    :param tuple xlim: a 2-tuple of numbers (x1, x2) representing the start and end points of the portion of the X axis to be displayed; by default this is determined automatically
     :param float scale: scaling factor for the Y axis
     :param str title: title for the plot
     """
@@ -580,6 +589,8 @@ def read_length_dist(
             lengths.append(len(record))
     fig = plt.figure(figsize=(6, 4), dpi=200)
     plt.hist(lengths, bins=25, weights=[1 / scale] * len(lengths), edgecolor="#000099")
+    if xlim is None:
+        xlim = (min(lengths) * 0.9, max(lengths) * 1.1)
     plt.xlim(*xlim)
     ax = plt.gca()
     ax.yaxis.grid(True, color="#DDDDDD")

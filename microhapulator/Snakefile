@@ -13,7 +13,7 @@ import sys
 
 
 def full_reference_index_files():
-    filename = resource_filename("microhapulator", "data/hg38.fasta.gz")
+    filename = config["hg38path"]
     filenames = [filename]
     for suffix in ("amb", "ann", "bwt", "pac", "sa"):
         idxfile = f"{filename}.{suffix}"
@@ -217,20 +217,17 @@ rule read_length_distributions:
         microhapulator.api.read_length_dist(
             input[0],
             output.r1,
-            xlim=(0, 300),
             title=f"{wildcards.sample} R1",
         )
         microhapulator.api.read_length_dist(
             input[1],
             output.r2,
-            xlim=(0, 300),
             title=f"{wildcards.sample} R2",
         )
         microhapulator.api.read_length_dist(
             input[2],
             output.merged,
             xlabel="Length of Merged Read Pair (bp)",
-            xlim=(0, 500),
             title=wildcards.sample,
         )
 
@@ -339,7 +336,7 @@ rule download_full_reference:
 
 rule map_full_reference:
     input:
-        refr=resource_filename("microhapulator", "data/hg38.fasta.gz"),
+        refr=config["hg38path"],
         fastq=rules.merge.output.mergedfq,
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
