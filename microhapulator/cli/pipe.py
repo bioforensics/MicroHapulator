@@ -175,7 +175,7 @@ def main(args):
         hg38path=args.hg38,
     )
     snakefile = resource_filename("microhapulator", "Snakefile")
-    snakemake(
+    success = snakemake(
         snakefile,
         cores=args.threads,
         printshellcmds=True,
@@ -183,3 +183,5 @@ def main(args):
         config=config,
         workdir=args.workdir,
     )
+    if not success:
+        return 1

@@ -116,4 +116,5 @@ def main(arglist=None):  # pragma: no cover
     assert args.subcmd in mains
     mainmethod = mains[args.subcmd]
     print("[MicroHapulator] running version", __version__, file=sys.stderr)
-    mainmethod(args)
+    result = mainmethod(args)
+    return result
