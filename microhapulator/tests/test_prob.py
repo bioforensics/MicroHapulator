@@ -74,9 +74,9 @@ def test_prob_cli_lrt(capsys):
 
 def test_prob_zero_freq(k5freqs):
     p = Profile(fromfile=data_file("prof/korea-5loc-zerofreq.json"))
-    assert p.rand_match_prob(k5freqs) == pytest.approx(2.3708e-11)
+    assert p.rand_match_prob(k5freqs) == pytest.approx(2.3708e-10)
 
 
 def test_prob_missing_freq(k5freqs):
     p = Profile(fromfile=data_file("prof/korea-5loc-missfreq.json"))
-    assert p.rand_match_prob(k5freqs) == pytest.approx(7.8360e-10)
+    assert p.rand_match_prob(k5freqs) == pytest.approx(7.8360e-9)

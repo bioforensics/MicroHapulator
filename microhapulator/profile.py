@@ -100,7 +100,7 @@ class Profile(object):
             )
         return set([a["haplotype"] for a in self.data["markers"][markerid]["genotype"]])
 
-    def rand_match_prob(self, freqs):
+    def rand_match_prob(self, freqs, minfreq=0.01):
         """Compute the random match probability of this profile.
 
         Given a set of population allele frequencies, the random match
@@ -117,14 +117,14 @@ class Profile(object):
                 raise RandomMatchError(msg)
             result = freqs[(freqs.Marker == marker) & (freqs.Haplotype.isin(haplotypes))]
             if len(haplotypes) == 1:
-                p = 0.001
+                p = minfreq
                 if len(result) == 1:
                     pp = list(result.Frequency)[0]
                     if pp > 0.0:
                         p = pp
                 prob *= p * p
             else:
-                p, q = 0.001, 0.001
+                p, q = minfreq, minfreq
                 if len(result) == 2:
                     pp, qp = list(result.Frequency)
                 elif len(result) == 1:
