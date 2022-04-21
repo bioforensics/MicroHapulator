@@ -1,3 +1,15 @@
+# -------------------------------------------------------------------------------------------------
+# Copyright (c) 2022, DHS.
+#
+# This file is part of MicroHapulator (https://github.com/bioforensics/microhapulator) and is
+# licensed under the BSD license: see LICENSE.txt.
+#
+# This software was prepared for the Department of Homeland Security (DHS) by the Battelle National
+# Biodefense Institute, LLC (BNBI) as part of contract HSHQDC-15-C-00064 to manage and operate the
+# National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
+# Development Center.
+# -------------------------------------------------------------------------------------------------
+
 from base64 import b64encode
 from datetime import datetime
 from glob import glob
@@ -331,7 +343,10 @@ rule download_full_reference:
     output:
         full_reference_index_files(),
     shell:
-        "mhpl8r getrefr"
+        """
+        echo 'WARNING: if you have not previously downloaded and indexed the GRCh38 assembly for use with MicroHapulator, this can take an hour or more!!!'
+        mhpl8r getrefr
+        """
 
 
 rule map_full_reference:
