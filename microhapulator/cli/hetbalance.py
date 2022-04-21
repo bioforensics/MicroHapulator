@@ -41,6 +41,13 @@ def subparser(subparsers):
         help="resolution (in dots per inch) of the image file to be generated; DPI=200 by default",
     )
     cli.add_argument(
+        "-t",
+        "--title",
+        metavar="T",
+        default=None,
+        help="add a title (such as a sample name) to the histogram plot",
+    )
+    cli.add_argument(
         "--labels", action="store_true", help="include labels showing marker names and read counts"
     )
     cli.add_argument(
@@ -54,6 +61,7 @@ def main(args):
     tstat, data = mhapi.heterozygote_balance(
         result,
         tofile=args.figure,
+        title=args.title,
         figsize=args.figsize,
         dpi=args.dpi,
         dolabels=args.labels,
