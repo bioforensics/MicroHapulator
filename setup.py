@@ -45,7 +45,6 @@ setup(
         "pandas>1.0",
         "scipy>=1.7",
         "snakemake>=6.0",
-        "snakefmt=0.6",
         "termgraph>=0.5",
         "tqdm>=4.0",
     ],
