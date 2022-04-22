@@ -64,7 +64,7 @@
                 {% endfor %}
             </table>
             <p>The following histograms show the distribution of R1 and R2 read lengths for each sample.</p>
-            {% for r1plot, r2plot in zip(r1readlenplots, r2readlenplots) %}
+            {% for r1plot, r2plot in zip(plots["r1readlen"], plots["r2readlen"]) %}
             <img src="data:image/png;base64,{{r1plot}}" class="small" />
             <img src="data:image/png;base64,{{r2plot}}" class="small" />
             {% endfor %}
@@ -90,7 +90,7 @@
                 {% endfor %}
             </table>
             <p>The following histograms show the distribution of merged read lengths for each sample.</p>
-            {% for plot in mergedreadlenplots %}
+            {% for plot in plots["mergedreadlen"] %}
             <img src="data:image/png;base64,{{plot}}" />
             {% endfor %}
 
@@ -119,7 +119,7 @@
             </table>
 
             <p>The following histograms show the interlocus balance for each sample.</p>
-            {% for plot in locbalanceplots %}
+            {% for plot in plots["locbalance"] %}
             <img src="data:image/png;base64,{{plot}}" />
             {% endfor %}
 
@@ -148,7 +148,7 @@
             <p>Fixed detection thresholds and dynamic analytical thresholds are applied to the typing result using <code>mhpl8r filter</code> to discriminate true and erroneous haplotypes and predict each sample's genotype. MicroHapulator applied a static filter of <strong>≥{{static}} reads</strong> as a detection threshold and a dynamic filter of <strong>≥{{"{:.1f}".format(dynamic*100)}}% of total reads</strong>.</p>
 
             <p>The following figures show the heterozygote balance for each sample.
-            {% for plot in hetbalanceplots %}
+            {% for plot in plots["hetbalance"] %}
             <img src="data:image/png;base64,{{plot}}" class="fullwidth" />
             {% endfor %}
         </div>

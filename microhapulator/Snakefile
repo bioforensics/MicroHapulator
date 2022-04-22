@@ -10,54 +10,13 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from base64 import b64encode
-from datetime import datetime
 from glob import glob
-from jinja2 import Template
-import json
-from matplotlib import pyplot as plt
-import microhapulator
+from microhapulator import api as mhapi
+from microhapulator.pipeaux import full_reference_index_files, final_html_report, aggregate_summary
 from microhapulator.profile import TypingResult
 from os import symlink
-from pkg_resources import resource_filename
 import pandas as pd
-import sys
-
-
-def full_reference_index_files():
-    filename = config["hg38path"]
-    filenames = [filename]
-    for suffix in ("amb", "ann", "bwt", "pac", "sa"):
-        idxfile = f"{filename}.{suffix}"
-        filenames.append(idxfile)
-    return filenames
-
-
-def parse_flash_summary(logfile):
-    with open(logfile, "r") as fh:
-        data = fh.read()
-        tp = re.search(r"Total pairs:\s+(\d+)", data).group(1)
-        cp = re.search(r"Combined pairs:\s+(\d+)", data).group(1)
-        ip = re.search(r"Innie pairs:\s+(\d+)", data).group(1)
-        op = re.search(r"Outie pairs:\s+(\d+)", data).group(1)
-        up = re.search(r"Uncombined pairs:\s+(\d+)", data).group(1)
-        return int(tp), int(cp), int(ip), int(op), int(up)
-
-
-def parse_read_counts(logfile):
-    with open(logfile, "r") as fh:
-        line = next(fh)
-        totalreads = line.strip().split()[-1]
-        line = next(fh)
-        mappedreads = line.strip().split()[-1]
-        return int(totalreads), int(mappedreads)
-
-
-def parse_balance_stat(logfile):
-    with open(logfile, "r") as fh:
-        line = next(fh)
-        stat = line.strip().split()[-1]
-        return float(stat)
+from pkg_resources import resource_filename
 
 
 rule report:
@@ -75,45 +34,7 @@ rule report:
         "report.html",
     run:
         summary = pd.read_csv("analysis/summary.tsv", sep="\t")
-        r1readlenplots = list()
-        r2readlenplots = list()
-        mergedreadlenplots = list()
-        locbalanceplots = list()
-        hetbalanceplots = list()
-        for sample in config["samples"]:
-            with open(f"analysis/{sample}/{sample}-r1-read-lengths.png", "rb") as fh:
-                data = b64encode(fh.read()).decode("ascii")
-                r1readlenplots.append(data)
-            with open(f"analysis/{sample}/{sample}-r2-read-lengths.png", "rb") as fh:
-                data = b64encode(fh.read()).decode("ascii")
-                r2readlenplots.append(data)
-            with open(f"analysis/{sample}/{sample}-merged-read-lengths.png", "rb") as fh:
-                data = b64encode(fh.read()).decode("ascii")
-                mergedreadlenplots.append(data)
-            with open(f"analysis/{sample}/{sample}-interlocus-balance.png", "rb") as fh:
-                data = b64encode(fh.read()).decode("ascii")
-                locbalanceplots.append(data)
-            with open(f"analysis/{sample}/{sample}-heterozygote-balance.png", "rb") as fh:
-                data = b64encode(fh.read()).decode("ascii")
-                hetbalanceplots.append(data)
-        templatefile = resource_filename("microhapulator", "data/template.html")
-        with open(templatefile, "r") as infh, open("report.html", "w") as outfh:
-            template = Template(infh.read())
-            output = template.render(
-                date=datetime.now().replace(microsecond=0).isoformat(),
-                mhpl8rversion=microhapulator.__version__,
-                samples=config["samples"],
-                summary=summary,
-                r1readlenplots=r1readlenplots,
-                r2readlenplots=r2readlenplots,
-                mergedreadlenplots=mergedreadlenplots,
-                locbalanceplots=locbalanceplots,
-                hetbalanceplots=hetbalanceplots,
-                static=5,
-                dynamic=0.02,
-                zip=zip,
-            )
-            print(output, file=outfh, end="")
+        final_html_report(config["samples"], summary)
 
 
 rule summary:
@@ -133,55 +54,8 @@ rule summary:
     output:
         tsv="analysis/summary.tsv",
     run:
-        columns = (
-            "Sample",
-            "TotalReads",
-            "Merged",
-            "MergeRate",
-            "Mapped",
-            "MappingRate",
-            "MappedFullRefr",
-            "MappingRateFullRefr",
-            "Typed",
-            "TypingRate",
-            "InterlocChiSq",
-            "HetTstat",
-        )
-        data = {colname: [] for colname in columns}
-        for sample in sorted(config["samples"]):
-            print(f"[Compiling summary] Sample={sample}", file=sys.stderr)
-            totalreads, mergedreads, *_ = parse_flash_summary(f"analysis/{sample}/flash.log")
-            maptotal, mapped = parse_read_counts(f"analysis/{sample}/{sample}-mapped-reads.txt")
-            assert maptotal == mergedreads, (sample, maptotal, mergedreads)
-            frmaptotal, frmapped = parse_read_counts(
-        f"analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt"
-            )
-            assert (
-                frmaptotal == maptotal
-            ), f"Sample={sample} fullrefr map total={frmaptotal} map total={maptotal}"
-            typing = pd.read_csv(f"analysis/{sample}/{sample}-typing-rate.tsv", sep="\t")
-            num_typed_reads = typing.TypedReads.sum()
-            typing_total_reads = typing.TotalReads.sum()
-            # assert typing_total_reads == mapped, f"Sample={sample} type total={typing_total_reads} mapped={mapped}"
-            typing_rate = num_typed_reads / typing_total_reads
-            chisq = parse_balance_stat(f"analysis/{sample}/{sample}-interlocus-balance-chisq.txt")
-            tstat = parse_balance_stat(
-                f"analysis/{sample}/{sample}-heterozygote-balance-pttest.txt"
-            )
-            data["Sample"].append(sample)
-            data["TotalReads"].append(totalreads)
-            data["Merged"].append(mergedreads)
-            data["MergeRate"].append(mergedreads / totalreads)
-            data["Mapped"].append(mapped)
-            data["MappingRate"].append(mapped / maptotal)
-            data["MappedFullRefr"].append(frmapped)
-            data["MappingRateFullRefr"].append(frmapped / frmaptotal)
-            data["Typed"].append(num_typed_reads)
-            data["TypingRate"].append(typing_rate)
-            data["InterlocChiSq"].append(chisq)
-            data["HetTstat"].append(tstat)
-        df = pd.DataFrame(data)
-        df.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+        summary = aggregate_summary(config["samples"])
+        summary.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
 
 
 rule fastqc:
@@ -226,17 +100,9 @@ rule read_length_distributions:
         r2="analysis/{sample}/{sample}-r2-read-lengths.png",
         merged="analysis/{sample}/{sample}-merged-read-lengths.png",
     run:
-        microhapulator.api.read_length_dist(
-            input[0],
-            output.r1,
-            title=f"{wildcards.sample} R1",
-        )
-        microhapulator.api.read_length_dist(
-            input[1],
-            output.r2,
-            title=f"{wildcards.sample} R2",
-        )
-        microhapulator.api.read_length_dist(
+        mhapi.read_length_dist(input[0], output.r1, title=f"{wildcards.sample} R1")
+        mhapi.read_length_dist(input[1], output.r2, title=f"{wildcards.sample} R2")
+        mhapi.read_length_dist(
             input[2],
             output.merged,
             xlabel="Length of Merged Read Pair (bp)",
@@ -341,7 +207,7 @@ rule heterozygote_balance:
 
 rule download_full_reference:
     output:
-        full_reference_index_files(),
+        full_reference_index_files(config["hg38path"]),
     shell:
         """
         echo 'WARNING: if you have not previously downloaded and indexed the GRCh38 assembly for use with MicroHapulator, this can take an hour or more!!!'

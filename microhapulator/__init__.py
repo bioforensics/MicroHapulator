@@ -20,3 +20,4 @@ from .parsers import *
 from . import profile
 from . import api
 from . import cli
+from . import pipeaux
