@@ -7,6 +7,19 @@ In brief, this means that every stable version of the MicroHapulator software is
 
 -----------
 
+## End-to-end analysis workflow
+
+### `mhpl8r pipe`
+
+```{argparse}
+:module: microhapulator.cli
+:func: get_parser
+:prog: mhpl8r
+:path: pipe
+:nodefault:
+```
+
+
 ## Haplotype calling
 
 ### `mhpl8r type`

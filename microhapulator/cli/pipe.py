@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2019, DHS.
+# Copyright (c) 2022, DHS.
 #
 # This file is part of MicroHapulator (https://github.com/bioforensics/microhapulator) and is
 # licensed under the BSD license: see LICENSE.txt.
@@ -172,7 +172,7 @@ def main(args):
         readfiles=workingfiles,
         mhrefr=Path(args.markerrefr).resolve(),
         mhdefn=Path(args.markerdefn).resolve(),
-        hg38path=args.hg38,
+        hg38path=Path(args.hg38).resolve(),
     )
     snakefile = resource_filename("microhapulator", "Snakefile")
     success = snakemake(
