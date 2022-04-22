@@ -21,6 +21,8 @@ Full installation instructions are available [here](https://microhapulator.readt
 conda install -c bioconda microhapulator
 ```
 
+> **NOTE**: MicroHapulator is only supported on Windows through the [Windows Subsystem for Linux (WSL2)](https://docs.microsoft.com/en-us/windows/wsl/install).
+
 
 ## Usage
 
@@ -45,4 +47,4 @@ All contributors are expected to abide by the project's [Code of Conduct](https:
 [licensebadge]: https://img.shields.io/badge/license-BSD-blue.svg
 [biocondabadge]: https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat
 [binderbadge]: https://mybinder.org/badge_logo.svg
-[platformbadge]: https://img.shields.io/badge/Platforms-linux--64%2Cosx--64-orange.svg
+[platformbadge]: https://img.shields.io/badge/Platforms-Linux%2CmacOS%2CWSL2-orange.svg
