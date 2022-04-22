@@ -28,7 +28,7 @@ In the analysis and interpretation phase, various characteristics of the haploty
 Before executing the workflow, it is important to configure MicroHapulator correctly.
 Be sure to read [the config docs](config.md) and prepare the three configuration files before beginning the workflow.
 
-Executing the MicroHapulator workflow with multiple in a stepwise fashion provides the most flexibility.
+Executing the MicroHapulator workflow with multiple commands in a stepwise fashion provides the most flexibility.
 But MicroHapulator also supports executing the entire end-to-end analysis workflow with a single command.
 This next section describes the end-to-end workflow, and subsequent sections describe how to run individual workflow commands.
 
