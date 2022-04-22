@@ -26,8 +26,8 @@ MicroHapulator depends on several Python packages.
 These are listed in `setup.py` in the main source code distribution.
 If performing a non-standard installation with `pip`, these dependencies will automatically be installed from the Python Package Index (PyPI).
 
-Preparing Illumina reads for analysis and interpretation with MicroHapulator also depends on several bioinformatics tools, including [FLASH](https://ccb.jhu.edu/software/FLASH/), [BWA](http://bio-bwa.sourceforge.net/) (or an alternative short read aligner), and [SAMtools](http://www.htslib.org/).
-These software tools are installed automatically when performing a standard installation with conda.
+Preparing Illumina reads for analysis and interpretation with MicroHapulator also depends on several bioinformatics tools, including [FLASH](https://ccb.jhu.edu/software/FLASH/), [BWA](http://bio-bwa.sourceforge.net/) (or an alternative short read aligner), [SAMtools](http://www.htslib.org/), and [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).
+These software tools are installed automatically when performing a standard installation with Conda.
 Otherwise, they must be installed manually.
 
 

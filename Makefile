@@ -18,7 +18,7 @@ test4:
 devdeps:
 	pip install --upgrade pip setuptools
 	pip install wheel twine
-	pip install 'black==22.3' 'pytest>=6.0' pytest-cov pytest-xdist pytest-sugar myst-parser sphinx sphinx-argparse
+	pip install 'black==22.3' 'snakefmt==0.6' 'pytest>=6.0' pytest-cov pytest-xdist pytest-sugar myst-parser sphinx sphinx-argparse
 
 ## doc:       build HTML documentation
 doc:
@@ -38,7 +38,9 @@ clean:
 ## style:     check code style vs Black
 style:
 	black --line-length=99 --check microhapulator/*.py microhapulator/*/*.py setup.py
+	snakefmt --line-length=99 --check microhapulator/Snakefile
 
 ## format:    autoformat Python code
 format:
-	black --line-length=99 microhapulator/*.py microhapulator/*/*.py setup.py
+	black --line-length=99 microhapulator/*.py microhapulator/
+	snakefmt --line-length=99 microhapulator/Snakefile

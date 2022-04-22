@@ -17,6 +17,7 @@ from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
+from microhapulator.parsers import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
 import numpy as np
 import os
@@ -570,23 +571,27 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     return result
 
 
-def read_length_dist(fastq, outfile, scale=1000, title=None):
+def read_length_dist(fastq, outfile, xlabel="Read Length (bp)", xlim=None, scale=1000, title=None):
     """Plot distribution of read lengths
 
     :param str fastq: path of a FASTQ file containing NGS reads
     :param str outfile: path of a graphic file to create
+    :param str xlabel: label for the X axis
+    :param tuple xlim: a 2-tuple of numbers (x1, x2) representing the start and end points of the portion of the X axis to be displayed; by default this is determined automatically
     :param float scale: scaling factor for the Y axis
     :param str title: title for the plot
     """
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
     lengths = list()
-    with open(fastq, "r") as fh:
+    with mhopen(fastq, "r") as fh:
         for record in SeqIO.parse(fh, "fastq"):
             lengths.append(len(record))
     fig = plt.figure(figsize=(6, 4), dpi=200)
     plt.hist(lengths, bins=25, weights=[1 / scale] * len(lengths), edgecolor="#000099")
-    plt.xlim(0, 500)
+    if xlim is None:
+        xlim = (min(lengths) * 0.9, max(lengths) * 1.1)
+    plt.xlim(*xlim)
     ax = plt.gca()
     ax.yaxis.grid(True, color="#DDDDDD")
     ax.set_axisbelow(True)
@@ -595,7 +600,7 @@ def read_length_dist(fastq, outfile, scale=1000, title=None):
     ax.spines["left"].set_visible(False)
     ax.spines["bottom"].set_color("#CCCCCC")
     ax.tick_params(left=False)
-    ax.set_xlabel("Length of Merged Read Pair (bp)", labelpad=15, fontsize=16)
+    ax.set_xlabel(xlabel, labelpad=15, fontsize=16)
     ax.set_ylabel(f"Frequency (× {scale})", labelpad=15, fontsize=16)
     if title:
         ax.set_title(title, pad=25, fontsize=18)

@@ -15,4 +15,5 @@ microhapulator/tests/data/bam/sandawe-dad.bam.bai
 docs/_build/
 build/
 microhapulator/data/hg38.fasta.gz*
+.snakemake/
 .vscode/

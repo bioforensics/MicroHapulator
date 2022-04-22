@@ -1,0 +1,235 @@
+# -------------------------------------------------------------------------------------------------
+# Copyright (c) 2022, DHS.
+#
+# This file is part of MicroHapulator (https://github.com/bioforensics/microhapulator) and is
+# licensed under the BSD license: see LICENSE.txt.
+#
+# This software was prepared for the Department of Homeland Security (DHS) by the Battelle National
+# Biodefense Institute, LLC (BNBI) as part of contract HSHQDC-15-C-00064 to manage and operate the
+# National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
+# Development Center.
+# -------------------------------------------------------------------------------------------------
+
+from glob import glob
+from microhapulator import api as mhapi
+from microhapulator.pipeaux import full_reference_index_files, final_html_report, aggregate_summary
+from microhapulator.profile import TypingResult
+from os import symlink
+import pandas as pd
+from pkg_resources import resource_filename
+
+
+rule report:
+    input:
+        "analysis/summary.tsv",
+        expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
+        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
+        resource_filename("microhapulator", "data/template.html"),
+    output:
+        "report.html",
+    run:
+        summary = pd.read_csv("analysis/summary.tsv", sep="\t")
+        final_html_report(config["samples"], summary)
+
+
+rule summary:
+    input:
+        expand("analysis/{sample}/flash.log", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-mapped-reads.txt", sample=config["samples"]),
+        expand(
+            "analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
+            sample=config["samples"],
+        ),
+        expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-interlocus-balance-chisq.txt", sample=config["samples"]),
+        expand(
+            "analysis/{sample}/{sample}-heterozygote-balance-pttest.txt",
+            sample=config["samples"],
+        ),
+    output:
+        tsv="analysis/summary.tsv",
+    run:
+        summary = aggregate_summary(config["samples"])
+        summary.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+
+
+rule fastqc:
+    input:
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+    output:
+        r1="analysis/{sample}/fastqc/R1-fastqc.html",
+        r2="analysis/{sample}/fastqc/R2-fastqc.html",
+    threads: 2
+    run:
+        shell("fastqc --outdir analysis/{wildcards.sample}/fastqc/ --threads {threads} {input}")
+        outfiles = sorted(glob(f"analysis/{wildcards.sample}/fastqc/*.html"))
+        for end, outfile in enumerate(outfiles, 1):
+            outfile = Path(outfile)
+            linkfile = f"analysis/{wildcards.sample}/fastqc/R{end}-fastqc.html"
+            symlink(outfile.name, linkfile)
+
+
+rule merge:
+    input:
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+    output:
+        mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
+        log="analysis/{sample}/flash.log",
+    threads: 8
+    shell:
+        """
+        flash --min-overlap=25 --max-overlap=300 --allow-outies \
+            --threads={threads} --max-mismatch-density=0.25 \
+            --output-prefix analysis/{wildcards.sample}/{wildcards.sample} \
+            {input} \
+            2>&1 | tee {output.log}
+        """
+
+
+rule read_length_distributions:
+    input:
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        rules.merge.output.mergedfq,
+    output:
+        r1="analysis/{sample}/{sample}-r1-read-lengths.png",
+        r2="analysis/{sample}/{sample}-r2-read-lengths.png",
+        merged="analysis/{sample}/{sample}-merged-read-lengths.png",
+    run:
+        mhapi.read_length_dist(input[0], output.r1, title=f"{wildcards.sample} R1")
+        mhapi.read_length_dist(input[1], output.r2, title=f"{wildcards.sample} R2")
+        mhapi.read_length_dist(
+            input[2],
+            output.merged,
+            xlabel="Length of Merged Read Pair (bp)",
+            title=wildcards.sample,
+        )
+
+
+rule copy_and_index_marker_data:
+    input:
+        tsv=config["mhdefn"],
+        fasta=config["mhrefr"],
+    output:
+        expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
+        fasta="marker-refr.fasta",
+        tsv="marker-definitions.tsv",
+    shell:
+        """
+        cp {input.tsv} {output.tsv}
+        cp {input.fasta} {output.fasta}
+        bwa index {output.fasta}
+        """
+
+
+rule map_sort_and_index:
+    input:
+        fastq=rules.merge.output.mergedfq,
+        fasta="marker-refr.fasta",
+        idx=expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
+    output:
+        bam="analysis/{sample}/{sample}.bam",
+        bai="analysis/{sample}/{sample}.bam.bai",
+        counts="analysis/{sample}/{sample}-mapped-reads.txt",
+    threads: 32
+    shell:
+        """
+        bwa mem -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
+        samtools index {output.bam}
+        echo -n "Total reads: " > {output.counts}
+        samtools view -c -F 2304 {output.bam} >> {output.counts}
+        echo -n "Mapped reads: " >> {output.counts}
+        samtools view -c -F 2308 {output.bam} >> {output.counts}
+        """
+
+
+rule call_haplotypes:
+    input:
+        marker_defn=config["mhdefn"],
+        bam=rules.map_sort_and_index.output.bam,
+    output:
+        typing_result="analysis/{sample}/{sample}-type-raw.json",
+    shell:
+        "mhpl8r type {input} --out {output}"
+
+
+rule check_typing_rate:
+    input:
+        json=rules.call_haplotypes.output.typing_result,
+    output:
+        tsv="analysis/{sample}/{sample}-typing-rate.tsv",
+    run:
+        result = TypingResult(fromfile=input.json)
+        rates = result.typing_rate()
+        rates.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+
+
+rule apply_filters:
+    input:
+        json=rules.call_haplotypes.output.typing_result,
+    output:
+        genotype_call="analysis/{sample}/{sample}-type.json",
+    shell:
+        "mhpl8r filter {input} --out {output} --static 5 --dynamic 0.02"
+
+
+rule interlocus_balance:
+    input:
+        result=rules.apply_filters.output.genotype_call,
+    output:
+        counts="analysis/{sample}/{sample}-marker-read-counts.csv",
+        plot="analysis/{sample}/{sample}-interlocus-balance.png",
+        log="analysis/{sample}/{sample}-interlocus-balance-chisq.txt",
+    shell:
+        """
+        mhpl8r locbalance {input} --csv {output.counts} --figure {output.plot} --title {wildcards.sample} --quiet \
+            | tee {output.log}
+        """
+
+
+rule heterozygote_balance:
+    input:
+        result=rules.apply_filters.output.genotype_call,
+    output:
+        counts="analysis/{sample}/{sample}-het-marker-allele-counts.csv",
+        plot="analysis/{sample}/{sample}-heterozygote-balance.png",
+        log="analysis/{sample}/{sample}-heterozygote-balance-pttest.txt",
+    shell:
+        """
+        mhpl8r hetbalance {input} --csv {output.counts} --figure {output.plot} --title {wildcards.sample} --labels \
+            | tee {output.log}
+        """
+
+
+rule download_full_reference:
+    output:
+        full_reference_index_files(config["hg38path"]),
+    shell:
+        """
+        echo 'WARNING: if you have not previously downloaded and indexed the GRCh38 assembly for use with MicroHapulator, this can take an hour or more!!!'
+        mhpl8r getrefr
+        """
+
+
+rule map_full_reference:
+    input:
+        refr=config["hg38path"],
+        fastq=rules.merge.output.mergedfq,
+    output:
+        bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
+        bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
+        counts="analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
+    threads: 32
+    shell:
+        """
+        bwa mem -t {threads} {input} | samtools view -b | samtools sort -o {output.bam}
+        samtools index {output.bam}
+        echo -n "Total reads: " > {output.counts}
+        samtools view -c -F 2304 {output.bam} >> {output.counts}
+        echo -n "Mapped reads: " >> {output.counts}
+        samtools view -c -F 2308 {output.bam} >> {output.counts}
+        """
