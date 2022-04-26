@@ -16,6 +16,7 @@ Otherwise, refer to the table of contents below for links to various manuals, in
 
 install
 primer
+typing
 manual
 config
 devel
