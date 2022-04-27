@@ -10,14 +10,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - New `typing_rate` method for the TypingResult class (#127).
 - New API function for plotting distribution of read lengths (#128).
 - New CLI entry point for downloading GRCh38 (#130).
-- New end-to-end microhap analysis pipeline and report (#129).
+- New end-to-end microhap analysis pipeline and report (#129, #132).
 
 ### Changed
-- Interlocus balance code updated to support generating high-resolution graphics and performing a chi-square goodness-of-fit test (#121, #131).
+- Interlocus balance code updated to support generating high-resolution graphics and performing a chi-square goodness-of-fit test (#121, #131, #132).
 
 ### Fixed
 - Bug with filtering/genotype calling for markers with no valid reads (#123).
-- Set 0.01 as a more reasonable default frequency for rare alleles than 0.001 (#131).
+- Set 0.01 as a more reasonable default frequency for rare alleles than 0.001 (#131, #132).
 
 
 ## [0.5] 2022-01-20

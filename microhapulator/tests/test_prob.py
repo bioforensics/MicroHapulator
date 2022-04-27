@@ -64,6 +64,7 @@ def test_prob_cli_lrt(capsys):
         data_file("freq/korea-5loc-freq.tsv"),
         data_file("prof/korea-5loc.json"),
         data_file("prof/korea-5loc-1diff.json"),
+        "--erate=0.001",
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.prob.main(args)

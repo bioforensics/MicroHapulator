@@ -1,76 +1,79 @@
 # User Manual
 
+> *This document is intended as a practical "operator's manual" for the MicroHapulator software, and it assumes the reader is familiar with the relevant concepts and terminology.
+> A brief overview of MicroHapulator's core haplotype calling procedure is provided [here](typing.md), and those needing a bit more background can find a primer on forensic DNA typing [here](primer.md).
+> Consult your system administrator if you need assistance [installing MicroHapulator](install.md) on your machine.
+> And if you want to test drive MicroHapulator without installing it on your machine, click on the "launch binder" button to run an interactive demo in the cloud.*
+>
+> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/main?filepath=binder%2Fdemo.ipynb)
+
+
 ## Overview
 
-Microhaplotypes are versatile and effective genetic markers for human forensics, matching or exceeding the power of conventional STR markers for identification and mixture deconvolution without stutter artifacts that complicate analysis and forensic interpretation.
-In the literature, a microhaplotype (MH) has been defined as a set of SNPs [^f] residing in close proximity in the genome, such that a single NGS read is capable of spanning the entire set.
-This allows each read to not only genotype individual SNPs, but also to empirically phase the SNP alleles and determine the haplotype.
-Genotyping of individual SNPs followed by statistical haplotype phasing procedures is not appropriate in a forensic context and does not leverage the defining characteristics of MH markers.
-MicroHapulator implements the first cross-platform empirical haplotype caller designed specifically for MHs.
+**MicroHapulator** is software for empirical haplotype calling and analysis of microhaplotype (MH) from NGS data.
+It can be configured for use with any published or custom panel.
+In addition to comprehensive quality control checks and basic interpretation features, MicroHapulator output can be readily formatted for compatibility with popular probabilistic genotyping programs for robust forensic interpretation.
 
-The MicroHapulator software is run by calling the `mhpl8r` command in a shell terminal.
+The MicroHapulator software is run by calling the `mhpl8r` command in a UNIX shell terminal (using e.g. the Windows Subsystem for Linux or the "Terminal" program in MacOS).
 Using the terminal can be intimidating for the uninitiated, so this manual is written to be acommodating of all users.
-Forensic practicioners routinely perform tasks and analyses that are much more complex than MicroHapulator's interface, so we are confident that the command line interface will not be an obstacle to interested users.
+Forensic practicioners routinely perform tasks and analyses that are much more complex than MicroHapulator's interface, so we are confident that the command line will not be an obstacle to interested users.
 
 
-## Processing workflow
+## End-to-end Workflow Execution
 
-The MicroHapulator data processing workflow is broken up roughly into three phases.
+Most users will want to run the entire MicroHapulator workflow end-to-end with a single command.
+The `mhpl8r pipe` procedure accepts one or more samples as input and—resources permitting—will process multiple samples in parallel.
+This command executes all core preprocessing and analysis workflow steps, as well as some additional quality control checks, and collates all results into a single human-readable report.
 
-1. preprocessing
-2. haplotype calling
-3. analysis and interpretation
+Prior to executing the workflow, the user will need to have the following inputs ready.
 
-In the preprocessing phase, read pairs are merged and then aligned to MH reference sequences.
-In the haplotype calling phase, read alignments are processed one at a time to genotype and phase the SNPs of interest and to tally observed haplotypes.
-In the analysis and interpretation phase, various characteristics of the haplotype calls are examined to assess one or more forensic hypotheses.
+- MH marker reference sequences in FASTA format (see [the config docs](config.md))
+- MH marker definitions (SNP offsets) in TSV format (see [the config docs](config.md))
+- A pair of NGS read files in FASTQ format for each sample
+    - Each FASTQ file name must include the name of the corresponding sample
+    - Sample names must be unique, and one sample name cannot be contained in another sample name
+    - All FASTQ files must be contained in a single directory
+        - If desired, the directory may be further divided into subdirectories by e.g. experiment, run, project, case, and so on; MicroHapulator will scan all subdirectories to locate FASTQ files
+        - It is OK if this directory includes FASTQ files for samples that the user does not want to analyze; any FASTQ file that does not match the user-provided sample name(s) will be ignored
 
-Before executing the workflow, it is important to configure MicroHapulator correctly.
-Be sure to read [the config docs](config.md) and prepare the three configuration files before beginning the workflow.
+> *MicroHapulator has been tested successfully on single-end Ion S5 data, but at the moment the end-to-end workflow has only been tested on paired-end reads from the Illumina MiSeq instrument.*
 
-Executing the MicroHapulator workflow with multiple commands in a stepwise fashion provides the most flexibility.
-But MicroHapulator also supports executing the entire end-to-end analysis workflow with a single command.
-This next section describes the end-to-end workflow, and subsequent sections describe how to run individual workflow commands.
-
-### End-to-end workflow execution
-
-The `mhpl8r pipe` command executes a standard MH analysis workflow in a single command.
-It is invoked as follows.
+With all of this in place, the user can invoke the end-to-end workflow as follows.
 
 ```bash
-mhpl8r pipe marker-refr.fasta marker-defn.tsv /path/to/data/dir/ SAMPLE1 SAMPLE2 SAMPLE3 --copy-input
+mhpl8r pipe marker-refr.fasta marker-defn.tsv /path/to/fastq/dir/ SAMPLE1 SAMPLE2 --workdir caseXYZ
 ```
 
-Here is a breakdown of that command.
+MicroHapulator will generate many intermediate data files throughout the workflow.
+These will be stored in the *working directory* (`caseXYZ` in this example), organized by sample.
+MicroHapulator will create this working directory if it doesn't already exist.
+When the workflow completes, the final report will be located at `caseXYZ/report.html`.
+This can be viewed in your favorite Web browser.
+The typing result and genotype prediction for each sample will be located at `caseXYZ/analysis/SAMPLENAME/SAMPLENAME-type.json`.
 
-- `mhpl8r pipe`: execute the analysis pipeline
-- `marker-refr.fasta`: FASTA file containing marker reference sequences (see [config docs](config.md) for details)
-- `marker-defn.tsv`: tabular file containing marker definitions (see [config docs](config.md) for details)
-- `/path/to/data/dir/`: absolute or relative path to a directory containing paired FASTQ files with MH sequence data
-    - MicroHapulator will scan nested directories, so FASTQ files can be organized in any number of subdirectories by experiment, run, project, case, and so on
-- `SAMPLE1 SAMPLE2 SAMPLE3`: a list of sample names
-    - alternatively, user can provide the path of a single text file containing sample names, one per line
-    - FASTQ file names must contain the name of the corresponding sample
-    - sample names must be unique, and one sample name cannot be contained in another sample name
-- `--copy-input`: optional; copy input FASTQ files into the working directory instead of symbolically linking them
-
-Other optional setting include specifying a working directory, limiting the number of CPU core threads to use for accelerating the workflow, and doing a workflow "dry run."
-Run `mhpl8r pipe --help` or consult the [CLI docs](cli.md) for a detailed description of all available workflow settings.
+The user has the option to configure various aspects of the workflow's behavior.
+For a detailed description of these options, run `mhpl8r pipe --help` in the terminal or consult the [CLI docs](cli.md) for the `mhpl8r pipe` command.
 
 
-### Preprocessing
+## Stepwise Workflow Execution
 
-NGS reads from a sample must be aligned to marker reference sequences before haplotypes can be called.
-In this manual we use the [bwa mem](http://bio-bwa.sourceforge.net/bwa.shtml) algorithm, but other algorithms such as [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) would also be appropriate to use here.
+While end-to-end execution is most convenient, users do have the option to execute individual tasks in a stepwise fashion, which gives maximum flexibility for workflow configuration.
+This section provides a detailed description of each step of the core MicroHapulator workflow, as well as some operations that are supplementary to the primary workflow.
 
-First, the marker reference sequences must be indexed to allow NGS read alignment.
-(Note, this only needs to be done once for each reference sequence file.)
+The core workflow consists of steps related to data preprocessing, haplotype calling, and quality control.
 
-```
-bwa index panel.fasta
-```
+- The preprocessing steps merge each read pair into a single sequence and then align the merged read to MH reference sequences.
+- The haplotype calling step examines each read alignment one at a time to genotype and phase the targeted SNPs and tally observed haplotypes. A filtering step is also performed to ignore low-abundance haplotypes likely resulting from sequencing error.
+- Various quality control steps can be performed to assess factors that may impact or compromise accurate haplotype calling or forensic interpretation, such as interlocus balance and heterozygote balance.
 
-Next, paired-end reads must be merged before they are aligned to the reference sequences.
+MicroHapulator also provides tools for basic interpretation which are not included in the core workflow.
+
+As with the end-to-end workflow, it is important to configure MicroHapulator correctly.
+Be sure to read [the config docs](config.md) and prepare the three configuration files before beginning the workflow.
+
+### Preprocessing: read merging
+
+Paired-end NGS reads should be merged before they are aligned to the reference sequences.
 The [FLASH program](https://ccb.jhu.edu/software/FLASH/) is recommended for this task.
 (Run `flash --help` for instructions on configuring FLASH.)
 
@@ -78,10 +81,24 @@ The [FLASH program](https://ccb.jhu.edu/software/FLASH/) is recommended for this
 flash EVD1-reads-R1.fastq.gz EVD1-reads-R2.fastq.gz --output-prefix EVD1 --allow-outies --threads 8
 ```
 
-And finally with read pairs merged, we can align, sort, and index the NGS reads.
+This step can be skipped for single-end reads.
+
+### Preprocessing: read alignment
+
+Merged reads must then be aligned to marker reference sequences before haplotypes can be called.
+In this manual we use the [bwa mem](http://bio-bwa.sourceforge.net/bwa.shtml) algorithm, but other algorithms such as [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) would also be appropriate to use here.
+
+First, the marker reference sequences must be indexed to allow NGS read alignment.
+(Note, this only needs to be done once for each reference sequence file.)
 
 ```
-bwa mem panel.fasta EVD1.extendedFrags.fastq | samtools view -bS | samtools sort -o EVD1-reads.bam -
+bwa index marker-refr.fasta
+```
+
+The we align, sort, and index the merged reads.
+
+```
+bwa mem marker-refr.fasta EVD1.extendedFrags.fastq | samtools view -bS | samtools sort -o EVD1-reads.bam -
 samtools index EVD1-reads.bam
 ```
 
@@ -90,7 +107,7 @@ samtools index EVD1-reads.bam
 With NGS reads merged and aligned to the reference, we can proceed with haplotype calling.
 
 ```
-mhpl8r type mypanel-def.tsv EVD1-reads.bam --out EVD1-result-raw.json
+mhpl8r type marker-defn.tsv EVD1-reads.bam --out EVD1-result-raw.json
 ```
 
 The initial typing result will likely include numerous erroneous haplotypes due to sequencing errors.
@@ -100,15 +117,29 @@ It is typical to apply a combination of static and dynamic abundance (in this ca
 mhpl8r filter EVD1-result-raw.json --static 10 --dynamic 0.02 --out EVD1-result.json
 ```
 
+### Quality control
+
+Interlocus balance looks at whether there are any markers with a disproportionately high or low number of aligned reads.
+This variation could be due to any combination of factors, such as primer kinetics, off-target amplification, or stochastic effects in sequencing.
+With the application of appropriate thresholds, interlocus imbalance shouldn't cause serious problems with forensic interpretation of a sample except in cases of extreme imbalance or the presence of DNA contributor(s) at very low levels in a sample.
+
+Heterozygote balance looks only at markers with two alleles, and compares the relative abundance of the major and minor alleles.
+Large differences in abundance between major and minor alleles can be a source of allelic drop-out, and should be accounted for in interpretation.
+
+The following commands can be used to plot histograms of inter<u>loc</u>us and <u>het</u>erozygote balance.
+
+```
+mhpl8r locbalance EVD1-result.json --figure EVD1-loc-balance.png --title EVD1
+mhpl8r hetbalance EVD1-result.json --figure EVD1-het-balance.png --title EVD1
+```
+
+
+
 ### Analysis and interpretation
 
 MicroHapulator provides some tools for analysis and basic interpretation of typing results.
 
 ```bash
-# Examine interlocus balance and heterozygote balance
-mhpl8r locbalance EVD1-result.json --figure EVD1-loc-balance.png --title EVD1
-mhpl8r hetbalance EVD1-result.json --figure EVD1-het-balance.png --title EVD1
-
 # Estimate minimum number of DNA contributors in a sample
 mhpl8r contrib --json EVD1-result.json
 
@@ -125,9 +156,10 @@ mhpl8r prob frequencies.tsv EVD1-result.json REF1-result.json
 mhpl8r contain EVD1-result.json REF2-result.json
 ```
 
-## Appendix: simulated data
+## Appendix: Simulated Data
 
 In addition to tools for haplotype calling, analysis, and interpretation, MicroHapulator also implements several tools for simulating genetic profiles and Illumina sequencing of those profiles.
+These were used extensively in the early stages of MicroHapulator's development, and may be useful for testing more broadly.
 
 ```
 # Simulate a mock profile—no haplotype counts, just genotype
@@ -142,6 +174,3 @@ mhpl8r unite mom.json dad.json --out kid.json
 # Simulate Illumina MiSeq sequencing of a mock profile
 mhpl8r seq mypanel-def.tsv panel.fasta mock1.json --out mock1-reads.fastq --num-reads 250000
 ```
-
-
-[^f]: Less commonly, short insertion/deletion polymorphisms (INDELs) are used to define a microhaplotype marker, but these markers are incompatible with MicroHapulator.

@@ -17,6 +17,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install
       run: |
+        sudo apt-get update
         sudo apt-get install bwa samtools fastqc
         curl -L -O http://ccb.jhu.edu/software/FLASH/FLASH-1.2.11-Linux-x86_64.tar.gz && tar -xzf FLASH-1.2.11-Linux-x86_64.tar.gz && sudo cp FLASH-1.2.11-Linux-x86_64/flash /usr/local/bin/ && rm -r FLASH-1.2.11*
         python -m pip install --upgrade pip

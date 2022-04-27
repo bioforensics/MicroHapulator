@@ -36,7 +36,7 @@ Otherwise, they must be installed manually.
 If you're setting up an environment for developing MicroHapulator, you may want to skip the procedure outlined above and use the following instead.
 
 ```bash
-conda create --new microhapulator python=3.8 flash bwa samtools
+conda create --new microhapulator python=3.8 flash bwa samtools fastqc
 conda activate microhapulator
 git clone https://github.com/bioforensics/MicroHapulator.git
 cd MicroHapulator/

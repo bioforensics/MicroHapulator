@@ -300,24 +300,24 @@ def dist(prof1, prof2):
     return hammdist
 
 
-def prob(frequencies, prof1, prof2=None, erate=0.001):
+def prob(frequencies, prof1, prof2=None, erate=0.01):
     r"""Compute a profile random match probability (RMP) or an RMP-based likelihood ratio (LR) test
 
     The LR test, when performed, assesses the relative weight of two competing propositions.
 
-    - :math:`H_p`: the genetic profiles *prof1* and *prof2* originated from the same individuals
-    - :math:`H_d`: *prof1* and *prof2* originated from two unrelated individuals in the population
+    - :math:`H_1`: the genetic profiles *prof1* and *prof2* originated from the same individuals
+    - :math:`H_2`: *prof1* and *prof2* originated from two unrelated individuals in the population
 
     The test statistic is computed as follows.
 
     .. math::
 
-        LR = \frac{P(H_p)}{P(H_d)}
+        LR = \frac{P(H_1)}{P(H_2)}
 
-    The probability :math:`P(H_p) = \epsilon^R`, where :math:`\epsilon` is the per-marker rate of
+    The probability :math:`P(H_1) = \epsilon^R`, where :math:`\epsilon` is the per-marker rate of
     genotyping error (*erate*) and :math:`R` is the number of markers with discordant genotypes
-    between profiles. The probability :math:`P(H_d)` is the RMP of *prof1*. Note that when there is
-    a perfect match between *prof1* and *prof2*, :math:`P(H_p) = 1` and the LR statistic is simply
+    between profiles. The probability :math:`P(H_2)` is the RMP of *prof1*. Note that when there is
+    a perfect match between *prof1* and *prof2*, :math:`P(H_1) = 1` and the LR statistic is simply
     the reciprocal of the RMP.
 
     Note that the LR test as formulated assumes that *prof1* and *prof2* are close matches. The

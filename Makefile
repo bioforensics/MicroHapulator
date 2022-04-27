@@ -1,5 +1,3 @@
-PYFILES := $(shell ls microhapulator/*.py | grep -v __init__.py)
-
 ## help:      print this help message and exit
 help: Makefile
 	@echo ''
@@ -8,11 +6,11 @@ help: Makefile
 
 ## test:      execute the automated test suite
 test:
-	pytest -m "not known_failing" --cov=microhapulator --doctest-modules $(PYFILES) microhapulator/*/test_*.py
+	pytest -m "not known_failing" --cov=microhapulator --doctest-modules microhapulator/
 
 ## test4:     execute the automated test suite in multithreaded mode
 test4:
-	pytest -m "not known_failing" -n 4 --cov=microhapulator --doctest-modules $(PYFILES) microhapulator/*/test_*.py
+	pytest -m "not known_failing" -n 4 --cov=microhapulator --doctest-modules microhapulator/
 
 ## devdeps:   install development dependencies
 devdeps:
@@ -42,5 +40,5 @@ style:
 
 ## format:    autoformat Python code
 format:
-	black --line-length=99 microhapulator/*.py microhapulator/
+	black --line-length=99 microhapulator/*.py microhapulator/*/*.py setup.py
 	snakefmt --line-length=99 microhapulator/Snakefile
