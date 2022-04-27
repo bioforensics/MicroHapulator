@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
-## Unreleased
+## [0.6] 2022-04-27
 
 ### Added
 - New API and CLI entry points for computing and visualizing heterozygote balance (#122, #131).

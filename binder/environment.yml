@@ -6,4 +6,4 @@ channels:
 dependencies:
   - bash_kernel
   - curl
-  - microhapulator >=0.5
+  - microhapulator >=0.6
