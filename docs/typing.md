@@ -7,7 +7,10 @@ We call this aggregate allele grouping the *MH allele*.
 Consider the following mock example.
 The first line shows the reference sequence for the `mh01USC-1pD` MH marker.
 Each subsequent line represents an NGS read aligned to the marker sequence.
-The `*` symbols denote the locations of the SNPs present in the marker, and the `.` symbols denote locations where the NGS read matches the reference.
+The `*` symbols denote the locations of the SNPs that define the marker, and the `.` symbols denote locations where the NGS read matches the reference.
+
+> *MicroHapulator considers only those SNPs that are explicitly indicated in the MH marker definition (see [the config docs](config.md) for details).
+> Currently, it does not report or incorporate any additional rare SNPs that may be present at the locus.*
 
 ```
                        *                     *           *

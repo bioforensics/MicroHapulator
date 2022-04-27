@@ -26,8 +26,8 @@ def subparser(subparsers):
         "--erate",
         type=float,
         metavar="ε",
-        default=0.001,
-        help="rate of genotyping error; by default ε=0.001",
+        default=0.01,
+        help="rate of genotyping error; by default ε=0.01",
     )
     cli.add_argument(
         "-o",
