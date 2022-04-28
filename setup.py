@@ -29,6 +29,7 @@ setup(
     packages=["microhapulator", "microhapulator.cli", "microhapulator.tests"],
     package_data={
         "microhapulator": [
+            "microhapulator/Snakefile",
             "microhapulator/data/*",
             "microhapulator/tests/data/*",
             "microhapulator/tests/data/*/*",

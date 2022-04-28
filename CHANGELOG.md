@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.1] 2022-04-27
+
+### Fixed
+- Bug with Snakefile not being included in package data.
+
 
 ## [0.6] 2022-04-27
 
