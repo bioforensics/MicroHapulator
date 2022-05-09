@@ -137,6 +137,24 @@ def subparser(subparsers):
         help="copy input files to working directory; by default, input files are symlinked",
     )
     cli.add_argument(
+        "--targets",
+        metavar="T",
+        nargs="+",
+        default=None,
+        help="specify one or more filenames or rules to run only part of the workflow",
+    )
+    graphargs = cli.add_mutually_exclusive_group()
+    graphargs.add_argument(
+        "--dag",
+        action="store_true",
+        help="print workflow DAG",
+    )
+    graphargs.add_argument(
+        "--rulegraph",
+        action="store_true",
+        help="print workflow rulegraph",
+    )
+    cli.add_argument(
         "--hg38",
         default=resource_filename("microhapulator", "data/hg38.fasta.gz"),
         help=SUPPRESS,
@@ -178,10 +196,12 @@ def main(args):
     success = snakemake(
         snakefile,
         cores=args.threads,
-        printshellcmds=True,
-        dryrun=args.dryrun,
         config=config,
         workdir=args.workdir,
+        dryrun=args.dryrun,
+        printshellcmds=True,
+        printdag=args.dag,
+        printrulegraph=args.rulegraph,
     )
     if not success:
         return 1
