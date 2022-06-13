@@ -49,8 +49,9 @@ def test_pipe_gbr_usc10(tmp_path):
         "gbr-usc",
         "--workdir",
         str(tmp_path),
-        "--threads",
-        "1",
+        "--threads=1",
+        "--static=5",
+        "--dynamic=0.02",
         "--hg38",
         hg38,
     ]

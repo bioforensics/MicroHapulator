@@ -132,6 +132,29 @@ def subparser(subparsers):
         help="process each batch using T threads; by default, one thread per available core is used",
     )
     cli.add_argument(
+        "-s",
+        "--static",
+        metavar="ST",
+        type=int,
+        default=None,
+        help="global fixed read count threshold",
+    )
+    cli.add_argument(
+        "-d",
+        "--dynamic",
+        metavar="DT",
+        type=float,
+        default=None,
+        help="global percentage of total read count threshold; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold",
+    )
+    cli.add_argument(
+        "-c",
+        "--config",
+        metavar="CSV",
+        default=None,
+        help="CSV file specifying marker-specific thresholds to override global thresholds; three required columns: 'Marker' for the marker name; 'Static' and 'Dynamic' for marker-specific thresholds",
+    )
+    cli.add_argument(
         "--copy-input",
         action="store_true",
         help="copy input files to working directory; by default, input files are symlinked",
@@ -173,6 +196,9 @@ def main(args):
         mhrefr=Path(args.markerrefr).resolve(),
         mhdefn=Path(args.markerdefn).resolve(),
         hg38path=Path(args.hg38).resolve(),
+        thresh_static=args.static,
+        thresh_dynamic=args.dynamic,
+        thresh_file=args.config,
     )
     snakefile = resource_filename("microhapulator", "Snakefile")
     success = snakemake(
