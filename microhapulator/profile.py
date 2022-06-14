@@ -372,7 +372,7 @@ class TypingResult(Profile):
             totalcount = sum(hapcounts.values())
             filteredcount = 0
             if markerstatic is not None and markerstatic > 0:
-                self.data["markers"][marker]["thresholds"]["static"] = markerstatic
+                self.data["markers"][marker]["thresholds"]["static"] = int(markerstatic)
                 for haplotype, count in hapcounts.items():
                     if count < markerstatic:
                         filtered.add(haplotype)
