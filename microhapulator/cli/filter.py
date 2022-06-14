@@ -41,12 +41,12 @@ def subparser(subparsers):
         metavar="DT",
         type=float,
         default=None,
-        help=r"global percentage of total read count; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold",
+        help="global percentage of total read count threshold; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold",
     )
     cli.add_argument(
         "-c",
         "--config",
-        metavar="FILE",
+        metavar="CSV",
         default=None,
         help="CSV file specifying marker-specific thresholds to override global thresholds; three required columns: 'Marker' for the marker name; 'Static' and 'Dynamic' for marker-specific thresholds",
     )

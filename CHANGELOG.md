@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Added
+- Profiles compatible with probgen programs now included in pipe output (#135).
+
+### Changed
+- Exposed static and dynamic threshold configuration to pipe CLI (#135).
+
+
 ## [0.6.1] 2022-04-27
 
 ### Fixed

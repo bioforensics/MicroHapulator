@@ -23,6 +23,11 @@ rule report:
     input:
         "analysis/summary.tsv",
         expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
+        expand(
+            "analysis/{sample}/profiles/{sample}-{suffix}.csv",
+            sample=config["samples"],
+            suffix=("qual", "quant", "qual-ref", "quant-ref"),
+        ),
         expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=config["samples"]),
@@ -173,8 +178,33 @@ rule apply_filters:
         json=rules.call_haplotypes.output.typing_result,
     output:
         genotype_call="analysis/{sample}/{sample}-type.json",
+    params:
+        staticthresh=""
+        if config["thresh_static"] is None
+        else f"--static {config['thresh_static']}",
+        dynamicthresh=""
+        if config["thresh_dynamic"] is None
+        else f"--dynamic {config['thresh_dynamic']}",
+        threshfile="" if config["thresh_file"] is None else f"--config {config['thresh_file']}",
     shell:
-        "mhpl8r filter {input} --out {output} --static 5 --dynamic 0.02"
+        "mhpl8r filter {input} --out {output} {params.staticthresh} {params.dynamicthresh} {params.threshfile}"
+
+
+rule profile_convert:
+    input:
+        json=rules.apply_filters.output.genotype_call,
+    output:
+        qual="analysis/{sample}/profiles/{sample}-qual.csv",
+        quant="analysis/{sample}/profiles/{sample}-quant.csv",
+        qualref="analysis/{sample}/profiles/{sample}-qual-ref.csv",
+        quantref="analysis/{sample}/profiles/{sample}-quant-ref.csv",
+    shell:
+        """
+        mhpl8r convert {input} {wildcards.sample} --out {output[0]} --no-counts
+        mhpl8r convert {input} {wildcards.sample} --out {output[1]}
+        mhpl8r convert {input} {wildcards.sample} --out {output[2]} --no-counts --fix-homo
+        mhpl8r convert {input} {wildcards.sample} --out {output[3]} --fix-homo
+        """
 
 
 rule interlocus_balance:
