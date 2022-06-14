@@ -22,6 +22,7 @@ from microhapulator.profile import SimulatedProfile, TypingResult
 import numpy as np
 import os
 import pandas as pd
+from pathlib import Path
 import pysam
 import re
 from scipy.stats import chisquare, ttest_rel
@@ -605,4 +606,53 @@ def read_length_dist(fastq, outfile, xlabel="Read Length (bp)", xlim=None, scale
     if title:
         ax.set_title(title, pad=25, fontsize=18)
     plt.savefig(outfile, bbox_inches="tight")
+    plt.switch_backend(backend)
+
+
+def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ignore_low=True):
+    """Plot haplotype calls for each marker in a typing result
+
+    :param microhapulator.profile.TypingResult result: a typing result
+    :param Path outdir: Path object or string indicating the directory to which the graphics files will be saved
+    :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
+    :param boolean plot_marker_name: flag indicating whether to plot the marker name as subtitle
+    :param boolean ignore_low: flag indicating whether to exclude haplotypes that fall below the detection threshold (when provided)
+    """
+    backend = matplotlib.get_backend()
+    plt.switch_backend("Agg")
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    for marker in result.markers():
+        count_dict = result.allele_counts(marker)
+        mdata = result.data["markers"][marker]
+        if ignore_low and "thresholds" in mdata and "static" in mdata["thresholds"]:
+            static = mdata["thresholds"]["static"]
+            count_dict = {allele: count for allele, count in count_dict.items() if count >= static}
+        counts = count_dict.values()
+        alleles = count_dict.keys()
+        fig = plt.figure(figsize=(4, 4), dpi=150)
+        plt.bar(range(len(counts)), counts)
+        if len(counts) == 1:
+            plt.xticks(range(len(counts)), labels=alleles)
+        else:
+            plt.xticks(range(len(counts)), labels=alleles, rotation=45, ha="right")
+        plt.xlabel("Observed MH Alleles", fontsize=14)
+        plt.ylabel("Read Count", fontsize=14)
+        if "thresholds" in mdata and "dynamic" in mdata["thresholds"]:
+            dynamic = mdata["thresholds"]["dynamic"]
+            plt.axhline(y=dynamic, color="red", linestyle="--", label=f"Dynamic Threshold")
+            plt.legend()
+        plt.gca().yaxis.grid(True, color="#DDDDDD")
+        plt.gca().set_axisbelow(True)
+        plt.gca().spines["top"].set_visible(False)
+        plt.gca().spines["right"].set_visible(False)
+        plt.gca().spines["left"].set_visible(False)
+        plt.gca().spines["bottom"].set_color("#CCCCCC")
+        if plot_marker_name:
+            plt.title(marker)
+        if sample:
+            plt.suptitle(sample)
+        filename = outdir / f"{marker}.png"
+        plt.savefig(filename, bbox_inches="tight")
+        plt.close()
     plt.switch_backend(backend)

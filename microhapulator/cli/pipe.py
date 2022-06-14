@@ -131,27 +131,31 @@ def subparser(subparsers):
         default=cpu_count(),
         help="process each batch using T threads; by default, one thread per available core is used",
     )
+    # Normally the defaults for the next three arguments would be `None`. But the values are passed
+    # to Snakemake, which intermittently casts NoneTypes as a string, causing issues with the
+    # downstream code; e.g., attempts to open a non-existent `None` file. The empty string defaults
+    # and the lambda functions for data types are a workaround.
     cli.add_argument(
         "-s",
         "--static",
         metavar="ST",
-        type=int,
-        default=None,
+        type=lambda a: "" if a == "" else int(a),
+        default="",
         help="global fixed read count threshold",
     )
     cli.add_argument(
         "-d",
         "--dynamic",
         metavar="DT",
-        type=float,
-        default=None,
+        type=lambda a: "" if a == "" else float(a),
+        default="",
         help="global percentage of total read count threshold; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold",
     )
     cli.add_argument(
         "-c",
         "--config",
         metavar="CSV",
-        default=None,
+        default="",
         help="CSV file specifying marker-specific thresholds to override global thresholds; three required columns: 'Marker' for the marker name; 'Static' and 'Dynamic' for marker-specific thresholds",
     )
     cli.add_argument(

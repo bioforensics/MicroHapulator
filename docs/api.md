@@ -26,6 +26,10 @@ In brief, this means that every stable version of the MicroHapulator software is
 ```
 
 ```{eval-rst}
+.. autofunction:: microhapulator.api.plot_haplotype_calls
+```
+
+```{eval-rst}
 .. autofunction:: microhapulator.api.heterozygote_balance
 ```
 

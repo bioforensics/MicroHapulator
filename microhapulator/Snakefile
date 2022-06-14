@@ -34,6 +34,7 @@ rule report:
         expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
+        expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
     output:
         "report.html",
@@ -179,15 +180,11 @@ rule apply_filters:
     output:
         genotype_call="analysis/{sample}/{sample}-type.json",
     params:
-        staticthresh=""
-        if config["thresh_static"] is None
-        else f"--static {config['thresh_static']}",
-        dynamicthresh=""
-        if config["thresh_dynamic"] is None
-        else f"--dynamic {config['thresh_dynamic']}",
-        threshfile="" if config["thresh_file"] is None else f"--config {config['thresh_file']}",
+        static="" if config["thresh_static"] == "" else f"--static {config['thresh_static']}",
+        dynamic="" if config["thresh_dynamic"] == "" else f"--dynamic {config['thresh_dynamic']}",
+        threshfile="" if config["thresh_file"] == "" else f"--config {config['thresh_file']}",
     shell:
-        "mhpl8r filter {input} --out {output} {params.staticthresh} {params.dynamicthresh} {params.threshfile}"
+        "mhpl8r filter {input} --out {output} {params.static} {params.dynamic} {params.threshfile}"
 
 
 rule profile_convert:
@@ -233,6 +230,18 @@ rule heterozygote_balance:
         mhpl8r hetbalance {input} --csv {output.counts} --figure {output.plot} --title {wildcards.sample} --labels \
             | tee {output.log}
         """
+
+
+rule plot_haplotype_calls:
+    input:
+        result=rules.apply_filters.output.genotype_call,
+    output:
+        sentinel=touch("analysis/{sample}/callplots/.done"),
+    run:
+        result = TypingResult(fromfile=input.result)
+        mhapi.plot_haplotype_calls(
+            result, f"analysis/{wildcards.sample}/callplots", sample=wildcards.sample
+        )
 
 
 rule download_full_reference:

@@ -27,6 +27,10 @@ import sys
 SCHEMA = None
 
 
+class RandomMatchError(ValueError):
+    pass
+
+
 def load_schema():
     with mhopen(package_file("data/profile-schema.json"), "r") as fh:
         return json.load(fh)
@@ -365,27 +369,35 @@ class TypingResult(Profile):
             if markerstatic is None and markerdynamic is None:
                 # No thresholds for calling haplotypes, just report raw haplotype counts
                 continue
+            self.data["markers"][marker]["thresholds"] = dict()
             hapcounts = mdata["typing_result"]
             genotype_call = set()
             filtered = set()
             totalcount = sum(hapcounts.values())
             filteredcount = 0
             if markerstatic is not None and markerstatic > 0:
+                self.data["markers"][marker]["thresholds"]["static"] = int(markerstatic)
                 for haplotype, count in hapcounts.items():
                     if count < markerstatic:
                         filtered.add(haplotype)
                         filteredcount += count
             if markerdynamic is not None and markerdynamic > 0.0:
+                threshold = (totalcount - filteredcount) * markerdynamic
+                self.data["markers"][marker]["thresholds"]["dynamic"] = threshold
                 for haplotype, count in hapcounts.items():
-                    if haplotype in filtered:
-                        continue
-                    if count < (totalcount - filteredcount) * markerdynamic:
+                    if count < threshold:
                         filtered.add(haplotype)
-                    else:
-                        genotype_call.add(haplotype)
+            for haplotype, count in hapcounts.items():
+                if haplotype not in filtered:
+                    genotype_call.add(haplotype)
             self.data["markers"][marker]["genotype"] = [
                 {"haplotype": ht} for ht in sorted(genotype_call)
             ]
+
+    def allele_counts(self, marker):
+        if marker not in self.data["markers"]:
+            raise IndexError(marker)
+        return self.data["markers"][marker]["typing_result"]
 
     def dump_csv(self, outfile, samplename, counts=True, fix_homo=False):
         max_haps = 0

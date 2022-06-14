@@ -146,6 +146,7 @@
             <a name="filters"></a>
             <h2>Genotype Calling</h2>
             <p>Fixed detection thresholds and dynamic analytical thresholds are applied to the typing result using <code>mhpl8r filter</code> to discriminate true and erroneous haplotypes and predict each sample's genotype. MicroHapulator applied a static filter of <strong>≥{{static}} reads</strong> as a detection threshold and a dynamic filter of <strong>≥{{"{:.1f}".format(dynamic*100)}}% of total reads</strong>.</p>
+            <p>Plots of the genotype calls, including the thresholds used to distinguish true haplotypes from false haplotypes, are available in each <code>analysis/{samplename}/callplots/</code> subdirectory, one graphics file per marker.</p>
 
             <p>The following figures show the heterozygote balance for each sample.
             {% for plot in plots["hetbalance"] %}
