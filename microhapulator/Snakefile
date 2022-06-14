@@ -180,17 +180,11 @@ rule apply_filters:
     output:
         genotype_call="analysis/{sample}/{sample}-type.json",
     params:
-        staticthresh=""
-        if config["thresh_static"] in (None, "None")
-        else f"--static {config['thresh_static']}",
-        dynamicthresh=""
-        if config["thresh_dynamic"] in (None, "None")
-        else f"--dynamic {config['thresh_dynamic']}",
-        threshfile=""
-        if config["thresh_file"] in (None, "None")
-        else f"--config {config['thresh_file']}",
+        static="" if config["thresh_static"] == "" else f"--static {config['thresh_static']}",
+        dynamic="" if config["thresh_dynamic"] == "" else f"--dynamic {config['thresh_dynamic']}",
+        threshfile="" if config["thresh_file"] == "" else f"--config {config['thresh_file']}",
     shell:
-        "mhpl8r filter {input} --out {output} {params.staticthresh} {params.dynamicthresh} {params.threshfile}"
+        "mhpl8r filter {input} --out {output} {params.static} {params.dynamic} {params.threshfile}"
 
 
 rule profile_convert:
