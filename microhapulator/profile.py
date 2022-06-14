@@ -415,7 +415,7 @@ class TypingResult(Profile):
             entry = [samplename, marker, *haplotypes, *hapcounts]
             entries.append(entry)
         table = pd.DataFrame(entries, columns=column_names)
-        table.to_csv(outfile, index=False)
+        table.to_csv(outfile, index=False, float_format="%d")
 
     def typing_rate(self):
         data = {

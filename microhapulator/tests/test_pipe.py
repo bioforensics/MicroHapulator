@@ -65,3 +65,8 @@ def test_pipe_gbr_usc10(tmp_path):
     expected = pd.read_csv(data_file("gbr-usc-summary.tsv"), sep="\t")
     observed = pd.read_csv(tmp_path / "analysis" / "summary.tsv", sep="\t")
     assert observed.equals(expected)
+    profile = tmp_path / "analysis" / "gbr-usc" / "profiles" / "gbr-usc-quant.csv"
+    assert profile.is_file()
+    expected = pd.read_csv(data_file("gbr-usc-profile.csv"))
+    observed = pd.read_csv(profile)
+    assert observed.equals(expected)
