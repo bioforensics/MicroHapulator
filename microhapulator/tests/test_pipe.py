@@ -10,6 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from glob import glob
 import microhapulator
 import microhapulator.api as mhapi
 from microhapulator.profile import SimulatedProfile, TypingResult
@@ -70,3 +71,18 @@ def test_pipe_gbr_usc10(tmp_path):
     expected = pd.read_csv(data_file("gbr-usc-profile.csv"))
     observed = pd.read_csv(profile)
     assert observed.equals(expected)
+
+
+@pytest.mark.parametrize(
+    "filepath,samplename,plotmarker",
+    [
+        ("prof/gujarati-ind1-gt-filt.json", "Guj1", True),
+        ("prof/gujarati-ind2-gt-filt.json", "Guj2", False),
+        ("prof/gujarati-ind3-gt-filt.json", None, True),
+    ],
+)
+def test_plot_haplotype_calls(filepath, samplename, plotmarker, tmp_path):
+    result = TypingResult(fromfile=data_file(filepath))
+    mhapi.plot_haplotype_calls(result, tmp_path, sample=samplename, plot_marker_name=plotmarker)
+    pngs = glob(str(tmp_path / "*.png"))
+    assert len(pngs) == 4

@@ -22,6 +22,7 @@ from microhapulator.profile import SimulatedProfile, TypingResult
 import numpy as np
 import os
 import pandas as pd
+from pathlib import Path
 import pysam
 import re
 from scipy.stats import chisquare, ttest_rel
@@ -605,4 +606,48 @@ def read_length_dist(fastq, outfile, xlabel="Read Length (bp)", xlim=None, scale
     if title:
         ax.set_title(title, pad=25, fontsize=18)
     plt.savefig(outfile, bbox_inches="tight")
+    plt.switch_backend(backend)
+
+
+def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True):
+    """Plot haplotype calls for each marker in a typing result
+
+    :param microhapulator.profile.TypingResult result: a typing result
+    :param Path outdir: Path object or string indicating the directory to which the graphics files will be saved
+    :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
+    :param boolean plot_marker_name: flag indicating whether to plot the marker name as subtitle
+    """
+    backend = matplotlib.get_backend()
+    plt.switch_backend("Agg")
+    outdir = Path(outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    for marker in result.markers():
+        count_dict = result.allele_counts(marker)
+        counts = count_dict.values()
+        alleles = count_dict.keys()
+        fig = plt.figure(figsize=(4, 4), dpi=150)
+        plt.bar(range(len(counts)), counts)
+        plt.xticks(range(len(counts)), labels=alleles, rotation=45)
+        plt.xlabel("Observed MH Alleles", fontsize=14)
+        plt.ylabel("Read Count", fontsize=14)
+        if "thresholds" in result.data["markers"][marker]:
+            t = result.data["markers"][marker]["thresholds"]
+            static = t["static"] if "static" in t else -1
+            dynamic = t["dynamic"] if "dynamic" in t else -1
+            threshold = max(static, dynamic)
+            ttype = "Dynamic" if threshold == dynamic else "Static"
+            plt.axhline(y=threshold, color="red", linestyle="--", label=f"{ttype} Threshold")
+            plt.legend(loc="center right")
+        plt.gca().yaxis.grid(True, color="#DDDDDD")
+        plt.gca().set_axisbelow(True)
+        plt.gca().spines["top"].set_visible(False)
+        plt.gca().spines["right"].set_visible(False)
+        plt.gca().spines["left"].set_visible(False)
+        plt.gca().spines["bottom"].set_color("#CCCCCC")
+        if plot_marker_name:
+            plt.title(marker)
+        if sample:
+            plt.suptitle(sample)
+        filename = outdir / f"{marker}.png"
+        plt.savefig(filename, bbox_inches="tight")
     plt.switch_backend(backend)
