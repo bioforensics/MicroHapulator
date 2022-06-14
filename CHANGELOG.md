@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Profiles compatible with probgen programs now included in pipe output (#135).
+- Haplotype call plots now included in the HTML report (#136).
 
 ### Changed
 - Exposed static and dynamic threshold configuration to pipe CLI (#135).

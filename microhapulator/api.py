@@ -625,7 +625,7 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
     for marker in result.markers():
         count_dict = result.allele_counts(marker)
         mdata = result.data["markers"][marker]
-        if "thresholds" in mdata and "static" in mdata["thresholds"]:
+        if ignore_low and "thresholds" in mdata and "static" in mdata["thresholds"]:
             static = mdata["thresholds"]["static"]
             count_dict = {allele: count for allele, count in count_dict.items() if count >= static}
         counts = count_dict.values()
