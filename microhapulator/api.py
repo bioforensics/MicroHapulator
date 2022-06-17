@@ -62,6 +62,7 @@ def interlocus_balance(
     title=None,
     figsize=(6, 4),
     dpi=200,
+    color=None,
 ):
     """Compute interlocus balance
 
@@ -79,6 +80,7 @@ def interlocus_balance(
     :param str title: add a title (such as a sample name) to the histogram plot
     :param tuple figsize: a 2-tuple of integers indicating the dimensions of the image file to be generated
     :param int dpi: resolution (in dots per inch) of the image file to be generated
+    :param str color: override histogram plot color; green by default
     :return: a tuple (S, C) where S is the chi-square statistic, and C is a table of total read counts for each marker
     :rtype: tuple(float, pandas.DataFrame)
     """
@@ -96,7 +98,9 @@ def interlocus_balance(
         plt.figure(figsize=figsize, dpi=dpi)
         x = range(len(data))
         y = [c / 1000 for c in data.ReadCount]
-        plt.bar(x, y)
+        if color is None:
+            color = "#4daf4a"
+        plt.bar(x, y, color=color)
         plt.xticks([])
         plt.xlabel("Marker", labelpad=15, fontsize=16)
         if include_discarded:
@@ -194,8 +198,8 @@ def heterozygote_balance(
             y1 = data.Allele1Perc
             y2 = data.Allele2Perc
             ylabel = "Percentage of Read Count"
-        ax.bar(x1, y1, width=barwidth)
-        ax.bar(x2, y2, width=barwidth)
+        ax.bar(x1, y1, width=barwidth, color="#984ea3")
+        ax.bar(x2, y2, width=barwidth, color="#ff7f00")
         if dolabels:
             ax.set_xticks(x)
             ax.set_xticklabels(data.Marker, rotation=90)
@@ -572,7 +576,16 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     return result
 
 
-def read_length_dist(fastq, outfile, xlabel="Read Length (bp)", xlim=None, scale=1000, title=None):
+def read_length_dist(
+    fastq,
+    outfile,
+    xlabel="Read Length (bp)",
+    xlim=None,
+    scale=1000,
+    title=None,
+    color=None,
+    edgecolor=None,
+):
     """Plot distribution of read lengths
 
     :param str fastq: path of a FASTQ file containing NGS reads
@@ -581,6 +594,8 @@ def read_length_dist(fastq, outfile, xlabel="Read Length (bp)", xlim=None, scale
     :param tuple xlim: a 2-tuple of numbers (x1, x2) representing the start and end points of the portion of the X axis to be displayed; by default this is determined automatically
     :param float scale: scaling factor for the Y axis
     :param str title: title for the plot
+    :param str color: override histogram plot color; red by default
+    :param str edgecolor: override histogram edge color; dark red by default
     """
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
@@ -589,7 +604,13 @@ def read_length_dist(fastq, outfile, xlabel="Read Length (bp)", xlim=None, scale
         for record in SeqIO.parse(fh, "fastq"):
             lengths.append(len(record))
     fig = plt.figure(figsize=(6, 4), dpi=200)
-    plt.hist(lengths, bins=25, weights=[1 / scale] * len(lengths), edgecolor="#000099")
+    if color is None:
+        color = "#e41a1c"
+    if edgecolor is None:
+        edgecolor = "#990000"
+    plt.hist(
+        lengths, bins=25, weights=[1 / scale] * len(lengths), color=color, edgecolor=edgecolor
+    )
     if xlim is None:
         xlim = (min(lengths) * 0.9, max(lengths) * 1.1)
     plt.xlim(*xlim)
@@ -631,7 +652,7 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
         counts = count_dict.values()
         alleles = count_dict.keys()
         fig = plt.figure(figsize=(4, 4), dpi=150)
-        plt.bar(range(len(counts)), counts)
+        plt.bar(range(len(counts)), counts, color="#999999")
         if len(counts) == 1:
             plt.xticks(range(len(counts)), labels=alleles)
         else:
@@ -640,7 +661,7 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
         plt.ylabel("Read Count", fontsize=14)
         if "thresholds" in mdata and "dynamic" in mdata["thresholds"]:
             dynamic = mdata["thresholds"]["dynamic"]
-            plt.axhline(y=dynamic, color="red", linestyle="--", label=f"Dynamic Threshold")
+            plt.axhline(y=dynamic, color="#e41a1c", linestyle="--", label=f"Dynamic Threshold")
             plt.legend()
         plt.gca().yaxis.grid(True, color="#DDDDDD")
         plt.gca().set_axisbelow(True)
