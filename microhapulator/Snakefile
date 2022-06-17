@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 from glob import glob
+from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
 from microhapulator.pipeaux import full_reference_index_files, final_html_report, aggregate_summary
 from microhapulator.profile import TypingResult
@@ -106,13 +107,27 @@ rule read_length_distributions:
         r2="analysis/{sample}/{sample}-r2-read-lengths.png",
         merged="analysis/{sample}/{sample}-merged-read-lengths.png",
     run:
-        mhapi.read_length_dist(input[0], output.r1, title=f"{wildcards.sample} R1")
-        mhapi.read_length_dist(input[1], output.r2, title=f"{wildcards.sample} R2")
+        mhapi.read_length_dist(
+            input[0],
+            output.r1,
+            title=f"{wildcards.sample} R1",
+            color="#e41a1c",
+            edgecolor="#990000",
+        )
+        mhapi.read_length_dist(
+            input[1],
+            output.r2,
+            title=f"{wildcards.sample} R2",
+            color="#e41a1c",
+            edgecolor="#990000",
+        )
         mhapi.read_length_dist(
             input[2],
             output.merged,
             xlabel="Length of Merged Read Pair (bp)",
             title=wildcards.sample,
+            color="#377eb8",
+            edgecolor="#000099",
         )
 
 

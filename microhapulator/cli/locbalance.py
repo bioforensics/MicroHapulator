@@ -70,6 +70,12 @@ def subparser(subparsers):
         default=None,
         help="add a title (such as a sample name) to the histogram plot",
     )
+    cli.add_argument(
+        "--color",
+        metavar="C",
+        default=None,
+        help="override histogram plot color; green by default",
+    )
     cli.add_argument("input", help="a typing result including haplotype counts in JSON format")
 
 
@@ -83,6 +89,7 @@ def main(args):
         title=args.title,
         figsize=args.figsize,
         dpi=args.dpi,
+        color=args.color,
     )
     print(f"Extent of imbalance (chi-square statistic): {chisq:.4f}")
     if args.csv:
