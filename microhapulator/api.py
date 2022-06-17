@@ -12,7 +12,8 @@
 
 
 from Bio import SeqIO
-from collections import namedtuple, defaultdict
+from collections import namedtuple, defaultdict, Counter
+import json
 from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
@@ -578,7 +579,8 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
 
 def read_length_dist(
     fastq,
-    outfile,
+    plotfile,
+    lengthsfile=None,
     xlabel="Read Length (bp)",
     xlim=None,
     scale=1000,
@@ -589,7 +591,8 @@ def read_length_dist(
     """Plot distribution of read lengths
 
     :param str fastq: path of a FASTQ file containing NGS reads
-    :param str outfile: path of a graphic file to create
+    :param str plotfile: path of a graphic file to create
+    :param str lengthsfile: if specified, read lengths will be written to the specified file
     :param str xlabel: label for the X axis
     :param tuple xlim: a 2-tuple of numbers (x1, x2) representing the start and end points of the portion of the X axis to be displayed; by default this is determined automatically
     :param float scale: scaling factor for the Y axis
@@ -600,17 +603,19 @@ def read_length_dist(
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
     lengths = list()
-    with mhopen(fastq, "r") as fh:
-        for record in SeqIO.parse(fh, "fastq"):
+    with mhopen(fastq, "r") as infh:
+        for record in SeqIO.parse(infh, "fastq"):
             lengths.append(len(record))
+        if lengthsfile:
+            with mhopen(lengthsfile, "w") as outfh:
+                json.dump(lengths, outfh)
     fig = plt.figure(figsize=(6, 4), dpi=200)
     if color is None:
         color = "#e41a1c"
     if edgecolor is None:
         edgecolor = "#990000"
-    plt.hist(
-        lengths, bins=25, weights=[1 / scale] * len(lengths), color=color, edgecolor=edgecolor
-    )
+    weights = [1 / scale] * len(lengths)
+    plt.hist(lengths, bins=25, weights=weights, color=color, edgecolor=edgecolor)
     if xlim is None:
         xlim = (min(lengths) * 0.9, max(lengths) * 1.1)
     plt.xlim(*xlim)
@@ -626,7 +631,7 @@ def read_length_dist(
     ax.set_ylabel(f"Frequency (× {scale})", labelpad=15, fontsize=16)
     if title:
         ax.set_title(title, pad=25, fontsize=18)
-    plt.savefig(outfile, bbox_inches="tight")
+    plt.savefig(plotfile, bbox_inches="tight")
     plt.switch_backend(backend)
 
 

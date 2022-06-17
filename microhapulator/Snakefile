@@ -105,11 +105,14 @@ rule read_length_distributions:
     output:
         r1="analysis/{sample}/{sample}-r1-read-lengths.png",
         r2="analysis/{sample}/{sample}-r2-read-lengths.png",
+        l1="analysis/{sample}/{sample}-r1-read-lengths.json",
+        l2="analysis/{sample}/{sample}-r2-read-lengths.json",
         merged="analysis/{sample}/{sample}-merged-read-lengths.png",
     run:
         mhapi.read_length_dist(
             input[0],
             output.r1,
+            lengthsfile=output.l1,
             title=f"{wildcards.sample} R1",
             color="#e41a1c",
             edgecolor="#990000",
@@ -117,6 +120,7 @@ rule read_length_distributions:
         mhapi.read_length_dist(
             input[1],
             output.r2,
+            lengthsfile=output.l2,
             title=f"{wildcards.sample} R2",
             color="#e41a1c",
             edgecolor="#990000",

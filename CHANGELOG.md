@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Exposed static and dynamic threshold configuration to pipe CLI (#135).
 - Updated plot colors in the pipe HTML report (#139).
+- Updated pipe HTML report to conditionally plot read length histograms or tables depending on uniformity (#140).
 
 
 ## [0.6.1] 2022-04-27

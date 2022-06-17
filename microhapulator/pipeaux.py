@@ -65,6 +65,21 @@ def encode(filepath):
 
 
 def final_html_report(samples, summary):
+    read_length_table = list()
+    for sample in samples:
+        with open(f"analysis/{sample}/{sample}-r1-read-lengths.json") as fh:
+            r1lengths = json.load(fh)
+            r1lengths = list(set(r1lengths))
+        with open(f"analysis/{sample}/{sample}-r2-read-lengths.json") as fh:
+            r2lengths = json.load(fh)
+            r2lengths = list(set(r2lengths))
+        if len(r1lengths) != 1 or len(r2lengths) != 1:
+            read_length_table = None
+            break
+        read_length_table.append((sample, r1lengths[0], r2lengths[0]))
+    if read_length_table is not None:
+        col = ("Sample", "LengthR1", "LengthR2")
+        read_length_table = pd.DataFrame(read_length_table, columns=col)
     plots = {
         "r1readlen": list(),
         "r2readlen": list(),
@@ -92,6 +107,7 @@ def final_html_report(samples, summary):
             static=5,
             dynamic=0.02,
             zip=zip,
+            read_length_table=read_length_table,
         )
         print(output, file=outfh, end="")
 

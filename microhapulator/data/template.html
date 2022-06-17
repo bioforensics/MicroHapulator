@@ -26,6 +26,10 @@
                 margin: 12pt auto;
                 width: 100%;
             }
+            table.half {
+                margin: 12pt auto 12pt 0;
+                width: 50%;
+            }
             td, th {
                 padding: auto 5px;
             }
@@ -63,11 +67,29 @@
                 </tr>
                 {% endfor %}
             </table>
+            {% if read_length_table is none %}
             <p>The following histograms show the distribution of R1 and R2 read lengths for each sample.</p>
             {% for r1plot, r2plot in zip(plots["r1readlen"], plots["r2readlen"]) %}
             <img src="data:image/png;base64,{{r1plot}}" class="small" />
             <img src="data:image/png;base64,{{r2plot}}" class="small" />
             {% endfor %}
+            {% else %}
+            <p>Read lengths, uniform for all samples, are shown below.</p>
+            <table class="half">
+                <tr>
+                    <th>Sample</th>
+                    <th class="alnrt">Length R1</th>
+                    <th class="alnrt">Length R2</th>
+                </tr>
+                {% for i, row in read_length_table.iterrows() %}
+                <tr>
+                    <td>{{ row.Sample }}</td>
+                    <td class="alnrt">{{ row.LengthR1 }}</td>
+                    <td class="alnrt">{{ row.LengthR2 }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
 
 
             <a name="readmerging"></a>
