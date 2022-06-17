@@ -62,7 +62,10 @@ def test_pipe_gbr_usc10(tmp_path):
     observed = TypingResult(fromfile=tmp_path / "analysis" / "gbr-usc" / "gbr-usc-type.json")
     diff = list(mhapi.diff(observed, expected))
     assert len(diff) == 0
-    assert (tmp_path / "report.html").is_file()
+    report = tmp_path / "report.html"
+    assert report.is_file()
+    with open(report, "r") as fh:
+        assert "Read lengths, uniform for all samples, are shown below" in fh.read()
     expected = pd.read_csv(data_file("gbr-usc-summary.tsv"), sep="\t")
     observed = pd.read_csv(tmp_path / "analysis" / "summary.tsv", sep="\t")
     assert observed.equals(expected)
