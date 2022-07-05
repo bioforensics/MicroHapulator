@@ -1,12 +1,4 @@
-# User Manual
-
-> *This document is intended as a practical "operator's manual" for the MicroHapulator software, and it assumes the reader is familiar with the relevant concepts and terminology.
-> A brief overview of MicroHapulator's core haplotype calling procedure is provided [here](typing.md), and those needing a bit more background can find a primer on forensic DNA typing [here](primer.md).
-> Consult your system administrator if you need assistance [installing MicroHapulator](install.md) on your machine.
-> And if you want to test drive MicroHapulator without installing it on your machine, click on the "launch binder" button to run an interactive demo in the cloud.*
->
-> [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bioforensics/MicroHapulator/main?filepath=binder%2Fdemo.ipynb)
-
+# User Manual: End-to-end Workflow
 
 ## Overview
 
