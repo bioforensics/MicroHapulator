@@ -62,6 +62,15 @@ def parse_balance_stat(logfile):
 def encode(filepath):
     with open(filepath, "rb") as fh:
         return b64encode(fh.read()).decode("ascii")
+    
+
+def per_marker_typing_rate(samples):
+    sample_rates = dict()
+    for sample in samples:
+        filename = Path("analysis") / sample / f"{sample}-typing-rate.tsv"
+        sample_rates[sample] = pd.read_csv(filename, sep="\t")
+    all_rates = pd.concat([df.TypingRate for df in sample_rates.values()], axis=1, keys=sample_rates.keys())
+    return all_rates
 
 
 def final_html_report(samples, summary):
@@ -80,6 +89,7 @@ def final_html_report(samples, summary):
     if read_length_table is not None:
         col = ("Sample", "LengthR1", "LengthR2")
         read_length_table = pd.DataFrame(read_length_table, columns=col)
+    typing_rate = per_marker_typing_rate(samples)
     plots = {
         "r1readlen": list(),
         "r2readlen": list(),
@@ -108,6 +118,7 @@ def final_html_report(samples, summary):
             dynamic=0.02,
             zip=zip,
             read_length_table=read_length_table,
+            typing_rates=typing_rates,
         )
         print(output, file=outfh, end="")
 
