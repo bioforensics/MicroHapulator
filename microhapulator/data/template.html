@@ -164,9 +164,9 @@
                 </tr>
                 {% endfor %}
             </table>
-            
+
             Some explanatory text here.
-            
+
             <table>
                 <tr>
                     <th>Marker</th>
@@ -176,7 +176,7 @@
                 </tr>
                 {% for markername, row in typing_rates.iterrows() %}
                 <tr>
-                    <td>markername</td>
+                    <td>{{markername}}</td>
                     {% for sample in typing_rates.keys() %}
                     <td>{{ "{:.2f}".format(row[sample] * 100) }}%</td>
                     {% endfor %}
