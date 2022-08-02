@@ -164,6 +164,25 @@
                 </tr>
                 {% endfor %}
             </table>
+            
+            Some explanatory text here.
+            
+            <table>
+                <tr>
+                    <th>Marker</th>
+                    {% for sample in typing_rates.keys() %}
+                    <th>{{sample}}</th>
+                    {% endfor %}
+                </tr>
+                {% for markername, row in typing_rates.iterrows() %}
+                <tr>
+                    <td>markername</td>
+                    {% for sample in typing_rates.keys() %}
+                    <td>{{ "{:.2f}".format(row[sample] * 100) }}%</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
 
             <a name="filters"></a>
             <h2>Genotype Calling</h2>
