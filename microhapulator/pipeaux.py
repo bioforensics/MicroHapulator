@@ -10,7 +10,6 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-
 from base64 import b64encode
 from datetime import datetime
 from jinja2 import Template
@@ -18,6 +17,7 @@ import json
 from matplotlib import pyplot as plt
 import microhapulator
 import pandas as pd
+from microhapulator.parsers import load_marker_reference_sequences, load_marker_definitions
 from pkg_resources import resource_filename
 import re
 import sys
@@ -74,6 +74,21 @@ def per_marker_typing_rate(samples):
     )
     return all_rates
 
+def per_marker_mapping_rate(samples):
+    sample_rates = dict()
+    for sample in samples:
+        filename =  f"analysis/{sample}/{sample}-marker-read-counts.csv"
+        sample_df = pd.read_csv(filename).set_index("Marker")
+        expected_count = sample_df["ReadCount"].sum()/len(sample_df)
+        sample_df["ExpectedObservedRatio"] = round(sample_df["ReadCount"]/expected_count, 2)
+        sample_rates[sample] = sample_df
+    all_rates = pd.concat([df for df in sample_rates.values()], axis=1, keys=sample_rates.keys())
+    average_reads = all_rates.loc(axis=1)[:,'ReadCount'].sum(axis=1)/len(samples)
+    average_ratio = all_rates.loc(axis=1)[:,'ExpectedObservedRatio'].sum(axis=1)/len(samples)
+    all_rates[('Average', 'ReadCount')]  = round(average_reads ,2)
+    all_rates[('Average', 'ExpectedObservedRatio')] = round(average_ratio,2)
+    return all_rates
+
 
 def final_html_report(samples, summary):
     read_length_table = list()
@@ -92,6 +107,7 @@ def final_html_report(samples, summary):
         col = ("Sample", "LengthR1", "LengthR2")
         read_length_table = pd.DataFrame(read_length_table, columns=col)
     typing_rates = per_marker_typing_rate(samples)
+    mapping_rates = per_marker_mapping_rate(samples)
     plots = {
         "r1readlen": list(),
         "r2readlen": list(),
@@ -121,6 +137,7 @@ def final_html_report(samples, summary):
             zip=zip,
             read_length_table=read_length_table,
             typing_rates=typing_rates,
+            mapping_rates = mapping_rates
         )
         print(output, file=outfh, end="")
 
