@@ -716,6 +716,12 @@ def count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker):
 
 
 def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
+    """Count reads mapped to an off target locus in the full reference genome
+
+    :param str marker_bam_file: path of BAM file containing read alignments to marker sequences
+    :param str fullref_bam_file: path of BAM file containing read alignments to the full reference genome
+    :param str markertsv: path of a TSV file containing marker metadata including the offset of each SNP for every marker in the panel and the chromosome and coordinate of each in the reference genome
+    """
     counts = dict(
         Marker=list(),
         OffTargetReads=list(),
