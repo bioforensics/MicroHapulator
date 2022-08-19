@@ -516,6 +516,10 @@ def check_index(bamfile):
         pysam.index(bamfile)
 
 
+def skip_read(read):
+    return read.is_secondary or read.is_supplementary or read.is_duplicate or read.is_qcfail
+
+
 def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
     for locusid in sorted(offsets):
@@ -684,23 +688,6 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
     plt.switch_backend(backend)
 
 
-def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
-    counts = dict(
-        Marker=list(),
-        OffTargetReads=list(),
-    )
-    marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
-    all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
-    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
-    for marker in set(all_marker_defs.index):
-        marker_def = all_marker_defs.loc[marker]
-        off_target_count = count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker)
-        counts["Marker"].append(marker)
-        counts["OffTargetReads"].append(off_target_count)
-    data = pd.DataFrame(counts).reset_index(drop=True)
-    return data
-
-
 def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
     reads_to_marker = defaultdict(str)
@@ -728,5 +715,18 @@ def count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker):
     return off_target_count
 
 
-def skip_read(read):
-    return read.is_secondary or read.is_supplementary or read.is_duplicate or read.is_qcfail
+def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
+    counts = dict(
+        Marker=list(),
+        OffTargetReads=list(),
+    )
+    marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
+    all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
+    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
+    for marker in set(all_marker_defs.index):
+        marker_def = all_marker_defs.loc[marker]
+        off_target_count = count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker)
+        counts["Marker"].append(marker)
+        counts["OffTargetReads"].append(off_target_count)
+    data = pd.DataFrame(counts).reset_index(drop=True)
+    return data
