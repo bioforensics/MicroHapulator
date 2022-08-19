@@ -5,53 +5,6 @@
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen">
 
     <title>MicroHapulator Marker Detail Report</title>
-    <script>
-        function initMarkerDetails() {
-            var marker_details = document.getElementsByClassName("marker_details");
-            markOffsets(marker_details)
-            marker_details[0].style.display = "block";
-        }
-        window.onload = function () {
-            initMarkerDetails();
-        }
-        function show_selected_details(markername) {
-            var marker_details = document.getElementsByClassName("marker_details");
-            var found_marker = false
-            for (var i = 0; i < marker_details.length; i++) {
-                if (marker_details[i].id == markername) {
-                    found_marker = true
-                    marker_details[i].style.display = "block";
-                } else {
-                    marker_details[i].style.display = "none";
-                }
-            }
-            if (found_marker == false) {
-                alert(markername + " not found");
-            }
-        }
-        function markOffsets(marker_details) {
-            for (var i = 0; i < marker_details.length; i++) {
-                var sequence = marker_details[i].getElementsByClassName("sequence")[0].innerHTML;
-                var offsets = marker_details[i].getElementsByClassName("offsets")[0].innerHTML.split(",");
-                var styled_text = "";
-                for (var j = 0; j < sequence.length; j++) {
-                    if (offsets.includes(j.toString())) {
-                        styled_text += '<span style="color:red' + '">' + sequence[j] + '</span>';
-                    } else {
-                        styled_text += sequence[j];
-                    }
-                }
-                marker_details[i].getElementsByClassName("sequence")[0].innerHTML = styled_text;
-            }
-        }
-
-        function search_marker() {
-            var input = document.getElementById('searchbar').value;
-            show_selected_details(input);
-            document.getElementById('drop_down').value = input;
-        }
-
-    </script>
     <style type="text/css">
         .overflow-table {
             width: 100%;
@@ -126,32 +79,106 @@
         <p></p>
         {% for markername in markernames %}
         <div class="marker_details" id={{markername}} style="display:none">
-            <p><b>Length</b><br>{{marker_details_table.loc[markername,'Length']}} bp</p>
-            <p><b>GC content</b><br>{{marker_details_table.loc[markername,'GC']}}%</p>
-            <p><b>Sequence </b><span class="sequence">{{marker_details_table.loc[markername,'Sequence']}}</span>
-            </p>
-            <p><b>Offsets</b><br><span class="offsets">{{marker_details_table.loc[markername,'Offsets']}}</span>
-            </p>
-            <p></p>
+            <p><h4>Length</h4>{{marker_details_table.loc[markername,'Length']}} bp</p><br>
+            <p><h4>GC content</h4>{{marker_details_table.loc[markername,'GC']}}%</p><br>
+            <p><h4>Offsets</h4><span class="offsets">{{marker_details_table.loc[markername,'Offsets']}}</span></p><br>
+            <p><h4>Sequence </h4><span class="sequence">{{marker_details_table.loc[markername,'Sequence']}}</span</p>
+            <br><br><br>
             <table>
-                <h5 style="text-align:center"><b>Read Mapping</b></h5>
+                <h4 style="text-align:left">Read Mapping</h4>
                 <tr>
                     <th>Sample</th>
-                    <th class="alnrt">Reads</th>
-                    <th class="alnrt">Rate</th>
+                    <th class="alnrt">Mapped Reads</th>
+                    <th class="alnrt">Mapped Rate</th>
+                    <th class="alnrt">Off Target Reads</th>
+                    <th class="alnrt">Off Target Rate</th>
+
                 </tr>
                 {% for sample, sample_data in mapping_rates.items()%}
                 <tr>
                     <td>{{sample}}</td>
                     <td class="alnrt">{{"{:,.0f}".format(sample_data.loc[markername,'ReadCount'])}}</td>
                     <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'ExpectedObservedRatio'])}}</td>
+                    <td class="alnrt">{{"{:,.0f}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
+                    <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'OffTargetRate']*100)}}%</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <br><br><br>
+            <table>
+                <h4>Haplotype Calling</h4>
+                <tr>
+                    <th>Sample</th>
+                    <th class="alnrt">Typed Reads</th>
+                    <th class="alnrt">Total Reads</th>
+                    <th class="alnrt">Typing Rate</th>
+
+                </tr>
+                {% for sample, sample_data in typing_rates.items()%}
+                <tr>
+                    <td>{{sample}}</td>
+                    <td class="alnrt">{{ "{:,.0f}".format(sample_data.loc[markername, 'TypedReads']) }}</td>
+                    <td class="alnrt">{{ "{:,.0f}".format(sample_data.loc[markername, 'TotalReads'])}}</td>
+                    <td class="alnrt">{{ "{:.2f}".format(sample_data.loc[markername, 'TypingRate'] * 100)}}%</td>
                 </tr>
                 {% endfor %}
             </table>
         </div>
-        {%endfor%}
+        {% endfor %}
     </div>
 
 </body>
+<script>
+    
+    var urlParams = new URLSearchParams(window.location.search);
+    initMarkerDetails(urlParams.get('marker'))
 
+    function initMarkerDetails(marker) {
+        if (marker != null){
+            show_selected_details(marker)
+        }else{
+            first_marker = document.getElementsByClassName("marker_details")[0]
+            show_selected_details(first_marker.id)
+        }
+    }
+    
+    function show_selected_details(markername) {
+        var marker_details = document.getElementsByClassName("marker_details");
+        var found_marker = false;
+        for (var i = 0; i < marker_details.length; i++) {
+            if (marker_details[i].id == markername) {
+                found_marker = true
+                colorOffsets(marker_details[i])
+                document.getElementById('drop_down').value = markername
+                marker_details[i].style.display = "block";
+            } else {
+                marker_details[i].style.display = "none";
+            }
+        }
+        if (found_marker == false) {
+            alert(markername + " not found");
+        }
+    }
+
+    function colorOffsets(marker) {
+        var sequence = marker.getElementsByClassName("sequence")[0].innerHTML
+        var offsets = marker.getElementsByClassName("offsets")[0].innerHTML.split(", ");
+        var colored_sequence  = "";
+            for (var j = 0; j < sequence.length; j++) {
+                if (offsets.includes(j.toString())) {
+                    colored_sequence += '<span style="color:red' + '">' + sequence[j] + '</span>';
+                } else {
+                    colored_sequence  += sequence[j];
+                }
+            }
+            marker.getElementsByClassName("sequence")[0].innerHTML = colored_sequence;
+        }
+    
+    function search_marker() {
+        var input = document.getElementById('searchbar').value;
+        show_selected_details(input);
+        document.getElementById('drop_down').value = input;
+    }
+
+</script>
 </html>

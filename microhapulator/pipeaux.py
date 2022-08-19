@@ -53,8 +53,10 @@ def parse_read_counts(logfile):
 
 
 def parse_balance_stat(logfile):
+    print(logfile)
     with open(logfile, "r") as fh:
         line = next(fh)
+        print(line)
         stat = line.strip().split()[-1]
         return float(stat)
 
@@ -68,24 +70,26 @@ def per_marker_typing_rate(samples):
     sample_rates = dict()
     for sample in samples:
         filename = f"analysis/{sample}/{sample}-typing-rate.tsv"
-        sample_rates[sample] = pd.read_csv(filename, sep="\t").set_index("Marker")
-    all_rates = pd.concat(
-        [df.TypingRate for df in sample_rates.values()], axis=1, keys=sample_rates.keys()
-    )
-    return all_rates
+        sample_df = pd.read_csv(filename, sep="\t").set_index("Marker") 
+        sample_rates[sample] = sample_df
+    return sample_rates
+
 
 def per_marker_mapping_rate(samples):
     sample_rates = dict()
     for sample in samples:
-        filename =  f"analysis/{sample}/{sample}-marker-read-counts.csv"
-        sample_df = pd.read_csv(filename).set_index("Marker")
-        expected_count = sample_df["ReadCount"].sum()/len(sample_df)
-        sample_df["ExpectedObservedRatio"] = round(sample_df["ReadCount"]/expected_count, 2)
+        total_reads_filename = f"analysis/{sample}/{sample}-marker-read-counts.csv"
+        off_target_filename = f"analysis/{sample}/{sample}-off-target-reads.csv"
+        total_df = pd.read_csv(total_reads_filename).set_index("Marker") 
+        off_target_df = pd.read_csv(off_target_filename).set_index("Marker")
+        expected_count = total_df["ReadCount"].sum() / len(total_df)
+        total_df["ExpectedObservedRatio"] = round(total_df["ReadCount"] / expected_count, 2)
+        sample_df = pd.concat([total_df, off_target_df], axis=1)
+        sample_df["OffTargetRate"] = sample_df["OffTargetReads"]/sample_df["ReadCount"]
         sample_rates[sample] = sample_df
     marker_names = sample_df.index
-    average_df = sum(list(sample_rates.values()))/len(samples)
-    sample_rates["Average"] = average_df.round({'ReadCount':0, 'ExpectedObersevedRatio':2})
     return sample_rates, marker_names
+
 
 
 def marker_details():
@@ -93,15 +97,14 @@ def marker_details():
     marker_defs = load_marker_definitions("marker-definitions.tsv")
     all_marker_details = list()
     for seqid, seq in marker_seqs.items():
-        marker_def = marker_defs.loc[marker_defs['Marker'] == seqid]["Offset"]
-        marker_offsets = ",".join([str(offset) for offset in marker_def.values])
-        GC_content =  round((seq.upper().count('G') + seq.upper().count('C'))/len(seq) * 100,2)
+        marker_def = marker_defs.loc[marker_defs["Marker"] == seqid]["Offset"]
+        marker_offsets = ", ".join([str(offset) for offset in marker_def.values])
+        GC_content = round((seq.upper().count("G") + seq.upper().count("C")) / len(seq) * 100, 2)
         sample_details = [seqid, len(seq), GC_content, marker_offsets, "".join(seq).strip()]
         all_marker_details.append(sample_details)
-    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence"]    
-    marker_details_table = pd.DataFrame(all_marker_details, columns=col_names).set_index('Marker')
+    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence"]
+    marker_details_table = pd.DataFrame(all_marker_details, columns=col_names).set_index("Marker")
     return marker_details_table
-
 
 
 def final_html_report(samples, summary):
@@ -120,7 +123,7 @@ def final_html_report(samples, summary):
     if read_length_table is not None:
         col = ("Sample", "LengthR1", "LengthR2")
         read_length_table = pd.DataFrame(read_length_table, columns=col)
-    typing_rates = per_marker_typing_rate(samples)
+    typing_rates= per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
     plots = {
         "r1readlen": list(),
@@ -209,6 +212,7 @@ def aggregate_summary(samples):
         data["HetTstat"].append(tstat)
     return pd.DataFrame(data)
 
+
 def marker_detail_report(samples):
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
     marker_details_table = marker_details()
@@ -216,10 +220,11 @@ def marker_detail_report(samples):
     with open(templatefile, "r") as infh, open("marker_detail_report.html", "w") as outfh:
         template = Template(infh.read())
         output = template.render(
-            date=datetime.now().replace(microsecond=0).isoformat(),
-            mhpl8rversion=microhapulator.__version__,
-            mapping_rates = mapping_rates,
-            markernames = sorted(marker_names),
-            marker_details_table = marker_details_table
+        date=datetime.now().replace(microsecond=0).isoformat(),
+        mhpl8rversion=microhapulator.__version__,
+        mapping_rates=mapping_rates,
+        typing_rates = per_marker_typing_rate(samples),
+        markernames=sorted(marker_names),
+        marker_details_table=marker_details_table,
         )
         print(output, file=outfh, end="")

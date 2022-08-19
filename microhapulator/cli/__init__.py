@@ -23,6 +23,7 @@ from . import getrefr
 from . import hetbalance
 from . import locbalance
 from . import mix
+from . import offtarget
 from . import pipe
 from . import prob
 from . import seq
@@ -42,6 +43,7 @@ mains = {
     "hetbalance": hetbalance.main,
     "locbalance": locbalance.main,
     "mix": mix.main,
+    "offtarget": offtarget.main,
     "pipe": pipe.main,
     "prob": prob.main,
     "seq": seq.main,
@@ -61,6 +63,7 @@ subparser_funcs = {
     "hetbalance": hetbalance.subparser,
     "locbalance": locbalance.subparser,
     "mix": mix.subparser,
+    "offtarget": offtarget.subparser,
     "pipe": pipe.subparser,
     "prob": prob.subparser,
     "seq": seq.subparser,

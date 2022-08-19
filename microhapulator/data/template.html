@@ -12,7 +12,6 @@
         <style type="text/css">
             .overflow-table {
                 width:  100%;
-                height: 250px;
                 overflow: auto;
             }
             .container {
@@ -38,17 +37,18 @@
             table {
                 margin: 12pt auto;
                 width: 100%;
+                display: block;
+                max-width: -moz-fit-content;
+                max-width: fit-content;
+                overflow-x: auto;
             }
             table.half {
                 margin: 12pt auto 12pt 0;
                 width: 50%;
             }
             td, th {
-                padding: auto 5px;
+                padding-right: 10px;
                 white-space: nowrap;
-            }
-            th[colspan="2"] {
-                text-align: right;
             }
         </style>
     </head>
@@ -158,20 +158,20 @@
                 </tr>
                 {% endfor %}
             </table>
-            <div class="overflow_table">
                 <table id="mapping_rates_table" class="pagination_table">
                     <thead>
-                    <tr>
-                        <th></th>
-                        {% for sample in mapping_rates.keys() %}
-                        <th colspan=2 data-sortas="numeric">{{sample}}</th>
-                        {% endfor %}
-                    </tr>
+                        <tr>
+                            <td></td>
+                            {% for sample in typing_rates.keys() %}
+                            <td style="visibility: collapse;">{{sample}}</td>
+                            <td style="font-weight:bold">{{sample}}</td>
+                            {% endfor %}
+                        </tr>
                     <tr>
                         <th>Marker</th>
                         {% for i in range(len(mapping_rates)) %}
-                        <td class="alnrt" style="font-weight:bold">Reads</td>
-                        <td class="alnrt" style="font-weight:bold">Rate</td>
+                        <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Reads</th>
+                        <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Off Target</th>
                         {% endfor %}
                         <td></td>
                     </tr>
@@ -179,17 +179,18 @@
                 <tbody>
                     {% for markername in markernames %}
                     <tr>
-                        <td>{{markername}}</td>
+                        <td><a href="marker_detail_report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                         {% for sample_data in mapping_rates.values()%}
-                        <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount' ]}}>{{
+                        <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{
                             "{:,.0f}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
-                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'ExpectedObservedRatio'])}}</td>
+                        <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'OffTargetReads']}}>{{"{:,.0f}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
+
+ 
 
 
 
@@ -219,28 +220,27 @@
             </table>
 
             Some explanatory text here.
-        <div class="overflow-table">
-            <table class="pagination_table">
-                <thead>
-                <tr>
-                    <th>Marker</th>
-                    {% for sample in typing_rates.keys() %}
-                    <th class="alnrt">{{sample}}</th>
-                    {% endfor %}
-                </tr>
+                <table id="typing_rates_table" class="pagination_table" >
+                    <thead>
+                    <tr>
+                        <th>Marker</th>
+                        {% for sample in typing_rates.keys() %}
+                        <th style="font-weight:bold" class="alnrt">{{sample}}</th>
+                        {% endfor %}
+                    </tr>
                 </thead>
                 <tbody>
-                {% for markername, row in typing_rates.iterrows() %}
-                <tr>
-                    <td>{{markername}}</td>
-                    {% for sample in typing_rates.keys() %}
-                    <td class="alnrt">{{ "{:.2f}".format(row[sample] * 100) }}%</td>
+                    {% for markername in markernames %}
+                    <tr>
+                        <td><a href="marker_detail_report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
+                        {% for sample_data in typing_rates.values()%}
+                        <td class="alnrt">{{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
+                        {% endfor %}
+                    </tr>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
+                </tbody>
             </table>
-        </div>
+
         
             <a name="filters"></a>
             <h2>Genotype Calling</h2>

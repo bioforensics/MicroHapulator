@@ -13,7 +13,12 @@
 from glob import glob
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
-from microhapulator.pipeaux import full_reference_index_files, final_html_report, aggregate_summary, marker_detail_report
+from microhapulator.pipeaux import (
+    full_reference_index_files,
+    final_html_report,
+    aggregate_summary,
+    marker_detail_report,
+)
 from microhapulator.profile import TypingResult
 from os import symlink
 import pandas as pd
@@ -37,11 +42,12 @@ rule report:
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
     output:
         "report.html",
-        "marker_detail_report.html"
+        "marker_detail_report.html",
     run:
         summary = pd.read_csv("analysis/summary.tsv", sep="\t")
         final_html_report(config["samples"], summary)
@@ -257,6 +263,7 @@ rule heterozygote_balance:
         """
 
 
+
 rule plot_haplotype_calls:
     input:
         result=rules.apply_filters.output.genotype_call,
@@ -297,3 +304,15 @@ rule map_full_reference:
         echo -n "Mapped reads: " >> {output.counts}
         samtools view -c -F 2308 {output.bam} >> {output.counts}
         """
+rule off_target_mapping:
+    input:
+        marker_bam=rules.map_sort_and_index.output.bam,
+        fullref_bam=rules.map_full_reference.output.bam,
+        marker_def=rules.copy_and_index_marker_data.output.tsv,
+    output:
+        counts="analysis/{sample}/{sample}-off-target-reads.csv"
+    shell:
+        """
+        mhpl8r offtarget {input} --out {output}
+        """
+
