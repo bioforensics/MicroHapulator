@@ -689,10 +689,10 @@ def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
         Marker=list(),
         OffTargetReads=list(),
     )
-    marker_bam=pysam.AlignmentFile(marker_bam_file, 'rb')
-    all_marker_defs = load_marker_definitions(markertsv).set_index('Marker')
+    marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
+    all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
     reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
-    for marker in set(all_marker_defs.index): 
+    for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
         off_target_count = count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker)
         counts["Marker"].append(marker)
@@ -702,7 +702,7 @@ def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
 
 
 def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
-    fullref_bam = pysam.AlignmentFile(fullref_bam_file, 'rb')
+    fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
     reads_to_marker = defaultdict(str)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
@@ -715,17 +715,18 @@ def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
 
 
 def count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker):
-        off_target_count = 0
-        for read in marker_bam.fetch(marker):
-            if not skip_read(read):
-                qual_mask = np.array(read.query_qualities) >= 10
-                qual_filtered_positions = np.array(read.get_reference_positions(full_length=True))[qual_mask]
-                contains_varloc = bool(set(qual_filtered_positions) & set(marker_def["Offset"]))
-                if contains_varloc:
-                    off_target_count += reads_to_marker[read.query_name] != marker
-        return off_target_count
+    off_target_count = 0
+    for read in marker_bam.fetch(marker):
+        if not skip_read(read):
+            qual_mask = np.array(read.query_qualities) >= 10
+            qual_filtered_positions = np.array(read.get_reference_positions(full_length=True))[
+                qual_mask
+            ]
+            contains_varloc = bool(set(qual_filtered_positions) & set(marker_def["Offset"]))
+            if contains_varloc:
+                off_target_count += reads_to_marker[read.query_name] != marker
+    return off_target_count
 
 
 def skip_read(read):
     return read.is_secondary or read.is_supplementary or read.is_duplicate or read.is_qcfail
-

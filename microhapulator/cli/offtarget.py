@@ -13,12 +13,18 @@
 import microhapulator.api as mhapi
 import sys
 
+
 def subparser(subparsers):
     desc = "Calculate off target read mapping"
     cli = subparsers.add_parser("offtarget", description=desc)
     cli.add_argument("markerbam", help="alignment file of reads aligned to marker sequences")
-    cli.add_argument("refbam", help="alignment file in BAM format of reads aligned to complete reference genome")
-    cli.add_argument("markerdef", help="marker definitions tsv including chromosome and full reference genome offset columns")
+    cli.add_argument(
+        "refbam", help="alignment file in BAM format of reads aligned to complete reference genome"
+    )
+    cli.add_argument(
+        "markerdef",
+        help="marker definitions tsv including chromosome and full reference genome offset columns",
+    )
     cli.add_argument(
         "-o",
         "--out",
@@ -27,6 +33,7 @@ def subparser(subparsers):
         help="write output to FILE; by default, output is written to the terminal (standard output)",
     )
 
+
 def main(args):
-    data = mhapi.off_target_mapping(args.markerbam,args.refbam, args.markerdef)
+    data = mhapi.off_target_mapping(args.markerbam, args.refbam, args.markerdef)
     data.to_csv(args.out, index=False)

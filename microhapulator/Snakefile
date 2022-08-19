@@ -263,7 +263,6 @@ rule heterozygote_balance:
         """
 
 
-
 rule plot_haplotype_calls:
     input:
         result=rules.apply_filters.output.genotype_call,
@@ -304,15 +303,16 @@ rule map_full_reference:
         echo -n "Mapped reads: " >> {output.counts}
         samtools view -c -F 2308 {output.bam} >> {output.counts}
         """
+
+
 rule off_target_mapping:
     input:
         marker_bam=rules.map_sort_and_index.output.bam,
         fullref_bam=rules.map_full_reference.output.bam,
         marker_def=rules.copy_and_index_marker_data.output.tsv,
     output:
-        counts="analysis/{sample}/{sample}-off-target-reads.csv"
+        counts="analysis/{sample}/{sample}-off-target-reads.csv",
     shell:
         """
         mhpl8r offtarget {input} --out {output}
         """
-
