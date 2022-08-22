@@ -534,7 +534,7 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
                 continue
             for record in column.pileups:
                 aligned_base = None
-                if not skip_read(record.alignment):
+                if record.is_del or record.is_refskip or skip_read(record.alignment):
                     continue
                 aligned_base = record.alignment.query_sequence[record.query_position]
                 ht[record.alignment.query_name][column.pos] = aligned_base
