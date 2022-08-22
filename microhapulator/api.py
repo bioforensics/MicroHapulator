@@ -690,18 +690,18 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
 
 def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
-    reads_to_marker = defaultdict(str)
+    reads_to_markers = defaultdict(list)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
         start = min(marker_def["GenomeOffset"])
         end = max(marker_def["GenomeOffset"]) + 1
         for read in fullref_bam.fetch(marker_def["Chrom"][0], start, end):
             if not skip_read(read):
-                reads_to_marker[read.query_name] = marker
-    return reads_to_marker
+                reads_to_markers[read.query_name].append(marker)
+    return reads_to_markers
 
 
-def count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker):
+def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers):
     off_target_count = 0
     for read in marker_bam.fetch(marker):
         if not skip_read(read):
@@ -711,7 +711,7 @@ def count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker):
             ]
             contains_varloc = bool(set(qual_filtered_positions) & set(marker_def["Offset"]))
             if contains_varloc:
-                off_target_count += reads_to_marker[read.query_name] != marker
+                off_target_count += marker not in reads_to_markers[read.query_name]
     return off_target_count
 
 
