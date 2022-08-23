@@ -734,5 +734,5 @@ def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
         off_target_count = count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker)
         counts["Marker"].append(marker)
         counts["OffTargetReads"].append(off_target_count)
-    data = pd.DataFrame(counts).reset_index(drop=True)
+    data = pd.DataFrame(counts).sort_values(by="Marker").reset_index(drop=True)
     return data
