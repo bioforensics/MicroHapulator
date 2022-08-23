@@ -22,7 +22,7 @@ def subparser(subparsers):
         "refbam", help="alignment file in BAM format of reads aligned to complete reference genome"
     )
     cli.add_argument(
-        "markerdef",
+        "tsv",
         help="marker definitions tsv including chromosome and full reference genome offset columns",
     )
     cli.add_argument(
@@ -35,5 +35,5 @@ def subparser(subparsers):
 
 
 def main(args):
-    data = mhapi.off_target_mapping(args.markerbam, args.refbam, args.markerdef)
+    data = mhapi.off_target_mapping(args.markerbam, args.refbam, args.tsv)
     data.to_csv(args.out, index=False)
