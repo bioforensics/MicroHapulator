@@ -12,7 +12,7 @@
 import microhapulator
 import microhapulator.api as mhapi
 from microhapulator.tests import data_file
-import pandas as pd 
+import pandas as pd
 
 
 def test_offtarget():
@@ -25,13 +25,17 @@ def test_offtarget():
 
 
 def test_offtarget_cli(tmp_path):
-    outfile = str(tmp_path/"off-target-reads.csv")
-    arglist = ["offtarget", data_file("bam/off-target.bam"),  data_file("bam/off-target-fullrefr.bam"),  data_file("def/off-target-offsets.tsv"), "--out", outfile]
+    outfile = str(tmp_path / "off-target-reads.csv")
+    arglist = [
+        "offtarget",
+        data_file("bam/off-target.bam"),
+        data_file("bam/off-target-fullrefr.bam"),
+        data_file("def/off-target-offsets.tsv"),
+        "--out",
+        outfile,
+    ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.offtarget.main(args)
     obs_data = pd.read_csv(outfile)
     exp_data = pd.read_csv(data_file("off-target-reads.csv"))
     assert obs_data.equals(exp_data)
-
-
-
