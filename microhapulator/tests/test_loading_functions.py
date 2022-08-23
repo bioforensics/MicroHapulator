@@ -57,7 +57,7 @@ def test_load_marker_frequencies_missing_or_bad_columns(tsv):
 )
 def test_load_marker_definitions(tsv, nrows, markerid, offset):
     markers = microhapulator.load_marker_definitions(data_file(tsv))
-    assert list(markers.columns) == ["Marker", "Offset"]
+    assert list(markers.columns) == ["Marker", "Offset", "Chrom", "GenomeOffset"]
     assert markers.shape[0] == nrows
     assert markers.Marker.iloc[10] == markerid
     assert markers.Offset.iloc[10] == offset
