@@ -701,11 +701,11 @@ def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     return reads_to_markers
 
 
-def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers):
+def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers, minbasequal):
     off_target_count = 0
     for read in marker_bam.fetch(marker):
         if not skip_read(read):
-            qual_mask = np.array(read.query_qualities) >= 10
+            qual_mask = np.array(read.query_qualities) >= minbasequal
             qual_filtered_positions = np.array(read.get_reference_positions(full_length=True))[
                 qual_mask
             ]
@@ -715,12 +715,13 @@ def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers):
     return off_target_count
 
 
-def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
+def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal=10):
     """Count reads mapped to an off target locus in the full reference genome
 
     :param str marker_bam_file: path of BAM file containing read alignments to marker sequences
     :param str fullref_bam_file: path of BAM file containing read alignments to the full reference genome
     :param str markertsv: path of a TSV file containing marker metadata including the offset of each SNP for every marker in the panel and the chromosome and coordinate of each in the reference genome
+    :param int minbasequal: minimum base quality (PHRED score) to be considered reliable for haplotype calling; default is 10, corresponding to Q10, i.e., 90% probability that the base call is correct
     """
     counts = dict(
         Marker=list(),
@@ -731,7 +732,7 @@ def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
     reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
-        off_target_count = count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker)
+        off_target_count = count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker, minbasequal=minbasequal)
         counts["Marker"].append(marker)
         counts["OffTargetReads"].append(off_target_count)
     data = pd.DataFrame(counts).sort_values(by="Marker").reset_index(drop=True)
