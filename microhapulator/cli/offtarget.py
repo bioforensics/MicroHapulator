@@ -43,5 +43,7 @@ def subparser(subparsers):
 
 
 def main(args):
-    data = mhapi.off_target_mapping(args.markerbam, args.refbam, args.tsv, minbasequal=args.base_qual)
+    data = mhapi.off_target_mapping(
+        args.markerbam, args.refbam, args.tsv, minbasequal=args.base_qual
+    )
     data.to_csv(args.out, index=False)
