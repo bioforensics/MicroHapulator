@@ -39,8 +39,6 @@ def test_pipe_missing_files(tmp_path):
 
 
 def test_pipe_gbr_usc10(tmp_path):
-    hg38_placeholder = str("microhapulator/data/hg38.fasta")
-    copyfile(data_file("refr/usc10-refr.fna"), hg38_placeholder)
     arglist = [
         "pipe",
         data_file("refr/usc10-refr.fna"),
@@ -52,8 +50,6 @@ def test_pipe_gbr_usc10(tmp_path):
         "--threads=1",
         "--static=5",
         "--dynamic=0.02",
-        "--hg38",
-        hg38_placeholder,
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.pipe.main(args)
