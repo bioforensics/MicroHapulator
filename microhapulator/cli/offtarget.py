@@ -18,9 +18,7 @@ def subparser(subparsers):
     desc = "Calculate off target read mapping"
     cli = subparsers.add_parser("offtarget", description=desc)
     cli.add_argument("markerbam", help="alignment file of reads aligned to marker sequences")
-    cli.add_argument(
-        "refbam", help="alignment file in BAM format of reads aligned to complete reference genome"
-    )
+    cli.add_argument("refbam", help="alignment file in BAM format of reads aligned to hg38")
     cli.add_argument(
         "tsv",
         help="marker definitions tsv including chromosome and full reference genome offset columns",

@@ -51,7 +51,7 @@ def load_marker_frequencies(tsvfile):
 
 def load_marker_definitions(tsvfile):
     markers = pd.read_csv(tsvfile, sep="\t")
-    missing = set(["Marker", "Offset", "Chrom", "GenomeOffset"]) - set(markers.columns)
+    missing = set(["Marker", "Offset", "Chrom", "OffsetHg38"]) - set(markers.columns)
     if len(missing) > 0:
         message = "column(s) missing from marker definition file: " + ", ".join(sorted(missing))
         raise ValueError(message)

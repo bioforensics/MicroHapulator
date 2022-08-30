@@ -693,8 +693,8 @@ def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     reads_to_markers = defaultdict(list)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
-        start = min(marker_def["GenomeOffset"])
-        end = max(marker_def["GenomeOffset"]) + 1
+        start = min(marker_def["OffsetHg38"])
+        end = max(marker_def["OffsetHg38"]) + 1
         for read in fullref_bam.fetch(marker_def["Chrom"][0], start, end):
             if not skip_read(read):
                 reads_to_markers[read.query_name].append(marker)
