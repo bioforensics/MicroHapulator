@@ -36,6 +36,7 @@ rule report:
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
     output:
         "report.html",
@@ -263,7 +264,7 @@ rule plot_haplotype_calls:
         )
 
 
-rule download_full_reference:
+rule download_and_index_full_reference:
     output:
         full_reference_index_files(config["hg38path"]),
     shell:
@@ -274,9 +275,11 @@ rule download_full_reference:
 
 
 rule map_full_reference:
-    input:
+    params:
         refr=config["hg38path"],
+    input:
         fastq=rules.merge.output.mergedfq,
+        indx=rules.download_and_index_full_reference.output,
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
         bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
@@ -284,10 +287,23 @@ rule map_full_reference:
     threads: 32
     shell:
         """
-        bwa mem -t {threads} {input} | samtools view -b | samtools sort -o {output.bam}
+        bwa mem -t {threads} {params.refr} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
         echo -n "Total reads: " > {output.counts}
         samtools view -c -F 2304 {output.bam} >> {output.counts}
         echo -n "Mapped reads: " >> {output.counts}
         samtools view -c -F 2308 {output.bam} >> {output.counts}
+        """
+
+
+rule off_target_mapping:
+    input:
+        marker_bam=rules.map_sort_and_index.output.bam,
+        fullref_bam=rules.map_full_reference.output.bam,
+        marker_def=rules.copy_and_index_marker_data.output.tsv,
+    output:
+        counts="analysis/{sample}/{sample}-off-target-reads.csv",
+    shell:
+        """
+        mhpl8r offtarget {input} --out {output}
         """

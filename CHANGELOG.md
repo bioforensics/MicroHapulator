@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Profiles compatible with probgen programs now included in pipe output (#135).
 - Haplotype call plots now included in the pipe HTML report (#136).
+- Added offtarget module to count reads that map to off target loci in hg38 (#141).
 
 ### Changed
 - Exposed static and dynamic threshold configuration to pipe CLI (#135).
