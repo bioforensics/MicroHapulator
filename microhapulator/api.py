@@ -516,6 +516,10 @@ def check_index(bamfile):
         pysam.index(bamfile)
 
 
+def skip_read(read):
+    return read.is_secondary or read.is_supplementary or read.is_duplicate or read.is_qcfail
+
+
 def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
     for locusid in sorted(offsets):
@@ -530,7 +534,7 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
                 continue
             for record in column.pileups:
                 aligned_base = None
-                if not skip_read(record):
+                if record.is_del or record.is_refskip or skip_read(record.alignment):
                     continue
                 aligned_base = record.alignment.query_sequence[record.query_position]
                 ht[record.alignment.query_name][column.pos] = aligned_base
@@ -684,41 +688,24 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
     plt.switch_backend(backend)
 
 
-def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv):
-    counts = dict(
-        Marker=list(),
-        OffTargetReads=list(),
-    )
-    marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
-    all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
-    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
-    for marker in set(all_marker_defs.index):
-        marker_def = all_marker_defs.loc[marker]
-        off_target_count = count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker)
-        counts["Marker"].append(marker)
-        counts["OffTargetReads"].append(off_target_count)
-    data = pd.DataFrame(counts).reset_index(drop=True)
-    return data
-
-
 def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
-    reads_to_marker = defaultdict(list)
+    reads_to_markers = defaultdict(list)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
-        start = min(marker_def["GenomeOffset"])
-        end = max(marker_def["GenomeOffset"]) + 1
+        start = min(marker_def["OffsetHg38"])
+        end = max(marker_def["OffsetHg38"]) + 1
         for read in fullref_bam.fetch(marker_def["Chrom"][0], start, end):
             if not skip_read(read):
-                reads_to_marker[read.query_name].append(marker)
-    return reads_to_marker
+                reads_to_markers[read.query_name].append(marker)
+    return reads_to_markers
 
 
-def count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker):
+def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers, minbasequal):
     off_target_count = 0
     for read in marker_bam.fetch(marker):
         if not skip_read(read):
-            qual_mask = np.array(read.query_qualities) >= 10
+            qual_mask = np.array(read.query_qualities) >= minbasequal
             qual_filtered_positions = np.array(read.get_reference_positions(full_length=True))[
                 qual_mask
             ]
@@ -728,5 +715,27 @@ def count_off_target_reads(marker_bam, marker, marker_def, reads_to_marker):
     return off_target_count
 
 
-def skip_read(read):
-    return read.is_secondary or read.is_supplementary or read.is_duplicate or read.is_qcfail
+def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal=10):
+    """Count reads mapped to an off target locus in the full reference genome
+
+    :param str marker_bam_file: path of BAM file containing read alignments to marker sequences
+    :param str fullref_bam_file: path of BAM file containing read alignments to the full reference genome
+    :param str markertsv: path of a TSV file containing marker metadata including the offset of each SNP for every marker in the panel and the chromosome and coordinate of each in the reference genome
+    :param int minbasequal: minimum base quality (PHRED score) to be considered reliable for haplotype calling; default is 10, corresponding to Q10, i.e., 90% probability that the base call is correct
+    """
+    counts = dict(
+        Marker=list(),
+        OffTargetReads=list(),
+    )
+    marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
+    all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
+    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
+    for marker in set(all_marker_defs.index):
+        marker_def = all_marker_defs.loc[marker]
+        off_target_count = count_off_target_reads(
+            marker_bam, marker, marker_def, reads_to_marker, minbasequal=minbasequal
+        )
+        counts["Marker"].append(marker)
+        counts["OffTargetReads"].append(off_target_count)
+    data = pd.DataFrame(counts).sort_values(by="Marker").reset_index(drop=True)
+    return data

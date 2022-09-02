@@ -275,7 +275,7 @@ rule plot_haplotype_calls:
         )
 
 
-rule download_full_reference:
+rule download_and_index_full_reference:
     output:
         full_reference_index_files(config["hg38path"]),
     shell:
@@ -286,9 +286,11 @@ rule download_full_reference:
 
 
 rule map_full_reference:
-    input:
+    params:
         refr=config["hg38path"],
+    input:
         fastq=rules.merge.output.mergedfq,
+        indx=rules.download_and_index_full_reference.output,
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
         bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
@@ -296,7 +298,7 @@ rule map_full_reference:
     threads: 32
     shell:
         """
-        bwa mem -t {threads} {input} | samtools view -b | samtools sort -o {output.bam}
+        bwa mem -t {threads} {params.refr} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
         echo -n "Total reads: " > {output.counts}
         samtools view -c -F 2304 {output.bam} >> {output.counts}

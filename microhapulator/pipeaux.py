@@ -25,7 +25,7 @@ import sys
 
 def full_reference_index_files(fasta):
     filename = fasta
-    filenames = [filename]
+    filenames = []
     for suffix in ("amb", "ann", "bwt", "pac", "sa"):
         idxfile = f"{filename}.{suffix}"
         filenames.append(idxfile)
