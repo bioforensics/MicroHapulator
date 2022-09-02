@@ -13,12 +13,28 @@
 from glob import glob
 import microhapulator
 import microhapulator.api as mhapi
+from microhapulator.cli.pipe import validate_sample_input_files
 from microhapulator.profile import SimulatedProfile, TypingResult
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
 from shutil import copyfile
 from subprocess import run
+
+
+def test_validate_sample_input_files():
+    assert validate_sample_input_files(1, "S1", paired_end_ok=True, single_end_ok=True) is True
+    assert validate_sample_input_files(2, "S2", paired_end_ok=True, single_end_ok=True) is True
+    with pytest.raises(ValueError, match=r"but single-end mode disabled"):
+        validate_sample_input_files(1, "S1", paired_end_ok=True, single_end_ok=False)
+    with pytest.raises(ValueError, match=r"but paired-end mode disabled"):
+        validate_sample_input_files(2, "S1", paired_end_ok=False, single_end_ok=True)
+    with pytest.raises(ValueError, match=r"both paired-end and single-end data disabled"):
+        validate_sample_input_files(2, "S1", paired_end_ok=False, single_end_ok=False)
+    with pytest.raises(FileNotFoundError):
+        validate_sample_input_files(0, "S1", paired_end_ok=True, single_end_ok=True)
+    with pytest.raises(ValueError, match=r"found 4 FASTQ files, not supported"):
+        validate_sample_input_files(4, "S1", paired_end_ok=True, single_end_ok=True)
 
 
 def test_pipe_missing_files(tmp_path):
@@ -34,7 +50,7 @@ def test_pipe_missing_files(tmp_path):
         "1",
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    with pytest.raises(FileNotFoundError, match=r"sample GBRusc: expected 2 FASTQ files, found 0"):
+    with pytest.raises(FileNotFoundError, match=r"sample GBRusc: found 0 FASTQ files"):
         microhapulator.cli.pipe.main(args)
 
 

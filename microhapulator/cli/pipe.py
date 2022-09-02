@@ -58,7 +58,21 @@ def traverse(dirpath):
             yield subpath
 
 
-def get_input_files(sample_names, seqpath, suffixes=None):
+def validate_sample_input_files(numfiles, sample, paired_end_ok=True, single_end_ok=True):
+    if not paired_end_ok and not single_end_ok:
+        raise ValueError(f"both paired-end and single-end data disabled, cannot proceed")
+    if numfiles == 0:
+        raise FileNotFoundError(f"sample {sample}: found 0 FASTQ files")
+    elif numfiles not in (1, 2):
+        raise ValueError(f"sample {sample}: found {numfiles} FASTQ files, not supported")
+    elif numfiles == 2 and not paired_end_ok:
+        raise ValueError(f"sample {sample}: found 2 FASTQ files, but paired-end mode disabled")
+    elif numfiles == 1 and not single_end_ok:
+        raise ValueError(f"sample {sample}: found 1 FASTQ file, but single-end mode disabled")
+    return True
+
+
+def get_input_files(sample_names, seqpath, paired_end_ok=True, single_end_ok=True, suffixes=None):
     """Find input files for each sample
 
     This function traverses `seqpath` and any of its sub-directories for FASTQ files. Any FASTQ
@@ -82,11 +96,11 @@ def get_input_files(sample_names, seqpath, suffixes=None):
     final_file_list = list()
     for sample in sample_names:
         filelist = files[sample]
-        if len(filelist) == 2:
-            final_file_list.extend(sorted(filelist))
-        else:
-            message = f"sample {sample}: expected 2 FASTQ files, found {len(filelist)}"
-            raise FileNotFoundError(message)
+        filelist_ok = validate_sample_input_files(
+            len(filelist), sample, paired_end_ok=paired_end_ok, single_end_ok=single_end_ok
+        )
+        if filelist_ok:
+            final_file_list.extend(filelist)
     unique_file_names = set([filepath.name for filepath in final_file_list])
     if len(unique_file_names) != len(final_file_list):
         raise ValueError("duplicate FASTQ file names found; refusing to proceed")
@@ -159,6 +173,18 @@ def subparser(subparsers):
         help="CSV file specifying marker-specific thresholds to override global thresholds; three required columns: 'Marker' for the marker name; 'Static' and 'Dynamic' for marker-specific thresholds",
     )
     cli.add_argument(
+        "--single",
+        dest="paired_end_ok",
+        action="store_false",
+        help="accept single-end reads only; by default, single-end or paired-end is accepted on a per-sample basis",
+    )
+    cli.add_argument(
+        "--paired",
+        dest="single_end_ok",
+        action="store_false",
+        help="accept paired-end reads only; by default, single-end or paired-end is accepted on a per-sample basis",
+    )
+    cli.add_argument(
         "--copy-input",
         action="store_true",
         help="copy input files to working directory; by default, input files are symlinked",
@@ -192,7 +218,9 @@ def validate_panel_config(markerseqs, markerdefn):
 
 def main(args):
     validate_panel_config(args.markerrefr, args.markerdefn)
-    samples, filenames = get_input_files(args.samples, args.seqpath)
+    samples, filenames = get_input_files(
+        args.samples, args.seqpath, args.paired_end_ok, args.single_end_ok
+    )
     workingfiles = link_or_copy_input(filenames, args.workdir, docopy=args.copy_input)
     config = dict(
         samples=samples,
