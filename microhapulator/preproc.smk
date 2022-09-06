@@ -10,76 +10,31 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from glob import glob
-from matplotlib import pyplot as plt
-from microhapulator import api as mhapi
-from microhapulator.pipeaux import full_reference_index_files, final_html_report, aggregate_summary
-from microhapulator.profile import TypingResult
-from os import symlink
-import pandas as pd
-from pkg_resources import resource_filename
+
+def sample_input_files(sample_name):
+    return sorted([fq for fq in config["readfiles"] if sample_name in fq])
 
 
-rule report:
-    input:
-        "analysis/summary.tsv",
-        expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
-        expand(
-            "analysis/{sample}/profiles/{sample}-{suffix}.csv",
-            sample=config["samples"],
-            suffix=("qual", "quant", "qual-ref", "quant-ref"),
-        ),
-        expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
-        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
-        expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
-        resource_filename("microhapulator", "data/template.html"),
-    output:
-        "report.html",
-    run:
-        summary = pd.read_csv("analysis/summary.tsv", sep="\t")
-        final_html_report(config["samples"], summary)
-
-
-rule summary:
-    input:
-        expand("analysis/{sample}/flash.log", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-mapped-reads.txt", sample=config["samples"]),
-        expand(
-            "analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
-            sample=config["samples"],
-        ),
-        expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-interlocus-balance-chisq.txt", sample=config["samples"]),
-        expand(
-            "analysis/{sample}/{sample}-heterozygote-balance-pttest.txt",
-            sample=config["samples"],
-        ),
-    output:
-        tsv="analysis/summary.tsv",
-    run:
-        summary = aggregate_summary(config["samples"])
-        summary.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+def sample_fastqc_files(sample_name):
+    numfiles = len([fq for fq in config["readfiles"] if sample_name in fq])
+    assert numfiles in (1, 2)
+    if numfiles == 2:
+        return [f"analysis/{sample}/fastqc/R1-fastqc.html", f"analysis/{sample}/fastqc/R2-fastqc.html"]
+    else:
+        return [f"analysis/{sample}/fastqc/reads-fastqc.html"]
 
 
 rule fastqc:
     input:
-        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        lambda wildcards: sample_input_files(wildcards.sample),
     output:
-        r1="analysis/{sample}/fastqc/R1-fastqc.html",
-        r2="analysis/{sample}/fastqc/R2-fastqc.html",
+        lambda wildcards: sample_fastqc_files
     threads: 2
     run:
         shell("fastqc --outdir analysis/{wildcards.sample}/fastqc/ --threads {threads} {input}")
         outfiles = sorted(glob(f"analysis/{wildcards.sample}/fastqc/*.html"))
-        for end, outfile in enumerate(outfiles, 1):
-            outfile = Path(outfile)
-            linkfile = f"analysis/{wildcards.sample}/fastqc/R{end}-fastqc.html"
-            symlink(outfile.name, linkfile)
+        for outfile, linkfile in zip(outfiles, output)
+            symlink(Path(outfile).name, linkfile)
 
 
 rule merge:
@@ -96,9 +51,7 @@ rule merge:
             else:
                 shell("ln -s {input) {output.fastq}")
         elif len(input) == 2:
-            shell(
-                "flash --min-overlap=25 --max-overlap=300 --allow-outies --threads={threads} --max-mismatch-density=0.25 --output-prefix analysis/{wildcards.sample}/{wildcards.sample} {input} 2>&1 | tee {output.log}"
-            )
+            shell("flash --min-overlap=25 --max-overlap=300 --allow-outies --threads={threads} --max-mismatch-density=0.25 --output-prefix analysis/{wildcards.sample}/{wildcards.sample} {input} 2>&1 | tee {output.log}")
             shell("ln -s {wildcards.sample}.extendedFrags.fastq {output.fastq}")
         else:
             raise ValueError(f"Unexpected number of FASTQ files for sample {sample}: {len(input)}")
