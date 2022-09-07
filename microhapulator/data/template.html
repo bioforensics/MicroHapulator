@@ -187,7 +187,7 @@
                 <tbody>
                     {% for markername in markernames %}
                     <tr>
-                        <td><a href="marker_detail_report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
+                        <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                         {% for sample_data in mapping_rates.values()%}
                         <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{
                             "{:,.0f}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
@@ -240,7 +240,7 @@
                 <tbody>
                     {% for markername in markernames %}
                     <tr>
-                        <td><a href="marker_detail_report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
+                        <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                         {% for sample_data in typing_rates.values()%}
                         <td class="alnrt">{{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
                         {% endfor %}
