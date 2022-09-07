@@ -711,7 +711,7 @@ def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers, min
             ]
             contains_varloc = bool(set(qual_filtered_positions) & set(marker_def["Offset"]))
             if contains_varloc:
-                off_target_count += marker not in reads_to_marker[read.query_name]
+                off_target_count += marker not in reads_to_markers[read.query_name]
     return off_target_count
 
 

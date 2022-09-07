@@ -47,7 +47,7 @@ rule report:
         resource_filename("microhapulator", "data/fancyTable.js"),
     output:
         "report.html",
-        "marker_detail_report.html",
+        "marker-detail-report.html",
     run:
         summary = pd.read_csv("analysis/summary.tsv", sep="\t")
         final_html_report(config["samples"], summary)

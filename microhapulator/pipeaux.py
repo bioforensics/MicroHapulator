@@ -53,10 +53,8 @@ def parse_read_counts(logfile):
 
 
 def parse_balance_stat(logfile):
-    print(logfile)
     with open(logfile, "r") as fh:
         line = next(fh)
-        print(line)
         stat = line.strip().split()[-1]
         return float(stat)
 
@@ -216,7 +214,7 @@ def marker_detail_report(samples):
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
     marker_details_table = marker_details()
     templatefile = resource_filename("microhapulator", "data/marker_details_template.html")
-    with open(templatefile, "r") as infh, open("marker_detail_report.html", "w") as outfh:
+    with open(templatefile, "r") as infh, open("marker-detail-report.html", "w") as outfh:
         template = Template(infh.read())
         output = template.render(
             date=datetime.now().replace(microsecond=0).isoformat(),
