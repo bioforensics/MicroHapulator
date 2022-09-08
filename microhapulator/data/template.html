@@ -165,6 +165,8 @@
                     <td class="alnrt">{{ "{:.2f}".format(row.InterlocChiSq)}}</td>
                 </tr>
                 {% endfor %}
+
+            <p>The number of total reads mapped to each marker for each sample and the number of off target reads. Off target reads are those that when aligned to the full human reference genome, map preferentially to a locus that is not the marker locus.</p>
             </table>
                 <table id="mapping_rates_table" class="pagination_table">
                     <thead>
@@ -227,7 +229,7 @@
                 {% endfor %}
             </table>
 
-            Some explanatory text here.
+            <p>The following table shows the typing rate per marker for each sample.</p>
                 <table id="typing_rates_table" class="pagination_table" >
                     <thead>
                     <tr>

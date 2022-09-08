@@ -94,12 +94,14 @@ def marker_details():
     marker_defs = load_marker_definitions("marker-definitions.tsv")
     all_marker_details = list()
     for seqid, seq in marker_seqs.items():
-        marker_def = marker_defs.loc[marker_defs["Marker"] == seqid]["Offset"]
-        marker_offsets = ", ".join([str(offset) for offset in marker_def.values])
+        marker_def = marker_defs.loc[marker_defs["Marker"] == seqid]
+        marker_offsets = ", ".join([str(offset) for offset in marker_def["Offset"].values])
+        chrom = marker_def["Chrom"]
+        hg38_offsets = ", ".join([str(offset) for offset in marker_def["OffsetHg38"].values])
         GC_content = round((seq.upper().count("G") + seq.upper().count("C")) / len(seq) * 100, 2)
-        sample_details = [seqid, len(seq), GC_content, marker_offsets, "".join(seq).strip()]
+        sample_details = [seqid, len(seq), GC_content, marker_offsets, "".join(seq).strip(), chrom, hg38_offsets]
         all_marker_details.append(sample_details)
-    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence"]
+    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence", "Chrom", "Hg38 Offset"]
     marker_details_table = pd.DataFrame(all_marker_details, columns=col_names).set_index("Marker")
     return marker_details_table
 
