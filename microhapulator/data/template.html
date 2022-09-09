@@ -29,10 +29,9 @@
             }
             table {
                 margin: 12pt auto;
-                width: 100%;
-                display: block;
-                max-width: -moz-fit-content;
-                max-width: fit-content;
+                width: 100%; 
+            }
+            .scrollwrapper {
                 overflow-x: auto;
             }
             table.half {
@@ -43,6 +42,7 @@
                 padding-right: 10px;
                 white-space: nowrap;
             }
+
             ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -144,6 +144,7 @@
             <a name="readmapping"></a>
             <h2>Read Mapping</h2>
             <p>Merged reads are aligned to marker reference sequences using <a href="http://bio-bwa.sourceforge.net/bwa.shtml" target="_blank">BWA MEM</a> and formatted/sorted using <a href="http://www.htslib.org/" target="_blank">SAMtools</a>. The reads were also aligned to the full (entire chromosomes) human reference genome, to aid in discriminating between off-target sequences and e.g. contaminant sequences: reads that align to the entire chromosomes but not to the marker sequences represent off-target sequences, while reads that do not align to either are likely contaminants.</p>
+            <div class="scrollwrapper">
             <table>
                 <tr>
                     <th>Sample</th>
@@ -165,9 +166,12 @@
                     <td class="alnrt">{{ "{:.2f}".format(row.InterlocChiSq)}}</td>
                 </tr>
                 {% endfor %}
-
-            <p>The number of total reads mapped to each marker for each sample and the number of off target reads. Off target reads are those that when aligned to the full human reference genome, map preferentially to a locus that is not the marker locus.</p>
             </table>
+            </div>
+        </br>
+            <h3>Per-marker Read Mapping</h3>
+            <p>The number of total reads mapped to each marker and the number of off-target reads. Off-target reads are those that when aligned to the full human reference genome, align preferentially to a locus that is not the marker locus.</p>
+                <div class="scrollwrapper">
                 <table id="mapping_rates_table" class="pagination_table">
                     <thead>
                         <tr>
@@ -199,6 +203,8 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+        </br>
 
  
 
@@ -228,14 +234,16 @@
                 </tr>
                 {% endfor %}
             </table>
-
-            <p>The following table shows the typing rate per marker for each sample.</p>
+        </br>
+        <h3>Per-marker Haplotype Calling</h3>
+            <p>The following table shows the percentage of reads haplotyped at each marker.</p>
+                <div class="scrollwrapper">
                 <table id="typing_rates_table" class="pagination_table" >
                     <thead>
                     <tr>
                         <th>Marker</th>
                         {% for sample in typing_rates.keys() %}
-                        <th style="font-weight:bold">{{sample}}</th>
+                        <th class=alnrt style="font-weight:bold">{{sample}}</th>
                         {% endfor %}
                     </tr>
                 </thead>
@@ -250,11 +258,12 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
 
         
             <a name="filters"></a>
             <h2>Genotype Calling</h2>
-            <p>Fixed detection thresholds and dynamic analytical thresholds are applied to the typing result using <code>mhpl8r filter</code> to discriminate true and erroneous haplotypes and predict each sample's genotype. MicroHapulator applied a static filter of <strong>≥{{static}} reads</strong> as a detection threshold and a dynamic filter of <strong>≥{{"{:.1f}".format(dynamic*100)}}% of total reads</strong>.</p>
+            <p>Fixed detection thresholds and dynamic analytical thresholds are applied to the typing result using <code>mhpl8r filter</code> to discriminate true and erroneous haplotypes and predict each sample's genotype. MicroHapulator applied a static filter of <strong>&#8805;{{static}} reads</strong> as a detection threshold and a dynamic filter of <strong>&#8805;{{"{:.1f}".format(dynamic*100)}}% of total reads</strong>.</p>
             <p>Plots of the genotype calls, including the thresholds used to distinguish true haplotypes from false haplotypes, are available in each <code>analysis/{samplename}/callplots/</code> subdirectory, one graphics file per marker.</p>
 
             <p>The following figures show the heterozygote balance for each sample.

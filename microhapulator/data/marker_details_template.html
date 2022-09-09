@@ -62,6 +62,7 @@
 
 
     <div class="container" id="marker_detail_container">
+        <h1>MicroHapulator Marker Detail Report</h1>
         <select onchange="show_selected_details(this.value)" id="drop_down">
             {% for markername in markernames %}
             <option>{{markername}}</option>
@@ -79,20 +80,16 @@
             <p>{{marker_details_table.loc[markername,'GC']}}%</p>
             <br/>
             <h4>Offsets</h4>
-            <p>{{marker_details_table.loc[markername,'Offsets']}}%</p>
+            <div class="offsets">{{marker_details_table.loc[markername,'Offsets']}}</div>
             <br/>
-            <h4>Chromosome</h4>
-            <p>{{marker_details_table.loc[markername,'Chrom']}}%</p>
-            <br/>
-            <h4>Hg38 Offsets</h4>
-            <p>{{marker_details_table.loc[markername,'Hg38 Offset']}}%</p>
+            <h4>Hg38 offsets</h4>
+            <p>{{marker_details_table.loc[markername,'Chrom']}}: {{marker_details_table.loc[markername,'Hg38 Offset']}}</p>
             <br/>
             <h4>Sequence (offsets in red) </h4>
             <div class="sequence">{{marker_details_table.loc[markername,'Sequence']}}</div>
             <br><br><br>
             <table>
                 <h4>Read Mapping</h4>
-                Here the mapped rate refers to the quotient of the number of mapped reads and the expected number of mapped reads given equal coverage across all markers. The off target rate is the number of reads that when aligned to the full human reference genome, map preferentially to a locus that is not the marker locus. The off target rate is the percentage of the total mapped reads which mapped off target.  
                 <tr>
                     <th>Sample</th>
                     <th class="alnrt">Mapped Reads</th>
@@ -101,6 +98,10 @@
                     <th class="alnrt">Off Target Rate</th>
 
                 </tr>
+                Here the mapped rate refers to the number of mapped reads divided by the expected number of mapped reads given equal
+                coverage across all markers. The off-target rate is the number of reads that when aligned to the full human reference
+                genome, align preferentially to a locus that is not the marker locus. The off-target rate is the percentage of the total
+                mapped reads which mapped off-target.
                 {% for sample, sample_data in mapping_rates.items()%}
                 <tr>
                     <td>{{sample}}</td>
@@ -114,7 +115,8 @@
             <br><br><br>
             <table>
                 <h4>Haplotype Calling</h4>
-                 Haplotype calling data for each sample. Reads that span all SNPs of interest in the marker are examined; all other reads are discarded
+                The number and percentage of reads which were successfully haplotyped in each sample. Reads that span all SNPs of
+                interest in the marker are examined; all other reads are discarded.
                 <tr>
                     <th>Sample</th>
                     <th class="alnrt">Typed Reads</th>
