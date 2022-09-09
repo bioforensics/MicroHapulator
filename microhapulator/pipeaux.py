@@ -109,7 +109,7 @@ def marker_details():
             hg38_offsets,
         ]
         all_marker_details.append(sample_details)
-    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence", "Chrom", "Hg38 Offset"]
+    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence", "Chrom", "Hg38Offset"]
     marker_details_table = pd.DataFrame(all_marker_details, columns=col_names).set_index("Marker")
     return marker_details_table
 

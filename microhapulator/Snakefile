@@ -44,6 +44,7 @@ rule report:
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
+        resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
     output:
         "report.html",
