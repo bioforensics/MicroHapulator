@@ -23,18 +23,16 @@ from subprocess import run
 
 
 def test_validate_sample_input_files():
-    assert validate_sample_input_files(1, "S1", paired_end_ok=True, single_end_ok=True) is True
-    assert validate_sample_input_files(2, "S2", paired_end_ok=True, single_end_ok=True) is True
-    with pytest.raises(ValueError, match=r"but single-end mode disabled"):
-        validate_sample_input_files(1, "S1", paired_end_ok=True, single_end_ok=False)
-    with pytest.raises(ValueError, match=r"but paired-end mode disabled"):
-        validate_sample_input_files(2, "S1", paired_end_ok=False, single_end_ok=True)
-    with pytest.raises(ValueError, match=r"both paired-end and single-end data disabled"):
-        validate_sample_input_files(2, "S1", paired_end_ok=False, single_end_ok=False)
+    assert validate_sample_input_files(1, "S1", reads_are_paired=False) is True
+    assert validate_sample_input_files(2, "S2", reads_are_paired=True) is True
+    with pytest.raises(ValueError, match=r"expected 2 in paired-end mode"):
+        validate_sample_input_files(1, "S3", reads_are_paired=True)
+    with pytest.raises(ValueError, match=r"expected 1 in single-end mode"):
+        validate_sample_input_files(2, "S4", reads_are_paired=False)
     with pytest.raises(FileNotFoundError):
-        validate_sample_input_files(0, "S1", paired_end_ok=True, single_end_ok=True)
-    with pytest.raises(ValueError, match=r"found 4 FASTQ files, not supported"):
-        validate_sample_input_files(4, "S1", paired_end_ok=True, single_end_ok=True)
+        validate_sample_input_files(0, "S5")
+    with pytest.raises(ValueError, match=r"expected 2 in paired-end mode"):
+        validate_sample_input_files(4, "S6", reads_are_paired=True)
 
 
 def test_pipe_missing_files(tmp_path):

@@ -58,21 +58,25 @@ def traverse(dirpath):
             yield subpath
 
 
-def validate_sample_input_files(numfiles, sample, paired_end_ok=True, single_end_ok=True):
-    if not paired_end_ok and not single_end_ok:
-        raise ValueError(f"both paired-end and single-end data disabled, cannot proceed")
+def validate_sample_input_files(numfiles, sample, reads_are_paired=True):
     if numfiles == 0:
         raise FileNotFoundError(f"sample {sample}: found 0 FASTQ files")
-    elif numfiles not in (1, 2):
-        raise ValueError(f"sample {sample}: found {numfiles} FASTQ files, not supported")
-    elif numfiles == 2 and not paired_end_ok:
-        raise ValueError(f"sample {sample}: found 2 FASTQ files, but paired-end mode disabled")
-    elif numfiles == 1 and not single_end_ok:
-        raise ValueError(f"sample {sample}: found 1 FASTQ file, but single-end mode disabled")
+    if reads_are_paired:
+        exp_num_fastq_files = 2
+        mode = "paired"
+    else:
+        exp_num_fastq_files = 1
+        mode = "single"
+    if numfiles != exp_num_fastq_files:
+        message = (
+            f"sample {sample}: found {numfiles} FASTQ files"
+            f", expected {exp_num_fastq_files} in {mode}-end mode"
+        )
+        raise ValueError(message)
     return True
 
 
-def get_input_files(sample_names, seqpath, paired_end_ok=True, single_end_ok=True, suffixes=None):
+def get_input_files(sample_names, seqpath, reads_are_paired=True, suffixes=None):
     """Find input files for each sample
 
     This function traverses `seqpath` and any of its sub-directories for FASTQ files. Any FASTQ
@@ -96,9 +100,7 @@ def get_input_files(sample_names, seqpath, paired_end_ok=True, single_end_ok=Tru
     final_file_list = list()
     for sample in sample_names:
         filelist = files[sample]
-        filelist_ok = validate_sample_input_files(
-            len(filelist), sample, paired_end_ok=paired_end_ok, single_end_ok=single_end_ok
-        )
+        filelist_ok = validate_sample_input_files(len(filelist), sample, reads_are_paired)
         if filelist_ok:
             final_file_list.extend(filelist)
     unique_file_names = set([filepath.name for filepath in final_file_list])
@@ -174,15 +176,9 @@ def subparser(subparsers):
     )
     cli.add_argument(
         "--single",
-        dest="paired_end_ok",
+        dest="reads_are_paired",
         action="store_false",
-        help="accept single-end reads only; by default, single-end or paired-end is accepted on a per-sample basis",
-    )
-    cli.add_argument(
-        "--paired",
-        dest="single_end_ok",
-        action="store_false",
-        help="accept paired-end reads only; by default, single-end or paired-end is accepted on a per-sample basis",
+        help="accept single-end reads only; by default, only paired-end reads are accepted",
     )
     cli.add_argument(
         "--copy-input",
@@ -218,9 +214,7 @@ def validate_panel_config(markerseqs, markerdefn):
 
 def main(args):
     validate_panel_config(args.markerrefr, args.markerdefn)
-    samples, filenames = get_input_files(
-        args.samples, args.seqpath, args.paired_end_ok, args.single_end_ok
-    )
+    samples, filenames = get_input_files(args.samples, args.seqpath, args.reads_are_paired)
     workingfiles = link_or_copy_input(filenames, args.workdir, docopy=args.copy_input)
     config = dict(
         samples=samples,
