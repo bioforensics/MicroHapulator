@@ -15,10 +15,12 @@ from microhapulator import api as mhapi
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
-preproc_files = chain(
+preproc_aux_files = chain(
     expand("analysis/{sample}/{sample}-read-lengths.png", sample=config["samples"]),
     expand("analysis/{sample}/fastqc/report.html", sample=config["samples"]),
 )
+
+summary_aux_files = list()
 
 
 rule fastqc:

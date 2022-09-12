@@ -30,7 +30,7 @@ include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
 rule report:
     input:
         "analysis/summary.tsv",
-        preproc_files,
+        preproc_aux_files,
         expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
         expand(
             "analysis/{sample}/profiles/{sample}-{suffix}.csv",
@@ -49,7 +49,7 @@ rule report:
         "marker-detail-report.html",
     run:
         summary = pd.read_csv("analysis/summary.tsv", sep="\t")
-        final_html_report(config["samples"], summary)
+        final_html_report(config["samples"], summary, config["paired"])
         marker_detail_report(config["samples"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
         shutil.copy(jsfile, "fancyTable.js")
@@ -57,7 +57,7 @@ rule report:
 
 rule summary:
     input:
-        expand("analysis/{sample}/flash.log", sample=config["samples"]),
+        summary_aux_files,
         expand("analysis/{sample}/{sample}-mapped-reads.txt", sample=config["samples"]),
         expand(
             "analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
@@ -72,7 +72,7 @@ rule summary:
     output:
         tsv="analysis/summary.tsv",
     run:
-        summary = aggregate_summary(config["samples"])
+        summary = aggregate_summary(config["samples"], config["paired"])
         summary.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
 
 

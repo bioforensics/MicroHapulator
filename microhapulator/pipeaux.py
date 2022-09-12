@@ -114,39 +114,17 @@ def marker_details():
     return marker_details_table
 
 
-def final_html_report(samples, summary):
-    read_length_table = list()
-    for sample in samples:
-        with open(f"analysis/{sample}/{sample}-r1-read-lengths.json") as fh:
-            r1lengths = json.load(fh)
-            r1lengths = list(set(r1lengths))
-        with open(f"analysis/{sample}/{sample}-r2-read-lengths.json") as fh:
-            r2lengths = json.load(fh)
-            r2lengths = list(set(r2lengths))
-        if len(r1lengths) != 1 or len(r2lengths) != 1:
-            read_length_table = None
-            break
-        read_length_table.append((sample, r1lengths[0], r2lengths[0]))
-    if read_length_table is not None:
-        col = ("Sample", "LengthR1", "LengthR2")
-        read_length_table = pd.DataFrame(read_length_table, columns=col)
+def final_html_report(samples, summary, reads_are_paired=True):
+    if reads_are_paired:
+        table_func = read_length_table_paired_end
+        plot_func = aggregate_plots_paired_end
+    else:
+        table_func = read_length_table_single_end
+        plot_func = aggregate_plots_single_end
+    read_length_table = table_func(samples)
+    plots = plot_func(samples)
     typing_rates = per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
-    plots = {
-        "r1readlen": list(),
-        "r2readlen": list(),
-        "mergedreadlen": list(),
-        "locbalance": list(),
-        "hetbalance": list(),
-    }
-    for sample in samples:
-        plots["r1readlen"].append(encode(f"analysis/{sample}/{sample}-r1-read-lengths.png"))
-        plots["r2readlen"].append(encode(f"analysis/{sample}/{sample}-r2-read-lengths.png"))
-        plots["mergedreadlen"].append(
-            encode(f"analysis/{sample}/{sample}-merged-read-lengths.png")
-        )
-        plots["locbalance"].append(encode(f"analysis/{sample}/{sample}-interlocus-balance.png"))
-        plots["hetbalance"].append(encode(f"analysis/{sample}/{sample}-heterozygote-balance.png"))
     templatefile = resource_filename("microhapulator", "data/template.html")
     with open(templatefile, "r") as infh, open("report.html", "w") as outfh:
         template = Template(infh.read())
@@ -168,8 +146,68 @@ def final_html_report(samples, summary):
         print(output, file=outfh, end="")
 
 
-def aggregate_summary(samples):
-    columns = (
+def read_length_table_paired_end(samples):
+    read_length_data = list()
+    for sample in samples:
+        with open(f"analysis/{sample}/{sample}-r1-read-lengths.json") as fh:
+            r1lengths = json.load(fh)
+            r1lengths = list(set(r1lengths))
+        with open(f"analysis/{sample}/{sample}-r2-read-lengths.json") as fh:
+            r2lengths = json.load(fh)
+            r2lengths = list(set(r2lengths))
+        if len(r1lengths) != 1 or len(r2lengths) != 1:
+            return None
+        read_length_data.append((sample, r1lengths[0], r2lengths[0]))
+    else:
+        return pd.DataFrame(read_length_data, columns=("Sample", "LengthR1", "LengthR2"))
+
+
+def read_length_table_single_end(samples):
+    read_length_data = list()
+    for sample in samples:
+        with open(f"analysis/{sample}/{sample}-read-lengths.json") as fh:
+            lengths = json.load(fh)
+            lengths = list(set(lengths))
+        if len(lengths) != 1:
+            return None
+        read_length_data.append((sample, lengths[0]))
+    return pd.DataFrame(read_length_data, columns=("Sample", "Length"))
+
+
+def aggregate_plots_paired_end(samples):
+    plots = {
+        "r1readlen": list(),
+        "r2readlen": list(),
+        "mergedreadlen": list(),
+        "locbalance": list(),
+        "hetbalance": list(),
+    }
+    for sample in samples:
+        plots["r1readlen"].append(encode(f"analysis/{sample}/{sample}-r1-read-lengths.png"))
+        plots["r2readlen"].append(encode(f"analysis/{sample}/{sample}-r2-read-lengths.png"))
+        plots["mergedreadlen"].append(
+            encode(f"analysis/{sample}/{sample}-merged-read-lengths.png")
+        )
+        plots["locbalance"].append(encode(f"analysis/{sample}/{sample}-interlocus-balance.png"))
+        plots["hetbalance"].append(encode(f"analysis/{sample}/{sample}-heterozygote-balance.png"))
+    return plots
+
+
+def aggregate_plots_single_end(samples):
+    plots = {
+        "readlen": list(),
+        "locbalance": list(),
+        "hetbalance": list(),
+    }
+    for sample in samples:
+        plots["readlen"].append(encode(f"analysis/{sample}/{sample}-read-lengths.png"))
+        plots["locbalance"].append(encode(f"analysis/{sample}/{sample}-interlocus-balance.png"))
+        plots["hetbalance"].append(encode(f"analysis/{sample}/{sample}-heterozygote-balance.png"))
+    return plots
+
+
+def aggregate_summary(samples, reads_are_paired=True):
+    colnames = (
         "Sample",
         "TotalReads",
         "Merged",
@@ -183,12 +221,20 @@ def aggregate_summary(samples):
         "InterlocChiSq",
         "HetTstat",
     )
-    data = {colname: [] for colname in columns}
+    data = list()
     for sample in sorted(samples):
         print(f"[Compiling summary] Sample={sample}", file=sys.stderr)
-        totalreads, mergedreads, *_ = parse_flash_summary(f"analysis/{sample}/flash.log")
+        if reads_are_paired:
+            totalreads, mergedreads, *_ = parse_flash_summary(f"analysis/{sample}/flash.log")
+            mergedrate = mergedreads / totalreads
+        else:
+            totalreads = None
+            mergedreads, mergedrate = None, None
         maptotal, mapped = parse_read_counts(f"analysis/{sample}/{sample}-mapped-reads.txt")
-        assert maptotal == mergedreads, (sample, maptotal, mergedreads)
+        if reads_are_paired:
+            assert maptotal == mergedreads, (sample, maptotal, mergedreads)
+        else:
+            totalreads = maptotal
         frmaptotal, frmapped = parse_read_counts(
             f"analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt"
         )
@@ -205,19 +251,22 @@ def aggregate_summary(samples):
         typing_rate = num_typed_reads / typing_total_reads
         chisq = parse_balance_stat(f"analysis/{sample}/{sample}-interlocus-balance-chisq.txt")
         tstat = parse_balance_stat(f"analysis/{sample}/{sample}-heterozygote-balance-pttest.txt")
-        data["Sample"].append(sample)
-        data["TotalReads"].append(totalreads)
-        data["Merged"].append(mergedreads)
-        data["MergeRate"].append(mergedreads / totalreads)
-        data["Mapped"].append(mapped)
-        data["MappingRate"].append(mapped / maptotal)
-        data["MappedFullRefr"].append(frmapped)
-        data["MappingRateFullRefr"].append(frmapped / frmaptotal)
-        data["Typed"].append(num_typed_reads)
-        data["TypingRate"].append(typing_rate)
-        data["InterlocChiSq"].append(chisq)
-        data["HetTstat"].append(tstat)
-    return pd.DataFrame(data)
+        entry = [
+            sample,
+            totalreads,
+            mergedreads,
+            mergedrate,
+            mapped,
+            mapped / maptotal,
+            frmapped,
+            frmapped / frmaptotal,
+            num_typed_reads,
+            typing_rate,
+            chisq,
+            tstat,
+        ]
+        data.append(entry)
+    return pd.DataFrame(data, columns=colnames)
 
 
 def marker_detail_report(samples):
