@@ -18,7 +18,10 @@ import pandas as pd
 from pkg_resources import resource_filename
 
 
-include: "preproc-paired.smk"
+preproc = "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
+
+
+include: preproc
 
 
 rule report:
@@ -80,6 +83,49 @@ rule copy_and_index_marker_data:
         cp {input.tsv} {output.tsv}
         cp {input.fasta} {output.fasta}
         bwa index {output.fasta}
+        """
+
+
+rule map_sort_and_index:
+    input:
+        fastq="analysis/{sample}/reads.fastq",
+        fasta="marker-refr.fasta",
+        idx=expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
+    output:
+        bam="analysis/{sample}/{sample}.bam",
+        bai="analysis/{sample}/{sample}.bam.bai",
+        counts="analysis/{sample}/{sample}-mapped-reads.txt",
+    threads: 32
+    shell:
+        """
+        bwa mem -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
+        samtools index {output.bam}
+        echo -n "Total reads: " > {output.counts}
+        samtools view -c -F 2304 {output.bam} >> {output.counts}
+        echo -n "Mapped reads: " >> {output.counts}
+        samtools view -c -F 2308 {output.bam} >> {output.counts}
+        """
+
+
+rule map_full_reference:
+    params:
+        refr=config["hg38path"],
+    input:
+        full_reference_index_files(config["hg38path"]),
+        fastq="analysis/{sample}/reads.fastq",
+    output:
+        bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
+        bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
+        counts="analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
+    threads: 32
+    shell:
+        """
+        bwa mem -t {threads} {params.refr} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
+        samtools index {output.bam}
+        echo -n "Total reads: " > {output.counts}
+        samtools view -c -F 2304 {output.bam} >> {output.counts}
+        echo -n "Mapped reads: " >> {output.counts}
+        samtools view -c -F 2308 {output.bam} >> {output.counts}
         """
 
 

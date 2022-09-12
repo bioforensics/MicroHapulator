@@ -37,6 +37,7 @@ rule merge:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
         mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
+        linkedfq="analysis/{sample}/reads.fastq",
         log="analysis/{sample}/flash.log",
     threads: 8
     shell:
@@ -46,13 +47,14 @@ rule merge:
             --output-prefix analysis/{wildcards.sample}/{wildcards.sample} \
             {input} \
             2>&1 | tee {output.log}
+        ln -s {wildcards.sample}.extendedFrags.fastq {output.linkedfq}
         """
 
 
 rule read_length_distributions:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
-        rules.merge.output.mergedfq,
+        rules.merge.output.linkedfq,
     output:
         r1="analysis/{sample}/{sample}-r1-read-lengths.png",
         r2="analysis/{sample}/{sample}-r2-read-lengths.png",
@@ -84,46 +86,3 @@ rule read_length_distributions:
             color="#377eb8",
             edgecolor="#000099",
         )
-
-
-rule map_sort_and_index:
-    input:
-        fastq=rules.merge.output.mergedfq,
-        fasta="marker-refr.fasta",
-        idx=expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
-    output:
-        bam="analysis/{sample}/{sample}.bam",
-        bai="analysis/{sample}/{sample}.bam.bai",
-        counts="analysis/{sample}/{sample}-mapped-reads.txt",
-    threads: 32
-    shell:
-        """
-        bwa mem -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
-        samtools index {output.bam}
-        echo -n "Total reads: " > {output.counts}
-        samtools view -c -F 2304 {output.bam} >> {output.counts}
-        echo -n "Mapped reads: " >> {output.counts}
-        samtools view -c -F 2308 {output.bam} >> {output.counts}
-        """
-
-
-rule map_full_reference:
-    params:
-        refr=config["hg38path"],
-    input:
-        full_reference_index_files(config["hg38path"]),
-        fastq=rules.merge.output.mergedfq,
-    output:
-        bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
-        bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
-        counts="analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
-    threads: 32
-    shell:
-        """
-        bwa mem -t {threads} {params.refr} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
-        samtools index {output.bam}
-        echo -n "Total reads: " > {output.counts}
-        samtools view -c -F 2304 {output.bam} >> {output.counts}
-        echo -n "Mapped reads: " >> {output.counts}
-        samtools view -c -F 2308 {output.bam} >> {output.counts}
-        """

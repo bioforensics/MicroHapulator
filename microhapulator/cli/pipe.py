@@ -225,6 +225,7 @@ def main(args):
         thresh_static=args.static,
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
+        paired=args.reads_are_paired,
     )
     snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
     success = snakemake(
