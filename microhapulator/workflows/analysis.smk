@@ -18,27 +18,21 @@ import pandas as pd
 from pkg_resources import resource_filename
 
 
-preproc = "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
-
-
-include: preproc
+include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
 
 
 rule report:
     input:
         "analysis/summary.tsv",
+        preproc_files,
         expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
         expand(
             "analysis/{sample}/profiles/{sample}-{suffix}.csv",
             sample=config["samples"],
             suffix=("qual", "quant", "qual-ref", "quant-ref"),
         ),
-        expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
-        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),

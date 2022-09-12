@@ -11,9 +11,17 @@
 # -------------------------------------------------------------------------------------------------
 
 from glob import glob
+from itertools import chain
 from microhapulator import api as mhapi
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
+
+preproc_files = chain(
+    expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=config["samples"]),
+    expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=config["samples"]),
+    expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=config["samples"]),
+    expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
+)
 
 
 rule fastqc:
