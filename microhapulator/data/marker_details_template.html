@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen">
+        <title>MicroHapulator Report: Marker Detail</title>
+        <style type="text/css">
+            .container {
+                max-width: 750px;
+                padding-top: 100px;
+            }
+
+            .alnrt {
+                text-align: right;
+            }
+
+            table {
+                margin: 12pt auto;
+                width: 100%;
+            }
+
+            td,
+            th {
+                padding: auto 5px;
+                white-space: nowrap;
+            }
+
+            .offsets {
+                overflow-wrap: break-word;
+            }
+
+            .sequence {
+                border: none;
+                padding: 5px;
+                width: 100%;
+                height: 40px;
+                overflow-x: scroll;
+                font-family: 'Courier New', monospace;
+                font-size: 12pt;
+            }
+
+            ::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: gray;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+                border-radius: 10px;
+                background-color: #F5F5F5;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container" id="marker_detail_container">
+            <h1>MicroHapulator Report: Marker Detail</h1>
+            <select onchange="show_selected_details(this.value)" id="drop_down">
+                {% for markername in markernames %}
+                <option>{{markername}}</option>
+                {% endfor %}
+            </select>
+            <input id="searchbar" , type="search" onsearch="search_marker()" name="search" placeholder="Search markers..">
+            <p></p>
+            {% for markername in markernames %}
+            <div class="marker_details" id={{markername}} style="display:none">
+                <p>
+                <h4>Marker Length</h4>
+                <p>{{marker_details_table.loc[markername,'Length']}} bp</p>
+                <br/>
+                <h4>%GC content</h4>
+                <p>{{marker_details_table.loc[markername,'GC']}}%</p>
+                <br/>
+                <h4>SNP Offsets</h4>
+                <p><strong>Locus</strong>: <span class="offsets">{{marker_details_table.loc[markername,'Offsets']}}</span></p>
+                <p><strong>GRCh38 {{marker_details_table.loc[markername,"Chrom"]}}</strong>: {{marker_details_table.loc[markername,"Hg38Offset"]}}</p>
+                <br/>
+                <h4>Marker Sequence (SNPs in red) </h4>
+                <div class="sequence">{{marker_details_table.loc[markername,"Sequence"]}}</div>
+                <br><br><br>
+                <table>
+                    <h4>Read Mapping</h4>
+                    <tr>
+                        <th>Sample</th>
+                        <th class="alnrt">Mapped Reads</th>
+                        <th class="alnrt">Mapped Rate</th>
+                        <th class="alnrt">Off Target Reads</th>
+                        <th class="alnrt">Off Target Rate</th>
+
+                    </tr>
+                    In this table, "Mapped Reads" refers to the total number of reads that mapped to the marker reference sequence. "Mapped Rate" refers to the proportion of reads mapped compared to what we would <em>expect</em> to see with perfectly even coverage across all markers: that is, a "Mapped Rate" of > 1.0 indicates higher than expected coverage and < 1.0 indicates lower than expected coverage.
+                    "Off Target Reads" and "Off Target Rate" refer to the number and percentage of reads that map to the marker reference, but preferentially map elsewhere when aligned to the entire genome.
+                    {% for sample, sample_data in mapping_rates.items()%}
+                    <tr>
+                        <td>{{sample}}</td>
+                        <td class="alnrt">{{"{:,.0f}".format(sample_data.loc[markername,'ReadCount'])}}</td>
+                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'ExpectedObservedRatio'])}}</td>
+                        <td class="alnrt">{{"{:,.0f}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
+                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'OffTargetRate']*100)}}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br><br><br>
+                <table>
+                    <h4>Haplotype Calling</h4>
+                    The number and percentage of reads which were successfully haplotyped in each sample. Reads that span all SNPs of
+                    interest in the marker are examined; all other reads are discarded.
+                    <tr>
+                        <th>Sample</th>
+                        <th class="alnrt">Typed Reads</th>
+                        <th class="alnrt">Total Reads</th>
+                        <th class="alnrt">Typing Rate</th>
+
+                    </tr>
+                    {% for sample, sample_data in typing_rates.items()%}
+                    <tr>
+                        <td>{{sample}}</td>
+                        <td class="alnrt">{{ "{:,.0f}".format(sample_data.loc[markername, 'TypedReads']) }}</td>
+                        <td class="alnrt">{{ "{:,.0f}".format(sample_data.loc[markername, 'TotalReads'])}}</td>
+                        <td class="alnrt">{{ "{:.2f}".format(sample_data.loc[markername, 'TypingRate'] * 100)}}%</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        initMarkerDetails(urlParams.get('marker'))
+
+        function initMarkerDetails(marker) {
+            if (marker != null) {
+                show_selected_details(marker)
+            } else {
+                first_marker = document.getElementsByClassName("marker_details")[0]
+                show_selected_details(first_marker.id)
+            }
+        }
+
+        function show_selected_details(markername) {
+            var marker_details = document.getElementsByClassName("marker_details");
+            var found_marker = false;
+            for (var i = 0; i < marker_details.length; i++) {
+                if (marker_details[i].id == markername) {
+                    found_marker = true
+                    colorOffsets(marker_details[i])
+                    document.getElementById('drop_down').value = markername
+                    marker_details[i].style.display = "block";
+                } else {
+                    marker_details[i].style.display = "none";
+                }
+            }
+            if (found_marker == false) {
+                alert(markername + " not found");
+            }
+        }
+
+        function colorOffsets(marker) {
+            var sequence = marker.getElementsByClassName("sequence")[0].innerHTML
+            var offsets = marker.getElementsByClassName("offsets")[0].innerHTML.split(", ");
+            var colored_sequence = "";
+            for (var j = 0; j < sequence.length; j++) {
+                if (offsets.includes(j.toString())) {
+                    colored_sequence += '<span style="color: red; font-weight: bold;' + '">' + sequence[j] + '</span>';
+                } else {
+                    colored_sequence += sequence[j];
+                }
+            }
+            marker.getElementsByClassName("sequence")[0].innerHTML = colored_sequence;
+        }
+
+        function search_marker() {
+            var input = document.getElementById('searchbar').value;
+            show_selected_details(input);
+            document.getElementById('drop_down').value = input;
+        }
+    </script>
+</html>
