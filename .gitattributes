@@ -4,3 +4,4 @@ binder/*.ipynb linguist-documentation
 binder/*.html linguist-documentation
 notebook/*/*.ipynb linguist-documentation
 microhapulator/data/template.html linguist-documentation
+microhapulator/data/fancyTable.js linguist-vendored

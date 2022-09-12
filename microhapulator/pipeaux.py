@@ -10,7 +10,6 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-
 from base64 import b64encode
 from datetime import datetime
 from jinja2 import Template
@@ -18,6 +17,7 @@ import json
 from matplotlib import pyplot as plt
 import microhapulator
 import pandas as pd
+from microhapulator.parsers import load_marker_reference_sequences, load_marker_definitions
 from pkg_resources import resource_filename
 import re
 import sys
@@ -64,6 +64,56 @@ def encode(filepath):
         return b64encode(fh.read()).decode("ascii")
 
 
+def per_marker_typing_rate(samples):
+    sample_rates = dict()
+    for sample in samples:
+        filename = f"analysis/{sample}/{sample}-typing-rate.tsv"
+        sample_df = pd.read_csv(filename, sep="\t").set_index("Marker")
+        sample_rates[sample] = sample_df
+    return sample_rates
+
+
+def per_marker_mapping_rate(samples):
+    sample_rates = dict()
+    for sample in samples:
+        total_reads_filename = f"analysis/{sample}/{sample}-marker-read-counts.csv"
+        off_target_filename = f"analysis/{sample}/{sample}-off-target-reads.csv"
+        total_df = pd.read_csv(total_reads_filename).set_index("Marker")
+        off_target_df = pd.read_csv(off_target_filename).set_index("Marker")
+        expected_count = total_df["ReadCount"].sum() / len(total_df)
+        total_df["ExpectedObservedRatio"] = round(total_df["ReadCount"] / expected_count, 2)
+        sample_df = pd.concat([total_df, off_target_df], axis=1)
+        sample_df["OffTargetRate"] = sample_df["OffTargetReads"] / sample_df["ReadCount"]
+        sample_rates[sample] = sample_df
+    marker_names = sample_df.index
+    return sample_rates, marker_names
+
+
+def marker_details():
+    marker_seqs = load_marker_reference_sequences("marker-refr.fasta")
+    marker_defs = load_marker_definitions("marker-definitions.tsv")
+    all_marker_details = list()
+    for seqid, seq in marker_seqs.items():
+        marker_def = marker_defs.loc[marker_defs["Marker"] == seqid]
+        marker_offsets = ", ".join([str(offset) for offset in marker_def["Offset"].values])
+        chrom = marker_def["Chrom"].values[0]
+        hg38_offsets = ", ".join([str(offset) for offset in marker_def["OffsetHg38"].values])
+        GC_content = round((seq.upper().count("G") + seq.upper().count("C")) / len(seq) * 100, 2)
+        sample_details = [
+            seqid,
+            len(seq),
+            GC_content,
+            marker_offsets,
+            "".join(seq).strip(),
+            chrom,
+            hg38_offsets,
+        ]
+        all_marker_details.append(sample_details)
+    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence", "Chrom", "Hg38Offset"]
+    marker_details_table = pd.DataFrame(all_marker_details, columns=col_names).set_index("Marker")
+    return marker_details_table
+
+
 def final_html_report(samples, summary):
     read_length_table = list()
     for sample in samples:
@@ -80,6 +130,8 @@ def final_html_report(samples, summary):
     if read_length_table is not None:
         col = ("Sample", "LengthR1", "LengthR2")
         read_length_table = pd.DataFrame(read_length_table, columns=col)
+    typing_rates = per_marker_typing_rate(samples)
+    mapping_rates, marker_names = per_marker_mapping_rate(samples)
     plots = {
         "r1readlen": list(),
         "r2readlen": list(),
@@ -108,6 +160,10 @@ def final_html_report(samples, summary):
             dynamic=0.02,
             zip=zip,
             read_length_table=read_length_table,
+            typing_rates=typing_rates,
+            mapping_rates=mapping_rates,
+            markernames=marker_names,
+            len=len,
         )
         print(output, file=outfh, end="")
 
@@ -162,3 +218,20 @@ def aggregate_summary(samples):
         data["InterlocChiSq"].append(chisq)
         data["HetTstat"].append(tstat)
     return pd.DataFrame(data)
+
+
+def marker_detail_report(samples):
+    mapping_rates, marker_names = per_marker_mapping_rate(samples)
+    marker_details_table = marker_details()
+    templatefile = resource_filename("microhapulator", "data/marker_details_template.html")
+    with open(templatefile, "r") as infh, open("marker-detail-report.html", "w") as outfh:
+        template = Template(infh.read())
+        output = template.render(
+            date=datetime.now().replace(microsecond=0).isoformat(),
+            mhpl8rversion=microhapulator.__version__,
+            mapping_rates=mapping_rates,
+            typing_rates=per_marker_typing_rate(samples),
+            markernames=sorted(marker_names),
+            marker_details_table=marker_details_table,
+        )
+        print(output, file=outfh, end="")

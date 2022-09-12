@@ -12,10 +12,16 @@
 
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
-from microhapulator.pipeaux import full_reference_index_files, final_html_report, aggregate_summary
+from microhapulator.pipeaux import (
+    full_reference_index_files,
+    final_html_report,
+    aggregate_summary,
+    marker_detail_report,
+)
 from microhapulator.profile import TypingResult
 import pandas as pd
 from pkg_resources import resource_filename
+import shutil
 
 
 include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
@@ -36,11 +42,17 @@ rule report:
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
+        resource_filename("microhapulator", "data/marker_details_template.html"),
+        resource_filename("microhapulator", "data/fancyTable.js"),
     output:
         "report.html",
+        "marker-detail-report.html",
     run:
         summary = pd.read_csv("analysis/summary.tsv", sep="\t")
         final_html_report(config["samples"], summary)
+        marker_detail_report(config["samples"])
+        jsfile = resource_filename("microhapulator", "data/fancyTable.js")
+        shutil.copy(jsfile, "fancyTable.js")
 
 
 rule summary:
