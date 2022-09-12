@@ -226,7 +226,7 @@ def main(args):
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
     )
-    snakefile = resource_filename("microhapulator", "Snakefile")
+    snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
     success = snakemake(
         snakefile,
         cores=args.threads,
