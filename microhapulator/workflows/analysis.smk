@@ -21,7 +21,7 @@ from microhapulator.pipeaux import (
 from microhapulator.profile import TypingResult
 import pandas as pd
 from pkg_resources import resource_filename
-from shutil import copy
+import shutil
 
 
 include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
@@ -52,7 +52,7 @@ rule report:
         final_html_report(config["samples"], summary, config["paired"])
         marker_detail_report(config["samples"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
-        copy(jsfile, "fancyTable.js")
+        shutil.copy(jsfile, "fancyTable.js")
 
 
 rule summary:
