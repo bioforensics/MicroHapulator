@@ -207,20 +207,6 @@ def aggregate_plots_single_end(samples):
 
 
 def aggregate_summary(samples, reads_are_paired=True):
-    colnames = (
-        "Sample",
-        "TotalReads",
-        "Merged",
-        "MergeRate",
-        "Mapped",
-        "MappingRate",
-        "MappedFullRefr",
-        "MappingRateFullRefr",
-        "Typed",
-        "TypingRate",
-        "InterlocChiSq",
-        "HetTstat",
-    )
     data = list()
     for sample in sorted(samples):
         print(f"[Compiling summary] Sample={sample}", file=sys.stderr)
@@ -266,6 +252,20 @@ def aggregate_summary(samples, reads_are_paired=True):
             tstat,
         ]
         data.append(entry)
+    colnames = (
+        "Sample",
+        "TotalReads",
+        "Merged",
+        "MergeRate",
+        "Mapped",
+        "MappingRate",
+        "MappedFullRefr",
+        "MappingRateFullRefr",
+        "Typed",
+        "TypingRate",
+        "InterlocChiSq",
+        "HetTstat",
+    )
     return pd.DataFrame(data, columns=colnames)
 
 
