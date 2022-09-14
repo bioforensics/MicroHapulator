@@ -29,14 +29,14 @@ Prior to executing the workflow, the user will need to have the following inputs
 
 - MH marker reference sequences in FASTA format (see [the config docs](config.md))
 - MH marker definitions (SNP offsets) in TSV format (see [the config docs](config.md))
-- A pair of NGS read files in FASTQ format for each sample
+- NGS read sequence file(s) in FASTQ format for each sample
     - Each FASTQ file name must include the name of the corresponding sample
     - Sample names must be unique, and one sample name cannot be contained in another sample name
     - All FASTQ files must be contained in a single directory
         - If desired, the directory may be further divided into subdirectories by e.g. experiment, run, project, case, and so on; MicroHapulator will scan all subdirectories to locate FASTQ files
         - It is OK if this directory includes FASTQ files for samples that the user does not want to analyze; any FASTQ file that does not match the user-provided sample name(s) will be ignored
 
-> *MicroHapulator has been tested successfully on single-end Ion S5 data, but at the moment the end-to-end workflow has only been tested on paired-end reads from the Illumina MiSeq instrument.*
+> *By default, MicroHapulator assumes paired-end data and two FASTQ files per sample. When analyzing single-end data from e.g. the Ion S5, the `--single` argument must be declared. See `mhpl8r pipe --help` for details.*
 
 With all of this in place, the user can invoke the end-to-end workflow as follows.
 

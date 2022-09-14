@@ -78,7 +78,9 @@
             <h2>Table of Contents</h2>
             <ol>
                 <li><a href="#readqc">Read QA/QC</a></li>
+                {% if "r1readlen" in plots %}
                 <li><a href="#readmerging">Read Merging</a></li>
+                {% endif %}
                 <li><a href="#readmapping">Read Mapping</a></li>
                 <li><a href="#typing">Haplotype Calling</a></li>
                 <li><a href="#filters">Genotype Calling</a></li>
@@ -89,6 +91,8 @@
             <h2>Read QA/QC</h2>
             <p>QC reports for the input reads are generated using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a>. Links to reports for each sample are provided below.</p>
             <blockquote><strong>NOTE</strong>: FastQC was designed for QC of whole-genome shotgun NGS reads prior to genome asssembly. A QC warning or failure for some modules (such as per-base sequence content or sequence duplication levels) may or may not be a concern with MH reads. Interpret results with care!</blockquote>
+
+            {% if "r1readlen" in plots %}
             <table>
                 <tr><th>Sample</th><th>R1 Report</th><th>R2 Report</th></tr>
                 {% for sample in samples %}
@@ -99,31 +103,65 @@
                 </tr>
                 {% endfor %}
             </table>
-            {% if read_length_table is none %}
-            <p>The following histograms show the distribution of R1 and R2 read lengths for each sample.</p>
-            {% for r1plot, r2plot in zip(plots["r1readlen"], plots["r2readlen"]) %}
-            <img src="data:image/png;base64,{{r1plot}}" class="small" />
-            <img src="data:image/png;base64,{{r2plot}}" class="small" />
-            {% endfor %}
             {% else %}
-            <p>Read lengths, uniform for all samples, are shown below.</p>
-            <table class="half">
+            <table>
+                <tr><th>Sample</th><th>Report</th></tr>
+                {% for sample in samples %}
                 <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Length R1</th>
-                    <th class="alnrt">Length R2</th>
-                </tr>
-                {% for i, row in read_length_table.iterrows() %}
-                <tr>
-                    <td>{{ row.Sample }}</td>
-                    <td class="alnrt">{{ row.LengthR1 }}</td>
-                    <td class="alnrt">{{ row.LengthR2 }}</td>
+                    <td>{{sample}}</td>
+                    <td><a href="analysis/{{sample}}/fastqc/report.html" target="_blank">Click here to open in a new tab</a></td>
                 </tr>
                 {% endfor %}
             </table>
             {% endif %}
 
+            {% if read_length_table is none %}
+                {% if "r1readlen" in plots %}
+                    <p>The following histograms show the distribution of R1 and R2 read lengths for each sample.</p>
+                    {% for r1plot, r2plot in zip(plots["r1readlen"], plots["r2readlen"]) %}
+                    <img src="data:image/png;base64,{{r1plot}}" class="small" />
+                    <img src="data:image/png;base64,{{r2plot}}" class="small" />
+                    {% endfor %}
+                {% else %}
+                    <p>The following histograms show read length distributions for each sample.</p>
+                    {% for rlplot in plots["readlen"] %}
+                    <img src="data:image/png;base64,{{rlplot}}" class="small" />
+                    {% endfor %}
+                {% endif %}
+            {% else %}
+                <p>Read lengths, uniform for all samples, are shown below.</p>
+                {% if "r1readlen" in plots %}
+                <table class="half">
+                    <tr>
+                        <th>Sample</th>
+                        <th class="alnrt">Length R1</th>
+                        <th class="alnrt">Length R2</th>
+                    </tr>
+                    {% for i, row in read_length_table.iterrows() %}
+                    <tr>
+                        <td>{{ row.Sample }}</td>
+                        <td class="alnrt">{{ row.LengthR1 }}</td>
+                        <td class="alnrt">{{ row.LengthR2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <table class="half">
+                    <tr>
+                        <th>Sample</th>
+                        <th class="alnrt">Length</th>
+                    </tr>
+                    {% for i, row in read_length_table.iterrows() %}
+                    <tr>
+                        <td>{{ row.Sample }}</td>
+                        <td class="alnrt">{{ row.Length }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+            {% endif %}
 
+            {% if "r1readlen" in plots %}
             <a name="readmerging"></a>
             <h2>Read Merging</h2>
             <p>Paired end reads are merged using <a href="https://ccb.jhu.edu/software/FLASH/" target="_blank">FLASh</a>.</p>
@@ -147,6 +185,7 @@
             {% for plot in plots["mergedreadlen"] %}
             <img src="data:image/png;base64,{{plot}}" />
             {% endfor %}
+            {% endif %}
 
             <a name="readmapping"></a>
             <h2>Read Mapping</h2>
@@ -155,7 +194,11 @@
             <table>
                 <tr>
                     <th>Sample</th>
+                    {% if "r1readlen" in plots %}
                     <th class="alnrt">Merged Reads</th>
+                    {% else %}
+                    <th class="alnrt">Total Reads</th>
+                    {% endif %}
                     <th class="alnrt">Mapped</th>
                     <th class="alnrt">Mapping Rate</th>
                     <th class="alnrt">Mapped (Chrom)</th>
@@ -165,7 +208,11 @@
                 {% for i, row in summary.iterrows() %}
                 <tr>
                     <td>{{row.Sample}}</td>
+                    {% if "r1readlen" in plots %}
                     <td class="alnrt">{{ "{:,}".format(row.Merged) }}</td>
+                    {% else %}
+                    <td class="alnrt">{{ "{:,}".format(row.TotalReads) }}</td>
+                    {% endif %}
                     <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
                     <td class="alnrt">{{ "{:.2f}".format(row.MappingRate * 100) }}%</td>
                     <td class="alnrt">{{ "{:,}".format(row.MappedFullRefr) }}</td>

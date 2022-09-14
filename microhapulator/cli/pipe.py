@@ -58,7 +58,25 @@ def traverse(dirpath):
             yield subpath
 
 
-def get_input_files(sample_names, seqpath, suffixes=None):
+def validate_sample_input_files(numfiles, sample, reads_are_paired=True):
+    if numfiles == 0:
+        raise FileNotFoundError(f"sample {sample}: found 0 FASTQ files")
+    if reads_are_paired:
+        exp_num_fastq_files = 2
+        mode = "paired"
+    else:
+        exp_num_fastq_files = 1
+        mode = "single"
+    if numfiles != exp_num_fastq_files:
+        message = (
+            f"sample {sample}: found {numfiles} FASTQ files"
+            f", expected {exp_num_fastq_files} in {mode}-end mode"
+        )
+        raise ValueError(message)
+    return True
+
+
+def get_input_files(sample_names, seqpath, reads_are_paired=True, suffixes=None):
     """Find input files for each sample
 
     This function traverses `seqpath` and any of its sub-directories for FASTQ files. Any FASTQ
@@ -82,11 +100,9 @@ def get_input_files(sample_names, seqpath, suffixes=None):
     final_file_list = list()
     for sample in sample_names:
         filelist = files[sample]
-        if len(filelist) == 2:
-            final_file_list.extend(sorted(filelist))
-        else:
-            message = f"sample {sample}: expected 2 FASTQ files, found {len(filelist)}"
-            raise FileNotFoundError(message)
+        filelist_ok = validate_sample_input_files(len(filelist), sample, reads_are_paired)
+        if filelist_ok:
+            final_file_list.extend(filelist)
     unique_file_names = set([filepath.name for filepath in final_file_list])
     if len(unique_file_names) != len(final_file_list):
         raise ValueError("duplicate FASTQ file names found; refusing to proceed")
@@ -159,6 +175,12 @@ def subparser(subparsers):
         help="CSV file specifying marker-specific thresholds to override global thresholds; three required columns: 'Marker' for the marker name; 'Static' and 'Dynamic' for marker-specific thresholds",
     )
     cli.add_argument(
+        "--single",
+        dest="reads_are_paired",
+        action="store_false",
+        help="accept single-end reads only; by default, only paired-end reads are accepted",
+    )
+    cli.add_argument(
         "--copy-input",
         action="store_true",
         help="copy input files to working directory; by default, input files are symlinked",
@@ -192,7 +214,7 @@ def validate_panel_config(markerseqs, markerdefn):
 
 def main(args):
     validate_panel_config(args.markerrefr, args.markerdefn)
-    samples, filenames = get_input_files(args.samples, args.seqpath)
+    samples, filenames = get_input_files(args.samples, args.seqpath, args.reads_are_paired)
     workingfiles = link_or_copy_input(filenames, args.workdir, docopy=args.copy_input)
     config = dict(
         samples=samples,
@@ -203,8 +225,9 @@ def main(args):
         thresh_static=args.static,
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
+        paired=args.reads_are_paired,
     )
-    snakefile = resource_filename("microhapulator", "Snakefile")
+    snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
     success = snakemake(
         snakefile,
         cores=args.threads,
