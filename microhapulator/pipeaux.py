@@ -10,7 +10,6 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from base64 import b64encode
 from datetime import datetime
 from jinja2 import Template
 import json
@@ -57,11 +56,6 @@ def parse_balance_stat(logfile):
         line = next(fh)
         stat = line.strip().split()[-1]
         return float(stat)
-
-
-def encode(filepath):
-    with open(filepath, "rb") as fh:
-        return b64encode(fh.read()).decode("ascii")
 
 
 def per_marker_typing_rate(samples):
@@ -183,13 +177,11 @@ def aggregate_plots_paired_end(samples):
         "hetbalance": list(),
     }
     for sample in samples:
-        plots["r1readlen"].append(encode(f"analysis/{sample}/{sample}-r1-read-lengths.png"))
-        plots["r2readlen"].append(encode(f"analysis/{sample}/{sample}-r2-read-lengths.png"))
-        plots["mergedreadlen"].append(
-            encode(f"analysis/{sample}/{sample}-merged-read-lengths.png")
-        )
-        plots["locbalance"].append(encode(f"analysis/{sample}/{sample}-interlocus-balance.png"))
-        plots["hetbalance"].append(encode(f"analysis/{sample}/{sample}-heterozygote-balance.png"))
+        plots["r1readlen"].append(f"analysis/{sample}/{sample}-r1-read-lengths.png")
+        plots["r2readlen"].append(f"analysis/{sample}/{sample}-r2-read-lengths.png")
+        plots["mergedreadlen"].append(f"analysis/{sample}/{sample}-merged-read-lengths.png")
+        plots["locbalance"].append(f"analysis/{sample}/{sample}-interlocus-balance.png")
+        plots["hetbalance"].append(f"analysis/{sample}/{sample}-heterozygote-balance.png")
     return plots
 
 
@@ -200,9 +192,9 @@ def aggregate_plots_single_end(samples):
         "hetbalance": list(),
     }
     for sample in samples:
-        plots["readlen"].append(encode(f"analysis/{sample}/{sample}-read-lengths.png"))
-        plots["locbalance"].append(encode(f"analysis/{sample}/{sample}-interlocus-balance.png"))
-        plots["hetbalance"].append(encode(f"analysis/{sample}/{sample}-heterozygote-balance.png"))
+        plots["readlen"].append(f"analysis/{sample}/{sample}-read-lengths.png")
+        plots["locbalance"].append(f"analysis/{sample}/{sample}-interlocus-balance.png")
+        plots["hetbalance"].append(f"analysis/{sample}/{sample}-heterozygote-balance.png")
     return plots
 
 
