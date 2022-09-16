@@ -54,6 +54,11 @@
                 border-radius: 10px;
                 background-color: #F5F5F5;
             }
+
+            img {
+                margin: 5pt 15pt;
+                width: 26%;
+            }
         </style>
     </head>
     <body>
@@ -64,36 +69,44 @@
                 <option>{{markername}}</option>
                 {% endfor %}
             </select>
-            <input id="searchbar" , type="search" onsearch="search_marker()" name="search" placeholder="Search markers..">
-            <p></p>
+            <input id="searchbar" type="search" onsearch="search_marker()" name="search" placeholder="Search markers...">
+            <br />
             {% for markername in markernames %}
             <div class="marker_details" id={{markername}} style="display:none">
-                <p>
                 <h4>Marker Length</h4>
                 <p>{{marker_details_table.loc[markername,'Length']}} bp</p>
-                <br/>
+                <br />
+
                 <h4>%GC content</h4>
                 <p>{{marker_details_table.loc[markername,'GC']}}%</p>
-                <br/>
+                <br />
+
                 <h4>SNP Offsets</h4>
                 <p><strong>Locus</strong>: <span class="offsets">{{marker_details_table.loc[markername,'Offsets']}}</span></p>
                 <p><strong>GRCh38 {{marker_details_table.loc[markername,"Chrom"]}}</strong>: {{marker_details_table.loc[markername,"Hg38Offset"]}}</p>
-                <br/>
+                <br />
+
                 <h4>Marker Sequence (SNPs in red) </h4>
                 <div class="sequence">{{marker_details_table.loc[markername,"Sequence"]}}</div>
-                <br><br><br>
+                <br />
+
+                <h4>Read Mapping</h4>
+                <p>
+                    In this table, "Mapped Reads" refers to the total number of reads that mapped to the marker
+                    reference sequence. "Mapped Rate" refers to the proportion of reads mapped compared to what we would
+                    <em>expect</em> to see with perfectly even coverage across all markers: that is, a "Mapped Rate" of
+                    > 1.0 indicates higher than expected coverage and < 1.0 indicates lower than expected coverage. "Off
+                    Target Reads" and "Off Target Rate" refer to the number and percentage of reads that map to the
+                    marker reference, but preferentially map elsewhere when aligned to the entire genome.
+                </p>
                 <table>
-                    <h4>Read Mapping</h4>
                     <tr>
                         <th>Sample</th>
                         <th class="alnrt">Mapped Reads</th>
                         <th class="alnrt">Mapped Rate</th>
                         <th class="alnrt">Off Target Reads</th>
                         <th class="alnrt">Off Target Rate</th>
-
                     </tr>
-                    In this table, "Mapped Reads" refers to the total number of reads that mapped to the marker reference sequence. "Mapped Rate" refers to the proportion of reads mapped compared to what we would <em>expect</em> to see with perfectly even coverage across all markers: that is, a "Mapped Rate" of > 1.0 indicates higher than expected coverage and < 1.0 indicates lower than expected coverage.
-                    "Off Target Reads" and "Off Target Rate" refer to the number and percentage of reads that map to the marker reference, but preferentially map elsewhere when aligned to the entire genome.
                     {% for sample, sample_data in mapping_rates.items()%}
                     <tr>
                         <td>{{sample}}</td>
@@ -104,17 +117,19 @@
                     </tr>
                     {% endfor %}
                 </table>
-                <br><br><br>
+                <br />
+
+                <h4>Haplotype Calling</h4>
+                <p>
+                    The number and percentage of reads which were successfully haplotyped in each sample. Reads that
+                    span all SNPs of interest in the marker are examined; all other reads are discarded.
+                </p>
                 <table>
-                    <h4>Haplotype Calling</h4>
-                    The number and percentage of reads which were successfully haplotyped in each sample. Reads that span all SNPs of
-                    interest in the marker are examined; all other reads are discarded.
                     <tr>
                         <th>Sample</th>
                         <th class="alnrt">Typed Reads</th>
                         <th class="alnrt">Total Reads</th>
                         <th class="alnrt">Typing Rate</th>
-
                     </tr>
                     {% for sample, sample_data in typing_rates.items()%}
                     <tr>
@@ -125,6 +140,16 @@
                     </tr>
                     {% endfor %}
                 </table>
+
+                <h4>Haplotype Calls</h4>
+                <p>
+                    The following plots show all MH alleles (haplotypes) observed at this marker, sample by sample. In
+                    each plot, the red dotted line shows the threshold used for that sample to discriminate between true
+                    MH alleles and noise/artifacts.
+                </p>
+                {% for sample in typing_rates.keys(): %}
+                <img src="analysis/{{sample}}/callplots/{{markername}}.png" />
+                {% endfor %}
             </div>
             {% endfor %}
         </div>
