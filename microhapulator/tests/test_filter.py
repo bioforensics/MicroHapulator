@@ -12,6 +12,7 @@
 
 import microhapulator
 import microhapulator.api as mhapi
+from microhapulator.parsers import load_marker_thresholds
 from microhapulator.profile import TypingResult
 from microhapulator.tests import data_file
 import pandas as pd
@@ -22,33 +23,44 @@ def test_filter_simple():
     bam = data_file("pashtun-sim/aligned-reads.bam")
     tsv = data_file("pashtun-sim/tiny-panel.tsv")
     observed = mhapi.type(bam, tsv)
-    observed.filter(static=10, dynamic=0.05)
+    thresholds = load_marker_thresholds(observed.markers(), global_static=10, global_dynamic=0.05)
+    observed.filter(thresholds)
     expected = TypingResult(fromfile=data_file("pashtun-sim/test-output.json"))
     assert observed == expected
 
 
 def test_filter_config_file():
-    config = pd.read_csv(data_file("filters.csv"), sep=None, engine="python")
     result = TypingResult(fromfile=data_file("prof/deep-raw.json"))
-    result.filter(static=5, dynamic=0.02, config=config)
+    thresholds = load_marker_thresholds(
+        result.markers(), configfile=data_file("filters.csv"), global_static=5, global_dynamic=0.02
+    )
+    result.filter(thresholds)
     assert len(result.haplotypes("mh01XYZ-1")) == 8
     assert len(result.haplotypes("mh02XYZ-2")) == 2
     assert len(result.haplotypes("mh02XYZ-3")) == 2
 
 
 def test_filter_missing_column():
-    config = pd.read_csv(data_file("filters-missing.csv"), sep=None, engine="python")
     result = TypingResult(fromfile=data_file("prof/deep-raw.json"))
     with pytest.raises(ValueError, match=r"filter config file missing column\(s\): Static"):
-        result.filter(static=5, dynamic=0.02, config=config)
+        thresholds = load_marker_thresholds(
+            result.markers(),
+            configfile=data_file("filters-missing.csv"),
+            global_static=5,
+            global_dynamic=0.02,
+        )
 
 
 def test_filter_dupl_marker():
-    config = pd.read_csv(data_file("filters-redundant.csv"), sep=None, engine="python")
     result = TypingResult(fromfile=data_file("prof/deep-raw.json"))
     message = "filter config file contains duplicate entries for some markers"
     with pytest.raises(ValueError, match=message):
-        result.filter(static=5, dynamic=0.02, config=config)
+        thresholds = load_marker_thresholds(
+            result.markers(),
+            configfile=data_file("filters-redundant.csv"),
+            global_static=5,
+            global_dynamic=0.02,
+        )
 
 
 def test_filter_cli(tmp_path):

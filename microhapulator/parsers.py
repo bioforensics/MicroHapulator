@@ -51,7 +51,7 @@ def load_marker_frequencies(tsvfile):
 
 def load_marker_definitions(tsvfile):
     markers = pd.read_csv(tsvfile, sep="\t")
-    missing = set(["Marker", "Offset", "Chrom", "OffsetHg38"]) - set(markers.columns)
+    missing = set(["Marker", "Offset"]) - set(markers.columns)
     if len(missing) > 0:
         message = "column(s) missing from marker definition file: " + ", ".join(sorted(missing))
         raise ValueError(message)
@@ -80,3 +80,21 @@ def cross_check_marker_ids(set1, set2, label1, label2):
         ustr2 = ", ".join(sorted(uniq2))
         message += f" marker IDs unique to set2={{{ustr2}}};"
     raise ValueError(message)
+
+
+def load_marker_thresholds(markernames, configfile=None, global_static=5, global_dynamic=0.02):
+    default = (global_static, global_dynamic)
+    thresholds = pd.DataFrame([default], index=sorted(markernames), columns=["Static", "Dynamic"])
+    if configfile:
+        config = pd.read_csv(configfile, sep=None, engine="python")
+        missing = set(["Marker", "Static", "Dynamic"]) - set(config.columns)
+        if len(missing) > 0:
+            missingstr = ",".join(sorted(missing))
+            raise ValueError(f"filter config file missing column(s): {missingstr}")
+        if len(config.Marker) != len(config.Marker.unique()):
+            raise ValueError("filter config file contains duplicate entries for some markers")
+        config = config.set_index("Marker", drop=True)
+        for marker, row in config.iterrows():
+            thresholds.loc[marker, "Static"] = row.Static
+            thresholds.loc[marker, "Dynamic"] = row.Dynamic
+    return thresholds.astype({"Static": "Int64"})

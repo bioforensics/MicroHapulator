@@ -21,6 +21,7 @@ from pkg_resources import resource_filename
 from shutil import copy
 from snakemake import snakemake
 import sys
+from warnings import warn
 
 
 def check_sample_names(samples):
@@ -147,25 +148,21 @@ def subparser(subparsers):
         default=cpu_count(),
         help="process each batch using T threads; by default, one thread per available core is used",
     )
-    # Normally the defaults for the next three arguments would be `None`. But the values are passed
-    # to Snakemake, which intermittently casts NoneTypes as a string, causing issues with the
-    # downstream code; e.g., attempts to open a non-existent `None` file. The empty string defaults
-    # and the lambda functions for data types are a workaround.
     cli.add_argument(
         "-s",
         "--static",
         metavar="ST",
-        type=lambda a: "" if a == "" else int(a),
-        default="",
-        help="global fixed read count threshold",
+        type=int,
+        default=5,
+        help="global fixed read count threshold; ST=5 by default",
     )
     cli.add_argument(
         "-d",
         "--dynamic",
         metavar="DT",
-        type=lambda a: "" if a == "" else float(a),
-        default="",
-        help="global percentage of total read count threshold; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold",
+        type=float,
+        default=0.02,
+        help="global percentage of total read count threshold; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold; DT=0.02 by default",
     )
     cli.add_argument(
         "-c",
@@ -205,6 +202,12 @@ def subparser(subparsers):
 
 def validate_panel_config(markerseqs, markerdefn):
     defn = load_marker_definitions(markerdefn)
+    if "Chrom" not in defn.columns or "OffsetHg38" not in defn.columns:
+        warn(
+            "Chrom and/or OffsetHg38 columns missing from the marker definition, off-target "
+            "alignment analysis will not be performed",
+            UserWarning,
+        )
     seqs = load_marker_reference_sequences(markerseqs)
     print("[MicroHapulator] validating panel configuration", file=sys.stderr)
     cross_check_marker_ids(

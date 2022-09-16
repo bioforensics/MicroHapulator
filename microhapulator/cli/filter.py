@@ -12,6 +12,7 @@
 
 
 import microhapulator.api as mhapi
+from microhapulator.parsers import load_marker_thresholds
 from microhapulator.profile import TypingResult
 import pandas as pd
 import sys
@@ -32,7 +33,7 @@ def subparser(subparsers):
         "--static",
         metavar="ST",
         type=int,
-        default=None,
+        default=5,
         help="global fixed read count threshold",
     )
     cli.add_argument(
@@ -40,7 +41,7 @@ def subparser(subparsers):
         "--dynamic",
         metavar="DT",
         type=float,
-        default=None,
+        default=0.02,
         help="global percentage of total read count threshold; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold",
     )
     cli.add_argument(
@@ -55,8 +56,6 @@ def subparser(subparsers):
 
 def main(args):
     result = TypingResult(fromfile=args.result)
-    config = None
-    if args.config:
-        config = pd.read_csv(args.config, sep=None, engine="python")
-    result.filter(static=args.static, dynamic=args.dynamic, config=config)
+    thresholds = load_marker_thresholds(result.markers(), args.config, args.static, args.dynamic)
+    result.filter(thresholds)
     result.dump(args.out)

@@ -12,6 +12,7 @@
 
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
+from microhapulator.parsers import load_marker_definitions
 from microhapulator.pipeaux import (
     full_reference_index_files,
     final_html_report,
@@ -169,8 +170,8 @@ rule apply_filters:
     output:
         genotype_call="analysis/{sample}/{sample}-type.json",
     params:
-        static="" if config["thresh_static"] == "" else f"--static {config['thresh_static']}",
-        dynamic="" if config["thresh_dynamic"] == "" else f"--dynamic {config['thresh_dynamic']}",
+        static=f"--static {config['thresh_static']}",
+        dynamic=f"--dynamic {config['thresh_dynamic']}",
         threshfile="" if config["thresh_file"] == "" else f"--config {config['thresh_file']}",
     shell:
         "mhpl8r filter {input} --out {output} {params.static} {params.dynamic} {params.threshfile}"
@@ -250,7 +251,9 @@ rule off_target_mapping:
         marker_def=rules.copy_and_index_marker_data.output.tsv,
     output:
         counts="analysis/{sample}/{sample}-off-target-reads.csv",
-    shell:
-        """
-        mhpl8r offtarget {input} --out {output}
-        """
+    run:
+        defn = load_marker_definitions(input.marker_def)
+        if "Chrom" not in defn.columns or "OffsetHg38" not in defn.columns:
+            shell("touch {output}")
+        else:
+            shell("mhpl8r offtarget {input} --out {output}")
