@@ -45,25 +45,28 @@ The **Marker** column contains the identifier (name, label, or designator) of a 
 For example, if a SNP of interest is the very first nucleotide in the reference, it has a distance of 0 from the beginning of the sequence and thus its offset is `0`.
 If a SNP is the 10th nucleotide, its offset is `9`.
 
-The following command shows how to use MicroHapDB (version 0.7 or greater) to prepare a marker definition file.
+The **Chrom** and **OffsetHg38** columns indicate the position of each SNP in the GRCh38 reference human genome assembly.
+**While these two columns are not strictly required, certain quality control checks in the end-to-end MH analysis pipeline will be disabled if this data is absent.**
+
+The following command shows how to use MicroHapDB (version 0.8 or greater) to prepare a marker definition file.
 Note that it is identical to the previous command, except that the `--format=fasta` setting was changed to `--format=offsets`.
 
 ```
 $ microhapdb marker --format=offsets --delta=25 --min-length=200 mh01KK-205 mh03USC-3qC mh18CP-005
-Marker	Offset
-mh01KK-205	25
-mh01KK-205	46
-mh01KK-205	134
-mh01KK-205	179
-mh03USC-3qC	52
-mh03USC-3qC	61
-mh03USC-3qC	71
-mh03USC-3qC	111
-mh03USC-3qC	148
-mh18CP-005	78
-mh18CP-005	107
-mh18CP-005	110
-mh18CP-005	121
+Marker	Offset	Chrom	OffsetHg38
+mh01KK-205	25	chr1	18396197
+mh01KK-205	46	chr1	18396218
+mh01KK-205	134	chr1	18396306
+mh01KK-205	179	chr1	18396351
+mh03USC-3qC	52	chr3	196653025
+mh03USC-3qC	61	chr3	196653034
+mh03USC-3qC	71	chr3	196653044
+mh03USC-3qC	111	chr3	196653084
+mh03USC-3qC	148	chr3	196653121
+mh18CP-005	78	chr18	8892864
+mh18CP-005	107	chr18	8892893
+mh18CP-005	110	chr18	8892896
+mh18CP-005	121	chr18	8892907
 ```
 
 

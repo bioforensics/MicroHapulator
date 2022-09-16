@@ -29,6 +29,7 @@ Prior to executing the workflow, the user will need to have the following inputs
 
 - MH marker reference sequences in FASTA format (see [the config docs](config.md))
 - MH marker definitions (SNP offsets) in TSV format (see [the config docs](config.md))
+    - The end-to-end analysis workflow includes a module for measuring the extent of off-target mapping for each marker. While the **Chrom** and **OffsetHg38** columns aren't strictly required for this workflow, they are required for this QC module. The final report will contain **N/A** values in the relevant fields if this data is absent.
 - NGS read sequence file(s) in FASTQ format for each sample
     - Each FASTQ file name must include the name of the corresponding sample
     - Sample names must be unique, and one sample name cannot be contained in another sample name
