@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Haplotype call plots now included in the pipe HTML report (#136).
 - Added offtarget module to count reads that map to off target loci in hg38 (#143).
 - Added typing rate and mapping rate information per marker to the main pipe HTML report (#146).
-- Added marker detail HTML report (#146).
+- Added marker detail HTML report (#146, #151).
 - Implemented support for single-end reads in the end-to-end microhap analysis pipeline (#147).
 
 ### Changed
