@@ -108,7 +108,14 @@ def marker_details():
     return marker_details_table
 
 
-def final_html_report(samples, summary, reads_are_paired=True):
+def final_html_report(
+    samples,
+    summary,
+    reads_are_paired=True,
+    thresh_static=10,
+    thresh_dynamic=0.02,
+    thresh_file=None,
+):
     if reads_are_paired:
         table_func = read_length_table_paired_end
         plot_func = aggregate_plots_paired_end
@@ -119,6 +126,9 @@ def final_html_report(samples, summary, reads_are_paired=True):
     plots = plot_func(samples)
     typing_rates = per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
+    filter_config = None
+    if thresh_file:
+        filter_config = pd.read_csv(thresh_file, sep=None, engine="python")
     templatefile = resource_filename("microhapulator", "data/template.html")
     with open(templatefile, "r") as infh, open("report.html", "w") as outfh:
         template = Template(infh.read())
@@ -128,8 +138,9 @@ def final_html_report(samples, summary, reads_are_paired=True):
             samples=samples,
             summary=summary,
             plots=plots,
-            static=5,
-            dynamic=0.02,
+            static=thresh_static,
+            dynamic=thresh_dynamic,
+            filter_config=filter_config,
             zip=zip,
             read_length_table=read_length_table,
             typing_rates=typing_rates,

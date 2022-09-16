@@ -49,7 +49,14 @@ rule report:
         "marker-detail-report.html",
     run:
         summary = pd.read_csv("analysis/summary.tsv", sep="\t")
-        final_html_report(config["samples"], summary, config["paired"])
+        final_html_report(
+            config["samples"],
+            summary,
+            reads_are_paired=config["paired"],
+            thresh_static=config["thresh_static"],
+            thresh_dynamic=config["thresh_dynamic"],
+            thresh_file=config["thresh_file"],
+        )
         marker_detail_report(config["samples"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
         shutil.copy(jsfile, "fancyTable.js")

@@ -288,7 +288,7 @@
             <br />
             <p>The table above shows the aggregate typing rate across all markers. The table below shows the typing rate per marker.</p>
             <div class="scrollwrapper">
-                <table id="typing_rates_table" class="pagination_table" >
+                <table id="typing_rates_table" class="pagination_table">
                     <thead>
                         <tr>
                             <th>Marker</th>
@@ -310,13 +310,51 @@
                 </table>
             </div>
 
-
             <a name="filters"></a>
             <h2>Genotype Calling</h2>
-            <p>Fixed detection thresholds and dynamic analytical thresholds are applied to the typing result using <code>mhpl8r filter</code> to discriminate true and erroneous haplotypes and predict each sample's genotype. MicroHapulator applied a static filter of <strong>&#8805;{{static}} reads</strong> as a detection threshold and a dynamic filter of <strong>&#8805;{{"{:.1f}".format(dynamic*100)}}% of total reads</strong>.</p>
-            <p>Plots of the genotype calls, including the thresholds used to distinguish true haplotypes from false haplotypes, are available in each <code>analysis/{samplename}/callplots/</code> subdirectory, one graphics file per marker.</p>
+            <p>
+                Two types of thresholds are applied to each typing result using <code>mhpl8r filter</code> to discriminate between true MH alleles (haplotypes) and false alleles resulting from sequencing error or other artifacts.
+                A static detection threshold, based on a fixed number of reads, is used to filter out low-level noise.
+                A dynamic analytical threshold, based on a percentage of the total reads at the locus (after removing alleles that fail the detection threshold), accounts for fluctuations in the depth of coverage between loci, samples, and runs, and can filter out higher-level noise in most cases.
+                The haplotype tallies, after all filters have been applied, represents the <em>genotype call</em> for that sample.
+            </p>
+            <p>
+                For this run, MicroHapulator applied a global detection threshold of <strong>&#8805;{{static}} reads</strong> and a global analytical threshold of <strong>&#8805;{{"{:.1f}".format(dynamic*100)}}% of total reads</strong>.
+                {% if filter_config is not none %}
+                User-provided per-marker thresholds were also applied as shown below.
+            </p>
+            <table class="half">
+                <thead>
+                    <tr>
+                        <th>Marker</th>
+                        <th class="alnrt">Detection</th>
+                        <th class="alnrt">Analytical</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i, row in filter_config.iterrows() %}
+                    <tr>
+                        <td>{{row.Marker}}</td>
+                        <td class="alnrt">{{row.Static}}</td>
+                        <td class="alnrt">{{"{:.2f}".format(row.Dynamic * 100)}}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+                {% else %}
+            </p>
+                {% endif %}
 
-            <p>The following figures show the heterozygote balance for each sample.
+            <p>Plots of the haplotype tallies, including thresholds, are available in the <a href="marker-detail-report.html?marker={{markernames[0]}}" target="_blank">marker detail report</a>.</p>
+
+            <hr />
+
+            <p>
+                For single-source samples, we expect the two alleles at heterozygous loci to have roughly even abundance.
+                The following plots show the <em>relative</em> abundance of the major and minor allele for each marker with a heterozygous genotype (markers are sorted by absolute combined abundance, which is printed above each pair of allele counts).
+                For known DNA mixtures, these plots can be safely ignored.
+                But for suspected single-source samples, if there is substantial imbalance between major and minor allele counts at numerous loci, the sample should be examined more closely for the presence of a minor DNA contributor.
+            </p>
             {% for plot in plots["hetbalance"] %}
             <img src="{{plot}}" class="fullwidth" />
             {% endfor %}
