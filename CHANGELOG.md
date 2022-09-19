@@ -2,20 +2,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [0.7] 2022-09-19
 
 ### Added
-- Profiles compatible with probgen programs now included in pipe output (#135).
-- Haplotype call plots now included in the pipe HTML report (#136).
-- Added offtarget module to count reads that map to off target loci in hg38 (#143, #153).
-- Added typing rate and mapping rate information per marker to the main pipe HTML report (#146).
-- Added marker detail HTML report (#146, #151).
-- Implemented support for single-end reads in the end-to-end microhap analysis pipeline (#147).
+- Profiles compatible with probgen programs now included in `mhpl8r pipe` output (#135).
+- Haplotype call plots now included in the `mhpl8r pipe` HTML report (#136).
+- New `offtarget` module to count reads that map to off-target loci in GRCh38 (#143, #153).
+- Added typing rate and mapping rate information per marker to the main `mhpl8r pipe` HTML report (#146).
+- Added marker detail page to the `mhpl8r pipe` HTML report (#146, #151).
+- Implemented support for single-end reads with `mhpl8r pipe` (#147).
 
 ### Changed
-- Exposed static and dynamic threshold configuration to pipe CLI (#135, #153).
-- Updated plot colors in the pipe HTML report (#139).
-- Updated pipe HTML report to conditionally plot read length histograms or tables depending on uniformity (#140).
+- Exposed static and dynamic threshold configuration to `mhpl8r pipe` CLI (#135, #153).
+- Updated plot colors in the `mhpl8r pipe` HTML report (#139).
+- Updated `mhpl8r pipe` HTML report to conditionally plot read length histograms or tables depending on uniformity (#140).
 
 
 ## [0.6.1] 2022-04-27
