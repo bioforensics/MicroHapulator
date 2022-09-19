@@ -69,6 +69,13 @@ def test_load_marker_definitions_missing_column():
         microhapulator.load_marker_definitions(data_file("def/orange-offsets-missing.tsv"))
 
 
+def test_load_marker_definitions_minimal():
+    defn_file = data_file("def/default-panel-offsets-minimal.tsv")
+    markers = microhapulator.load_marker_definitions(defn_file)
+    assert list(markers.columns) == ["Marker", "Offset"]
+    assert markers.shape[0] == 90
+
+
 @pytest.mark.parametrize(
     "fasta,nseq,firstseq",
     [
@@ -97,3 +104,28 @@ def test_cross_check_unequal():
         microhapulator.cross_check_marker_ids(s1, s2, "marker definitions", "marker frequencies")
     with pytest.raises(ValueError, match=r"marker IDs unique to set2={mh06USC-6qD};"):
         microhapulator.cross_check_marker_ids(s2, s1, "marker definitions", "marker frequencies")
+
+
+def test_load_marker_filters():
+    markers = ("mh01XYZ-1", "mh02XYZ-2", "mh02XYZ-3")
+    configfile = data_file("filters.csv")
+    thresholds = microhapulator.load_marker_thresholds(
+        markers, configfile=configfile, global_static=10, global_dynamic=0.015
+    )
+    print(thresholds)
+    assert thresholds.shape == (3, 2)
+    assert thresholds.loc["mh01XYZ-1", "Static"] == 5
+    assert thresholds.loc["mh02XYZ-2", "Static"] == 10
+    assert thresholds.loc["mh02XYZ-3", "Static"] == 10
+    assert thresholds.loc["mh01XYZ-1", "Dynamic"] == pytest.approx(0.001)
+    assert thresholds.loc["mh02XYZ-2", "Dynamic"] == pytest.approx(0.015)
+    assert thresholds.loc["mh02XYZ-3", "Dynamic"] == pytest.approx(0.015)
+
+
+def test_load_marker_filters_default():
+    markers = ("mh04ZZZ-1", "mh06ZZZ-2", "mh19ZZZ-3", "mh22ZZZ-4")
+    thresholds = microhapulator.load_marker_thresholds(markers)
+    assert thresholds.shape == (4, 2)
+    for marker, row in thresholds.iterrows():
+        assert row.Static == 5
+        assert row.Dynamic == pytest.approx(0.02)

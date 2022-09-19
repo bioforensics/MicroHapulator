@@ -225,7 +225,7 @@
                 <h3>Interpretation Hints</h3>
                 <p>The "Mapping Rate (Chrom)" column in the table above indicates the proportion of the reads in the sample that map <em>anywhere</em> to the human genome. The percentage <em>not</em> mapped represents non-human material (typically contamination) in the sample.</p>
                 <p>The difference between the "Mapping Rate" column and the "Mapping Rate (Chrom)" column indicates the proportion of reads in the sample that are off-target <em>with respect to the marker panel</em>: their origin is elsewhere in the genome, and their presence is an artifact of an imperfect enrichment strategy.</p>
-                <p>In the table below, the "Off Target" columns refer to reads that can and do align to a marker reference sequence, but preferentially map elsewhere when aligned to the entire genome. These reads indicate repetitive content in the corresponding marker, which therefore requires extra scrutiny to ensure that reads from alternate loci are not jeopardizing the haplotype calling process.</p>
+                <p>In the table below, the "Off Target" columns refer to reads that can and do align to a marker reference sequence, but preferentially map elsewhere when aligned to the entire genome. These reads indicate repetitive content in the corresponding marker, which therefore requires extra scrutiny to ensure that reads from alternate loci are not jeopardizing the haplotype calling process. <strong>N/A values in the "Off Target" column indicate that the marker definition file did not include GRCh38 coordinates for all SNPs, which are required for off-target analysis.</strong></p>
             </blockquote>
             <div class="scrollwrapper">
                 <table id="mapping_rates_table" class="pagination_table">
@@ -251,9 +251,12 @@
                         <tr>
                             <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                             {% for sample_data in mapping_rates.values()%}
-                            <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{
-                                "{:,.0f}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
-                            <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'OffTargetReads']}}>{{"{:,.0f}".format   (sample_data.loc[markername, 'OffTargetReads'])}}</td>
+                            <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
+                            {% if isna(sample_data.loc[markername, 'OffTargetReads']) %}
+                            <td class="alnrt" data-sortvalue="0">N/A</td>
+                            {% else %}
+                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'OffTargetReads']}}">{{"{:,d}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -319,11 +322,10 @@
                 The haplotype tallies, after all filters have been applied, represents the <em>genotype call</em> for that sample.
             </p>
             <p>
-                For this run, MicroHapulator applied a global detection threshold of <strong>&#8805;{{static}} reads</strong> and a global analytical threshold of <strong>&#8805;{{"{:.1f}".format(dynamic*100)}}% of total reads</strong>.
-                {% if filter_config is not none %}
-                User-provided per-marker thresholds were also applied as shown below.
+                Thresholds were were applied to each marker as shown in the table below.
+                Click on marker names in the table below to see plots of haplotype talles and thresholds in the marker detail report.
             </p>
-            <table class="half">
+            <table class="half pagination_table">
                 <thead>
                     <tr>
                         <th>Marker</th>
@@ -332,20 +334,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i, row in filter_config.iterrows() %}
+                    {% for marker, row in thresholds.iterrows() %}
                     <tr>
-                        <td>{{row.Marker}}</td>
+                        <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
                         <td class="alnrt">{{row.Static}}</td>
-                        <td class="alnrt">{{"{:.2f}".format(row.Dynamic * 100)}}%</td>
+                        <td class="alnrt">{{"{:.1f}".format(row.Dynamic * 100)}}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-                {% else %}
-            </p>
-                {% endif %}
-
-            <p>Plots of the haplotype tallies, including thresholds, are available in the <a href="marker-detail-report.html?marker={{markernames[0]}}" target="_blank">marker detail report</a>.</p>
 
             <hr />
 

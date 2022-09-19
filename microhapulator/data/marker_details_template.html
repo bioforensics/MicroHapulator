@@ -83,7 +83,9 @@
 
                 <h4>SNP Offsets</h4>
                 <p><strong>Locus</strong>: <span class="offsets">{{marker_details_table.loc[markername,'Offsets']}}</span></p>
+                {% if not isna(marker_details_table.loc[markername,"Chrom"]) %}
                 <p><strong>GRCh38 {{marker_details_table.loc[markername,"Chrom"]}}</strong>: {{marker_details_table.loc[markername,"Hg38Offset"]}}</p>
+                {% endif %}
                 <br />
 
                 <h4>Marker Sequence (SNPs in red) </h4>
@@ -97,7 +99,9 @@
                     <em>expect</em> to see with perfectly even coverage across all markers: that is, a "Mapped Rate" of
                     > 1.0 indicates higher than expected coverage and < 1.0 indicates lower than expected coverage. "Off
                     Target Reads" and "Off Target Rate" refer to the number and percentage of reads that map to the
-                    marker reference, but preferentially map elsewhere when aligned to the entire genome.
+                    marker reference, but preferentially map elsewhere when aligned to the entire genome. <strong>N/A
+                    values in these columns indicate that the marker definition file does not have GRCh38 coordinates
+                    for all SNPs, which are required for off-target analysis.</strong>
                 </p>
                 <table>
                     <tr>
@@ -110,10 +114,15 @@
                     {% for sample, sample_data in mapping_rates.items()%}
                     <tr>
                         <td>{{sample}}</td>
-                        <td class="alnrt">{{"{:,.0f}".format(sample_data.loc[markername,'ReadCount'])}}</td>
+                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[markername,'ReadCount'])}}</td>
                         <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'ExpectedObservedRatio'])}}</td>
-                        <td class="alnrt">{{"{:,.0f}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
+                        {% if isna(sample_data.loc[markername, 'OffTargetReads']) %}
+                        <td class="alnrt">N/A</td>
+                        <td class="alnrt">N/A</td>
+                        {% else %}
+                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
                         <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'OffTargetRate']*100)}}%</td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </table>
@@ -140,12 +149,13 @@
                     </tr>
                     {% endfor %}
                 </table>
+                <br />
 
-                <h4>Haplotype Calls</h4>
+                <h4>Genotype Calls</h4>
                 <p>
                     The following plots show all MH alleles (haplotypes) observed at this marker, sample by sample. In
                     each plot, the red dotted line shows the threshold used for that sample to discriminate between true
-                    MH alleles and noise/artifacts.
+                    MH alleles and noise/artifacts and make a final genotype determination.
                 </p>
                 {% for sample in typing_rates.keys(): %}
                 <img src="analysis/{{sample}}/callplots/{{markername}}.png" />

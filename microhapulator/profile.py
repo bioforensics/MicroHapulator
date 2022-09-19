@@ -36,18 +36,6 @@ def load_schema():
         return json.load(fh)
 
 
-def check_filter_config(config):
-    if config is None:
-        return
-    expected = set(["Marker", "Static", "Dynamic"])
-    missing = expected - set(config)
-    if len(missing) > 0:
-        missingstr = ",".join(sorted(missing))
-        raise ValueError(f"filter config file missing column(s): {missingstr}")
-    if len(config.Marker) != len(config.Marker.unique()):
-        raise ValueError("filter config file contains duplicate entries for some markers")
-
-
 class Profile(object):
     def __init__(self, fromfile=None):
         global SCHEMA
@@ -342,7 +330,7 @@ class TypingResult(Profile):
     def record_haplotype(self, marker, haplotype, count):
         self.data["markers"][marker]["typing_result"][haplotype] = count
 
-    def filter(self, static=None, dynamic=None, config=None):
+    def filter(self, thresholds=None):
         """Apply static and/or dynamic thresholds to distinguish true and false haplotypes
 
         Thresholds are applied to the haplotype read counts of a raw typing result. Static integer
@@ -351,22 +339,14 @@ class TypingResult(Profile):
         represent a percentage of the total read count at the marker, after any haplotypes failing
         a static threshold are discarded.
 
-        :param int static: global fixed read count threshold
-        :param float dynamic: global percentage of total read count; e.g. use `dynamic=0.02` to apply a 2% analytical threshold
-        :param pandas.DataFrame config: tabular data structure specifying marker-specific thresholds to override global thresholds; three required columns: **Marker** for the marker name; **Static** and **Dynamic** for marker-specific thresholds
+        :param pandas.DataFrame thresholds: tabular data structure containing static and dynamic thresholds for each marker; two required columns, with marker name as index: **Static** and **Dynamic**
         """
-        check_filter_config(config)
         for marker, mdata in self.data["markers"].items():
-            markerstatic = static
-            markerdynamic = dynamic
-            if config is not None:
-                thresh = config[config.Marker == marker]
-                assert len(thresh) in (0, 1)
-                if len(thresh) == 1:
-                    markerstatic = thresh.Static.iloc[0]
-                    markerdynamic = thresh.Dynamic.iloc[0]
+            static, dynamic = None, None
+            if thresholds is not None and marker in thresholds.index:
+                static, dynamic = thresholds.loc[marker]
             self.data["markers"][marker]["genotype"] = list()
-            if markerstatic is None and markerdynamic is None:
+            if static is None and dynamic is None:
                 # No thresholds for calling haplotypes, just report raw haplotype counts
                 continue
             self.data["markers"][marker]["thresholds"] = dict()
@@ -375,14 +355,14 @@ class TypingResult(Profile):
             filtered = set()
             totalcount = sum(hapcounts.values())
             filteredcount = 0
-            if markerstatic is not None and markerstatic > 0:
-                self.data["markers"][marker]["thresholds"]["static"] = int(markerstatic)
+            if static is not None and not pd.isna(static) and static > 0:
+                self.data["markers"][marker]["thresholds"]["static"] = int(static)
                 for haplotype, count in hapcounts.items():
-                    if count < markerstatic:
+                    if count < static:
                         filtered.add(haplotype)
                         filteredcount += count
-            if markerdynamic is not None and markerdynamic > 0.0:
-                threshold = (totalcount - filteredcount) * markerdynamic
+            if dynamic is not None and not pd.isna(dynamic) and dynamic > 0.0:
+                threshold = (totalcount - filteredcount) * dynamic
                 self.data["markers"][marker]["thresholds"]["dynamic"] = threshold
                 for haplotype, count in hapcounts.items():
                     if count < threshold:

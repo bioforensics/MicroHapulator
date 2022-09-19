@@ -12,6 +12,7 @@
 
 import microhapulator
 import microhapulator.api as mhapi
+from microhapulator.parsers import load_marker_thresholds
 from microhapulator.profile import TypingResult
 from microhapulator.tests import data_file
 import pytest
@@ -134,11 +135,13 @@ def test_type_filter_threshold():
     bam = data_file("bam/dyncut-test-reads.bam")
     tsv = data_file("def/dyncut-panel.tsv")
     rslt = mhapi.type(bam, tsv)
-    rslt.filter(static=10, dynamic=0.005)
+    thresholds = load_marker_thresholds(rslt.markers(), global_static=10, global_dynamic=0.005)
+    rslt.filter(thresholds)
     assert rslt.haplotypes("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
     assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
     rslt = mhapi.type(bam, tsv)
-    rslt.filter(static=4, dynamic=0.005)
+    thresholds = load_marker_thresholds(rslt.markers(), global_static=4, global_dynamic=0.005)
+    rslt.filter(thresholds)
     assert rslt.haplotypes("MHDBL000018") == set(
         ["C,A,C,T,G", "T,G,C,T,G", "C,A,C,T,A", "T,G,C,T,A"]
     )

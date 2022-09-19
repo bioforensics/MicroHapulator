@@ -16,7 +16,12 @@ import json
 from matplotlib import pyplot as plt
 import microhapulator
 import pandas as pd
-from microhapulator.parsers import load_marker_reference_sequences, load_marker_definitions
+from pathlib import Path
+from microhapulator.parsers import (
+    load_marker_reference_sequences,
+    load_marker_definitions,
+    load_marker_thresholds,
+)
 from pkg_resources import resource_filename
 import re
 import sys
@@ -71,13 +76,18 @@ def per_marker_mapping_rate(samples):
     sample_rates = dict()
     for sample in samples:
         total_reads_filename = f"analysis/{sample}/{sample}-marker-read-counts.csv"
-        off_target_filename = f"analysis/{sample}/{sample}-off-target-reads.csv"
         total_df = pd.read_csv(total_reads_filename).set_index("Marker")
-        off_target_df = pd.read_csv(off_target_filename).set_index("Marker")
         expected_count = total_df["ReadCount"].sum() / len(total_df)
         total_df["ExpectedObservedRatio"] = round(total_df["ReadCount"] / expected_count, 2)
-        sample_df = pd.concat([total_df, off_target_df], axis=1)
-        sample_df["OffTargetRate"] = sample_df["OffTargetReads"] / sample_df["ReadCount"]
+        off_target_filename = Path(f"analysis/{sample}/{sample}-off-target-reads.csv")
+        if off_target_filename.stat().st_size > 0:
+            off_target_df = pd.read_csv(off_target_filename).set_index("Marker")
+            sample_df = pd.concat([total_df, off_target_df], axis=1)
+            sample_df["OffTargetRate"] = sample_df["OffTargetReads"] / sample_df["ReadCount"]
+        else:
+            sample_df = total_df
+            sample_df["OffTargetReads"] = None
+            sample_df["OffTargetRate"] = None
         sample_rates[sample] = sample_df
     marker_names = sample_df.index
     return sample_rates, marker_names
@@ -90,8 +100,12 @@ def marker_details():
     for seqid, seq in marker_seqs.items():
         marker_def = marker_defs.loc[marker_defs["Marker"] == seqid]
         marker_offsets = ", ".join([str(offset) for offset in marker_def["Offset"].values])
-        chrom = marker_def["Chrom"].values[0]
-        hg38_offsets = ", ".join([str(offset) for offset in marker_def["OffsetHg38"].values])
+        chrom = None
+        hg38_offsets = "N/A"
+        if "Chrom" in marker_def.columns:
+            chrom = marker_def["Chrom"].values[0]
+        if "OffsetHg38" in marker_def.columns:
+            hg38_offsets = ", ".join([str(offset) for offset in marker_def["OffsetHg38"].values])
         GC_content = round((seq.upper().count("G") + seq.upper().count("C")) / len(seq) * 100, 2)
         sample_details = [
             seqid,
@@ -126,9 +140,8 @@ def final_html_report(
     plots = plot_func(samples)
     typing_rates = per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
-    filter_config = None
-    if thresh_file:
-        filter_config = pd.read_csv(thresh_file, sep=None, engine="python")
+    thresholds = load_marker_thresholds(marker_names, thresh_file, thresh_static, thresh_dynamic)
+    thresholds.fillna(0, inplace=True)
     templatefile = resource_filename("microhapulator", "data/template.html")
     with open(templatefile, "r") as infh, open("report.html", "w") as outfh:
         template = Template(infh.read())
@@ -138,15 +151,14 @@ def final_html_report(
             samples=samples,
             summary=summary,
             plots=plots,
-            static=thresh_static,
-            dynamic=thresh_dynamic,
-            filter_config=filter_config,
+            thresholds=thresholds,
             zip=zip,
             read_length_table=read_length_table,
             typing_rates=typing_rates,
             mapping_rates=mapping_rates,
             markernames=marker_names,
             len=len,
+            isna=pd.isna,
         )
         print(output, file=outfh, end="")
 
@@ -285,5 +297,6 @@ def marker_detail_report(samples):
             typing_rates=per_marker_typing_rate(samples),
             markernames=sorted(marker_names),
             marker_details_table=marker_details_table,
+            isna=pd.isna,
         )
         print(output, file=outfh, end="")
