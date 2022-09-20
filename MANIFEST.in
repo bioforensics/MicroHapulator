@@ -1,5 +1,5 @@
 include versioneer.py
 include microhapulator/_version.py
-include microhapulator/Snakefile
+include microhapulator/workflows/*.smk
 recursive-include microhapulator/data *
 recursive-include microhapulator/tests/data *

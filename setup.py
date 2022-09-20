@@ -39,7 +39,7 @@ setup(
     install_requires=[
         "biopython",
         "happer>=0.1",
-        "insilicoseq>=1.5.2",
+        "insilicoseq>=1.5.4",
         "jsonschema>=4.0",
         "matplotlib>=3.0",
         "numpy>=1.19",

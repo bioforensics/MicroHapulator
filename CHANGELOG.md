@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.1] 2022-09-20
+
+### Fixed
+- Updated MANIFEST.in, setup.py (6bf4533).
+
+
 ## [0.7] 2022-09-19
 
 ### Added
