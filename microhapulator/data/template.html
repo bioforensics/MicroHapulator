@@ -305,7 +305,7 @@
                         <tr>
                             <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                             {% for sample_data in typing_rates.values()%}
-                            <td class="alnrt">{{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
+                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'TypingRate']}}">{{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -337,8 +337,8 @@
                     {% for marker, row in thresholds.iterrows() %}
                     <tr>
                         <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
-                        <td class="alnrt">{{row.Static}}</td>
-                        <td class="alnrt">{{"{:.1f}".format(row.Dynamic * 100)}}%</td>
+                        <td class="alnrt" data-sortvalue="{{row.Static}}">{{row.Static}}</td>
+                        <td class="alnrt" data-sortvalue="{{row.Dynamic}}">{{"{:.1f}".format(row.Dynamic * 100)}}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
