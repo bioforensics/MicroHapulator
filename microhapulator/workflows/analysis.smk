@@ -42,6 +42,7 @@ rule report:
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
+        expand("analysis/cohort.vcf.gz"),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
@@ -91,12 +92,16 @@ rule copy_and_index_marker_data:
     output:
         expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
         fasta="marker-refr.fasta",
+        fai="marker-refr.fasta.fai",
+        seqdict="marker-refr.dict",
         tsv="marker-definitions.tsv",
     shell:
         """
         cp {input.tsv} {output.tsv}
         cp {input.fasta} {output.fasta}
         bwa index {output.fasta}
+        samtools faidx {output.fasta}
+        gatk CreateSequenceDictionary -R {output.fasta}
         """
 
 
@@ -110,15 +115,57 @@ rule map_sort_and_index:
         bai="analysis/{sample}/{sample}.bam.bai",
         counts="analysis/{sample}/{sample}-mapped-reads.txt",
     threads: 32
+    params:
+        readgroup=lambda wildcards: rf'"@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}\tLB:{wildcards.sample}"',
     shell:
         """
-        bwa mem -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
+        bwa mem -R {params.readgroup} -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
         echo -n "Total reads: " > {output.counts}
         samtools view -c -F 2304 {output.bam} >> {output.counts}
         echo -n "Mapped reads: " >> {output.counts}
         samtools view -c -F 2308 {output.bam} >> {output.counts}
         """
+
+
+rule vardiscover:
+    input:
+        bam="analysis/{sample}/{sample}.bam",
+        refr="marker-refr.fasta",
+    output:
+        gvcf="analysis/{sample}/{sample}.g.vcf.gz",
+    params:
+        javamem=config["gatk_mem_gb"],
+    resources:
+        mem_mb=config["gatk_mem_mb"],
+    shell:
+        "gatk --java-options '-Xmx{params.javamem}' HaplotypeCaller -R {input.refr} -I {input.bam} -O {output.gvcf} -ERC GVCF"
+
+
+rule combinegvcfs:
+    input:
+        expand("analysis/{sample}/{sample}.g.vcf.gz", sample=config["samples"]),
+        refr="marker-refr.fasta",
+    output:
+        gvcf="analysis/cohort.g.vcf.gz",
+    run:
+        vcfargs = [f"--variant {vcf}" for vcf in input[:-1]]
+        vcfargs = " ".join(vcfargs)
+        shell(f"gatk CombineGVCFs -R {input.refr} {vcfargs} -O {output.gvcf}")
+
+
+rule genotypegvcfs:
+    input:
+        gvcf="analysis/cohort.g.vcf.gz",
+        refr="marker-refr.fasta",
+    output:
+        vcf="analysis/cohort.vcf.gz",
+    params:
+        javamem=config["gatk_mem_gb"],
+    resources:
+        mem_mb=config["gatk_mem_mb"],
+    shell:
+        "gatk --java-options '-Xmx{params.javamem}' GenotypeGVCFs -R {input.refr} -V {input.gvcf} -O {output.vcf}"
 
 
 rule map_full_reference:

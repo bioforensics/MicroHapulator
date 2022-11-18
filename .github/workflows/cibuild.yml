@@ -19,6 +19,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install bwa samtools fastqc
+        curl -L -O https://github.com/broadinstitute/gatk/releases/download/4.3.0.0/gatk-4.3.0.0.zip && unzip gatk-4.3.0.0.zip && sudo mv gatk-*/gatk gatk-*/gatk-package-*.jar /usr/local/bin/ && rm -r gatk-*
         curl -L -O http://ccb.jhu.edu/software/FLASH/FLASH-1.2.11-Linux-x86_64.tar.gz && tar -xzf FLASH-1.2.11-Linux-x86_64.tar.gz && sudo cp FLASH-1.2.11-Linux-x86_64/flash /usr/local/bin/ && rm -r FLASH-1.2.11*
         curl -L https://osf.io/wuzm6/download --output bwa_index.tar.gz && tar -xzf bwa_index.tar.gz && cp bwa_index/* microhapulator/data && rm -r bwa_index*
         python -m pip install --upgrade pip

@@ -183,6 +183,20 @@ def subparser(subparsers):
         help="copy input files to working directory; by default, input files are symlinked",
     )
     cli.add_argument(
+        "--gatk-mem",
+        metavar="M",
+        type=int,
+        default=2,
+        help="restrict individual GATK processes to M Gb of memory; by default M=2",
+    )
+    cli.add_argument(
+        "--total-mem",
+        metavar="T",
+        type=int,
+        default=8,
+        help="restrict concurrent GATK processes to M total Gb of memory; by default T=8; for example, if T=8 and M=2, MicroHapulator will limit GATK to four concurrent jobs",
+    )
+    cli.add_argument(
         "--hg38",
         default=resource_filename("microhapulator", "data/hg38.fasta.gz"),
         help=SUPPRESS,
@@ -229,6 +243,8 @@ def main(args):
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
         paired=args.reads_are_paired,
+        gatk_mem_mb=args.gatk_mem * 1000,
+        gatk_mem_gb=f"{args.gatk_mem}G",
     )
     snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
     success = snakemake(
@@ -238,6 +254,7 @@ def main(args):
         dryrun=args.dryrun,
         config=config,
         workdir=args.workdir,
+        resources={"mem_mb": args.total_mem * 1000},
     )
     if not success:
         return 1
