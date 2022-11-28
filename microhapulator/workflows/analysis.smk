@@ -42,6 +42,7 @@ rule report:
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-donut.png", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
@@ -257,3 +258,15 @@ rule off_target_mapping:
             shell("touch {output}")
         else:
             shell("mhpl8r offtarget {input} --out {output}")
+
+rule donut_plots:
+    input:
+        marker=rules.map_sort_and_index.output.counts,
+        full_rerf=rules.map_full_reference.output.counts, 
+        off_target=rules.off_target_mapping.output.counts,
+    output:
+        plot="analysis/{sample}/{sample}-donut.png"
+    run:
+        mhapi.donut_plot(input.marker, input.full_rerf, input.off_target, output.plot, sample=wildcards.sample)
+            
+
