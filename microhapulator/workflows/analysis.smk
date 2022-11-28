@@ -259,14 +259,15 @@ rule off_target_mapping:
         else:
             shell("mhpl8r offtarget {input} --out {output}")
 
+
 rule donut_plots:
     input:
         marker=rules.map_sort_and_index.output.counts,
-        full_rerf=rules.map_full_reference.output.counts, 
+        full_rerf=rules.map_full_reference.output.counts,
         off_target=rules.off_target_mapping.output.counts,
     output:
-        plot="analysis/{sample}/{sample}-donut.png"
+        plot="analysis/{sample}/{sample}-donut.png",
     run:
-        mhapi.donut_plot(input.marker, input.full_rerf, input.off_target, output.plot, sample=wildcards.sample)
-            
-
+        mhapi.donut_plot(
+            input.marker, input.full_rerf, input.off_target, output.plot, sample=wildcards.sample
+        )

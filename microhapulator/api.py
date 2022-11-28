@@ -751,29 +751,34 @@ def donut_plot(marker_mapped, refr_mapped, off_target_mapped, output, sample=Non
     :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
     """
     data = count_mapped_read_types(marker_mapped, refr_mapped, off_target_mapped)
-    percs = data/sum(data) * 100
+    percs = data / sum(data) * 100
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
     plt.figure(figsize=(6, 4), dpi=300)
     labels = ["on target", "repetitive", "off target", "contamination"]
     wedges, texts = plt.pie(data)
-    kw = dict(arrowprops=dict(arrowstyle="-",  linewidth=0.5),zorder=0, va="center")
+    kw = dict(arrowprops=dict(arrowstyle="-", linewidth=0.5), zorder=0, va="center")
     for i, p in enumerate(wedges):
-        ang = (p.theta2 - p.theta1)/2. + p.theta1
+        ang = (p.theta2 - p.theta1) / 2.0 + p.theta1
         y = np.sin(np.deg2rad(ang))
         x = np.cos(np.deg2rad(ang))
         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
         connectionstyle = "angle,angleA=0,angleB={}".format(ang)
         kw["arrowprops"].update({"connectionstyle": connectionstyle})
-        plt.annotate(f'{labels[i]} ({"{:.2f}".format(percs[i])}%)', xy=(x, y), xytext=(1.4*np.sign(x), 1.4*y),
-                    horizontalalignment=horizontalalignment, **kw)
+        plt.annotate(
+            f'{labels[i]} ({"{:.2f}".format(percs[i])}%)',
+            xy=(x, y),
+            xytext=(1.4 * np.sign(x), 1.4 * y),
+            horizontalalignment=horizontalalignment,
+            **kw,
+        )
     circle = plt.Circle((0, 0), 0.7, color="white")
     plt.gca().add_artist(circle)
     plt.title(sample)
     plt.savefig(output, bbox_inches="tight")
     plt.switch_backend(backend)
- 
- 
+
+
 def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
     with open(marker_mapped) as fh1:
         total_reads = int(next(fh1).strip().split(": ")[1])
@@ -782,9 +787,8 @@ def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
         next(fh2)
         refr_mapped_count = int(next(fh2).strip().split(": ")[1])
     repetitive_df = pd.read_csv(repetitive_mapped)
-    repetitive_count = np.sum(repetitive_df['OffTargetReads'])
+    repetitive_count = np.sum(repetitive_df["OffTargetReads"])
     on_target_count = marker_mapped_count - repetitive_count
     contam_count = total_reads - refr_mapped_count
     off_target_count = refr_mapped_count - marker_mapped_count
     return [on_target_count, repetitive_count, off_target_count, contam_count]
-

@@ -198,7 +198,7 @@ def aggregate_plots_paired_end(samples):
         "mergedreadlen": list(),
         "locbalance": list(),
         "hetbalance": list(),
-        "donut": list()
+        "donut": list(),
     }
     for sample in samples:
         plots["r1readlen"].append(f"analysis/{sample}/{sample}-r1-read-lengths.png")
@@ -211,12 +211,7 @@ def aggregate_plots_paired_end(samples):
 
 
 def aggregate_plots_single_end(samples):
-    plots = {
-        "readlen": list(),
-        "locbalance": list(),
-        "hetbalance": list(),
-        "donut": list()
-    }
+    plots = {"readlen": list(), "locbalance": list(), "hetbalance": list(), "donut": list()}
     for sample in samples:
         plots["readlen"].append(f"analysis/{sample}/{sample}-read-lengths.png")
         plots["locbalance"].append(f"analysis/{sample}/{sample}-interlocus-balance.png")
