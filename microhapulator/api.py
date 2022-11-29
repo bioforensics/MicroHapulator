@@ -751,7 +751,7 @@ def donut_plot(marker_mapped, refr_mapped, off_target_mapped, output, sample=Non
     :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
     """
     data = count_mapped_read_types(marker_mapped, refr_mapped, off_target_mapped)
-    percs =  data / sum(data) * 100
+    percs = data / sum(data) * 100
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
     plt.figure(figsize=(10, 4), dpi=300)

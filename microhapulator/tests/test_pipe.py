@@ -83,8 +83,10 @@ def test_pipe_gbr_usc10(tmp_path):
     expected = pd.read_csv(data_file("gbr-usc-profile.csv"))
     observed = pd.read_csv(profile)
     assert observed.equals(expected)
-    pngs = glob(str(tmp_path / "analysis" / "*" / "callplots" / "*.png"))
-    assert len(pngs) == 10
+    call_pngs = glob(str(tmp_path / "analysis" / "*" / "callplots" / "*.png"))
+    assert len(call_pngs) == 10
+    donut_pngs = glob(str(tmp_path / "analysis" / "gbr-usc" / "gbr-usc-donut.png"))
+    assert len(donut_pngs) == 1
 
 
 def test_pipe_jpt_usc10_single(tmp_path):
