@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added typing rate and mapping rate information per marker to the main `mhpl8r pipe` HTML report (#146).
 - Added marker detail page to the `mhpl8r pipe` HTML report (#146, #151).
 - Implemented support for single-end reads with `mhpl8r pipe` (#147).
+- Added donut plots to HTML report (#157)
 
 ### Changed
 - Exposed static and dynamic threshold configuration to `mhpl8r pipe` CLI (#135, #153).
