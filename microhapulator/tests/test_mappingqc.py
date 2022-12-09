@@ -15,10 +15,9 @@ from microhapulator.tests import data_file
 import pandas as pd
 
 
-
 def test_mappingqc(tmp_path):
     marker_counts = data_file("test-mapped-reads.txt")
-    full_refr_counts= data_file("test-fullrefr-mapped-reads.txt")
+    full_refr_counts = data_file("test-fullrefr-mapped-reads.txt")
     rep_counts = data_file("repetitive-reads.csv")
     figure = tmp_path / "donut.png"
     obs_data = mhapi.read_mapping_qc(marker_counts, full_refr_counts, rep_counts, figure)
@@ -26,14 +25,14 @@ def test_mappingqc(tmp_path):
     assert obs_data.equals(exp_data)
     with open(marker_counts) as fh:
         total_reads = int(next(fh).split()[2])
-    assert total_reads == obs_data.sum(axis='columns')[0]
+    assert total_reads == obs_data.sum(axis="columns")[0]
     assert len(obs_data.columns) == 4
     assert figure.is_file()
 
 
 def test_no_refr_offsets(tmp_path):
     marker_counts = data_file("test-mapped-reads.txt")
-    full_refr_counts= data_file("test-fullrefr-mapped-reads.txt")
+    full_refr_counts = data_file("test-fullrefr-mapped-reads.txt")
     rep_counts = data_file("repetitive-reads-empy.csv")
     figure = tmp_path / "donut-no-rerf-offsets.png"
     obs_data = mhapi.read_mapping_qc(marker_counts, full_refr_counts, rep_counts, figure)
@@ -41,11 +40,10 @@ def test_no_refr_offsets(tmp_path):
     assert obs_data.equals(exp_data)
     with open(marker_counts) as fh:
         total_reads = int(next(fh).split()[2])
-    assert total_reads == obs_data.sum(axis='columns')[0]
+    assert total_reads == obs_data.sum(axis="columns")[0]
     assert len(obs_data.columns) == 3
     assert figure.is_file()
 
-    
 
 def test_mappingqc_cli(tmp_path):
     arglist = [
@@ -54,8 +52,7 @@ def test_mappingqc_cli(tmp_path):
         data_file("test-fullrefr-mapped-reads.txt"),
         data_file("repetitive-reads.csv"),
         str(tmp_path / "mapping-qc.csv"),
-        str(tmp_path / "donut.png")
-
+        str(tmp_path / "donut.png"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.mappingqc.main(args)

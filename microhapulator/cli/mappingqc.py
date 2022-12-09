@@ -14,14 +14,19 @@ import microhapulator.api as mhapi
 import sys
 
 
-
 def subparser(subparsers):
     desc = "Calculate number of on target, off target, repetitive, and contaminant reads and create a donut plot"
     cli = subparsers.add_parser("mappingqc", description=desc)
-    cli.add_argument("marker", help="path of csv file containing number of reads mapped to marker sequences")
-    cli.add_argument("refr",  help="path of csv file containing number of reads mapped to full reference genome")
-    cli.add_argument("rep",  help="path of csv file containing number of repetitive reads per marker")
-    cli.add_argument("csv",  help="write read counts to FILE in CSV format")
+    cli.add_argument(
+        "marker", help="path of csv file containing number of reads mapped to marker sequences"
+    )
+    cli.add_argument(
+        "refr", help="path of csv file containing number of reads mapped to full reference genome"
+    )
+    cli.add_argument(
+        "rep", help="path of csv file containing number of repetitive reads per marker"
+    )
+    cli.add_argument("csv", help="write read counts to FILE in CSV format")
     cli.add_argument(
         "figure",
         help="create donut plot to FILE showing porportions of on target, off target, repetitive, and contaminant reads ",

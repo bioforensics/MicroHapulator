@@ -65,15 +65,25 @@ In brief, this means that every stable version of the MicroHapulator software is
 :nodefault:
 ```
 
-### `mhpl8r offtarget`
+### `mhpl8r repetitive`
 
 ```{argparse}
 :module: microhapulator.cli
 :func: get_parser
 :prog: mhpl8r
-:path: offtarget
+:path: repetitive
 :nodefault:
 ```
+
+### `mhpl8r mappingqc`
+```{argparse}
+:module: microhapulator.cli
+:func: get_parser
+:prog: mhpl8r
+:path: mappingqc
+:nodefault:
+```
+
 
 ### `mhpl8r contrib`
 

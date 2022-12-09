@@ -260,7 +260,6 @@ rule repetitive_mapping:
             shell("mhpl8r repetitive {input} --out {output}")
 
 
-
 rule read_mapping_qc:
     input:
         marker=rules.map_sort_and_index.output.counts,
@@ -270,6 +269,6 @@ rule read_mapping_qc:
         counts="analysis/{sample}/{sample}-read-mapping-qc.csv",
         plot="analysis/{sample}/{sample}-donut.png",
     run:
-        shell("mhpl8r mappingqc  {input.marker} {input.full_refr} {input.repetitive}  {output.counts}  {output.plot}")
- 
-
+        shell(
+            "mhpl8r mappingqc  {input.marker} {input.full_refr} {input.repetitive}  {output.counts}  {output.plot}"
+        )

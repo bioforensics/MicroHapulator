@@ -748,14 +748,14 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, sampl
     :param str repetitive_mapped: path of txt file containing number of reads mapped preferentially to non-marker loci in the human reference genome
     :param str output: path where the png file of the plot will be saved
     :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
-    
+
     """
-    data=count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
-    percs =  data.values[0] / sum(data.values[0]) * 100
+    data = count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
+    percs = data.values[0] / sum(data.values[0]) * 100
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
-    plt.figure(figsize=(18,6))
-    labels = ["on target",  "off target", "contamination", "repetitive"]
+    plt.figure(figsize=(18, 6))
+    labels = ["on target", "off target", "contamination", "repetitive"]
     wedges, texts = plt.pie(percs, startangle=1)
     kw = dict(arrowprops=dict(arrowstyle="-", linewidth=1), zorder=0, va="center")
     for i, p in enumerate(wedges):
@@ -781,7 +781,7 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, sampl
     plt.switch_backend(backend)
     return data
 
-    
+
 def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
     counts = list()
     with open(marker_mapped) as fh1:
@@ -804,5 +804,5 @@ def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
     counts.append(contam_count)
     if repetitive_count:
         counts.append(repetitive_count)
-    cols=["OnTarget", "OffTarget", "Contaminant", "Repetitive"]
-    return pd.DataFrame([counts], columns=cols[:len(counts)]) 
+    cols = ["OnTarget", "OffTarget", "Contaminant", "Repetitive"]
+    return pd.DataFrame([counts], columns=cols[: len(counts)])
