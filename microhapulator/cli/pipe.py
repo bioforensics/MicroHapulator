@@ -204,7 +204,7 @@ def validate_panel_config(markerseqs, markerdefn):
     defn = load_marker_definitions(markerdefn)
     if "Chrom" not in defn.columns or "OffsetHg38" not in defn.columns:
         warn(
-            "Chrom and/or OffsetHg38 columns missing from the marker definition, off-target "
+            "Chrom and/or OffsetHg38 columns missing from the marker definition, repetitive read "
             "alignment analysis will not be performed",
             UserWarning,
         )

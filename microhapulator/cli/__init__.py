@@ -22,8 +22,9 @@ from . import filter
 from . import getrefr
 from . import hetbalance
 from . import locbalance
+from . import mappingqc
 from . import mix
-from . import offtarget
+from . import repetitive
 from . import pipe
 from . import prob
 from . import seq
@@ -42,8 +43,9 @@ mains = {
     "getrefr": getrefr.main,
     "hetbalance": hetbalance.main,
     "locbalance": locbalance.main,
+    "mappingqc": mappingqc.main,
     "mix": mix.main,
-    "offtarget": offtarget.main,
+    "repetitive": repetitive.main,
     "pipe": pipe.main,
     "prob": prob.main,
     "seq": seq.main,
@@ -62,8 +64,9 @@ subparser_funcs = {
     "getrefr": getrefr.subparser,
     "hetbalance": hetbalance.subparser,
     "locbalance": locbalance.subparser,
+    "mappingqc": mappingqc.subparser,
     "mix": mix.subparser,
-    "offtarget": offtarget.subparser,
+    "repetitive": repetitive.subparser,
     "pipe": pipe.subparser,
     "prob": prob.subparser,
     "seq": seq.subparser,

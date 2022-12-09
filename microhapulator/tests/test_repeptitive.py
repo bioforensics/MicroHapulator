@@ -15,27 +15,27 @@ from microhapulator.tests import data_file
 import pandas as pd
 
 
-def test_offtarget():
-    marker_bam = data_file("bam/off-target.bam")
-    fullrefr_bam = data_file("bam/off-target-fullrefr.bam")
-    marker_def = data_file("def/off-target-offsets.tsv")
-    obs_data = mhapi.off_target_mapping(marker_bam, fullrefr_bam, marker_def)
-    exp_data = pd.read_csv(data_file("off-target-reads.csv"))
+def test_repetitive():
+    marker_bam = data_file("bam/repetitive.bam")
+    fullrefr_bam = data_file("bam/repetitive-fullrefr.bam")
+    marker_def = data_file("def/repetitive-offsets.tsv")
+    obs_data = mhapi.repetitive_mapping(marker_bam, fullrefr_bam, marker_def)
+    exp_data = pd.read_csv(data_file("repetitive-reads.csv"))
     assert obs_data.equals(exp_data)
 
 
-def test_offtarget_cli(tmp_path):
-    outfile = str(tmp_path / "off-target-reads.csv")
+def test_repetitive_cli(tmp_path):
+    outfile = str(tmp_path / "repetitive-reads.csv")
     arglist = [
-        "offtarget",
-        data_file("bam/off-target.bam"),
-        data_file("bam/off-target-fullrefr.bam"),
-        data_file("def/off-target-offsets.tsv"),
+        "repetitive",
+        data_file("bam/repetitive.bam"),
+        data_file("bam/repetitive-fullrefr.bam"),
+        data_file("def/repetitive-offsets.tsv"),
         "--out",
         outfile,
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
-    microhapulator.cli.offtarget.main(args)
+    microhapulator.cli.repetitive.main(args)
     obs_data = pd.read_csv(outfile)
-    exp_data = pd.read_csv(data_file("off-target-reads.csv"))
+    exp_data = pd.read_csv(data_file("repetitive-reads.csv"))
     assert obs_data.equals(exp_data)

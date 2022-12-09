@@ -79,15 +79,15 @@ def per_marker_mapping_rate(samples):
         total_df = pd.read_csv(total_reads_filename).set_index("Marker")
         expected_count = total_df["ReadCount"].sum() / len(total_df)
         total_df["ExpectedObservedRatio"] = round(total_df["ReadCount"] / expected_count, 2)
-        off_target_filename = Path(f"analysis/{sample}/{sample}-off-target-reads.csv")
-        if off_target_filename.stat().st_size > 0:
-            off_target_df = pd.read_csv(off_target_filename).set_index("Marker")
-            sample_df = pd.concat([total_df, off_target_df], axis=1)
-            sample_df["OffTargetRate"] = sample_df["OffTargetReads"] / sample_df["ReadCount"]
+        repetitive_filename = Path(f"analysis/{sample}/{sample}-repetitive-reads.csv")
+        if repetitive_filename.stat().st_size > 0:
+            repetitive_df = pd.read_csv(repetitive_filename).set_index("Marker")
+            sample_df = pd.concat([total_df, repetitive_df], axis=1)
+            sample_df["RepetitiveRate"] = sample_df["RepetitiveReads"] / sample_df["ReadCount"]
         else:
             sample_df = total_df
-            sample_df["OffTargetReads"] = None
-            sample_df["OffTargetRate"] = None
+            sample_df["RepetitiveReads"] = None
+            sample_df["RepetitiveRate"] = None
         sample_rates[sample] = sample_df
     marker_names = sample_df.index
     return sample_rates, marker_names

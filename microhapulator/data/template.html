@@ -21,6 +21,11 @@
             img.small {
                 width: 24.5%;
             }
+            .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            }           
             .fullwidth {
                 width: 100%;
             }
@@ -220,12 +225,21 @@
             </table>
             </div>
             <br />
-            <p>The following table shows the number of total reads mapped to each marker for each sample. Also shown is the number of off-target reads, determined by selecting the reads aligned to the marker, mapping them to the entire GRCh38 human reference sequence, and counting the reads that map preferentially to a locus outside the target marker locus.</p>
+
+            <p> The following donut plots show the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
+       
+            {% for plot in plots["donut"] %}
+            <img src="{{plot}}" width="1200" height="90" class="center"/>
+            <br />
+            {% endfor %}
+            <br />
+            <br />
+            <p>The following table shows the number of total reads mapped to each marker for each sample. Also shown is the number of repetitive reads, determined by selecting the reads aligned to the marker, mapping them to the entire GRCh38 human reference sequence, and counting the reads that map preferentially to a locus outside the target marker locus.</p>
             <blockquote>
                 <h3>Interpretation Hints</h3>
                 <p>The "Mapping Rate (Chrom)" column in the table above indicates the proportion of the reads in the sample that map <em>anywhere</em> to the human genome. The percentage <em>not</em> mapped represents non-human material (typically contamination) in the sample.</p>
                 <p>The difference between the "Mapping Rate" column and the "Mapping Rate (Chrom)" column indicates the proportion of reads in the sample that are off-target <em>with respect to the marker panel</em>: their origin is elsewhere in the genome, and their presence is an artifact of an imperfect enrichment strategy.</p>
-                <p>In the table below, the "Repetitive Off Target" column refer to reads that can and do align to a marker reference sequence, but preferentially map elsewhere when aligned to the entire genome. These reads indicate repetitive content in the corresponding marker, which therefore requires extra scrutiny to ensure that reads from alternate loci are not jeopardizing the haplotype calling process. <strong>N/A values in the "Off Target" column indicate that the marker definition file did not include GRCh38 coordinates for all SNPs, which are required for off-target analysis.</strong></p>
+                <p>In the table below, the "Repetitive" column refer to reads that can and do align to a marker reference sequence, but preferentially map elsewhere when aligned to the entire genome. These reads indicate repetitive content in the corresponding marker, which therefore requires extra scrutiny to ensure that reads from alternate loci are not jeopardizing the haplotype calling process. <strong>N/A values in the "Repetitive" column indicate that the marker definition file did not include GRCh38 coordinates for all SNPs, which are required for repetitive analysis.</strong></p>
             </blockquote>
             <div class="scrollwrapper">
                 <table id="mapping_rates_table" class="pagination_table">
@@ -241,7 +255,7 @@
                             <th>Marker</th>
                             {% for i in range(len(mapping_rates)) %}
                             <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Reads</th>
-                            <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Repetitive Off Target</th>
+                            <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Repetitive</th>
                             {% endfor %}
                             <td></td>
                         </tr>
@@ -252,10 +266,10 @@
                             <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                             {% for sample_data in mapping_rates.values()%}
                             <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
-                            {% if isna(sample_data.loc[markername, 'OffTargetReads']) %}
+                            {% if isna(sample_data.loc[markername, 'RepetitiveReads']) %}
                             <td class="alnrt" data-sortvalue="0">N/A</td>
                             {% else %}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'OffTargetReads']}}">{{"{:,d}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
+                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'RepetitiveReads']}}">{{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
                             {% endif %}
                             {% endfor %}
                         </tr>
@@ -265,12 +279,6 @@
             </div>
             <br />
 
-            <p> The following donut plots show the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
-       
-            {% for plot in plots["donut"] %}
-            <img src="{{plot}}" />
-            {% endfor %}
-            <br />
             <p>The following histograms show the interlocus balance for each sample.</p>
             {% for plot in plots["locbalance"] %}
             <img src="{{plot}}" />
