@@ -20,6 +20,7 @@ from matplotlib import pyplot as plt
 from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
 from microhapulator.parsers import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
+import math
 import numpy as np
 import os
 import pandas as pd
@@ -741,7 +742,7 @@ def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
     return data
 
 
-def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, sample=None):
+def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title=None):
     """Count on target, off target, repetitive, and contaminant reads
     :param str marker_mapped: path of txt file containing number of reads mapped to marker sequences
     :param str refr_mapped: path of txt file containing number of reads mapped to the full human reference genome
@@ -754,30 +755,46 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, sampl
     percs = data.values[0] / sum(data.values[0]) * 100
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
-    plt.figure(figsize=(18, 6))
+    fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=dict(aspect="equal"))
     labels = ["on target", "off target", "contamination", "repetitive"]
-    wedges, texts = plt.pie(percs, startangle=1)
-    kw = dict(arrowprops=dict(arrowstyle="-", linewidth=1), zorder=0, va="center")
+    wedges, texts = ax.pie(
+        percs,
+        counterclock=True,
+        wedgeprops=dict(width=0.6, linewidth=1, edgecolor="w"),
+        startangle=91,
+    )
+
+    # Plot annotations adapted from https://stackoverflow.com/a/56833146
+    bbox_props = dict(boxstyle="square,pad=0", fc="w", ec="w", lw=0.72)
+    kw = dict(
+        xycoords="data",
+        textcoords="data",
+        arrowprops=dict(arrowstyle="-"),
+        bbox=bbox_props,
+        zorder=0,
+        va="center",
+    )
     for i, p in enumerate(wedges):
         ang = (p.theta2 - p.theta1) / 2.0 + p.theta1
         y = np.sin(np.deg2rad(ang))
         x = np.cos(np.deg2rad(ang))
         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
-        connectionstyle = "angle,angleA=0,angleB={}".format(ang)
+        connectionstyle = "angle,angleA=0,angleB={}".format(int(ang))
         kw["arrowprops"].update({"connectionstyle": connectionstyle})
-        plt.annotate(
+        ax.annotate(
             f'{labels[i]} ({"{:.2f}".format(percs[i])}%)',
             xy=(x, y),
-            xytext=(1.4 * np.sign(x), 1.4 * y),
+            xytext=((i / 8) + 1.1 * np.sign(x), (i / 8) + y),
             horizontalalignment=horizontalalignment,
-            fontsize=24,
             **kw,
+            fontsize=14,
         )
+    plt.axis("equal")
     circle = plt.Circle((0, 0), 0.7, color="white")
     plt.gca().add_artist(circle)
-    plt.title(sample, fontsize=24, fontweight="bold")
+    plt.title(title, fontsize=14)
     plt.tight_layout()
-    plt.savefig(figure, dpi=300)
+    plt.savefig(figure, bbox_inches="tight", dpi=300)
     plt.switch_backend(backend)
     return data
 

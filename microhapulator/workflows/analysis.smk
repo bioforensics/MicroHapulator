@@ -268,7 +268,7 @@ rule read_mapping_qc:
     output:
         counts="analysis/{sample}/{sample}-read-mapping-qc.csv",
         plot="analysis/{sample}/{sample}-donut.png",
-    run:
-        shell(
-            "mhpl8r mappingqc  {input.marker} {input.full_refr} {input.repetitive}  {output.counts}  {output.plot}"
-        )
+    shell:
+        """
+        mhpl8r mappingqc  --marker {input.marker} --refr {input.full_refr} --rep {input.repetitive}  --csv {output.counts}  --figure {output.plot} --title {wildcards.sample}
+        """

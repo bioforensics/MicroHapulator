@@ -21,7 +21,8 @@
             img.small {
                 width: 24.5%;
             }
-            .center {
+            .centerfull {
+            width: 100%;
             display: block;
             margin-left: auto;
             margin-right: auto;
@@ -229,7 +230,7 @@
             <p> The following donut plots show the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
        
             {% for plot in plots["donut"] %}
-            <img src="{{plot}}" width="1200" height="90" class="center"/>
+            <img src="{{plot}}"  class="centerfull"/>
             <br />
             {% endfor %}
             <br />
