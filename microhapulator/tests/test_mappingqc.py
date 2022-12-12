@@ -48,10 +48,15 @@ def test_no_refr_offsets(tmp_path):
 def test_mappingqc_cli(tmp_path):
     arglist = [
         "mappingqc",
+        "--marker",
         data_file("test-mapped-reads.txt"),
+        "--refr",
         data_file("test-fullrefr-mapped-reads.txt"),
+        "--rep",
         data_file("repetitive-reads.csv"),
+        "--csv",
         str(tmp_path / "mapping-qc.csv"),
+        "--figure",
         str(tmp_path / "donut.png"),
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
