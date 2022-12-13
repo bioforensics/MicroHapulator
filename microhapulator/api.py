@@ -752,48 +752,14 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
 
     """
     data = count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
-    percs = data.values[0] / sum(data.values[0]) * 100
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
-    fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=dict(aspect="equal"))
     labels = ["on target", "off target", "contamination", "repetitive"]
-    wedges, texts = ax.pie(
-        percs,
-        counterclock=True,
-        wedgeprops=dict(width=0.6, linewidth=1, edgecolor="w"),
-        startangle=91,
-    )
-
-    # Plot annotations adapted from https://stackoverflow.com/a/56833146
-    bbox_props = dict(boxstyle="square,pad=0", fc="w", ec="w", lw=0.72)
-    kw = dict(
-        xycoords="data",
-        textcoords="data",
-        arrowprops=dict(arrowstyle="-"),
-        bbox=bbox_props,
-        zorder=0,
-        va="center",
-    )
-    for i, p in enumerate(wedges):
-        ang = (p.theta2 - p.theta1) / 2.0 + p.theta1
-        y = np.sin(np.deg2rad(ang))
-        x = np.cos(np.deg2rad(ang))
-        horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
-        connectionstyle = "angle,angleA=0,angleB={}".format(int(ang))
-        kw["arrowprops"].update({"connectionstyle": connectionstyle})
-        ax.annotate(
-            f'{labels[i]} ({"{:.2f}".format(percs[i])}%)',
-            xy=(x, y),
-            xytext=((i / 8) + 1.1 * np.sign(x), (i / 8) + y),
-            horizontalalignment=horizontalalignment,
-            **kw,
-            fontsize=14,
-        )
-    plt.axis("equal")
+    plt.pie(data.values[0])
     circle = plt.Circle((0, 0), 0.7, color="white")
     plt.gca().add_artist(circle)
     plt.title(title, fontsize=14)
-    plt.tight_layout()
+    plt.legend(labels=labels[: len(data.values[0])], bbox_to_anchor=(1.05, 1.0), loc="upper left")
     plt.savefig(figure, bbox_inches="tight", dpi=300)
     plt.switch_backend(backend)
     return data
