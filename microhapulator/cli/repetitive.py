@@ -15,8 +15,8 @@ import sys
 
 
 def subparser(subparsers):
-    desc = "Calculate off target read mapping"
-    cli = subparsers.add_parser("offtarget", description=desc)
+    desc = "Calculate number of reads that map to a marker sequence but map preferentially to another locus when aligned to the whole genome"
+    cli = subparsers.add_parser("repetitive", description=desc)
     cli.add_argument("markerbam", help="alignment file of reads aligned to marker sequences")
     cli.add_argument("refbam", help="alignment file in BAM format of reads aligned to hg38")
     cli.add_argument(
@@ -41,7 +41,7 @@ def subparser(subparsers):
 
 
 def main(args):
-    data = mhapi.off_target_mapping(
+    data = mhapi.repetitive_mapping(
         args.markerbam, args.refbam, args.tsv, minbasequal=args.base_qual
     )
     data.to_csv(args.out, index=False)

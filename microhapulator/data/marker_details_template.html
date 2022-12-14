@@ -97,31 +97,30 @@
                     In this table, "Mapped Reads" refers to the total number of reads that mapped to the marker
                     reference sequence. "Mapped Rate" refers to the proportion of reads mapped compared to what we would
                     <em>expect</em> to see with perfectly even coverage across all markers: that is, a "Mapped Rate" of
-                    > 1.0 indicates higher than expected coverage and < 1.0 indicates lower than expected coverage. "Off
-                    Target Reads" and "Off Target Rate" refer to the number and percentage of reads that map to the
+                    > 1.0 indicates higher than expected coverage and < 1.0 indicates lower than expected coverage. "Repetitive Reads" and "Repetitive Rate" refer to the number and percentage of reads that map to the
                     marker reference, but preferentially map elsewhere when aligned to the entire genome. <strong>N/A
                     values in these columns indicate that the marker definition file does not have GRCh38 coordinates
-                    for all SNPs, which are required for off-target analysis.</strong>
+                    for all SNPs, which are required for repetitive read analysis.</strong>
                 </p>
                 <table>
                     <tr>
                         <th>Sample</th>
                         <th class="alnrt">Mapped Reads</th>
                         <th class="alnrt">Mapped Rate</th>
-                        <th class="alnrt">Off Target Reads</th>
-                        <th class="alnrt">Off Target Rate</th>
+                        <th class="alnrt">Repetitive Reads</th>
+                        <th class="alnrt">Repetitive Rate</th>
                     </tr>
                     {% for sample, sample_data in mapping_rates.items()%}
                     <tr>
                         <td>{{sample}}</td>
                         <td class="alnrt">{{"{:,d}".format(sample_data.loc[markername,'ReadCount'])}}</td>
                         <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'ExpectedObservedRatio'])}}</td>
-                        {% if isna(sample_data.loc[markername, 'OffTargetReads']) %}
+                        {% if isna(sample_data.loc[markername, 'RepetitiveReads']) %}
                         <td class="alnrt">N/A</td>
                         <td class="alnrt">N/A</td>
                         {% else %}
-                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[markername, 'OffTargetReads'])}}</td>
-                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'OffTargetRate']*100)}}%</td>
+                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
+                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'RepetitiveRate']*100)}}%</td>
                         {% endif %}
                     </tr>
                     {% endfor %}

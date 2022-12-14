@@ -41,7 +41,8 @@ rule report:
         expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-off-target-reads.csv", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-repetitive-reads.csv", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-donut.png", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
@@ -244,16 +245,30 @@ rule download_and_index_full_reference:
         """
 
 
-rule off_target_mapping:
+rule repetitive_mapping:
     input:
         marker_bam=rules.map_sort_and_index.output.bam,
         fullref_bam=rules.map_full_reference.output.bam,
         marker_def=rules.copy_and_index_marker_data.output.tsv,
     output:
-        counts="analysis/{sample}/{sample}-off-target-reads.csv",
+        counts="analysis/{sample}/{sample}-repetitive-reads.csv",
     run:
         defn = load_marker_definitions(input.marker_def)
         if "Chrom" not in defn.columns or "OffsetHg38" not in defn.columns:
             shell("touch {output}")
         else:
-            shell("mhpl8r offtarget {input} --out {output}")
+            shell("mhpl8r repetitive {input} --out {output}")
+
+
+rule read_mapping_qc:
+    input:
+        marker=rules.map_sort_and_index.output.counts,
+        full_refr=rules.map_full_reference.output.counts,
+        repetitive=rules.repetitive_mapping.output.counts,
+    output:
+        counts="analysis/{sample}/{sample}-read-mapping-qc.csv",
+        plot="analysis/{sample}/{sample}-donut.png",
+    shell:
+        """
+        mhpl8r mappingqc  --marker {input.marker} --refr {input.full_refr} --rep {input.repetitive}  --csv {output.counts}  --figure {output.plot} --title {wildcards.sample}
+        """

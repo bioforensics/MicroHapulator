@@ -20,6 +20,7 @@ from matplotlib import pyplot as plt
 from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
 from microhapulator.parsers import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
+import math
 import numpy as np
 import os
 import pandas as pd
@@ -701,8 +702,8 @@ def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     return reads_to_markers
 
 
-def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers, minbasequal):
-    off_target_count = 0
+def count_repetitive_reads(marker_bam, marker, marker_def, reads_to_markers, minbasequal):
+    repetitive_count = 0
     for read in marker_bam.fetch(marker):
         if not skip_read(read):
             qual_mask = np.array(read.query_qualities) >= minbasequal
@@ -711,12 +712,12 @@ def count_off_target_reads(marker_bam, marker, marker_def, reads_to_markers, min
             ]
             contains_varloc = bool(set(qual_filtered_positions) & set(marker_def["Offset"]))
             if contains_varloc:
-                off_target_count += marker not in reads_to_markers[read.query_name]
-    return off_target_count
+                repetitive_count += marker not in reads_to_markers[read.query_name]
+    return repetitive_count
 
 
-def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal=10):
-    """Count reads mapped to an off target locus in the full reference genome
+def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal=10):
+    """Count reads mapped that map to a marker sequence but preferentially align elsewhere in the full reference
 
     :param str marker_bam_file: path of BAM file containing read alignments to marker sequences
     :param str fullref_bam_file: path of BAM file containing read alignments to the full reference genome
@@ -725,17 +726,66 @@ def off_target_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
     """
     counts = dict(
         Marker=list(),
-        OffTargetReads=list(),
+        RepetitiveReads=list(),
     )
     marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
     all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
     reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
-        off_target_count = count_off_target_reads(
+        repetitive_count = count_repetitive_reads(
             marker_bam, marker, marker_def, reads_to_marker, minbasequal=minbasequal
         )
         counts["Marker"].append(marker)
-        counts["OffTargetReads"].append(off_target_count)
+        counts["RepetitiveReads"].append(repetitive_count)
     data = pd.DataFrame(counts).sort_values(by="Marker").reset_index(drop=True)
     return data
+
+
+def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title=None):
+    """Count on target, off target, repetitive, and contaminant reads
+    :param str marker_mapped: path of txt file containing number of reads mapped to marker sequences
+    :param str refr_mapped: path of txt file containing number of reads mapped to the full human reference genome
+    :param str repetitive_mapped: path of txt file containing number of reads mapped preferentially to non-marker loci in the human reference genome
+    :param str output: path where the png file of the plot will be saved
+    :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
+
+    """
+    data = count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
+    backend = matplotlib.get_backend()
+    plt.switch_backend("Agg")
+    labels = ["on target", "off target", "contamination", "repetitive"]
+    plt.pie(data.values[0])
+    circle = plt.Circle((0, 0), 0.7, color="white")
+    plt.gca().add_artist(circle)
+    plt.title(title, fontsize=14)
+    plt.legend(labels=labels[: len(data.values[0])], bbox_to_anchor=(1.05, 1.0), loc="upper left")
+    plt.savefig(figure, bbox_inches="tight", dpi=300)
+    plt.switch_backend(backend)
+    return data
+
+
+def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
+    counts = list()
+    with open(marker_mapped) as fh1:
+        total_reads = int(next(fh1).strip().split(": ")[1])
+        marker_mapped_count = int(next(fh1).strip().split(": ")[1])
+    with open(refr_mapped) as fh2:
+        next(fh2)
+        refr_mapped_count = int(next(fh2).strip().split(": ")[1])
+    try:
+        repetitive_df = pd.read_csv(repetitive_mapped)
+        repetitive_count = np.sum(repetitive_df["RepetitiveReads"])
+        on_target_count = marker_mapped_count - repetitive_count
+    except Exception:
+        repetitive_count = None
+        on_target_count = marker_mapped_count
+    contam_count = total_reads - refr_mapped_count
+    off_target_count = refr_mapped_count - marker_mapped_count
+    counts.append(on_target_count)
+    counts.append(off_target_count)
+    counts.append(contam_count)
+    if repetitive_count:
+        counts.append(repetitive_count)
+    cols = ["OnTarget", "OffTarget", "Contaminant", "Repetitive"]
+    return pd.DataFrame([counts], columns=cols[: len(counts)])
