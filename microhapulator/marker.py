@@ -29,8 +29,8 @@ class DefinitionIndex(defaultdict):
             if strict:
                 ident = Identifier(entry.Marker)
                 if not ident.valid:
-                    message = f"invalid identifier {ident}: {ident.errors}; {ident.warnings}"
-                    raise ValueError(message)
+                    msg = f"invalid identifier {entry.Marker}: {ident.errors}; {ident.warnings}"
+                    raise ValueError(msg)
                 index[ident.locus][str(ident)].append(entry.Offset)
             else:
                 index[entry.Marker][entry.Marker].append(entry.Offset)

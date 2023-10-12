@@ -229,6 +229,7 @@ def heterozygote_balance(
                 ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
         ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
         plt.savefig(tofile, bbox_inches="tight")
+        plt.close("all")
         plt.switch_backend(backend)
     return tstat, data
 
@@ -560,14 +561,14 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     )
 
 
-def type(bamfile, markertsv, minbasequal=10, max_depth=1e6, strict=False):
+def type(bamfile, markertsv, minbasequal=10, max_depth=1e6, strict=True):
     """Perform haplotype calling
 
     :param str bamfile: path of a BAM file containing NGS reads aligned to marker reference sequences and sorted
     :param str markertsv: path of a TSV file containing marker metadata, specifically the offset of each SNP for every marker in the panel
     :param int minbasequal: minimum base quality (PHRED score) to be considered reliable for haplotype calling; default is 10, corresponding to Q10, i.e., 90% probability that the base call is correct
     :param float max_depth: maximum permitted read depth
-    :param boolean strict: whether to check for multiple marker definitions and validate marker IDs against MicroHapDB nomenclature; disabled by default
+    :param boolean strict: whether to check for multiple marker definitions and validate marker IDs against MicroHapDB nomenclature; enabled by default
     :returns: an unfiltered catalog of haplotype counts for each marker (a *typing result*)
     :rtype: microhapulator.profile.TypingResult
     """
@@ -696,9 +697,9 @@ def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     reads_to_markers = defaultdict(list)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
-        start = min(marker_def["OffsetHg38"])
-        end = max(marker_def["OffsetHg38"]) + 1
-        for read in fullref_bam.fetch(marker_def["Chrom"][0], start, end):
+        start = min(marker_def.OffsetHg38)
+        end = max(marker_def.OffsetHg38) + 1
+        for read in fullref_bam.fetch(marker_def.Chrom.iloc[0], start, end):
             if not skip_read(read):
                 reads_to_markers[read.query_name].append(marker)
     return reads_to_markers
@@ -763,6 +764,7 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
     plt.title(title, fontsize=14)
     plt.legend(labels=labels[: len(data.values[0])], bbox_to_anchor=(1.05, 1.0), loc="upper left")
     plt.savefig(figure, bbox_inches="tight", dpi=300)
+    plt.close("all")
     plt.switch_backend(backend)
     return data
 
