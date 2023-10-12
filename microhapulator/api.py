@@ -17,6 +17,7 @@ import json
 from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
+from microhapulator import DefinitionIndex
 from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
 from microhapulator.parsers import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
@@ -523,11 +524,10 @@ def skip_read(read):
 
 def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
-    for locusid in sorted(offsets):
+    for markerid, locusid, varloc in offsets:
         discarded = 0
         haplotypes = defaultdict(int)
         ht = defaultdict(dict)
-        varloc = set(offsets[locusid])
         cov_pos = list()
         for column in bam.pileup(locusid, min_base_quality=minbasequal, max_depth=max_depth):
             cov_pos.append(column.n)
@@ -546,7 +546,7 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
                 continue
             htstr = ",".join(htlist)
             haplotypes[htstr] += 1
-        yield locusid, cov_pos, haplotypes, discarded
+        yield markerid, cov_pos, haplotypes, discarded
         totaldiscarded += discarded
     print(
         "[MicroHapulator::type] discarded",
@@ -556,29 +556,27 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
     )
 
 
-def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
+def type(bamfile, markertsv, minbasequal=10, max_depth=1e6, strict=False):
     """Perform haplotype calling
 
     :param str bamfile: path of a BAM file containing NGS reads aligned to marker reference sequences and sorted
     :param str markertsv: path of a TSV file containing marker metadata, specifically the offset of each SNP for every marker in the panel
     :param int minbasequal: minimum base quality (PHRED score) to be considered reliable for haplotype calling; default is 10, corresponding to Q10, i.e., 90% probability that the base call is correct
     :param float max_depth: maximum permitted read depth
+    :param boolean strict: whether to check for multiple marker definitions and validate marker IDs against MicroHapDB nomenclature; disabled by default
     :returns: an unfiltered catalog of haplotype counts for each marker (a *typing result*)
     :rtype: microhapulator.profile.TypingResult
     """
     check_index(bamfile)
     bam = pysam.AlignmentFile(bamfile, "rb")
-    markers = load_marker_definitions(markertsv)
-    offsets = defaultdict(list)
-    for n, row in markers.iterrows():
-        offsets[row.Marker].append(row.Offset)
-    cross_check_marker_ids(bam.references, offsets.keys(), "read alignments", "marker definitions")
+    offsets = DefinitionIndex.from_csv(markertsv, strict=strict)
+    cross_check_marker_ids(bam.references, offsets.loci, "read alignments", "marker definitions")
     haplotype_caller = tally_haplotypes(bam, offsets, minbasequal=minbasequal, max_depth=max_depth)
     result = TypingResult()
-    for locusid, cov_by_pos, htcounts, ndiscarded in haplotype_caller:
-        result.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
+    for markerid, cov_by_pos, htcounts, ndiscarded in haplotype_caller:
+        result.record_coverage(markerid, cov_by_pos, ndiscarded=ndiscarded)
         for haplotype, count in htcounts.items():
-            result.record_haplotype(locusid, haplotype, count)
+            result.record_haplotype(markerid, haplotype, count)
     return result
 
 
