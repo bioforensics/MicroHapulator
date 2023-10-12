@@ -754,12 +754,12 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
     data = count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
-    labels = ["on target", "off target", "contamination", "repetitive"]
+    labels = ["On-target", "Off-target", "Contamination", "Repetitive"]
     plt.pie(data.values[0])
     circle = plt.Circle((0, 0), 0.7, color="white")
     plt.gca().add_artist(circle)
     plt.title(title, fontsize=14)
-    plt.legend(labels=labels[: len(data.values[0])], bbox_to_anchor=(1.05, 1.0), loc="upper left")
+    plt.legend(labels=labels[: len(data.values[0])], loc="center")
     plt.savefig(figure, bbox_inches="tight", dpi=300)
     plt.switch_backend(backend)
     return data
