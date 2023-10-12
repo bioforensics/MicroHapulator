@@ -53,7 +53,11 @@ def count_and_sort(profile, include_discarded=True):
             readcount += count
         counts["Marker"].append(marker)
         counts["ReadCount"].append(readcount)
-    data = pd.DataFrame(counts).sort_values(["ReadCount"], ascending=False).reset_index(drop=True)
+    data = (
+        pd.DataFrame(counts)
+        .sort_values(["ReadCount", "Marker"], ascending=False)
+        .reset_index(drop=True)
+    )
     return data
 
 
