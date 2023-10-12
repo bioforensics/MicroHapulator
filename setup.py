@@ -26,12 +26,7 @@ setup(
     url="https://github.com/bioforensics/microhapulator",
     author="Daniel Standage",
     author_email="daniel.standage@nbacc.dhs.gov",
-    packages=[
-        "microhapulator",
-        "microhapulator.cli",
-        "microhapulator.tests",
-        "microhapulator.tests.data.refr",
-    ],
+    packages=["microhapulator", "microhapulator.cli", "microhapulator.tests"],
     package_data={
         "microhapulator": [
             "microhapulator/Snakefile",
