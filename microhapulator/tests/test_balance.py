@@ -16,14 +16,15 @@ from microhapulator.profile import Profile
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
+import sys
 
 
 def test_interlocus_balance_basic(capfd):
     profile = Profile(fromfile=data_file("prof/three-contrib-log.json"))
     chisq, obs_data = mhapi.interlocus_balance(profile)
     exp_data = pd.read_csv(data_file("three-contrib-log-balance.csv"))
-    exp_data.to_csv(index=False)
-    obs_data.to_csv(index=False)
+    exp_data.to_csv(sys.stdout, index=False)
+    obs_data.to_csv(sys.stdout, index=False)
     assert obs_data.equals(exp_data)
     assert chisq == pytest.approx(0.00928395)
     terminal = capfd.readouterr()
@@ -37,8 +38,8 @@ def test_locbalance_cli(tmp_path, capfd):
     microhapulator.cli.locbalance.main(args)
     obs_data = pd.read_csv(outfile)
     exp_data = pd.read_csv(data_file("three-contrib-log-balance.csv"))
-    exp_data.to_csv(index=False)
-    obs_data.to_csv(index=False)
+    exp_data.to_csv(sys.stdout, index=False)
+    obs_data.to_csv(sys.stdout, index=False)
     assert obs_data.equals(exp_data)
     terminal = capfd.readouterr()
     print(terminal.out)
