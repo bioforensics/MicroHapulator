@@ -20,8 +20,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install bwa samtools fastqc
         curl -L -O http://ccb.jhu.edu/software/FLASH/FLASH-1.2.11-Linux-x86_64.tar.gz && tar -xzf FLASH-1.2.11-Linux-x86_64.tar.gz && sudo cp FLASH-1.2.11-Linux-x86_64/flash /usr/local/bin/ && rm -r FLASH-1.2.11*
-        python -c 'from pkg_resources import resource_filename; print(resource_filename("microhapulator", "data"))'
         python -m pip install --upgrade pip
+        python -c 'from pkg_resources import resource_filename; print(resource_filename("microhapulator", "data"))'
         pip install .
         make devdeps
     - name: Test with pytest
