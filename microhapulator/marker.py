@@ -38,7 +38,8 @@ class DefinitionIndex:
                 chrom = entry.Chrom
             if index.chrom_offsets is not None and pd.isna(entry.OffsetHg38):
                 raise ValueError("empty OffsetHg38 value in marker definition file")
-            index.add(entry.Marker, entry.Offset, entry.OffsetHg38, chrom=chrom, strict=strict)
+            o38 = entry.OffsetHg38 if hasattr(entry, "OffsetHg38") else None
+            index.add(entry.Marker, entry.Offset, offset38=o38, chrom=chrom, strict=strict)
         return index
 
     def add(self, markerid, offset, offset38=None, chrom=None, strict=False):

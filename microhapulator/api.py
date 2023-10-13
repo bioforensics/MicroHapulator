@@ -41,20 +41,16 @@ SimulatedRead = namedtuple("SimulatedRead", ["identifier", "sequence", "quality"
 
 
 def count_and_sort(profile, include_discarded=True):
-    counts = dict(
-        Marker=list(),
-        ReadCount=list(),
-    )
+    counts = list()
     for marker, mdata in profile.data["markers"].items():
         readcount = 0
         if include_discarded:
             readcount += mdata["num_discarded_reads"]
         for haplotype, count in mdata["typing_result"].items():
             readcount += count
-        counts["Marker"].append(marker)
-        counts["ReadCount"].append(readcount)
+        counts.append((marker, readcount))
     data = (
-        pd.DataFrame(counts)
+        pd.DataFrame(counts, columns=["Marker", "ReadCount"])
         .sort_values(["ReadCount", "Marker"], ascending=False)
         .reset_index(drop=True)
     )

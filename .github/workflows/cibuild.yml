@@ -23,7 +23,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install .
         make devdeps
-        curl -L https://osf.io/wuzm6/download --output bwa_index.tar.gz && tar -xzf bwa_index.tar.gz && cp bwa_index/* /home/runner/work/MicroHapulator/MicroHapulator/microhapulator/data && rm -r bwa_index*
+        curl -L https://osf.io/wuzm6/download --output bwa_index.tar.gz && tar -xzf bwa_index.tar.gz && cp bwa_index/* /home/runner/work/MicroHapulator/MicroHapulator/microhapulator/data/ && rm -r bwa_index*
     - name: Test with pytest
       run: make test
     - name: Style check
