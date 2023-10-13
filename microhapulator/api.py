@@ -692,30 +692,28 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
     plt.switch_backend(backend)
 
 
-def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
+def get_reads_in_marker_loci(fullref_bam_file, index):
     fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
     reads_to_markers = defaultdict(list)
-    for marker in set(all_marker_defs.index):
-        marker_def = all_marker_defs.loc[marker]
-        start = min(marker_def.OffsetHg38)
-        end = max(marker_def.OffsetHg38) + 1
-        for read in fullref_bam.fetch(marker_def.Chrom.iloc[0], start, end):
+    for locusid in index.offsets:
+        start, end = index.offset_span(locusid, chrom=True)
+        chrom = index.marker_chroms[locusid]
+        for read in fullref_bam.fetch(chrom, start, end):
             if not skip_read(read):
-                reads_to_markers[read.query_name].append(marker)
+                reads_to_markers[read.query_name].append(locusid)
     return reads_to_markers
 
 
-def count_repetitive_reads(marker_bam, marker, marker_def, reads_to_markers, minbasequal):
+def count_repetitive_reads(marker_bam, locusid, index, reads_to_markers, minbasequal):
     repetitive_count = 0
-    for read in marker_bam.fetch(marker):
-        if not skip_read(read):
-            qual_mask = np.array(read.query_qualities) >= minbasequal
-            qual_filtered_positions = np.array(read.get_reference_positions(full_length=True))[
-                qual_mask
-            ]
-            contains_varloc = bool(set(qual_filtered_positions) & set(marker_def["Offset"]))
-            if contains_varloc:
-                repetitive_count += marker not in reads_to_markers[read.query_name]
+    for read in marker_bam.fetch(locusid):
+        if skip_read(read):
+            continue
+        qual_mask = np.array(read.query_qualities) >= minbasequal
+        qual_filt_positions = np.array(read.get_reference_positions(full_length=True))[qual_mask]
+        contains_varloc = bool(set(qual_filt_positions) & index.all_offsets(locusid))
+        if contains_varloc:
+            repetitive_count += locusid not in reads_to_markers[read.query_name]
     return repetitive_count
 
 
@@ -732,15 +730,17 @@ def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
         RepetitiveReads=list(),
     )
     marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
-    all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
-    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
-    for marker in set(all_marker_defs.index):
-        marker_def = all_marker_defs.loc[marker]
+    index = DefinitionIndex.from_csv(markertsv, strict=True)
+    if not index.has_chrom_offsets:
+        raise ValueError("cannot perform repetitive analysis without chromosome offsets")
+    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, index)
+    for locus in index.offsets:
         repetitive_count = count_repetitive_reads(
-            marker_bam, marker, marker_def, reads_to_marker, minbasequal=minbasequal
+            marker_bam, locus, index, reads_to_marker, minbasequal=minbasequal
         )
-        counts["Marker"].append(marker)
-        counts["RepetitiveReads"].append(repetitive_count)
+        for marker in index.offsets[locus]:
+            counts["Marker"].append(marker)
+            counts["RepetitiveReads"].append(repetitive_count)
     data = pd.DataFrame(counts).sort_values(by="Marker").reset_index(drop=True)
     return data
 
