@@ -17,6 +17,7 @@ from matplotlib import pyplot as plt
 import microhapulator
 import pandas as pd
 from pathlib import Path
+from microhapulator.marker import DefinitionIndex
 from microhapulator.parsers import (
     load_marker_reference_sequences,
     load_marker_definitions,
@@ -95,26 +96,25 @@ def per_marker_mapping_rate(samples):
 
 def marker_details():
     marker_seqs = load_marker_reference_sequences("marker-refr.fasta")
-    marker_defs = load_marker_definitions("marker-definitions.tsv")
+    index = DefinitionIndex.from_csv("marker-definitions.tsv", strict=True)
     all_marker_details = list()
-    for seqid, seq in marker_seqs.items():
-        marker_def = marker_defs.loc[marker_defs["Marker"] == seqid]
-        marker_offsets = ", ".join([str(offset) for offset in marker_def["Offset"].values])
-        chrom = None
-        hg38_offsets = "N/A"
-        if "Chrom" in marker_def.columns:
-            chrom = marker_def["Chrom"].values[0]
-        if "OffsetHg38" in marker_def.columns:
-            hg38_offsets = ", ".join([str(offset) for offset in marker_def["OffsetHg38"].values])
-        GC_content = round((seq.upper().count("G") + seq.upper().count("C")) / len(seq) * 100, 2)
+    for markerid, locusid, offsets in index:
+        marker_offsets = ", ".join([str(o) for o in sorted(offsets)])
+        chrom = index.marker_chroms[markerid]
+        offsets38 = "N/A"
+        if index.has_chrom_offsets:
+            offsets38 = index.chrom_offsets[locusid][markerid]
+            offsets38 = ", ".join([str(o) for o in sorted(offsets38)])
+        seq = marker_seqs[locusid].strip().upper()
+        gc_content = round((seq.count("G") + seq.count("C")) / len(seq) * 100, 2)
         sample_details = [
-            seqid,
+            markerid,
             len(seq),
-            GC_content,
+            gc_content,
             marker_offsets,
-            "".join(seq).strip(),
+            seq,
             chrom,
-            hg38_offsets,
+            offsets38,
         ]
         all_marker_details.append(sample_details)
     col_names = ["Marker", "Length", "GC", "Offsets", "Sequence", "Chrom", "Hg38Offset"]
