@@ -17,7 +17,7 @@ __version__ = get_versions()["version"]
 del get_versions
 
 from .parsers import *
-from .marker import DefinitionIndex
+from .marker import MicrohapIndex
 from . import profile
 from . import api
 from . import cli

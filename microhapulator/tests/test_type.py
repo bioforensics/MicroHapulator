@@ -151,8 +151,8 @@ def test_type_filter_threshold():
 def test_type_no_var_offsets():
     bam = data_file("bam/sandawe-dad.bam")
     tsv = data_file("def/sandawe-empty.tsv")
-    message = r"marker IDs unique to set1={mh01KK-205, mh02KK-005, mh03KK-006};"
-    with pytest.raises(ValueError, match=message):
+    message = "no marker definitions in microhap index"
+    with pytest.warns(UserWarning, match=message):
         mhapi.type(bam, tsv)
 
 
