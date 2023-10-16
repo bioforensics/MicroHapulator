@@ -40,19 +40,19 @@ SimulatedRead = namedtuple("SimulatedRead", ["identifier", "sequence", "quality"
 
 
 def count_and_sort(profile, include_discarded=True):
-    counts = dict(
-        Marker=list(),
-        ReadCount=list(),
-    )
+    counts = list()
     for marker, mdata in profile.data["markers"].items():
         readcount = 0
         if include_discarded:
             readcount += mdata["num_discarded_reads"]
         for haplotype, count in mdata["typing_result"].items():
             readcount += count
-        counts["Marker"].append(marker)
-        counts["ReadCount"].append(readcount)
-    data = pd.DataFrame(counts).sort_values(["ReadCount"], ascending=False).reset_index(drop=True)
+        counts.append((marker, readcount))
+    data = (
+        pd.DataFrame(counts, columns=["Marker", "ReadCount"])
+        .sort_values(["ReadCount", "Marker"], ascending=False)
+        .reset_index(drop=True)
+    )
     return data
 
 
@@ -224,6 +224,7 @@ def heterozygote_balance(
                 ax.text(m, height + 0.01, f"{count:,}", ha="center", va="bottom", rotation=90)
         ax.legend(["Major Allele", "Minor Allele"], loc="lower left")
         plt.savefig(tofile, bbox_inches="tight")
+        plt.close("all")
         plt.switch_backend(backend)
     return tstat, data
 
@@ -694,9 +695,9 @@ def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
     reads_to_markers = defaultdict(list)
     for marker in set(all_marker_defs.index):
         marker_def = all_marker_defs.loc[marker]
-        start = min(marker_def["OffsetHg38"])
-        end = max(marker_def["OffsetHg38"]) + 1
-        for read in fullref_bam.fetch(marker_def["Chrom"][0], start, end):
+        start = min(marker_def.OffsetHg38)
+        end = max(marker_def.OffsetHg38) + 1
+        for read in fullref_bam.fetch(marker_def.Chrom.iloc[0], start, end):
             if not skip_read(read):
                 reads_to_markers[read.query_name].append(marker)
     return reads_to_markers
@@ -761,6 +762,7 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
     plt.title(title, fontsize=14)
     plt.legend(labels=labels[: len(data.values[0])], bbox_to_anchor=(1.05, 1.0), loc="upper left")
     plt.savefig(figure, bbox_inches="tight", dpi=300)
+    plt.close("all")
     plt.switch_backend(backend)
     return data
 
