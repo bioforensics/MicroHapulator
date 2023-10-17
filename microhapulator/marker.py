@@ -13,6 +13,7 @@
 from Bio import SeqIO
 from collections import defaultdict
 from microhapdb.nomenclature import Identifier
+from microhapulator.parsers import open as mhopen
 import pandas as pd
 from warnings import warn
 
@@ -69,7 +70,7 @@ class MicrohapIndex:
 
     @staticmethod
     def parse_sequences_from_fasta(path):
-        with open(path, "r") as fh:
+        with mhopen(path, "r") as fh:
             sequences = SeqIO.to_dict(SeqIO.parse(fh, "fasta"))
             sequences = {seqid: record.seq for seqid, record in sequences.items()}
         return sequences
@@ -82,12 +83,19 @@ class MicrohapIndex:
         else:
             raise KeyError(key)
 
+    def sequence(self, key):
+        for locus in self.loci.values():
+            for marker in locus:
+                if marker.id == key:
+                    return self.sequences[locus.id]
+        raise KeyError(key)
+
     def __iter__(self):
         for locusid, locus in sorted(self.loci.items()):
             for marker in locus:
                 yield locus, marker
 
-    def validate(self, refrids=None):
+    def validate(self, refrids=None, symmetric=False):
         seqnames = set(refrids) if refrids is not None else set(self.sequences.keys())
         locusnames = set(self.loci.keys())
         if len(locusnames) == 0:
@@ -98,6 +106,12 @@ class MicrohapIndex:
             missing = ", ".join(sorted(missing))
             message = f"reference sequences missing for the following loci: {missing}"
             raise ValueError(message)
+        if symmetric:
+            extra = seqnames - locusnames
+            if len(extra) > 0:
+                extra = ", ".join(sorted(extra))
+                message = f"reference sequences with no marker definition: {extra}"
+                raise ValueError(message)
 
     @property
     def has_chrom_offsets(self):
