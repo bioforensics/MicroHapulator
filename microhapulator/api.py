@@ -552,14 +552,13 @@ def tally_haplotypes(bam, mhindex, minbasequal=10, max_depth=1e6):
     )
 
 
-def type(bamfile, markertsv, minbasequal=10, max_depth=1e6, strict=True):
+def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     """Perform haplotype calling
 
     :param str bamfile: path of a BAM file containing NGS reads aligned to marker reference sequences and sorted
     :param str markertsv: path of a TSV file containing marker metadata, specifically the offset of each SNP for every marker in the panel
     :param int minbasequal: minimum base quality (PHRED score) to be considered reliable for haplotype calling; default is 10, corresponding to Q10, i.e., 90% probability that the base call is correct
     :param float max_depth: maximum permitted read depth
-    :param boolean strict: whether to check for multiple marker definitions and validate marker IDs against MicroHapDB nomenclature; enabled by default
     :returns: an unfiltered catalog of haplotype counts for each marker (a *typing result*)
     :rtype: microhapulator.profile.TypingResult
     """

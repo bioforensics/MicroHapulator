@@ -41,13 +41,6 @@ def subparser(subparsers):
         help="maximum permitted read depth; by default M=1000000",
     )
     cli.add_argument(
-        "-r",
-        "--relaxed",
-        dest="strict",
-        action="store_false",
-        help="disable strict validation of marker definitions",
-    )
-    cli.add_argument(
         "tsv",
         help="path of a TSV file containing marker metadata, specifically the offset of each SNP for every marker in the panel",
     )
@@ -58,11 +51,5 @@ def subparser(subparsers):
 
 
 def main(args):
-    profile = mhapi.type(
-        args.bam,
-        args.tsv,
-        minbasequal=args.base_qual,
-        max_depth=args.max_depth,
-        strict=args.strict,
-    )
+    profile = mhapi.type(args.bam, args.tsv, minbasequal=args.base_qual, max_depth=args.max_depth)
     profile.dump(args.out)

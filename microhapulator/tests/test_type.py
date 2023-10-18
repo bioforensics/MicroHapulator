@@ -71,7 +71,7 @@ def test_type_missing_bam_index(tmp_path):
     tmp_tsv = str(tmp_path / "offsets.tsv")
     copyfile(bam, tmp_bam)
     copyfile(tsv, tmp_tsv)
-    result = mhapi.type(tmp_bam, tmp_tsv, minbasequal=13, strict=False)
+    result = mhapi.type(tmp_bam, tmp_tsv, minbasequal=13)
     ac30 = result.data["markers"]["MHDBL000030"]["typing_result"]
     ac197 = result.data["markers"]["MHDBL000197"]["typing_result"]
     assert ac30 == {"A,A,T,C": 3, "A,C,C,C": 2, "A,C,C,G": 18, "G,C,C,C": 1, "G,C,C,G": 34}
@@ -134,12 +134,12 @@ def test_type_cli_simple(tmp_path):
 def test_type_filter_threshold():
     bam = data_file("bam/dyncut-test-reads.bam")
     tsv = data_file("def/dyncut-panel.tsv")
-    rslt = mhapi.type(bam, tsv, strict=False)
+    rslt = mhapi.type(bam, tsv)
     thresholds = load_marker_thresholds(rslt.markers(), global_static=10, global_dynamic=0.005)
     rslt.filter(thresholds)
     assert rslt.haplotypes("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
     assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
-    rslt = mhapi.type(bam, tsv, strict=False)
+    rslt = mhapi.type(bam, tsv)
     thresholds = load_marker_thresholds(rslt.markers(), global_static=4, global_dynamic=0.005)
     rslt.filter(thresholds)
     assert rslt.haplotypes("MHDBL000018") == set(
