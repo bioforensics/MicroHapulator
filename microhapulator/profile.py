@@ -17,9 +17,9 @@ from io import StringIO
 import json
 import jsonschema
 from microhapulator import __version__
-from microhapulator.parsers import open as mhopen
-from microhapulator.parsers import package_file
+from microhapulator import open as mhopen
 from numpy.random import choice
+from pkg_resources import resource_filename
 import pandas as pd
 from pathlib import Path
 import sys
@@ -32,7 +32,7 @@ class RandomMatchError(ValueError):
 
 
 def load_schema():
-    with mhopen(package_file("data/profile-schema.json"), "r") as fh:
+    with mhopen(resource_filename("microhapulator", "data/profile-schema.json"), "r") as fh:
         return json.load(fh)
 
 
@@ -180,7 +180,6 @@ class Profile(object):
         for markerid in sorted(self.markers()):
             marker = mhindex.markers[markerid]
             offsets = marker.offsets_locus
-            print("DEBUG", offsets)
             variants = [list() for _ in range(len(offsets))]
             for i in sorted(self.haploindexes()):
                 haplotype = self.haplotypes(markerid, index=i).pop()

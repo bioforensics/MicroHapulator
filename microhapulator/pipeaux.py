@@ -17,8 +17,8 @@ from matplotlib import pyplot as plt
 import microhapulator
 import pandas as pd
 from pathlib import Path
+from microhapulator import load_marker_thresholds
 from microhapulator.marker import MicrohapIndex
-from microhapulator.parsers import load_marker_thresholds
 from pkg_resources import resource_filename
 import re
 import sys

@@ -12,7 +12,7 @@
 
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
-from microhapulator.parsers import load_marker_definitions
+from microhapulator.marker import MicrohapIndex
 from microhapulator.pipeaux import (
     full_reference_index_files,
     final_html_report,
@@ -253,11 +253,11 @@ rule repetitive_mapping:
     output:
         counts="analysis/{sample}/{sample}-repetitive-reads.csv",
     run:
-        defn = load_marker_definitions(input.marker_def)
-        if "Chrom" not in defn.columns or "OffsetHg38" not in defn.columns:
-            shell("touch {output}")
-        else:
+        microhaps = MicrohapIndex.from_files(input.marker_def)
+        if microhaps.has_chrom_offsets:
             shell("mhpl8r repetitive {input} --out {output}")
+        else:
+            shell("touch {output}")
 
 
 rule read_mapping_qc:

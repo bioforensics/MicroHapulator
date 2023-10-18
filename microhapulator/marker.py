@@ -13,7 +13,7 @@
 from Bio import SeqIO
 from collections import defaultdict
 from microhapdb.nomenclature import Identifier
-from microhapulator.parsers import open as mhopen
+from microhapulator import open as mhopen
 import pandas as pd
 from warnings import warn
 
@@ -85,6 +85,8 @@ class MicrohapIndex:
 
     def sequence(self, key):
         for locus in self.loci.values():
+            if locus.id == key:
+                return self.sequences[locus.id]
             for marker in locus:
                 if marker.id == key:
                     return self.sequences[locus.id]

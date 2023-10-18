@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 
-from microhapulator.parsers import open as mhopen
+from microhapulator import open as mhopen
 from microhapulator.profile import SimulatedProfile
 
 

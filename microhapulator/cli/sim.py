@@ -11,9 +11,9 @@
 # -------------------------------------------------------------------------------------------------
 
 
+from microhapulator import load_marker_frequencies
 import microhapulator.api as mhapi
 from microhapulator.marker import MicrohapIndex
-from microhapulator.parsers import load_marker_frequencies
 import sys
 
 

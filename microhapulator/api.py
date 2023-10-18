@@ -18,7 +18,7 @@ from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import MicrohapIndex
-from microhapulator.parsers import open as mhopen
+from microhapulator import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
 import math
 import numpy as np
@@ -371,7 +371,7 @@ def sequencing(
     tempdir = mkdtemp()
     try:
         haplofile = tempdir + "/haplo.fasta"
-        with open(haplofile, "w") as fh:
+        with mhopen(haplofile, "w") as fh:
             for defline, sequence in profile.haploseqs(mhindex):
                 print(">", defline, "\n", sequence, sep="", file=fh)
         isscmd = [
@@ -393,7 +393,7 @@ def sequencing(
             isscmd.extend(["--cpus", str(threads)])
         check_call(isscmd)
         f1, f2 = tempdir + "/seq_R1.fastq", tempdir + "/seq_R2.fastq"
-        with open(f1, "r") as infh1, open(f2, "r") as infh2:
+        with mhopen(f1, "r") as infh1, mhopen(f2, "r") as infh2:
             if readsignature is None:
                 readsignature = new_signature()
             linebuffer = list()
@@ -763,10 +763,10 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
 
 def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
     counts = list()
-    with open(marker_mapped) as fh1:
+    with mhopen(marker_mapped, "r") as fh1:
         total_reads = int(next(fh1).strip().split(": ")[1])
         marker_mapped_count = int(next(fh1).strip().split(": ")[1])
-    with open(refr_mapped) as fh2:
+    with mhopen(refr_mapped, "r") as fh2:
         next(fh2)
         refr_mapped_count = int(next(fh2).strip().split(": ")[1])
     try:

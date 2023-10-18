@@ -12,7 +12,7 @@
 
 
 import microhapulator.api as mhapi
-from microhapulator.parsers import load_marker_thresholds
+from microhapulator import load_marker_thresholds
 from microhapulator.profile import TypingResult
 import pandas as pd
 import sys

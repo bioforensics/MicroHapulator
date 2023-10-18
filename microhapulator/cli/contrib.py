@@ -12,7 +12,7 @@
 
 
 import json
-from microhapulator.parsers import open as mhopen
+from microhapulator import open as mhopen
 import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 
