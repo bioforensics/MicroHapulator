@@ -64,6 +64,22 @@ def test_type_simple():
     }
 
 
+def test_type_multiple_marker_definitions_per_locus():
+    bam = data_file("pashtun-sim/aligned-reads-multi.bam")
+    tsv = data_file("pashtun-sim/tiny-panel-multidef.tsv")
+    result = mhapi.type(bam, tsv)
+    assert sorted(result.data["markers"]) == [
+        "mh13KK-218.v1",
+        "mh13KK-218.v6",
+        "mh21KK-320.v1",
+        "mh21KK-320.v5",
+    ]
+    assert result.data["markers"]["mh21KK-320.v1"]["typing_result"]["G,A,T,A"] == 1075
+    assert result.data["markers"]["mh21KK-320.v1"]["typing_result"]["G,A,C,A"] == 3
+    assert result.data["markers"]["mh21KK-320.v5"]["typing_result"]["G,A,T,A,A"] == 932
+    assert result.data["markers"]["mh21KK-320.v5"]["typing_result"]["G,G,A,T,A"] == 1
+
+
 def test_type_missing_bam_index(tmp_path):
     bam = data_file("bam/three-contrib-log-link.bam")
     tsv = data_file("def/default-panel-offsets.tsv")
