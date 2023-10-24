@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+- Smart handling of multiple markers at a single locus implemented for `type` and `pipe` (#158).
+- Replaced `parsers` module with a `MicrohapIndex` class and supporting classes (#158).
+
 ### Fixed
 - Bug with inconsistent sorting of read counts for interlocus balance (#159).
 

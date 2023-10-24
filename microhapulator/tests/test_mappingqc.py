@@ -23,7 +23,7 @@ def test_mappingqc(tmp_path):
     obs_data = mhapi.read_mapping_qc(marker_counts, full_refr_counts, rep_counts, figure)
     exp_data = pd.read_csv(data_file("test-mapping-qc.csv"))
     assert obs_data.equals(exp_data)
-    with open(marker_counts) as fh:
+    with open(marker_counts, "r") as fh:
         total_reads = int(next(fh).split()[2])
     assert total_reads == obs_data.sum(axis="columns")[0]
     assert len(obs_data.columns) == 4
@@ -38,7 +38,7 @@ def test_no_refr_offsets(tmp_path):
     obs_data = mhapi.read_mapping_qc(marker_counts, full_refr_counts, rep_counts, figure)
     exp_data = pd.read_csv(data_file("mapping-qc-no-offsets.csv"))
     assert obs_data.equals(exp_data)
-    with open(marker_counts) as fh:
+    with open(marker_counts, "r") as fh:
         total_reads = int(next(fh).split()[2])
     assert total_reads == obs_data.sum(axis="columns")[0]
     assert len(obs_data.columns) == 3

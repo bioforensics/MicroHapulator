@@ -73,7 +73,7 @@
             <br />
             {% for markername in markernames %}
             <div class="marker_details" id={{markername}} style="display:none">
-                <h4>Marker Length</h4>
+                <h4>Microhaplotype Length</h4>
                 <p>{{marker_details_table.loc[markername,'Length']}} bp</p>
                 <br />
 
@@ -88,7 +88,7 @@
                 {% endif %}
                 <br />
 
-                <h4>Marker Sequence (SNPs in red) </h4>
+                <h4>Microhaplotype Sequence (SNPs in red) </h4>
                 <div class="sequence">{{marker_details_table.loc[markername,"Sequence"]}}</div>
                 <br />
 

@@ -17,8 +17,8 @@ import json
 from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
-from microhapulator.parsers import load_marker_definitions, cross_check_marker_ids
-from microhapulator.parsers import open as mhopen
+from microhapulator import MicrohapIndex
+from microhapulator import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
 import math
 import numpy as np
@@ -361,8 +361,7 @@ def new_signature():
 
 def sequencing(
     profile,
-    markers,
-    refrseqs,
+    mhindex,
     seed=None,
     threads=1,
     numreads=500000,
@@ -372,8 +371,8 @@ def sequencing(
     tempdir = mkdtemp()
     try:
         haplofile = tempdir + "/haplo.fasta"
-        with open(haplofile, "w") as fh:
-            for defline, sequence in profile.haploseqs(markers, refrseqs):
+        with mhopen(haplofile, "w") as fh:
+            for defline, sequence in profile.haploseqs(mhindex):
                 print(">", defline, "\n", sequence, sep="", file=fh)
         isscmd = [
             "iss",
@@ -394,7 +393,7 @@ def sequencing(
             isscmd.extend(["--cpus", str(threads)])
         check_call(isscmd)
         f1, f2 = tempdir + "/seq_R1.fastq", tempdir + "/seq_R2.fastq"
-        with open(f1, "r") as infh1, open(f2, "r") as infh2:
+        with mhopen(f1, "r") as infh1, mhopen(f2, "r") as infh2:
             if readsignature is None:
                 readsignature = new_signature()
             linebuffer = list()
@@ -427,8 +426,7 @@ def sequencing(
 
 def seq(
     profiles,
-    markers,
-    refrseqs,
+    mhindex,
     seeds=None,
     threads=1,
     totalreads=500000,
@@ -442,8 +440,7 @@ def seq(
     reads are aggregated.
 
     :param list profiles: list of mock profiles
-    :param pandas.DataFrame markers: marker definitions, provided as a table of SNP offsets, one row per SNP; required columns: **Marker** and **Offset**, representing the distance of the SNP from the first nucleotide in the reference sequence
-    :param dict refrseqs: a dictionary with marker names as the keys and marker reference sequences as the values
+    :param MicrohapIndex mhindex: an index containing microhap marker definitions and reference sequences
     :param list seeds: optional list of random seeds, one per profile
     :param int threads: number of threads to use for each sequencing task; note that optimal performance is typically achieved with a single thread
     :param int totalreads: total number of reads to generate across all profiles
@@ -466,8 +463,7 @@ def seq(
         print("[MicroHapulator::seq]", message, file=sys.stderr)
         sequencer = sequencing(
             profile,
-            markers,
-            refrseqs,
+            mhindex,
             seed=seed,
             threads=threads,
             numreads=nreads,
@@ -522,17 +518,16 @@ def skip_read(read):
     return read.is_secondary or read.is_supplementary or read.is_duplicate or read.is_qcfail
 
 
-def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
+def tally_haplotypes(bam, mhindex, minbasequal=10, max_depth=1e6):
     totaldiscarded = 0
-    for locusid in sorted(offsets):
+    for locus, marker in mhindex:
         discarded = 0
         haplotypes = defaultdict(int)
         ht = defaultdict(dict)
-        varloc = set(offsets[locusid])
         cov_pos = list()
-        for column in bam.pileup(locusid, min_base_quality=minbasequal, max_depth=max_depth):
+        for column in bam.pileup(locus.id, min_base_quality=minbasequal, max_depth=max_depth):
             cov_pos.append(column.n)
-            if column.pos not in varloc:
+            if column.pos not in marker.offsets_locus:
                 continue
             for record in column.pileups:
                 aligned_base = None
@@ -542,12 +537,12 @@ def tally_haplotypes(bam, offsets, minbasequal=10, max_depth=1e6):
                 ht[record.alignment.query_name][column.pos] = aligned_base
         for readname, htdict in ht.items():
             htlist = [htdict[pos] for pos in sorted(htdict)]
-            if len(htlist) < len(varloc):
+            if len(htlist) < len(marker.offsets_locus):
                 discarded += 1
                 continue
             htstr = ",".join(htlist)
             haplotypes[htstr] += 1
-        yield locusid, cov_pos, haplotypes, discarded
+        yield marker.id, cov_pos, haplotypes, discarded
         totaldiscarded += discarded
     print(
         "[MicroHapulator::type] discarded",
@@ -569,17 +564,16 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     """
     check_index(bamfile)
     bam = pysam.AlignmentFile(bamfile, "rb")
-    markers = load_marker_definitions(markertsv)
-    offsets = defaultdict(list)
-    for n, row in markers.iterrows():
-        offsets[row.Marker].append(row.Offset)
-    cross_check_marker_ids(bam.references, offsets.keys(), "read alignments", "marker definitions")
-    haplotype_caller = tally_haplotypes(bam, offsets, minbasequal=minbasequal, max_depth=max_depth)
+    microhaps = MicrohapIndex.from_files(markertsv)
+    microhaps.validate(refrids=bam.references)
+    haplotype_caller = tally_haplotypes(
+        bam, microhaps, minbasequal=minbasequal, max_depth=max_depth
+    )
     result = TypingResult()
-    for locusid, cov_by_pos, htcounts, ndiscarded in haplotype_caller:
-        result.record_coverage(locusid, cov_by_pos, ndiscarded=ndiscarded)
+    for markerid, cov_by_pos, htcounts, ndiscarded in haplotype_caller:
+        result.record_coverage(markerid, cov_by_pos, ndiscarded=ndiscarded)
         for haplotype, count in htcounts.items():
-            result.record_haplotype(locusid, haplotype, count)
+            result.record_haplotype(markerid, haplotype, count)
     return result
 
 
@@ -690,30 +684,27 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
     plt.switch_backend(backend)
 
 
-def get_reads_in_marker_loci(fullref_bam_file, all_marker_defs):
+def get_reads_in_marker_loci(fullref_bam_file, mhindex):
     fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
     reads_to_markers = defaultdict(list)
-    for marker in set(all_marker_defs.index):
-        marker_def = all_marker_defs.loc[marker]
-        start = min(marker_def.OffsetHg38)
-        end = max(marker_def.OffsetHg38) + 1
-        for read in fullref_bam.fetch(marker_def.Chrom.iloc[0], start, end):
+    for locus in mhindex.loci.values():
+        start, end = locus.span(chrom=True)
+        for read in fullref_bam.fetch(locus.chrom, start, end):
             if not skip_read(read):
-                reads_to_markers[read.query_name].append(marker)
+                reads_to_markers[read.query_name].append(locus.id)
     return reads_to_markers
 
 
-def count_repetitive_reads(marker_bam, marker, marker_def, reads_to_markers, minbasequal):
+def count_repetitive_reads(marker_bam, locus, reads_to_markers, minbasequal):
     repetitive_count = 0
-    for read in marker_bam.fetch(marker):
-        if not skip_read(read):
-            qual_mask = np.array(read.query_qualities) >= minbasequal
-            qual_filtered_positions = np.array(read.get_reference_positions(full_length=True))[
-                qual_mask
-            ]
-            contains_varloc = bool(set(qual_filtered_positions) & set(marker_def["Offset"]))
-            if contains_varloc:
-                repetitive_count += marker not in reads_to_markers[read.query_name]
+    for read in marker_bam.fetch(locus.id):
+        if skip_read(read):
+            continue
+        qual_mask = np.array(read.query_qualities) >= minbasequal
+        qual_filt_positions = np.array(read.get_reference_positions(full_length=True))[qual_mask]
+        contains_varloc = bool(set(qual_filt_positions) & locus.offsets())
+        if contains_varloc:
+            repetitive_count += locus.id not in reads_to_markers[read.query_name]
     return repetitive_count
 
 
@@ -730,15 +721,17 @@ def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
         RepetitiveReads=list(),
     )
     marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
-    all_marker_defs = load_marker_definitions(markertsv).set_index("Marker")
-    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, all_marker_defs)
-    for marker in set(all_marker_defs.index):
-        marker_def = all_marker_defs.loc[marker]
+    microhaps = MicrohapIndex.from_files(markertsv)
+    if not microhaps.has_chrom_offsets:
+        raise ValueError("cannot perform repetitive analysis without chromosome offsets")
+    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, microhaps)
+    for locus in microhaps.loci.values():
         repetitive_count = count_repetitive_reads(
-            marker_bam, marker, marker_def, reads_to_marker, minbasequal=minbasequal
+            marker_bam, locus, reads_to_marker, minbasequal=minbasequal
         )
-        counts["Marker"].append(marker)
-        counts["RepetitiveReads"].append(repetitive_count)
+        for marker in locus:
+            counts["Marker"].append(marker.id)
+            counts["RepetitiveReads"].append(repetitive_count)
     data = pd.DataFrame(counts).sort_values(by="Marker").reset_index(drop=True)
     return data
 
@@ -769,10 +762,10 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
 
 def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
     counts = list()
-    with open(marker_mapped) as fh1:
+    with mhopen(marker_mapped, "r") as fh1:
         total_reads = int(next(fh1).strip().split(": ")[1])
         marker_mapped_count = int(next(fh1).strip().split(": ")[1])
-    with open(refr_mapped) as fh2:
+    with mhopen(refr_mapped, "r") as fh2:
         next(fh2)
         refr_mapped_count = int(next(fh2).strip().split(": ")[1])
     try:

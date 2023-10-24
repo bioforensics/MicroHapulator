@@ -11,8 +11,8 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
+from microhapulator import load_marker_thresholds
 import microhapulator.api as mhapi
-from microhapulator.parsers import load_marker_thresholds
 from microhapulator.profile import TypingResult
 from microhapulator.tests import data_file
 import pytest
@@ -62,6 +62,22 @@ def test_type_simple():
         "G,T,C,A": 1,
         "T,G,C,A": 1,
     }
+
+
+def test_type_multiple_marker_definitions_per_locus():
+    bam = data_file("pashtun-sim/aligned-reads-multi.bam")
+    tsv = data_file("pashtun-sim/tiny-panel-multidef.tsv")
+    result = mhapi.type(bam, tsv)
+    assert sorted(result.data["markers"]) == [
+        "mh13KK-218.v1",
+        "mh13KK-218.v6",
+        "mh21KK-320.v1",
+        "mh21KK-320.v5",
+    ]
+    assert result.data["markers"]["mh21KK-320.v1"]["typing_result"]["G,A,T,A"] == 1075
+    assert result.data["markers"]["mh21KK-320.v1"]["typing_result"]["G,A,C,A"] == 3
+    assert result.data["markers"]["mh21KK-320.v5"]["typing_result"]["G,A,T,A,A"] == 932
+    assert result.data["markers"]["mh21KK-320.v5"]["typing_result"]["G,G,A,T,A"] == 1
 
 
 def test_type_missing_bam_index(tmp_path):
@@ -151,8 +167,8 @@ def test_type_filter_threshold():
 def test_type_no_var_offsets():
     bam = data_file("bam/sandawe-dad.bam")
     tsv = data_file("def/sandawe-empty.tsv")
-    message = r"marker IDs unique to set1={mh01KK-205, mh02KK-005, mh03KK-006};"
-    with pytest.raises(ValueError, match=message):
+    message = "no marker definitions in microhap index"
+    with pytest.warns(UserWarning, match=message):
         mhapi.type(bam, tsv)
 
 

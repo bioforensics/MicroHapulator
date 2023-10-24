@@ -17,9 +17,9 @@ from io import StringIO
 import json
 import jsonschema
 from microhapulator import __version__
-from microhapulator.parsers import open as mhopen
-from microhapulator.parsers import package_file
+from microhapulator import open as mhopen
 from numpy.random import choice
+from pkg_resources import resource_filename
 import pandas as pd
 from pathlib import Path
 import sys
@@ -32,7 +32,7 @@ class RandomMatchError(ValueError):
 
 
 def load_schema():
-    with mhopen(package_file("data/profile-schema.json"), "r") as fh:
+    with mhopen(resource_filename("microhapulator", "data/profile-schema.json"), "r") as fh:
         return json.load(fh)
 
 
@@ -175,35 +175,34 @@ class Profile(object):
     def __str__(self):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
-    def bedstream(self, markers):
-        for marker in sorted(self.markers()):
-            result = markers[markers.Marker == marker]
-            if len(result) == 0:
-                raise ValueError(f"unknown marker identifier '{marker}'")
-            offsets = sorted(result.Offset)
+    def bedstream(self, mhindex):
+        mhindex.validate(refrids=self.markers(), symmetric=True)
+        for markerid in sorted(self.markers()):
+            marker = mhindex.markers[markerid]
+            offsets = marker.offsets_locus
             variants = [list() for _ in range(len(offsets))]
-            for index in sorted(self.haploindexes()):
-                haplotype = self.haplotypes(marker, index=index).pop()
+            for i in sorted(self.haploindexes()):
+                haplotype = self.haplotypes(markerid, index=i).pop()
                 for snp, allelelist in zip(haplotype.split(","), variants):
                     allelelist.append(snp)
             for offset, snps in zip(offsets, variants):
                 haplostr = "|".join(snps)
-                yield "\t".join((marker, str(offset), str(offset + 1), haplostr))
+                yield "\t".join((markerid, str(offset), str(offset + 1), haplostr))
 
-    def seqstream(self, refrseqs):
-        for marker in sorted(self.markers()):
-            yield marker, refrseqs[marker]
+    def seqstream(self, mhindex):
+        for markerid in sorted(self.markers()):
+            yield markerid, mhindex.sequence(markerid)
 
-    def bedstr(self, markers):
+    def bedstr(self, mhindex):
         out = StringIO()
-        for line in self.bedstream(markers):
+        for line in self.bedstream(mhindex):
             print(line, file=out)
         return out.getvalue()
 
-    def haploseqs(self, markers, refrseqs):
+    def haploseqs(self, mhindex):
         """Apply genotype to reference and construct full haplotype sequences."""
-        ss = self.seqstream(refrseqs)
-        bs = self.bedstream(markers)
+        ss = self.seqstream(mhindex)
+        bs = self.bedstream(mhindex)
         for defline, sequence in mutate(ss, bs):
             yield defline, sequence
 

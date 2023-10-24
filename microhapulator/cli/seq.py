@@ -13,7 +13,7 @@
 
 from argparse import Action, SUPPRESS
 import microhapulator.api as mhapi
-from microhapulator.parsers import load_marker_definitions, load_marker_reference_sequences
+from microhapulator.marker import MicrohapIndex
 from microhapulator.profile import Profile
 import sys
 
@@ -93,12 +93,10 @@ def main(args):
     if len(args.out) == 2:
         fh2 = args.out[1]
     profiles = resolve_profiles(args.profiles)
-    markers = load_marker_definitions(args.tsv)
-    refrseqs = load_marker_reference_sequences(args.refrseqs)
+    index = MicrohapIndex.from_files(args.tsv, fasta_path=args.refrseqs)
     sequencer = mhapi.seq(
         profiles,
-        markers,
-        refrseqs,
+        index,
         seeds=args.seeds,
         threads=args.threads,
         totalreads=args.num_reads,

@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator.api as mhapi
+from microhapulator.marker import MicrohapIndex
 from microhapulator.profile import SimulatedProfile, TypingResult
 from microhapulator.tests import data_file
 import numpy
@@ -93,8 +94,8 @@ def test_merge_sim_genotypes():
     prof3.add(0, "mh05KK-123", "G,C")
     prof3.add(1, "mh05KK-123", "G,T")
     profile = SimulatedProfile.merge([prof1, prof2, prof3])
-    markers = pd.read_csv(data_file("def/loc2-offsets.tsv"), sep="\t")
-    output = profile.bedstr(markers)
+    index = MicrohapIndex.from_files(data_file("def/loc2-offsets.tsv"))
+    output = profile.bedstr(index)
     print(output)
     assert output == (
         "mh05KK-123\t121\t122\tA|A|A|A|G|G\n"
@@ -107,11 +108,15 @@ def test_merge_sim_genotypes():
 
 def test_bed_error():
     p = SimulatedProfile()
+    p.add(0, "mh05KK-123", "A,C")
+    p.add(1, "mh05KK-123", "A,C")
+    p.add(0, "mh11CP-004", "C,G,A")
+    p.add(1, "mh11CP-004", "C,T,G")
     p.add(0, "BOGUS", "A,C,C")
     p.add(1, "BOGUS", "A,C,C")
-    markers = pd.read_csv(data_file("def/loc2-offsets.tsv"), sep="\t")
-    with pytest.raises(ValueError, match=r"unknown marker identifier 'BOGUS'"):
-        print(p.bedstr(markers))
+    index = MicrohapIndex.from_files(data_file("def/loc2-offsets.tsv"))
+    with pytest.raises(ValueError, match=r"reference sequences with no marker definition: BOGUS"):
+        print(p.bedstr(index))
 
 
 def test_typing_rate():

@@ -13,8 +13,7 @@
 
 from argparse import SUPPRESS
 from collections import defaultdict
-from microhapulator.parsers import cross_check_marker_ids
-from microhapulator.parsers import load_marker_reference_sequences, load_marker_definitions
+from microhapulator.marker import MicrohapIndex
 from os import cpu_count, symlink
 from pathlib import Path
 from pkg_resources import resource_filename
@@ -201,18 +200,12 @@ def subparser(subparsers):
 
 
 def validate_panel_config(markerseqs, markerdefn):
-    defn = load_marker_definitions(markerdefn)
-    if "Chrom" not in defn.columns or "OffsetHg38" not in defn.columns:
-        warn(
-            "Chrom and/or OffsetHg38 columns missing from the marker definition, repetitive read "
-            "alignment analysis will not be performed",
-            UserWarning,
-        )
-    seqs = load_marker_reference_sequences(markerseqs)
     print("[MicroHapulator] validating panel configuration", file=sys.stderr)
-    cross_check_marker_ids(
-        seqs.keys(), defn.Marker, "marker reference sequences", "marker definitions"
-    )
+    index = MicrohapIndex.from_files(markerdefn, markerseqs)
+    index.validate()
+    if not index.has_chrom_offsets:
+        msg = "Chrom and/or OffsetHg38 columns missing from the marker definition, repetitive read alignment analysis will not be performed"
+        warn(msg)
 
 
 def main(args):

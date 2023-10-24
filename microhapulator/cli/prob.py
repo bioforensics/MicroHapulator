@@ -12,8 +12,8 @@
 
 
 import json
-from microhapulator.parsers import load_marker_frequencies
-from microhapulator.parsers import open as mhopen
+from microhapulator import load_marker_frequencies
+from microhapulator import open as mhopen
 import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 

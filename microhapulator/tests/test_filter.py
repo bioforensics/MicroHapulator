@@ -11,8 +11,8 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
+from microhapulator import load_marker_thresholds
 import microhapulator.api as mhapi
-from microhapulator.parsers import load_marker_thresholds
 from microhapulator.profile import TypingResult
 from microhapulator.tests import data_file
 import pandas as pd
