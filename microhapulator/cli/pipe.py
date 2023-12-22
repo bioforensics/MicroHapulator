@@ -231,6 +231,7 @@ def main(args):
         dryrun=args.dryrun,
         config=config,
         workdir=args.workdir,
+        rerun_triggers=["mtime"],
     )
     if not success:
         return 1

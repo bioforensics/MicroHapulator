@@ -684,13 +684,16 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
     plt.switch_backend(backend)
 
 
-def get_reads_in_marker_loci(fullref_bam_file, mhindex):
-    fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
+def get_reads_in_marker_loci(marker_bam, fullrefr_bam, mhindex):
+    fullref_bam = pysam.AlignmentFile(fullrefr_bam, "rb")
     reads_to_markers = defaultdict(list)
     for locus in mhindex.loci.values():
         start, end = locus.span(chrom=True)
+        baseline = set()
+        for read in marker_bam.fetch(locus.id):
+            baseline.add(read.query_name)
         for read in fullref_bam.fetch(locus.chrom, start, end):
-            if not skip_read(read):
+            if not skip_read(read) and read.query_name in baseline:
                 reads_to_markers[read.query_name].append(locus.id)
     return reads_to_markers
 
@@ -708,11 +711,11 @@ def count_repetitive_reads(marker_bam, locus, reads_to_markers, minbasequal):
     return repetitive_count
 
 
-def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal=10):
+def repetitive_mapping(marker_bam, fullrefr_bam, markertsv, minbasequal=10):
     """Count reads mapped that map to a marker sequence but preferentially align elsewhere in the full reference
 
-    :param str marker_bam_file: path of BAM file containing read alignments to marker sequences
-    :param str fullref_bam_file: path of BAM file containing read alignments to the full reference genome
+    :param str marker_bam: path of BAM file containing read alignments to marker sequences
+    :param str fullrefr_bam: path of BAM file containing read alignments to the full reference genome
     :param str markertsv: path of a TSV file containing marker metadata including the offset of each SNP for every marker in the panel and the chromosome and coordinate of each in the reference genome
     :param int minbasequal: minimum base quality (PHRED score) to be considered reliable for haplotype calling; default is 10, corresponding to Q10, i.e., 90% probability that the base call is correct
     """
@@ -720,11 +723,11 @@ def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
         Marker=list(),
         RepetitiveReads=list(),
     )
-    marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
+    marker_bam = pysam.AlignmentFile(marker_bam, "rb")
     microhaps = MicrohapIndex.from_files(markertsv)
     if not microhaps.has_chrom_offsets:
         raise ValueError("cannot perform repetitive analysis without chromosome offsets")
-    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, microhaps)
+    reads_to_marker = get_reads_in_marker_loci(marker_bam, fullrefr_bam, microhaps)
     for locus in microhaps.loci.values():
         repetitive_count = count_repetitive_reads(
             marker_bam, locus, reads_to_marker, minbasequal=minbasequal
