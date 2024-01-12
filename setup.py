@@ -46,7 +46,7 @@ setup(
         "nbformat>=5.0,<5.6",
         "numpy>=1.19",
         "pandas>1.0",
-        "pulp=2.3.1",
+        "pulp==2.3.1",
         "scipy>=1.7",
         "snakemake>=7.15.2,<8.0",
         "termgraph>=0.5",
