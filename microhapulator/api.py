@@ -702,18 +702,11 @@ def count_repetitive_reads(marker_bam, locus, marker, reads_to_markers_fullref, 
     for read in marker_bam.fetch(locus.id):
         if skip_read(read):
             continue
-        quality_filtered_positions = [
-            pos
-            for i, pos in enumerate(read.get_reference_positions(full_length=True))
-            if read.query_qualities[i] >= minbasequal
-        ]
-        quality_snp_positions = [
-            offset for offset in marker.offsets_locus if offset in quality_filtered_positions
-        ]
-        if (
-            len(quality_snp_positions) > 0
-            and marker.id not in reads_to_markers_fullref[read.query_name]
-        ):
+        ref_pos = read.get_reference_positions(full_length=True)
+        quals = read.query_qualities
+        qual_filtered_pos = [pos for i, pos in enumerate(ref_pos) if quals[i] >= minbasequal]
+        qual_snp_pos = [offset for offset in marker.offsets_locus if offset in qual_filtered_pos]
+        if qual_snp_pos and marker.id not in reads_to_markers_fullref[read.query_name]:
             repetitive_count += 1
     return repetitive_count
 
