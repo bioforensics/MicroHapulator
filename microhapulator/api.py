@@ -42,7 +42,6 @@ SimulatedRead = namedtuple("SimulatedRead", ["identifier", "sequence", "quality"
 def count_and_sort(profile, include_discarded=True):
     counts = list()
     for marker, mdata in profile.data["markers"].items():
-        print(mdata)
         readcount = 0
         if include_discarded:
             readcount += mdata["num_discarded_reads"]
@@ -537,7 +536,6 @@ def tally_haplotypes(bam, mhindex, minbasequal=10, max_depth=1e6):
                 aligned_base = record.alignment.query_sequence[record.query_position]
                 ht[record.alignment.query_name][column.pos] = aligned_base
         for readname, htdict in ht.items():
-            print(readname)
             htlist = [htdict[pos] for pos in sorted(htdict)]
             if len(htlist) < len(marker.offsets_locus):
                 discarded += 1
