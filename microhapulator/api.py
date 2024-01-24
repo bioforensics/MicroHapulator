@@ -700,11 +700,13 @@ def count_repetitive_reads(marker_bam, locus, marker, reads_to_markers_fullref, 
     for read in marker_bam.fetch(locus.id):
         if skip_read(read):
             continue
-        ref_pos = read.get_reference_positions(full_length=True)
+        refr_pos = read.get_reference_positions(full_length=True)
         quals = read.query_qualities
-        qual_filtered_pos = [pos for i, pos in enumerate(ref_pos) if quals[i] >= minbasequal]
+        qual_filtered_pos = [pos for pos, qual in zip(refr_pos, quals) if qual >= minbasequal]
         qual_snp_pos = [offset for offset in marker.offsets_locus if offset in qual_filtered_pos]
-        if qual_snp_pos and marker.id not in reads_to_markers_fullref[read.query_name]:
+        read_overlaps_target_snps = len(qual_snp_pos) > 0
+        read_maps_elsewhere = marker.id not in reads_to_markers_fullref[read.query_name]
+        if read_overlaps_target_snps and read_maps_elsewhere:
             repetitive_count += 1
     return repetitive_count
 

@@ -131,16 +131,26 @@ rule map_full_reference:
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
         bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
-        counts="analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
     threads: 32
     shell:
         """
         bwa mem -t {threads} {params.refr} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
+        """
+
+
+rule count_fullrefr_mapped_reads:
+    input:
+        bam=rules.map_full_reference.output.bam,
+        bai=rules.map_full_reference.output.bai,
+    output:
+        counts="analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
+    shell:
+        """
         echo -n "Total reads: " > {output.counts}
-        samtools view -c -F 2304 {output.bam} >> {output.counts}
+        samtools view -c -F 2304 {input.bam} >> {output.counts}
         echo -n "Mapped reads: " >> {output.counts}
-        samtools view -c -F 2308 {output.bam} >> {output.counts}
+        samtools view -c -F 2308 {input.bam} >> {output.counts}
         """
 
 
@@ -263,7 +273,7 @@ rule repetitive_mapping:
 rule read_mapping_qc:
     input:
         marker=rules.map_sort_and_index.output.counts,
-        full_refr=rules.map_full_reference.output.counts,
+        full_refr=rules.count_fullrefr_mapped_reads.output.counts,
         repetitive=rules.repetitive_mapping.output.counts,
     output:
         counts="analysis/{sample}/{sample}-read-mapping-qc.csv",
