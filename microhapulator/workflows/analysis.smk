@@ -257,9 +257,9 @@ rule download_and_index_full_reference:
 
 rule repetitive_mapping:
     input:
-        marker_bam=rules.map_sort_and_index.output.bam,
-        fullref_bam=rules.map_full_reference.output.bam,
-        marker_def=rules.copy_and_index_marker_data.output.tsv,
+        marker_bam="analysis/{sample}/{sample}.bam",
+        fullref_bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
+        marker_def="marker-definitions.tsv",
     output:
         counts="analysis/{sample}/{sample}-repetitive-reads.csv",
     run:
