@@ -160,10 +160,10 @@ def final_html_report(
 def read_length_table_paired_end(samples):
     read_length_data = list()
     for sample in samples:
-        with open(f"analysis/{sample}/{sample}-r1-read-lengths.json") as fh:
+        with open(f"analysis/{sample}/{sample}-r1-read-lengths.json", "r") as fh:
             r1lengths = json.load(fh)
             r1lengths = list(set(r1lengths))
-        with open(f"analysis/{sample}/{sample}-r2-read-lengths.json") as fh:
+        with open(f"analysis/{sample}/{sample}-r2-read-lengths.json", "r") as fh:
             r2lengths = json.load(fh)
             r2lengths = list(set(r2lengths))
         if len(r1lengths) != 1 or len(r2lengths) != 1:
@@ -176,7 +176,7 @@ def read_length_table_paired_end(samples):
 def read_length_table_single_end(samples):
     read_length_data = list()
     for sample in samples:
-        with open(f"analysis/{sample}/{sample}-read-lengths.json") as fh:
+        with open(f"analysis/{sample}/{sample}-read-lengths.json", "r") as fh:
             lengths = json.load(fh)
             lengths = list(set(lengths))
         if len(lengths) != 1:

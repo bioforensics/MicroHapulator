@@ -687,24 +687,27 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
 def get_reads_in_marker_loci(fullref_bam_file, mhindex):
     fullref_bam = pysam.AlignmentFile(fullref_bam_file, "rb")
     reads_to_markers = defaultdict(list)
-    for locus in mhindex.loci.values():
-        start, end = locus.span(chrom=True)
+    for locus, marker in mhindex:
+        start, end = marker.span(chrom=True)
         for read in fullref_bam.fetch(locus.chrom, start, end):
             if not skip_read(read):
-                reads_to_markers[read.query_name].append(locus.id)
+                reads_to_markers[read.query_name].append(marker.id)
     return reads_to_markers
 
 
-def count_repetitive_reads(marker_bam, locus, reads_to_markers, minbasequal):
+def count_repetitive_reads(marker_bam, locus, marker, reads_to_markers_fullref, minbasequal):
     repetitive_count = 0
     for read in marker_bam.fetch(locus.id):
         if skip_read(read):
             continue
-        qual_mask = np.array(read.query_qualities) >= minbasequal
-        qual_filt_positions = np.array(read.get_reference_positions(full_length=True))[qual_mask]
-        contains_varloc = bool(set(qual_filt_positions) & locus.offsets())
-        if contains_varloc:
-            repetitive_count += locus.id not in reads_to_markers[read.query_name]
+        refr_pos = read.get_reference_positions(full_length=True)
+        quals = read.query_qualities
+        qual_filtered_pos = [pos for pos, qual in zip(refr_pos, quals) if qual >= minbasequal]
+        qual_snp_pos = [offset for offset in marker.offsets_locus if offset in qual_filtered_pos]
+        read_overlaps_target_snps = len(qual_snp_pos) > 0
+        read_maps_elsewhere = marker.id not in reads_to_markers_fullref[read.query_name]
+        if read_overlaps_target_snps and read_maps_elsewhere:
+            repetitive_count += 1
     return repetitive_count
 
 
@@ -724,14 +727,13 @@ def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
     microhaps = MicrohapIndex.from_files(markertsv)
     if not microhaps.has_chrom_offsets:
         raise ValueError("cannot perform repetitive analysis without chromosome offsets")
-    reads_to_marker = get_reads_in_marker_loci(fullref_bam_file, microhaps)
-    for locus in microhaps.loci.values():
+    reads_to_marker_fullref = get_reads_in_marker_loci(fullref_bam_file, microhaps)
+    for locus, marker in microhaps:
         repetitive_count = count_repetitive_reads(
-            marker_bam, locus, reads_to_marker, minbasequal=minbasequal
+            marker_bam, locus, marker, reads_to_marker_fullref, minbasequal=minbasequal
         )
-        for marker in locus:
-            counts["Marker"].append(marker.id)
-            counts["RepetitiveReads"].append(repetitive_count)
+        counts["Marker"].append(marker.id)
+        counts["RepetitiveReads"].append(repetitive_count)
     data = pd.DataFrame(counts).sort_values(by="Marker").reset_index(drop=True)
     return data
 
