@@ -86,6 +86,48 @@
 
             <a name="readqc"></a>
             <h2>Read QA/QC</h2>
+            <h5>Ambiguous Reads</h5>
+            {% if reads_are_paired %}
+            <p>
+                If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), both reads in the pair are filtered out prior to read merging and excluded from all subsequent analysis.
+                The table below shows the number of read pairs that were removed in each sample and which read(s) in the pair contained too many ambiguous bases.
+            </p>
+            <table>
+                <tr>
+                    <th>Sample</th>
+                    <th class="alnrt">R1 Only</th>
+                    <th class="alnrt">R2 Only</th>
+                    <th class="alnrt">R1 and R2</th>
+                    <th class="alnrt">Pairs Removed</th>
+                </tr>
+                {% for sample, ambig_reads_df in ambiguous_reads.items() %}
+                <tr>
+                    <td>{{sample}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1Only"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2Only"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1AndR2"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsRemoved"])}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p>
+                If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), it is filtered out prior to read mapping and excluded from all subsequent analysis.
+                The table below shows the number of reads removed fin each sample.
+            </p>
+            <table>
+                <tr>
+                    <th>Sample</th>
+                    <th>Reads Removed</th>
+                </tr>
+                {% for sample, ambig_reads_df in ambiguous_reads.items() %}
+                <tr>
+                    <td>{{sample}}</td>  
+                    <td>{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"])}}</td>  
+                </tr>
+                {% endfor%}
+            </table>
+            {% endif %}
             <p>QC reports for the input reads are generated using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a>. Links to reports for each sample are provided below.</p>
             <blockquote><strong>NOTE</strong>: FastQC was designed for QC of whole-genome shotgun NGS reads prior to genome asssembly. A QC warning or failure for some modules (such as per-base sequence content or sequence duplication levels) may or may not be a concern with MH reads. Interpret results with care!</blockquote>
 

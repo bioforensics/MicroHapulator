@@ -1,0 +1,2 @@
+R1Only	R2Only	R1AndR2	PairsRemoved
+1	1	1	3

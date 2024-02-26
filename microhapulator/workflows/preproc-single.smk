@@ -37,22 +37,26 @@ rule fastqc:
         symlink(outfile.name, linkfile)
 
 
-rule fastq_reads:
+rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        fastq="analysis/{sample}/reads.fastq",
+        filtered="analysis/{sample}/{sample}-ambiguous-filtered.fastq",
+        copied_fq="analysis/{sample}/reads.fastq",
+        counts="analysis/{sample}/{sample}-ambiguous-read-counts.txt",
+    params:
+        ambiguous_thresh=config["ambiguous_thresh"],
     run:
         assert len(input) == 1
-        if input[0].endswith(".gz"):
-            shell("gunzip -c {input[0]} > {output.fastq}")
-        else:
-            shell("cp {input[0]} {output.fastq}")
+        mhapi.filter_ambiguous_single_reads(
+            input[0], f"analysis/{wildcards.sample}", wildcards.sample, params.ambiguous_thresh
+        )
+        shell("cp {output.filtered} {output.copied_fq}")
 
 
 rule read_length_distributions:
     input:
-        rules.fastq_reads.output.fastq,
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
         png="analysis/{sample}/{sample}-read-lengths.png",
         json="analysis/{sample}/{sample}-read-lengths.json",

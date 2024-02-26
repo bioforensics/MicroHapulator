@@ -123,6 +123,7 @@ def final_html_report(
     thresh_static=10,
     thresh_dynamic=0.02,
     thresh_file=None,
+    ambiguous_read_threshold=0.2,
 ):
     if reads_are_paired:
         table_func = read_length_table_paired_end
@@ -131,6 +132,7 @@ def final_html_report(
         table_func = read_length_table_single_end
         plot_func = aggregate_plots_single_end
     read_length_table = table_func(samples)
+    ambiguous_reads = parse_ambig_reads(samples)
     plots = plot_func(samples)
     typing_rates = per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
@@ -151,8 +153,11 @@ def final_html_report(
             typing_rates=typing_rates,
             mapping_rates=mapping_rates,
             markernames=marker_names,
+            ambiguous_reads=ambiguous_reads,
             len=len,
             isna=pd.isna,
+            reads_are_paired=reads_are_paired,
+            ambiguous_read_threshold=ambiguous_read_threshold,
         )
         print(output, file=outfh, end="")
 
@@ -183,6 +188,16 @@ def read_length_table_single_end(samples):
             return None
         read_length_data.append((sample, lengths[0]))
     return pd.DataFrame(read_length_data, columns=("Sample", "Length"))
+
+
+def parse_ambig_reads(samples):
+    ambig_read_counts_all = dict()
+    for sample in samples:
+        ambig_reads_df = pd.read_csv(
+            f"analysis/{sample}/{sample}-ambiguous-read-counts.txt", sep="\t", index_col=None
+        )
+        ambig_read_counts_all[sample] = ambig_reads_df
+    return ambig_read_counts_all
 
 
 def aggregate_plots_paired_end(samples):

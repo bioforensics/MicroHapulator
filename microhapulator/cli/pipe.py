@@ -164,6 +164,14 @@ def subparser(subparsers):
         help="global percentage of total read count threshold; e.g. use --dynamic=0.02 to apply a 2%% analytical threshold; DT=0.02 by default",
     )
     cli.add_argument(
+        "-a",
+        "--ambiguous-thresh",
+        metavar="AT",
+        type=float,
+        default=0.2,
+        help="filter out reads with more than AT percent of ambiguous characters ('N'); AT=0.2 by default",
+    )
+    cli.add_argument(
         "-c",
         "--config",
         metavar="CSV",
@@ -222,6 +230,7 @@ def main(args):
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
         paired=args.reads_are_paired,
+        ambiguous_thresh=args.ambiguous_thresh,
     )
     snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
     success = snakemake(

@@ -42,9 +42,31 @@ rule fastqc:
             symlink(outfile.name, linkfile)
 
 
-rule merge:
+rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+    output:
+        filtered_r1="analysis/{sample}/{sample}-r1-ambiguous-filtered.fastq",
+        filtered_r2="analysis/{sample}/{sample}-r2-ambiguous-filtered.fastq",
+        mates_r1="analysis/{sample}/{sample}-ambiguous-r1-mates.fastq",
+        mates_r2="analysis/{sample}/{sample}-ambiguous-r2-mates.fastq",
+        counts="analysis/{sample}/{sample}-ambiguous-read-counts.txt",
+    params:
+        ambiguous_thresh=config["ambiguous_thresh"],
+    run:
+        mhapi.filter_ambiguous_paired_reads(
+            input[0],
+            input[1],
+            f"analysis/{wildcards.sample}",
+            wildcards.sample,
+            params.ambiguous_thresh,
+        )
+
+
+rule merge:
+    input:
+        r1=rules.filter_ambiguous.output.filtered_r1,
+        r2=rules.filter_ambiguous.output.filtered_r2,
     output:
         mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
         linkedfq="analysis/{sample}/reads.fastq",

@@ -58,6 +58,7 @@ rule report:
             thresh_static=config["thresh_static"],
             thresh_dynamic=config["thresh_dynamic"],
             thresh_file=config["thresh_file"],
+            ambiguous_read_threshold=config["ambiguous_thresh"],
         )
         marker_detail_report(config["samples"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
