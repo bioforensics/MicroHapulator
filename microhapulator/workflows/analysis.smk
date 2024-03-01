@@ -38,6 +38,7 @@ rule report:
             sample=config["samples"],
             suffix=("qual", "quant", "qual-ref", "quant-ref"),
         ),
+        expand("analysis/{sample}/{sample}-ambig-read-counts.txt", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),

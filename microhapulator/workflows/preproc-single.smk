@@ -12,6 +12,7 @@
 
 from glob import glob
 from microhapulator import api as mhapi
+from microhapulator.filter import AmbigSingleReadFilter
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
@@ -41,16 +42,16 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered="analysis/{sample}/{sample}-ambiguous-filtered.fastq",
+        filtered="analysis/{sample}/{sample}-ambig-filtered.fastq",
         copied_fq="analysis/{sample}/reads.fastq",
-        counts="analysis/{sample}/{sample}-ambiguous-read-counts.txt",
+        counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
-        ambiguous_thresh=config["ambiguous_thresh"],
+        ambig_thresh=config["ambiguous_thresh"],
     run:
         assert len(input) == 1
-        mhapi.filter_ambiguous_single_reads(
-            input[0], f"analysis/{wildcards.sample}", wildcards.sample, params.ambiguous_thresh
-        )
+        out_prefix = f"analysis/{wildcards.sample}/{wildcards.sample}"
+        ambig_filter = AmbigSingleReadFilter(input[0], out_prefix, params.ambig_thresh)
+        ambig_filter.filter()
         shell("cp {output.filtered} {output.copied_fq}")
 
 

@@ -13,12 +13,12 @@
 
 from Bio import SeqIO
 from collections import namedtuple, defaultdict, Counter
-import gzip
 import json
 from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import MicrohapIndex
+from microhapulator.filter import AmbigPairedReadFilter
 from microhapulator import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
 import math
@@ -787,79 +787,3 @@ def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
         counts.append(repetitive_count)
     cols = ["OnTarget", "OffTarget", "Contaminant", "Repetitive"]
     return pd.DataFrame([counts], columns=cols[: len(counts)])
-
-
-def filter_ambiguous_paired_reads(r1_file, r2_file, outdir, sample, ambiguous_thresh=0.2):
-    outdir = Path(outdir)
-    filtered_r1 = outdir / f"{sample}-r1-ambiguous-filtered.fastq"
-    filtered_r2 = outdir / f"{sample}-r2-ambiguous-filtered.fastq"
-    ambig_r1_mates = outdir / f"{sample}-ambiguous-r1-mates.fastq"
-    ambig_r2_mates = outdir / f"{sample}-ambiguous-r2-mates.fastq"
-    r1_reads = parse_reads(r1_file)
-    r2_reads = parse_reads(r2_file)
-    ambig_counts = defaultdict(int)
-    with open(filtered_r1, "w") as fh1, open(filtered_r2, "w") as fh2, open(
-        ambig_r1_mates, "w"
-    ) as fh3, open(ambig_r2_mates, "w") as fh4:
-        for read_name in r1_reads.keys():
-            r1, r2 = r1_reads[read_name], r2_reads[read_name]
-            r1_is_ambiguous = is_ambiguous(r1.seq, ambiguous_thresh)
-            r2_is_ambiguous = is_ambiguous(r2.seq, ambiguous_thresh)
-            if not r1_is_ambiguous and not r2_is_ambiguous:
-                SeqIO.write(r1, fh1, "fastq")
-                SeqIO.write(r2, fh2, "fastq")
-            elif r1_is_ambiguous and not r2_is_ambiguous:
-                SeqIO.write(r2, fh3, "fastq")
-                ambig_counts["R1"] += 1
-            elif not r1_is_ambiguous and r2_is_ambiguous:
-                SeqIO.write(r1, fh4, "fastq")
-                ambig_counts["R2"] += 1
-            else:
-                ambig_counts["pairs"] += 1
-    write_ambiguous_paired_counts(ambig_counts, outdir, sample)
-
-
-def filter_ambiguous_single_reads(reads_file, outdir, sample, ambiguous_thresh=0.2):
-    outdir = Path(outdir)
-    reads = parse_reads(reads_file)
-    num_ambig_reads = 0
-    filtered_reads = outdir / f"{sample}-ambiguous-filtered.fastq"
-    with open(filtered_reads, "w") as fh:
-        for read in reads.values():
-            if not is_ambiguous(read.seq, ambiguous_thresh):
-                SeqIO.write(read, fh, "fastq")
-            else:
-                num_ambig_reads += 1
-    write_ambiguous_single_counts(num_ambig_reads, outdir, sample)
-
-
-def parse_reads(reads_file):
-    if reads_file.endswith(".gz"):
-        open_func = gzip.open
-        read_mode = "rt"
-    else:
-        open_func = open
-        read_mode = "r"
-    with open_func(reads_file, read_mode) as fh:
-        return SeqIO.to_dict(SeqIO.parse(fh, "fastq"))
-
-
-def write_ambiguous_paired_counts(ambig_counts, outdir, sample):
-    counts_file = outdir / f"{sample}-ambiguous-read-counts.txt"
-    with open(counts_file, "w") as fh:
-        header = f"R1Only\tR2Only\tR1AndR2\tPairsRemoved"
-        total_pairs = ambig_counts["R1"] + ambig_counts["R2"] + ambig_counts["pairs"]
-        counts_str = (
-            f'{ambig_counts["R1"]}\t{ambig_counts["R2"]}\t{ambig_counts["pairs"]}\t{total_pairs}'
-        )
-        fh.write(f"{header}\n{counts_str}")
-
-
-def write_ambiguous_single_counts(num_ambig_reads, outdir, sample):
-    counts_file = outdir / f"{sample}-ambiguous-read-counts.txt"
-    with open(counts_file, "w") as fh:
-        fh.write(f"ReadsRemoved\n{num_ambig_reads}")
-
-
-def is_ambiguous(seq, ambiguous_thresh=0.2):
-    return seq.count("N") / len(seq) > ambiguous_thresh

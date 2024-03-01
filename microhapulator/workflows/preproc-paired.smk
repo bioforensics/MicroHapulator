@@ -46,21 +46,17 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered_r1="analysis/{sample}/{sample}-r1-ambiguous-filtered.fastq",
-        filtered_r2="analysis/{sample}/{sample}-r2-ambiguous-filtered.fastq",
-        mates_r1="analysis/{sample}/{sample}-ambiguous-r1-mates.fastq",
-        mates_r2="analysis/{sample}/{sample}-ambiguous-r2-mates.fastq",
-        counts="analysis/{sample}/{sample}-ambiguous-read-counts.txt",
+        filtered_r1="analysis/{sample}/{sample}-ambig-filtered-R1.fastq",
+        filtered_r2="analysis/{sample}/{sample}-ambig-filtered-R2.fastq",
+        mates_r1="analysis/{sample}/{sample}-ambig-R1-mates.fastq",
+        mates_r2="analysis/{sample}/{sample}-ambig-R2-mates.fastq",
+        counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
-        ambiguous_thresh=config["ambiguous_thresh"],
+        ambig_thresh=config["ambiguous_thresh"],
     run:
-        mhapi.filter_ambiguous_paired_reads(
-            input[0],
-            input[1],
-            f"analysis/{wildcards.sample}",
-            wildcards.sample,
-            params.ambiguous_thresh,
-        )
+        out_prefix = f"analysis/{wildcards.sample}/{wildcards.sample}"
+        ambig_filter = AmbigPairedReadFilter(input[0], input[1], out_prefix, params.ambig_thresh)
+        ambig_filter.filter()
 
 
 rule merge:

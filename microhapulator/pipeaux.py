@@ -194,7 +194,7 @@ def parse_ambig_reads(samples):
     ambig_read_counts_all = dict()
     for sample in samples:
         ambig_reads_df = pd.read_csv(
-            f"analysis/{sample}/{sample}-ambiguous-read-counts.txt", sep="\t", index_col=None
+            f"analysis/{sample}/{sample}-ambig-read-counts.txt", sep="\t", index_col=None
         )
         ambig_read_counts_all[sample] = ambig_reads_df
     return ambig_read_counts_all
