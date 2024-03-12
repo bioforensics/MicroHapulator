@@ -578,7 +578,24 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     return result
 
 
-def read_length_dist(
+def calculate_read_lengths(
+    fastq,
+    lengthsfile,
+):
+    """Count read lengths
+
+    :param str fastq: path of a FASTQ file containing NGS reads
+    :param str lengthsfile: file to write read lengths to
+    """
+    lengths = list()
+    with mhopen(fastq, "r") as infh:
+        for record in SeqIO.parse(infh, "fastq"):
+            lengths.append(len(record))
+    with mhopen(lengthsfile, "w") as outfh:
+        json.dump(lengths, outfh)
+
+
+def plot_read_length_dist(
     lengthfiles,
     plotfile,
     samples,
@@ -645,23 +662,6 @@ def read_distribution_plot_label(sample_subset, color, label):
         va="center",
         transform=ax.transAxes,
     )
-
-
-def read_length_counts(
-    fastq,
-    lengthsfile,
-):
-    """Count read lengths
-
-    :param str fastq: path of a FASTQ file containing NGS reads
-    :param str lengthsfile: file to write read lengths to
-    """
-    lengths = list()
-    with mhopen(fastq, "r") as infh:
-        for record in SeqIO.parse(infh, "fastq"):
-            lengths.append(len(record))
-    with mhopen(lengthsfile, "w") as outfh:
-        json.dump(lengths, outfh)
 
 
 def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ignore_low=True):

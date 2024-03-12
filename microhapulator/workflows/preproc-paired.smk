@@ -63,7 +63,7 @@ rule merge:
         """
 
 
-rule read_length_counts:
+rule calculate_read_lengths:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
         rules.merge.output.linkedfq,
@@ -72,18 +72,18 @@ rule read_length_counts:
         l2="analysis/{sample}/{sample}-r2-read-lengths.json",
         merged="analysis/{sample}/{sample}-merged-read-lengths.json",
     run:
-        mhapi.read_length_counts(
+        mhapi.calculate_read_lengths(
             input[0],
             output.l1,
         )
-        mhapi.read_length_counts(
+        mhapi.calculate_read_lengths(
             input[1],
             output.l2,
         )
-        mhapi.read_length_counts(input[2], output.merged)
+        mhapi.calculate_read_lengths(input[2], output.merged)
 
 
-rule read_length_distributions:
+rule plot_read_length_distributions:
     input:
         r1s=expand("analysis/{sample}/{sample}-r1-read-lengths.json", sample=config["samples"]),
         r2s=expand("analysis/{sample}/{sample}-r2-read-lengths.json", sample=config["samples"]),
@@ -95,21 +95,21 @@ rule read_length_distributions:
         r2="analysis/r2-read-lengths.png",
         merged="analysis/merged-read-lengths.png",
     run:
-        mhapi.read_length_dist(
+        mhapi.plot_read_length_dist(
             input.r1s,
             output.r1,
             config["samples"],
             config["hspace"],
             title="R1 Length Distribution",
         )
-        mhapi.read_length_dist(
+        mhapi.plot_read_length_dist(
             input.r2s,
             output.r2,
             config["samples"],
             config["hspace"],
             title="R2 Length Distribution",
         )
-        mhapi.read_length_dist(
+        mhapi.plot_read_length_dist(
             input.merged,
             output.merged,
             config["samples"],

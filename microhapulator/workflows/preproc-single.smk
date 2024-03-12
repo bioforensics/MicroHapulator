@@ -50,25 +50,25 @@ rule fastq_reads:
             shell("cp {input[0]} {output.fastq}")
 
 
-rule read_length_counts:
+rule calculate_read_lengths:
     input:
         rules.fastq_reads.output.fastq,
     output:
         json="analysis/{sample}/{sample}-read-lengths.json",
     run:
-        mhapi.read_length_counts(
+        mhapi.calculate_read_lengths(
             input[0],
             output.json,
         )
 
 
-rule read_length_distributions:
+rule plot_read_length_distributions:
     input:
         reads=expand("analysis/{sample}/{sample}-read-lengths.json", sample=config["samples"]),
     output:
         png="analysis/read-lengths.png",
     run:
-        mhapi.read_length_dist(
+        mhapi.plot_read_length_dist(
             input.reads,
             output.png,
             config["samples"],
