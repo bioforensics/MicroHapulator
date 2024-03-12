@@ -28,6 +28,7 @@ from pathlib import Path
 import pysam
 import re
 from scipy.stats import chisquare, ttest_rel
+import seaborn as sns
 from shutil import rmtree
 from string import ascii_letters, digits
 from subprocess import check_call, run
@@ -578,61 +579,89 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
 
 
 def read_length_dist(
-    fastq,
+    lengthfiles,
     plotfile,
-    lengthsfile=None,
+    samples,
+    hspace=-0.7,
     xlabel="Read Length (bp)",
-    xlim=None,
-    scale=1000,
     title=None,
-    color=None,
-    edgecolor=None,
+    color="red",
+    edgecolor="black",
 ):
     """Plot distribution of read lengths
-
-    :param str fastq: path of a FASTQ file containing NGS reads
+    :param list lengthsfiles: list of JSON files containing read lengths for each sample
     :param str plotfile: path of a graphic file to create
-    :param str lengthsfile: if specified, read lengths will be written to the specified file
     :param str xlabel: label for the X axis
-    :param tuple xlim: a 2-tuple of numbers (x1, x2) representing the start and end points of the portion of the X axis to be displayed; by default this is determined automatically
-    :param float scale: scaling factor for the Y axis
     :param str title: title for the plot
     :param str color: override histogram plot color; red by default
-    :param str edgecolor: override histogram edge color; dark red by default
+    :param str edgecolor: override histogram edge color; black by default
     """
+    read_lengths = aggregate_read_lengths(lengthfiles, samples)
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0), "axes.linewidth": 2})
+    grid = sns.FacetGrid(read_lengths, row="Sample", hue="Sample", aspect=20)
+    grid.map_dataframe(sns.kdeplot, x="ReadLength", color=color, fill=True, alpha=1)
+    grid.map_dataframe(sns.kdeplot, x="ReadLength", color=edgecolor)
+    grid.map(read_distribution_plot_label, "Sample")
+    grid.figure.subplots_adjust(hspace=hspace)
+    minimum_height = 2
+    height = max(minimum_height, len(samples) / 2)
+    grid.figure.set_size_inches(6, height)
+    grid.set_titles("")
+    grid.set(yticks=[], ylabel="")
+    plt.xlabel(xlabel, fontsize=18)
+    plt.xticks(fontsize=18)
+    grid.despine(left=True)
+    if title:
+        plt.title(title, fontsize=18, pad=35)
+    plt.savefig(plotfile, bbox_inches="tight")
+    plt.switch_backend(backend)
+
+
+def aggregate_read_lengths(lengthfiles, samples):
+    all_read_lengths = list()
+    for i, lengthfile in enumerate(lengthfiles):
+        read_len_df = pd.read_json(lengthfile)
+        read_len_df["Sample"] = samples[i]
+        all_read_lengths.append(read_len_df)
+    all_read_lengths_df = pd.concat(all_read_lengths)
+    all_read_lengths_df.rename(
+        columns={all_read_lengths_df.columns[0]: "ReadLength"}, inplace=True
+    )
+    return all_read_lengths_df
+
+
+# See https://stackoverflow.com/questions/59756154/label-function-used-to-map-to-a-facet-grid-in-seaborn for an explanation of how this function works
+def read_distribution_plot_label(sample_subset, color, label):
+    ax = plt.gca()
+    ax.text(
+        -0.02,
+        0.00,
+        label,
+        color="black",
+        fontsize=16,
+        ha="right",
+        va="center",
+        transform=ax.transAxes,
+    )
+
+
+def read_length_counts(
+    fastq,
+    lengthsfile,
+):
+    """Count read lengths
+
+    :param str fastq: path of a FASTQ file containing NGS reads
+    :param str lengthsfile: file to write read lengths to
+    """
     lengths = list()
     with mhopen(fastq, "r") as infh:
         for record in SeqIO.parse(infh, "fastq"):
             lengths.append(len(record))
-        if lengthsfile:
-            with mhopen(lengthsfile, "w") as outfh:
-                json.dump(lengths, outfh)
-    fig = plt.figure(figsize=(6, 4), dpi=200)
-    if color is None:
-        color = "#e41a1c"
-    if edgecolor is None:
-        edgecolor = "#990000"
-    weights = [1 / scale] * len(lengths)
-    plt.hist(lengths, bins=25, weights=weights, color=color, edgecolor=edgecolor)
-    if xlim is None:
-        xlim = (min(lengths) * 0.9, max(lengths) * 1.1)
-    plt.xlim(*xlim)
-    ax = plt.gca()
-    ax.yaxis.grid(True, color="#DDDDDD")
-    ax.set_axisbelow(True)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-    ax.spines["bottom"].set_color("#CCCCCC")
-    ax.tick_params(left=False)
-    ax.set_xlabel(xlabel, labelpad=15, fontsize=16)
-    ax.set_ylabel(f"Frequency (× {scale})", labelpad=15, fontsize=16)
-    if title:
-        ax.set_title(title, pad=25, fontsize=18)
-    plt.savefig(plotfile, bbox_inches="tight")
-    plt.switch_backend(backend)
+    with mhopen(lengthsfile, "w") as outfh:
+        json.dump(lengths, outfh)
 
 
 def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ignore_low=True):

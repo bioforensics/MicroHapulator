@@ -17,13 +17,15 @@ from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
 preproc_aux_files = chain(
-    expand("analysis/{sample}/{sample}-r1-read-lengths.png", sample=config["samples"]),
-    expand("analysis/{sample}/{sample}-r2-read-lengths.png", sample=config["samples"]),
-    expand("analysis/{sample}/{sample}-merged-read-lengths.png", sample=config["samples"]),
     expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
+    [
+        "analysis/r1-read-lengths.png",
+        "analysis/r2-read-lengths.png",
+        "analysis/merged-read-lengths.png",
+    ],
 )
 
-summary_aux_files = expand("analysis/{sample}/flash.log", sample=config["samples"])
+summary_aux_files = (expand("analysis/{sample}/flash.log", sample=config["samples"]),)
 
 
 rule fastqc:
@@ -61,38 +63,56 @@ rule merge:
         """
 
 
-rule read_length_distributions:
+rule read_length_counts:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
         rules.merge.output.linkedfq,
     output:
-        r1="analysis/{sample}/{sample}-r1-read-lengths.png",
-        r2="analysis/{sample}/{sample}-r2-read-lengths.png",
         l1="analysis/{sample}/{sample}-r1-read-lengths.json",
         l2="analysis/{sample}/{sample}-r2-read-lengths.json",
-        merged="analysis/{sample}/{sample}-merged-read-lengths.png",
+        merged="analysis/{sample}/{sample}-merged-read-lengths.json",
+    run:
+        mhapi.read_length_counts(
+            input[0],
+            output.l1,
+        )
+        mhapi.read_length_counts(
+            input[1],
+            output.l2,
+        )
+        mhapi.read_length_counts(input[2], output.merged)
+
+
+rule read_length_distributions:
+    input:
+        r1s=expand("analysis/{sample}/{sample}-r1-read-lengths.json", sample=config["samples"]),
+        r2s=expand("analysis/{sample}/{sample}-r2-read-lengths.json", sample=config["samples"]),
+        merged=expand(
+            "analysis/{sample}/{sample}-merged-read-lengths.json", sample=config["samples"]
+        ),
+    output:
+        r1="analysis/r1-read-lengths.png",
+        r2="analysis/r2-read-lengths.png",
+        merged="analysis/merged-read-lengths.png",
     run:
         mhapi.read_length_dist(
-            input[0],
+            input.r1s,
             output.r1,
-            lengthsfile=output.l1,
-            title=f"{wildcards.sample} R1",
-            color="#e41a1c",
-            edgecolor="#990000",
+            config["samples"],
+            config["hspace"],
+            title="R1 Length Distribution",
         )
         mhapi.read_length_dist(
-            input[1],
+            input.r2s,
             output.r2,
-            lengthsfile=output.l2,
-            title=f"{wildcards.sample} R2",
-            color="#e41a1c",
-            edgecolor="#990000",
+            config["samples"],
+            config["hspace"],
+            title="R2 Length Distribution",
         )
         mhapi.read_length_dist(
-            input[2],
+            input.merged,
             output.merged,
-            xlabel="Length of Merged Read Pair (bp)",
-            title=wildcards.sample,
-            color="#377eb8",
-            edgecolor="#000099",
+            config["samples"],
+            config["hspace"],
+            title="Merged Read Length Distribution",
         )

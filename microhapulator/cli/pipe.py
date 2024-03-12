@@ -188,6 +188,12 @@ def subparser(subparsers):
         # Hidden option for testing purposes
     )
     cli.add_argument(
+        "--hspace",
+        metavar="HS",
+        default=-0.7,
+        help="Hhorizontal spacing between samples in the read distribution length ridge plots; negative value for this parameter enables overlapping plots; HS=-0.7 by default",
+    )
+    cli.add_argument(
         "markerrefr", help="path to a FASTA file containing marker reference sequences"
     )
     cli.add_argument("markerdefn", help="path to a TSV file containing marker definitions")
@@ -222,6 +228,7 @@ def main(args):
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
         paired=args.reads_are_paired,
+        hspace=args.hspace,
     )
     snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
     success = snakemake(
