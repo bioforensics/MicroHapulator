@@ -595,7 +595,7 @@ def calculate_read_lengths(
         json.dump(lengths, outfh)
 
 
-def plot_read_length_dist(
+def read_length_dist(
     lengthfiles,
     plotfile,
     samples,

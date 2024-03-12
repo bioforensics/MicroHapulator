@@ -95,21 +95,21 @@ rule plot_read_length_distributions:
         r2="analysis/r2-read-lengths.png",
         merged="analysis/merged-read-lengths.png",
     run:
-        mhapi.plot_read_length_dist(
+        mhapi.read_length_dist(
             input.r1s,
             output.r1,
             config["samples"],
             config["hspace"],
             title="R1 Length Distribution",
         )
-        mhapi.plot_read_length_dist(
+        mhapi.read_length_dist(
             input.r2s,
             output.r2,
             config["samples"],
             config["hspace"],
             title="R2 Length Distribution",
         )
-        mhapi.plot_read_length_dist(
+        mhapi.read_length_dist(
             input.merged,
             output.merged,
             config["samples"],

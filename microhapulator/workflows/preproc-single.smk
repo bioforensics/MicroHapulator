@@ -68,7 +68,7 @@ rule plot_read_length_distributions:
     output:
         png="analysis/read-lengths.png",
     run:
-        mhapi.plot_read_length_dist(
+        mhapi.read_length_dist(
             input.reads,
             output.png,
             config["samples"],
