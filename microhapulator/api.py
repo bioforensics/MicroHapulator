@@ -631,7 +631,7 @@ def read_length_dist(
     plt.xticks(fontsize=18)
     grid.despine(left=True)
     if title:
-        plt.title(title, fontsize=18, pad=35)
+        plt.suptitle(title, fontsize=18, y=1.05)
     plt.savefig(plotfile, bbox_inches="tight")
     plt.switch_backend(backend)
 

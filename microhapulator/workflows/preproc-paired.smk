@@ -115,4 +115,5 @@ rule plot_read_length_distributions:
             config["samples"],
             config["hspace"],
             title="Merged Read Length Distribution",
+            color="blue",
         )

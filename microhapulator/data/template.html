@@ -114,12 +114,12 @@
 
             {% if read_length_table is none %}
                 {% if "r1readlen" in plots %}
-                    <p>The following histograms show the distribution of R1 and R2 read lengths for each sample.</p>
+                    <p>The following ridge plots show the distribution of R1 and R2 read lengths for each sample.</p>
                     <img src="analysis/r1-read-lengths.png"/>
                     <img src="analysis/r2-read-lengths.png"/>
                 {% else %}
-                    <p>The following histograms show read length distributions for each sample.</p>
-                    <img src="analysis/read-lengths.png"/>
+                    <p>The following ridge plot shows read length distributions for each sample.</p>
+                    <img class="fullwidth" src="analysis/read-lengths.png"/>
                 {% endif %}
             {% else %}
                 <p>Read lengths, uniform for all samples, are shown below.</p>
@@ -174,8 +174,8 @@
                 </tr>
                 {% endfor %}
             </table>
-            <p>The following histograms show the distribution of merged read lengths for each sample.</p>
-            <img src="analysis/merged-read-lengths.png"/>
+            <p>The following ridge plot shows the distribution of merged read lengths for each sample.</p>
+            <img class=fullwidth src="analysis/merged-read-lengths.png"/>
             {% endif %}
 
             <a name="readmapping"></a>

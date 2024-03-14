@@ -191,7 +191,7 @@ def subparser(subparsers):
         "--hspace",
         metavar="HS",
         default=-0.7,
-        help="Hhorizontal spacing between samples in the read distribution length ridge plots; negative value for this parameter enables overlapping plots; HS=-0.7 by default",
+        help="horizontal spacing between samples in the read distribution length ridge plots; negative value for this parameter enables overlapping plots; HS=-0.7 by default",
     )
     cli.add_argument(
         "markerrefr", help="path to a FASTA file containing marker reference sequences"
