@@ -9,6 +9,7 @@ def test_filter_ambiguous_single_reads(tmp_path):
     reads = data_file("ambiguous-single-end.fastq")
     ambig_filter = AmbigSingleReadFilter(reads, tmp_path / "test")
     ambig_filter.filter()
+    ambig_filter.write_counts_output()
     filtered_reads_file = tmp_path / "test-ambig-filtered.fastq"
     counts = tmp_path / "test-ambig-read-counts.txt"
     assert filtered_reads_file.is_file()
@@ -24,6 +25,7 @@ def test_filter_ambiguous_paired_reads(tmp_path):
     r2 = data_file("ambiguous-r2.fastq")
     ambig_filter = AmbigPairedReadFilter(r1, r2, tmp_path / "test")
     ambig_filter.filter()
+    ambig_filter.write_counts_output()
     filtered_r1_file = tmp_path / "test-ambig-filtered-R1.fastq"
     filtered_r2_file = tmp_path / "test-ambig-filtered-R2.fastq"
     r1_mates_file = tmp_path / "test-ambig-R1-mates.fastq"

@@ -52,6 +52,7 @@ rule filter_ambiguous:
         out_prefix = f"analysis/{wildcards.sample}/{wildcards.sample}"
         ambig_filter = AmbigSingleReadFilter(input[0], out_prefix, params.ambig_thresh)
         ambig_filter.filter()
+        ambig_filter.write_counts_output()
         shell("cp {output.filtered} {output.copied_fq}")
 
 

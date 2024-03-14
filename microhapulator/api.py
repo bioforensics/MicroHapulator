@@ -18,7 +18,6 @@ from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import MicrohapIndex
-from microhapulator.filter import AmbigPairedReadFilter
 from microhapulator import open as mhopen
 from microhapulator.profile import SimulatedProfile, TypingResult
 import math

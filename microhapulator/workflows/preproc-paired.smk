@@ -58,6 +58,7 @@ rule filter_ambiguous:
         out_prefix = f"analysis/{wildcards.sample}/{wildcards.sample}"
         ambig_filter = AmbigPairedReadFilter(input[0], input[1], out_prefix, params.ambig_thresh)
         ambig_filter.filter()
+        ambig_filter.write_counts_output()
 
 
 rule merge:
