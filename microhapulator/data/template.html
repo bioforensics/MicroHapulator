@@ -21,6 +21,11 @@
             img.small {
                 width: 24.5%;
             }
+            img.center {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
             .fullwidth {
                 width: 100%;
             }
@@ -114,16 +119,12 @@
 
             {% if read_length_table is none %}
                 {% if "r1readlen" in plots %}
-                    <p>The following histograms show the distribution of R1 and R2 read lengths for each sample.</p>
-                    {% for r1plot, r2plot in zip(plots["r1readlen"], plots["r2readlen"]) %}
-                    <img src={{r1plot}} class="small" />
-                    <img src={{r2plot}} class="small" />
-                    {% endfor %}
+                    <p>The following ridge plots show the distribution of R1 and R2 read lengths for each sample.</p>
+                    <img src="analysis/r1-read-lengths.png"/>
+                    <img src="analysis/r2-read-lengths.png"/>
                 {% else %}
-                    <p>The following histograms show read length distributions for each sample.</p>
-                    {% for rlplot in plots["readlen"] %}
-                    <img src="{{rlplot}}" class="small" />
-                    {% endfor %}
+                    <p>The following ridge plot shows read length distributions for each sample.</p>
+                    <img class="center" src="analysis/read-lengths.png"/>
                 {% endif %}
             {% else %}
                 <p>Read lengths, uniform for all samples, are shown below.</p>
@@ -178,10 +179,8 @@
                 </tr>
                 {% endfor %}
             </table>
-            <p>The following histograms show the distribution of merged read lengths for each sample.</p>
-            {% for plot in plots["mergedreadlen"] %}
-            <img src="{{plot}}" />
-            {% endfor %}
+            <p>The following ridge plot shows the distribution of merged read lengths for each sample.</p>
+            <img class=center src="analysis/merged-read-lengths.png"/>
             {% endif %}
 
             <a name="readmapping"></a>
