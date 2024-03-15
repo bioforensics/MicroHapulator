@@ -282,3 +282,28 @@ rule read_mapping_qc:
         """
         mhpl8r mappingqc  --marker {input.marker} --refr {input.full_refr} --rep {input.repetitive}  --csv {output.counts}  --figure {output.plot} --title {wildcards.sample}
         """
+
+
+rule aggregate_read_mapping_qc:
+    input:
+        expand("analysis/{sample}/{sample}-read-mapping-qc.csv"),
+    output:
+        plot="analysis/read-mapping-qc.png",
+    run:
+        read_qc = pd.concat([pd.read_csv(infile) for infile in input]).sort_values(
+            "Sample", ascending=False
+        )
+        backend = matplotlib.get_backend()
+        plt.switch_backend("Agg")
+        axes = qcdata.plot(kind="barh", stacked=True, width=0.8)
+        axes.get_figure().set(dpi=200, figheight=4, figwidth=6)
+        axes.set_xlabel("Reads")
+        axes.set_yticks(range(len(qcdata)), labels=qcdata.Sample)
+        axes.xaxis.grid(True, color="#DDDDDD")
+        axes.set_axisbelow(True)
+        axes.spines["top"].set_visible(False)
+        axes.spines["right"].set_visible(False)
+        axes.spines["left"].set_visible(False)
+        axes.spines["bottom"].set_color("#CCCCCC")
+        plt.savefig(output.plot, bbox_inches="tight")
+        plt.switch_backend(backend)
