@@ -18,7 +18,7 @@ class PairedReadFilter:
     def __init__(self, r1_in, r2_in, output_prefix):
         self.r1_in = mhopen(r1_in, "r")
         self.r2_in = mhopen(r2_in, "r")
-        self.outfiles = self.get_output_files(output_prefix)
+        self.get_output_files(output_prefix)
         self.num_r1_failed = 0
         self.num_r2_failed = 0
         self.num_both_failed = 0
@@ -60,30 +60,28 @@ class AmbigPairedReadFilter(PairedReadFilter):
         return keep_r1, keep_r2
 
     def is_ambiguous(self, read):
-        return read.count("N") / len(read) > self.threshold
+        return read.seq.count("N") / len(read.seq) > self.threshold
 
     def write_counts_output(self):
-        with self.out["counts"] as counts_out:
+        with self.outfiles["counts"] as counts_out:
             header = f"R1Only\tR2Only\tR1andR2\tPairsRemoved"
             total_pairs_filtered = self.num_r1_failed + self.num_r2_failed + self.num_both_failed
             counts_str = f"{self.num_r1_failed}\t{self.num_r2_failed}\t{self.num_both_failed}\t{total_pairs_filtered}"
             counts_out.write(f"{header}\n{counts_str}\n")
 
-    @staticmethod
-    def get_output_files(out_prefix):
-        outfiles = dict()
-        outfiles["r1"] = mhopen(f"{out_prefix}-ambig-filtered-R1.fastq")
-        outfiles["r2"] = mhopen(f"{out_prefix}-ambig-filtered-R2.fastq")
-        outfiles["r1_mates"] = mhopen(f"{out_prefix}-ambig-R1-mates.fastq")
-        outfiles["r2_mates"] = mhopen(f"{out_prefix}-ambig-R2-mates.fastq")
-        outfiles["counts"] = mhopen(f"{out_prefix}-ambig-read-counts.txt")
-        return outfiles
+    def get_output_files(self, out_prefix):
+        self.outfiles = dict()
+        self.outfiles["r1"] = mhopen(f"{out_prefix}-ambig-filtered-R1.fastq", "w")
+        self.outfiles["r2"] = mhopen(f"{out_prefix}-ambig-filtered-R2.fastq", "w")
+        self.outfiles["r1_mates"] = mhopen(f"{out_prefix}-ambig-R1-mates.fastq", "w")
+        self.outfiles["r2_mates"] = mhopen(f"{out_prefix}-ambig-R2-mates.fastq", "w")
+        self.outfiles["counts"] = mhopen(f"{out_prefix}-ambig-read-counts.txt", "w")
 
 
 class SingleReadFilter:
     def __init__(self, reads_in, output_prefix):
         self.reads_in = mhopen(reads_in, "r")
-        self.outfiles = self.get_output_files(output_prefix)
+        self.get_output_files(output_prefix)
         self.num_reads_failed = 0
 
     def filter(self):
@@ -101,7 +99,7 @@ class AmbigSingleReadFilter(SingleReadFilter):
         super().__init__(reads_in, out_prefix)
 
     def keep(self, read):
-        is_ambiguous = read.count("N") / len(read) > self.threshold
+        is_ambiguous = read.seq.count("N") / len(read.seq) > self.threshold
         return not is_ambiguous
 
     def write_counts_output(self):
@@ -109,7 +107,6 @@ class AmbigSingleReadFilter(SingleReadFilter):
             counts_out.write(f"ReadsRemoved\n{self.num_reads_failed}\n")
 
     def get_output_files(self, out_prefix):
-        outfiles = dict()
-        outfiles["reads"] = f"{out_prefix}-ambig-filtered.fastq"
-        outfiles["counts"] = f"{out_prefix}-ambig-read-counts.txt"
-        return outfiles
+        self.outfiles = dict()
+        self.outfiles["reads"] = mhopen(f"{out_prefix}-ambig-filtered.fastq", "w")
+        self.outfiles["counts"] = mhopen(f"{out_prefix}-ambig-read-counts.txt", "w")
