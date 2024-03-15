@@ -39,7 +39,7 @@ setup(
     install_requires=[
         "biopython",
         "happer>=0.1",
-        "insilicoseq<2.0",
+        "insilicoseq>=1.5.4,<2.0",
         "jsonschema>=4.0",
         "matplotlib>=3.0",
         "microhapdb>=0.10.1",
@@ -48,6 +48,7 @@ setup(
         "pandas>1.0",
         "pulp==2.3.1",
         "scipy>=1.7",
+        "seaborn>=0.13.2",
         "snakemake>=7.15.2,<8.0",
         "termgraph>=0.5",
         "tqdm>=4.0",
