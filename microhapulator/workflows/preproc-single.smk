@@ -73,5 +73,7 @@ rule plot_read_length_distributions:
             output.png,
             config["samples"],
             config["hspace"],
-            title="Read Length Distribution",
+            xlabel="Read Length (bp)",
+            color="#e41a1c",
+            edgecolor="#990000",
         )

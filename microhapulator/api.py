@@ -601,9 +601,8 @@ def read_length_dist(
     samples,
     hspace=-0.7,
     xlabel="Read Length (bp)",
-    title=None,
-    color="red",
-    edgecolor="black",
+    color=None,
+    edgecolor=None,
 ):
     """Plot distribution of read lengths
     :param list lengthsfiles: list of JSON files containing read lengths for each sample
@@ -630,8 +629,6 @@ def read_length_dist(
     plt.xlabel(xlabel, fontsize=18)
     plt.xticks(fontsize=18)
     grid.despine(left=True)
-    if title:
-        plt.suptitle(title, fontsize=18, y=1.05)
     plt.savefig(plotfile, bbox_inches="tight")
     plt.switch_backend(backend)
 

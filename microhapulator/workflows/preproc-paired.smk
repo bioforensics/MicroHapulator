@@ -100,20 +100,25 @@ rule plot_read_length_distributions:
             output.r1,
             config["samples"],
             config["hspace"],
-            title="R1 Length Distribution",
+            xlabel="R1 Read Length (bp)",
+            color="#e41a1c",
+            edgecolor="#990000",
         )
         mhapi.read_length_dist(
             input.r2s,
             output.r2,
             config["samples"],
             config["hspace"],
-            title="R2 Length Distribution",
+            xlabel="R2 Read Length (bp)",
+            color="#e41a1c",
+            edgecolor="#990000",
         )
         mhapi.read_length_dist(
             input.merged,
             output.merged,
             config["samples"],
             config["hspace"],
-            title="Merged Read Length Distribution",
-            color="blue",
+            xlabel="Merged Read Length (bp)",
+            color="#377eb8",
+            edgecolor="#3355aa",
         )

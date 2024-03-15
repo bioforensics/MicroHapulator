@@ -21,6 +21,11 @@
             img.small {
                 width: 24.5%;
             }
+            img.center {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
             .fullwidth {
                 width: 100%;
             }
@@ -119,7 +124,7 @@
                     <img src="analysis/r2-read-lengths.png"/>
                 {% else %}
                     <p>The following ridge plot shows read length distributions for each sample.</p>
-                    <img class="fullwidth" src="analysis/read-lengths.png"/>
+                    <img class="center" src="analysis/read-lengths.png"/>
                 {% endif %}
             {% else %}
                 <p>Read lengths, uniform for all samples, are shown below.</p>
@@ -175,7 +180,7 @@
                 {% endfor %}
             </table>
             <p>The following ridge plot shows the distribution of merged read lengths for each sample.</p>
-            <img class=fullwidth src="analysis/merged-read-lengths.png"/>
+            <img class=center src="analysis/merged-read-lengths.png"/>
             {% endif %}
 
             <a name="readmapping"></a>
