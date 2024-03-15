@@ -16,8 +16,8 @@ from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
 preproc_aux_files = chain(
-    expand("analysis/{sample}/{sample}-read-lengths.png", sample=config["samples"]),
     expand("analysis/{sample}/fastqc/report.html", sample=config["samples"]),
+    ["analysis/read-lengths.png"],
 )
 
 summary_aux_files = list()
@@ -50,18 +50,30 @@ rule fastq_reads:
             shell("cp {input[0]} {output.fastq}")
 
 
-rule read_length_distributions:
+rule calculate_read_lengths:
     input:
         rules.fastq_reads.output.fastq,
     output:
-        png="analysis/{sample}/{sample}-read-lengths.png",
         json="analysis/{sample}/{sample}-read-lengths.json",
     run:
-        mhapi.read_length_dist(
+        mhapi.calculate_read_lengths(
             input[0],
+            output.json,
+        )
+
+
+rule plot_read_length_distributions:
+    input:
+        reads=expand("analysis/{sample}/{sample}-read-lengths.json", sample=config["samples"]),
+    output:
+        png="analysis/read-lengths.png",
+    run:
+        mhapi.read_length_dist(
+            input.reads,
             output.png,
-            lengthsfile=output.json,
-            title=wildcards.sample,
+            config["samples"],
+            config["hspace"],
+            xlabel="Read Length (bp)",
             color="#e41a1c",
             edgecolor="#990000",
         )
