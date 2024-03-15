@@ -302,7 +302,7 @@ rule aggregate_read_mapping_qc:
         backend = matplotlib.get_backend()
         plt.switch_backend("Agg")
         axes = read_qc.plot(kind="barh", stacked=True, width=0.8)
-        axes.get_figure().set(dpi=200, figheight=len(config["samples"] * 0.66), figwidth=6)
+        axes.get_figure().set(dpi=200, figheight=len(config["samples"]) * 0.25, figwidth=6)
         axes.set_xlabel("Reads")
         axes.set_yticks(range(len(read_qc)), labels=read_qc.Sample)
         axes.xaxis.grid(True, color="#DDDDDD")
