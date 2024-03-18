@@ -292,24 +292,4 @@ rule aggregate_read_mapping_qc:
     output:
         plot="analysis/read-mapping-qc.png",
     run:
-        sample_qc_tables = list()
-        for sample in config["samples"]:
-            infile = f"analysis/{sample}/{sample}-read-mapping-qc.csv"
-            sample_qc_table = pd.read_csv(infile)
-            sample_qc_table["Sample"] = sample
-            sample_qc_tables.append(sample_qc_table)
-        read_qc = pd.concat(sample_qc_tables).sort_values("Sample", ascending=False)
-        backend = matplotlib.get_backend()
-        plt.switch_backend("Agg")
-        axes = read_qc.plot(kind="barh", stacked=True, width=0.8)
-        axes.get_figure().set(dpi=200, figheight=len(config["samples"]) * 0.25, figwidth=6)
-        axes.set_xlabel("Reads")
-        axes.set_yticks(range(len(read_qc)), labels=read_qc.Sample)
-        axes.xaxis.grid(True, color="#DDDDDD")
-        axes.set_axisbelow(True)
-        axes.spines["top"].set_visible(False)
-        axes.spines["right"].set_visible(False)
-        axes.spines["left"].set_visible(False)
-        axes.spines["bottom"].set_color("#CCCCCC")
-        plt.savefig(output.plot, bbox_inches="tight")
-        plt.switch_backend(backend)
+        mhapi.aggregate_read_mapping_qc(config["samples"], output.plot)

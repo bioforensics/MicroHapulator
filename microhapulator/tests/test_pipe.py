@@ -85,8 +85,7 @@ def test_pipe_gbr_usc10(tmp_path):
     assert observed.equals(expected)
     call_pngs = glob(str(tmp_path / "analysis" / "*" / "callplots" / "*.png"))
     assert len(call_pngs) == 10
-    donut_pngs = glob(str(tmp_path / "analysis" / "gbr-usc" / "gbr-usc-donut.png"))
-    assert len(donut_pngs) == 1
+    assert (tmp_path / "analysis" / "read-mapping-qc.png").is_file()
 
 
 def test_pipe_jpt_usc10_single(tmp_path):
