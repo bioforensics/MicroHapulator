@@ -783,6 +783,7 @@ def aggregate_read_mapping_qc(samples, outpath):
     axes.spines["right"].set_visible(False)
     axes.spines["left"].set_visible(False)
     axes.spines["bottom"].set_color("#CCCCCC")
+    plt.legend(loc="lower left", ncols=4, bbox_to_anchor=(0, 1))
     plt.savefig(outpath, bbox_inches="tight")
     plt.switch_backend(backend)
 
