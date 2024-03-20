@@ -7,6 +7,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
         <script src="fancyTable.js"></script>
         <style type="text/css">
+            h2 {
+                margin-top: 50px;
+            }
             .container {
                 max-width: 750px;
                 padding-top: 100px;
@@ -120,11 +123,11 @@
             {% if read_length_table is none %}
                 {% if "r1readlen" in plots %}
                     <p>The following ridge plots show the distribution of R1 and R2 read lengths for each sample.</p>
-                    <img src="analysis/r1-read-lengths.png"/>
-                    <img src="analysis/r2-read-lengths.png"/>
+                    <img src="analysis/r1-read-lengths.png" />
+                    <img src="analysis/r2-read-lengths.png" />
                 {% else %}
                     <p>The following ridge plot shows read length distributions for each sample.</p>
-                    <img class="center" src="analysis/read-lengths.png"/>
+                    <img class="center" src="analysis/read-lengths.png" />
                 {% endif %}
             {% else %}
                 <p>Read lengths, uniform for all samples, are shown below.</p>
@@ -180,7 +183,7 @@
                 {% endfor %}
             </table>
             <p>The following ridge plot shows the distribution of merged read lengths for each sample.</p>
-            <img class=center src="analysis/merged-read-lengths.png"/>
+            <img class="center" src="analysis/merged-read-lengths.png" />
             {% endif %}
 
             <a name="readmapping"></a>
@@ -220,11 +223,8 @@
             </div>
             <br />
 
-            <p> The following donut plots show the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
-       
-            {% for plot in plots["donut"] %}
-            <img src="{{plot}}"/>
-            {% endfor %}
+            <p> The following bar graph shows the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
+            <img class="fullwidth" src="analysis/read-mapping-qc.png" />
             <br />
             <br />
             <p>The following table shows the number of total reads mapped to each marker for each sample. Also shown is the number of repetitive reads, determined by selecting the reads aligned to the marker, mapping them to the entire GRCh38 human reference sequence, and counting the reads that map preferentially to a locus outside the target marker locus.</p>

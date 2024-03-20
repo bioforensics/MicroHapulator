@@ -10,6 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
 from microhapulator.marker import MicrohapIndex
@@ -31,6 +32,7 @@ include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
 rule report:
     input:
         "analysis/summary.tsv",
+        "analysis/read-mapping-qc.png",
         preproc_aux_files,
         expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
         expand(
@@ -282,3 +284,12 @@ rule read_mapping_qc:
         """
         mhpl8r mappingqc  --marker {input.marker} --refr {input.full_refr} --rep {input.repetitive}  --csv {output.counts}  --figure {output.plot} --title {wildcards.sample}
         """
+
+
+rule aggregate_read_mapping_qc:
+    input:
+        expand("analysis/{sample}/{sample}-read-mapping-qc.csv", sample=config["samples"]),
+    output:
+        plot="analysis/read-mapping-qc.png",
+    run:
+        mhapi.aggregate_read_mapping_qc(config["samples"], output.plot)

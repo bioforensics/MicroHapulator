@@ -764,14 +764,49 @@ def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
     return data
 
 
+def aggregate_read_mapping_qc(samples, outpath):
+    """Aggregate per-sample read mapping stats and plot as a stacked bar graph
+
+    :param list samples: list of sample names
+    :param str outpath: path to image file to be generated
+    """
+    read_qc = consolidate_read_mapping_qc_tables(samples)
+    backend = matplotlib.get_backend()
+    plt.switch_backend("Agg")
+    axes = read_qc.plot(kind="barh", stacked=True, width=0.8)
+    axes.get_figure().set(dpi=200, figheight=len(samples) * 0.25, figwidth=8)
+    axes.set_xlabel("Reads")
+    axes.set_yticks(range(len(read_qc)), labels=read_qc.Sample)
+    axes.xaxis.grid(True, color="#DDDDDD")
+    axes.set_axisbelow(True)
+    axes.spines["top"].set_visible(False)
+    axes.spines["right"].set_visible(False)
+    axes.spines["left"].set_visible(False)
+    axes.spines["bottom"].set_color("#CCCCCC")
+    plt.legend(loc="lower left", ncols=4, bbox_to_anchor=(0, 1))
+    plt.savefig(outpath, bbox_inches="tight")
+    plt.switch_backend(backend)
+
+
+def consolidate_read_mapping_qc_tables(samples):
+    sample_qc_tables = list()
+    for sample in samples:
+        infile = f"analysis/{sample}/{sample}-read-mapping-qc.csv"
+        sample_qc_table = pd.read_csv(infile)
+        sample_qc_table["Sample"] = sample
+        sample_qc_tables.append(sample_qc_table)
+    aggregate_qc_table = pd.concat(sample_qc_tables).sort_values("Sample", ascending=False)
+    return aggregate_qc_table
+
+
 def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title=None):
     """Count on target, off target, repetitive, and contaminant reads
+
     :param str marker_mapped: path of txt file containing number of reads mapped to marker sequences
     :param str refr_mapped: path of txt file containing number of reads mapped to the full human reference genome
     :param str repetitive_mapped: path of txt file containing number of reads mapped preferentially to non-marker loci in the human reference genome
     :param str output: path where the png file of the plot will be saved
     :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
-
     """
     data = count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
     backend = matplotlib.get_backend()
