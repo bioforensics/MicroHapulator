@@ -22,6 +22,7 @@ class PairedReadFilter:
         self.num_r1_failed = 0
         self.num_r2_failed = 0
         self.num_both_failed = 0
+        self.num_pairs_passed = 0
 
     def __iter__(self):
         with self.r1_in as r1_in, self.r2_in as r2_in:
@@ -39,6 +40,7 @@ class PairedReadFilter:
                 if keep_r1 and keep_r2:
                     SeqIO.write(r1, r1_out, "fastq")
                     SeqIO.write(r2, r2_out, "fastq")
+                    self.num_pairs_passed += 1
                 elif keep_r1:
                     SeqIO.write(r1, r2_mates, "fastq")
                     self.num_r2_failed += 1
@@ -64,9 +66,9 @@ class AmbigPairedReadFilter(PairedReadFilter):
 
     def write_counts_output(self):
         with self.outfiles["counts"] as counts_out:
-            header = f"R1Only\tR2Only\tR1andR2\tPairsRemoved"
+            header = f"R1Only\tR2Only\tR1andR2\tPairsRemoved\tPairsKept"
             total_pairs_filtered = self.num_r1_failed + self.num_r2_failed + self.num_both_failed
-            counts_str = f"{self.num_r1_failed}\t{self.num_r2_failed}\t{self.num_both_failed}\t{total_pairs_filtered}"
+            counts_str = f"{self.num_r1_failed}\t{self.num_r2_failed}\t{self.num_both_failed}\t{total_pairs_filtered}\t{self.num_pairs_passed}"
             counts_out.write(f"{header}\n{counts_str}\n")
 
     def get_output_files(self, out_prefix):
@@ -83,12 +85,14 @@ class SingleReadFilter:
         self.reads_in = mhopen(reads_in, "r")
         self.get_output_files(output_prefix)
         self.num_reads_failed = 0
+        self.num_reads_passed = 0
 
     def filter(self):
         with self.reads_in as r_in, self.outfiles["reads"] as r_out:
             for read in SeqIO.parse(r_in, "fastq"):
                 if self.keep(read):
                     SeqIO.write(read, r_out, "fastq")
+                    self.num_reads_passed += 1
                 else:
                     self.num_reads_failed += 1
 
@@ -104,7 +108,9 @@ class AmbigSingleReadFilter(SingleReadFilter):
 
     def write_counts_output(self):
         with self.outfiles["counts"] as counts_out:
-            counts_out.write(f"ReadsRemoved\n{self.num_reads_failed}\n")
+            counts_out.write(
+                f"ReadsRemoved\tReadsKept\n{self.num_reads_failed}\t{self.num_reads_passed}\n"
+            )
 
     def get_output_files(self, out_prefix):
         self.outfiles = dict()

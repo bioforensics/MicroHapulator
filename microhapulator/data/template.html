@@ -104,8 +104,8 @@
                     <th class="alnrt">R2 Only</th>
                     <th class="alnrt">R1 and R2</th>
                     <th class="alnrt">Pairs Removed</th>
-                    <th class="alnrt">Total Pairs</th>
-                    <th class="alnrt">Percent Removed</th>
+                    <th class="alnrt">Pairs Kept</th>
+
                   
                 </tr>
                 {% for sample, ambig_reads_df in ambiguous_reads.items() %}
@@ -115,6 +115,7 @@
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2Only"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1andR2"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsRemoved"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsKept"])}}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -126,12 +127,15 @@
             <table>
                 <tr>
                     <th>Sample</th>
-                    <th>Reads Removed</th>
+                    <th class="alnrt">Reads Removed</th>
+                    <th class="alnrt">Reads Kept</th>
+
                 </tr>
                 {% for sample, ambig_reads_df in ambiguous_reads.items() %}
                 <tr>
                     <td>{{sample}}</td>  
-                    <td>{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"])}}</td>  
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsKept"])}}</td>    
                 </tr>
                 {% endfor%}
             </table>
@@ -211,7 +215,7 @@
             <table>
                 <tr>
                     <th>Sample</th>
-                    <th class="alnrt">Total Reads</th>
+                    <th class="alnrt">Filtered Reads</th>
                     <th class="alnrt">Merged Reads</th>
                     <th class="alnrt">Merge Rate</th>
                 </tr>
@@ -238,7 +242,7 @@
                     {% if "r1readlen" in plots %}
                     <th class="alnrt">Merged Reads</th>
                     {% else %}
-                    <th class="alnrt">Total Reads</th>
+                    <th class="alnrt">Filtered Reads</th>
                     {% endif %}
                     <th class="alnrt">Mapped</th>
                     <th class="alnrt">Mapping Rate</th>

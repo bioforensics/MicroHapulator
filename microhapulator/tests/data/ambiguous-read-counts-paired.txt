@@ -1,2 +1,2 @@
-R1Only	R2Only	R1andR2	PairsRemoved
-2	1	1	4
+R1Only	R2Only	R1andR2	PairsRemoved	PairsKept
+2	1	1	4	6

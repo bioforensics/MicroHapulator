@@ -190,15 +190,14 @@ def read_length_table_single_end(samples):
     return pd.DataFrame(read_length_data, columns=("Sample", "Length"))
 
 
-def parse_ambig_reads(sample):
-    # ambig_read_counts_all = dict()
-    # for sample in samples:
-    return pd.read_csv(
-        f"analysis/{sample}/{sample}-ambig-read-counts.txt", sep="\t", index_col=None
-    )
-    #     ambig_read_counts_all[sample] = ambig_reads_df
-    # print(pd.DataFrame.from_dict(ambig_read_counts_all))
-    # return ambig_read_counts_all
+def parse_ambig_reads(samples):
+    ambig_read_counts_all = dict()
+    for sample in samples:
+        ambig_reads_df = pd.read_csv(
+            f"analysis/{sample}/{sample}-ambig-read-counts.txt", sep="\t", index_col=None
+        )
+        ambig_read_counts_all[sample] = ambig_reads_df
+    return ambig_read_counts_all
 
 
 def aggregate_plots_paired_end(samples):
