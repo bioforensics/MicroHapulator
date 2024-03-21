@@ -22,7 +22,7 @@ del get_versions
 
 
 @contextmanager
-def open(filename, mode):
+def open(filename, mode, enter=True):
     if mode not in ("r", "w"):
         raise ValueError('invalid mode "{}"'.format(mode))
     if filename in ["-", None]:
@@ -33,8 +33,11 @@ def open(filename, mode):
         if filename.endswith(".gz"):
             openfunc = gzopen
             mode += "t"
-        with openfunc(filename, mode) as filehandle:
-            yield filehandle
+        if enter:
+            with openfunc(filename, mode) as filehandle:
+                yield filehandle
+        else:
+            yield openfunc(filename, mode)
 
 
 def load_marker_frequencies(tsvfile):

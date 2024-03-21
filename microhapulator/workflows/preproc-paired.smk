@@ -56,11 +56,12 @@ rule filter_ambiguous:
         counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
+        out_prefix="analysis/{sample}/{sample}",
     run:
-        out_prefix = f"analysis/{wildcards.sample}/{wildcards.sample}"
-        ambig_filter = AmbigPairedReadFilter(input[0], input[1], out_prefix, params.ambig_thresh)
+        ambig_filter = AmbigPairedReadFilter(*input, params.out_prefix, params.ambig_thresh)
         ambig_filter.filter()
-        ambig_filter.write_counts_output()
+        with open(output.counts, "w") as fh:
+            print(ambig_filter.summary, file=fh)
 
 
 rule merge:

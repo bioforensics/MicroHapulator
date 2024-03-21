@@ -52,8 +52,9 @@ rule filter_ambiguous:
         out_prefix = f"analysis/{wildcards.sample}/{wildcards.sample}"
         ambig_filter = AmbigSingleReadFilter(input[0], out_prefix, params.ambig_thresh)
         ambig_filter.filter()
-        ambig_filter.write_counts_output()
-        shell("cp {output.filtered} {output.copied_fq}")
+        with open(output.counts, "w") as fh:
+            print(ambig_filter.summary, file=fh)
+        shell("ln -s {output.filtered} {output.copied_fq}")
 
 
 rule calculate_read_lengths:
