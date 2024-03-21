@@ -16,14 +16,13 @@ from microhapulator import api as mhapi
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
-preproc_aux_files = chain(
-    expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
-    [
-        "analysis/r1-read-lengths.png",
-        "analysis/r2-read-lengths.png",
-        "analysis/merged-read-lengths.png",
-    ],
-)
+preproc_aux_files = [
+    "analysis/r1-read-lengths.png",
+    "analysis/r2-read-lengths.png",
+    "analysis/merged-read-lengths.png",
+    "analysis/multiqc_report.html",
+]
+
 
 summary_aux_files = (expand("analysis/{sample}/flash.log", sample=config["samples"]),)
 
@@ -42,6 +41,17 @@ rule fastqc:
             outfile = Path(outfile)
             linkfile = f"analysis/{wildcards.sample}/fastqc/R{end}-fastqc.html"
             symlink(outfile.name, linkfile)
+
+
+rule multiqc:
+    input:
+        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
+    output:
+        report="analysis/multiqc_report.html",
+    shell:
+        """
+        multiqc analysis/*/fastqc --outdir analysis
+        """
 
 
 rule merge:
