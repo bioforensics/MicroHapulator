@@ -43,7 +43,7 @@ rule filter_ambiguous:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
         filtered="analysis/{sample}/{sample}-ambig-filtered.fastq",
-        copied_fq="analysis/{sample}/reads.fastq",
+        copied_fq="analysis/{sample}/preprocessed-reads.fastq",
         counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],

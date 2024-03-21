@@ -105,7 +105,7 @@ rule copy_and_index_marker_data:
 
 rule map_sort_and_index:
     input:
-        fastq="analysis/{sample}/reads.fastq",
+        fastq="analysis/{sample}/preprocessed-reads.fastq",
         fasta="marker-refr.fasta",
         idx=expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
     output:
@@ -129,7 +129,7 @@ rule map_full_reference:
         refr=config["hg38path"],
     input:
         full_reference_index_files(config["hg38path"]),
-        fastq="analysis/{sample}/reads.fastq",
+        fastq="analysis/{sample}/preprocessed-reads.fastq",
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
         bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
