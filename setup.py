@@ -43,6 +43,7 @@ setup(
         "jsonschema>=4.0",
         "matplotlib>=3.0",
         "microhapdb>=0.10.1",
+        "multiqc>=1.14",
         "nbformat>=5.0,<5.6",
         "numpy>=1.19",
         "pandas>1.0",
