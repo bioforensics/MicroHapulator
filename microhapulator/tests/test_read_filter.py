@@ -9,9 +9,10 @@ import pytest
 def ambig_seqs_dir_single(tmp_path_factory):
     tmpdir = tmp_path_factory.mktemp("WD")
     reads = data_file("ambiguous-single-end.fastq")
-    ambig_filter = AmbigSingleReadFilter(reads, tmpdir / "test")
+    ambig_filter = AmbigSingleReadFilter(reads, tmpdir / "test-ambig-filtered.fastq")
     ambig_filter.filter()
-    ambig_filter.write_counts_output()
+    with open(tmpdir / "test-ambig-read-counts.txt", "w") as fh:
+        print(ambig_filter.summary, file=fh)
     return tmpdir
 
 
@@ -22,7 +23,8 @@ def ambig_seqs_dir_paired(tmp_path_factory):
     r2 = data_file("ambiguous-r2.fastq")
     ambig_filter = AmbigPairedReadFilter(r1, r2, tmpdir / "test")
     ambig_filter.filter()
-    ambig_filter.write_counts_output()
+    with open(tmpdir / "test-ambig-read-counts.txt", "w") as fh:
+        print(ambig_filter.summary, file=fh)
     return tmpdir
 
 

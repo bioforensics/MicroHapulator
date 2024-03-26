@@ -91,35 +91,38 @@ class AmbigPairedReadFilter(PairedReadFilter):
 
     @property
     def summary(self):
-        header = "R1OnlyFailed\tR2OnlyFailed\tPairFailed\tPairsRemoved\tPairsKept\tTotalPairs"
+        header = "R1OnlyFailed\tR2OnlyFailed\tPairsFailed\tPairsRemoved\tPairsKept\tTotalPairs"
         count_data = f"{self.counts.r1_failed}\t{self.counts.r2_failed}\t{self.counts.pairs_failed}\t{self.counts.total_pairs_filtered}\t{self.counts.pairs_passed}\t{self.counts.total_pairs}"
         return f"{header}\n{count_data}"
 
 
 class SingleReadFilter:
     def __init__(self, reads_in, reads_out):
-        self.reads_in = mhopen(reads_in, "r", enter=False)
-        self.reads_out = mhopen(reads_out, "w", enter=False)
+        self.reads_in = mhopen(
+            reads_in,
+            "r",
+        )
+        self.reads_out = open(reads_out, "w")
         self.num_reads_failed = 0
         self.num_reads_passed = 0
 
     def __del__(self):
-        self.reads_in.close()
         self.reads_out.close()
 
     def filter(self):
-        for read in SeqIO.parse(self.reads_in, "fastq"):
-            if self.keep(read):
-                SeqIO.write(read, self.reads_out, "fastq")
-                self.num_reads_passed += 1
-            else:
-                self.num_reads_failed += 1
+        with self.reads_in as r_in:
+            for read in SeqIO.parse(r_in, "fastq"):
+                if self.keep(read):
+                    SeqIO.write(read, self.reads_out, "fastq")
+                    self.num_reads_passed += 1
+                else:
+                    self.num_reads_failed += 1
 
 
 class AmbigSingleReadFilter(SingleReadFilter):
-    def __init__(self, reads_in, out_prefix, threshold=0.2):
+    def __init__(self, reads_in, outfile, threshold=0.2):
         self.threshold = threshold
-        super().__init__(reads_in, out_prefix)
+        super().__init__(reads_in, outfile)
 
     def keep(self, read):
         is_ambiguous = read.seq.count("N") / len(read.seq) > self.threshold

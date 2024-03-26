@@ -70,7 +70,7 @@ rule merge:
         r2=rules.filter_ambiguous.output.filtered_r2,
     output:
         mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
-        linkedfq="analysis/{sample}/preprocessed-reads.fastq",
+        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
         log="analysis/{sample}/flash.log",
     threads: 8
     shell:
