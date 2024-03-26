@@ -42,18 +42,18 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered="analysis/{sample}/{sample}-ambig-filtered.fastq",
-        copied_fq="analysis/{sample}/preprocessed-reads.fastq",
+        filtered_fq="analysis/{sample}/{sample}-ambig-filtered.fastq",
+        copied_fq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
         counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
     run:
         assert len(input) == 1
-        out_prefix = f"analysis/{wildcards.sample}/{wildcards.sample}"
-        ambig_filter = AmbigSingleReadFilter(input[0], out_prefix, params.ambig_thresh)
+        ambig_filter = AmbigSingleReadFilter(input[0], output.filtered_fq, params.ambig_thresh)
         ambig_filter.filter()
-        ambig_filter.write_counts_output()
-        shell("cp {output.filtered} {output.copied_fq}")
+        with open(output.counts, "w") as fh:
+            print(ambig_filter.summary, file=fh)
+        symlink(Path(output.filtered_fq).name, output.copied_fq)
 
 
 rule calculate_read_lengths:

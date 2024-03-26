@@ -9,20 +9,18 @@
 # National Biodefense Analysis and Countermeasures Center (NBACC), a Federally Funded Research and
 # Development Center.
 # -------------------------------------------------------------------------------------------------
+
 from Bio import SeqIO
+from dataclasses import dataclass
 from microhapulator import open as mhopen
-import gzip
 
 
 class PairedReadFilter:
     def __init__(self, r1_in, r2_in, output_prefix):
         self.r1_in = mhopen(r1_in, "r")
         self.r2_in = mhopen(r2_in, "r")
-        self.get_output_files(output_prefix)
-        self.num_r1_failed = 0
-        self.num_r2_failed = 0
-        self.num_both_failed = 0
-        self.num_pairs_passed = 0
+        self.outstream = PairedReadOutputStream(output_prefix)
+        self.counts = PairedReadFilterCounts()
 
     def __iter__(self):
         with self.r1_in as r1_in, self.r2_in as r2_in:
@@ -32,23 +30,50 @@ class PairedReadFilter:
                 yield r1, r2
 
     def filter(self):
-        with self.outfiles["r1"] as r1_out, self.outfiles["r2"] as r2_out, self.outfiles[
-            "r1_mates"
-        ] as r1_mates, self.outfiles["r2_mates"] as r2_mates:
-            for r1, r2 in self:
-                keep_r1, keep_r2 = self.keep(r1, r2)
-                if keep_r1 and keep_r2:
-                    SeqIO.write(r1, r1_out, "fastq")
-                    SeqIO.write(r2, r2_out, "fastq")
-                    self.num_pairs_passed += 1
-                elif keep_r1:
-                    SeqIO.write(r1, r2_mates, "fastq")
-                    self.num_r2_failed += 1
-                elif keep_r2:
-                    SeqIO.write(r2, r1_mates, "fastq")
-                    self.num_r1_failed += 1
-                else:
-                    self.num_both_failed += 1
+        for r1, r2 in self:
+            keep_r1, keep_r2 = self.keep(r1, r2)
+            if keep_r1 and keep_r2:
+                SeqIO.write(r1, self.outstream.r1, "fastq")
+                SeqIO.write(r2, self.outstream.r2, "fastq")
+                self.counts.pairs_passed += 1
+            elif keep_r1:
+                SeqIO.write(r1, self.outstream.r2_mates, "fastq")
+                self.counts.r2_failed += 1
+            elif keep_r2:
+                SeqIO.write(r2, self.outstream.r1_mates, "fastq")
+                self.counts.r1_failed += 1
+            else:
+                self.counts.pairs_failed += 1
+
+
+@dataclass
+class PairedReadFilterCounts:
+    r1_failed: int = 0
+    r2_failed: int = 0
+    pairs_failed: int = 0
+    pairs_passed: int = 0
+
+    @property
+    def total_pairs(self):
+        return self.total_pairs_filtered + self.pairs_passed
+
+    @property
+    def total_pairs_filtered(self):
+        return self.r1_failed + self.r2_failed + self.pairs_failed
+
+
+class PairedReadOutputStream:
+    def __init__(self, prefix):
+        self.r1 = open(f"{prefix}-ambig-filtered-R1.fastq", "w")
+        self.r2 = open(f"{prefix}-ambig-filtered-R2.fastq", "w")
+        self.r1_mates = open(f"{prefix}-ambig-R1-mates.fastq", "w")
+        self.r2_mates = open(f"{prefix}-ambig-R2-mates.fastq", "w")
+
+    def __del__(self):
+        self.r1.close()
+        self.r2.close()
+        self.r1_mates.close()
+        self.r2_mates.close()
 
 
 class AmbigPairedReadFilter(PairedReadFilter):
@@ -64,55 +89,45 @@ class AmbigPairedReadFilter(PairedReadFilter):
     def is_ambiguous(self, read):
         return read.seq.count("N") / len(read.seq) > self.threshold
 
-    def write_counts_output(self):
-        with self.outfiles["counts"] as counts_out:
-            header = f"R1Only\tR2Only\tR1andR2\tPairsRemoved\tPairsKept"
-            total_pairs_filtered = self.num_r1_failed + self.num_r2_failed + self.num_both_failed
-            counts_str = f"{self.num_r1_failed}\t{self.num_r2_failed}\t{self.num_both_failed}\t{total_pairs_filtered}\t{self.num_pairs_passed}"
-            counts_out.write(f"{header}\n{counts_str}\n")
-
-    def get_output_files(self, out_prefix):
-        self.outfiles = dict()
-        self.outfiles["r1"] = mhopen(f"{out_prefix}-ambig-filtered-R1.fastq", "w")
-        self.outfiles["r2"] = mhopen(f"{out_prefix}-ambig-filtered-R2.fastq", "w")
-        self.outfiles["r1_mates"] = mhopen(f"{out_prefix}-ambig-R1-mates.fastq", "w")
-        self.outfiles["r2_mates"] = mhopen(f"{out_prefix}-ambig-R2-mates.fastq", "w")
-        self.outfiles["counts"] = mhopen(f"{out_prefix}-ambig-read-counts.txt", "w")
+    @property
+    def summary(self):
+        header = "R1OnlyFailed\tR2OnlyFailed\tPairsFailed\tPairsRemoved\tPairsKept\tTotalPairs"
+        count_data = f"{self.counts.r1_failed}\t{self.counts.r2_failed}\t{self.counts.pairs_failed}\t{self.counts.total_pairs_filtered}\t{self.counts.pairs_passed}\t{self.counts.total_pairs}"
+        return f"{header}\n{count_data}"
 
 
 class SingleReadFilter:
-    def __init__(self, reads_in, output_prefix):
-        self.reads_in = mhopen(reads_in, "r")
-        self.get_output_files(output_prefix)
+    def __init__(self, reads_in, reads_out):
+        self.reads_in = mhopen(
+            reads_in,
+            "r",
+        )
+        self.reads_out = open(reads_out, "w")
         self.num_reads_failed = 0
         self.num_reads_passed = 0
 
+    def __del__(self):
+        self.reads_out.close()
+
     def filter(self):
-        with self.reads_in as r_in, self.outfiles["reads"] as r_out:
+        with self.reads_in as r_in:
             for read in SeqIO.parse(r_in, "fastq"):
                 if self.keep(read):
-                    SeqIO.write(read, r_out, "fastq")
+                    SeqIO.write(read, self.reads_out, "fastq")
                     self.num_reads_passed += 1
                 else:
                     self.num_reads_failed += 1
 
 
 class AmbigSingleReadFilter(SingleReadFilter):
-    def __init__(self, reads_in, out_prefix, threshold=0.2):
+    def __init__(self, reads_in, outfile, threshold=0.2):
         self.threshold = threshold
-        super().__init__(reads_in, out_prefix)
+        super().__init__(reads_in, outfile)
 
     def keep(self, read):
         is_ambiguous = read.seq.count("N") / len(read.seq) > self.threshold
         return not is_ambiguous
 
-    def write_counts_output(self):
-        with self.outfiles["counts"] as counts_out:
-            counts_out.write(
-                f"ReadsRemoved\tReadsKept\n{self.num_reads_failed}\t{self.num_reads_passed}\n"
-            )
-
-    def get_output_files(self, out_prefix):
-        self.outfiles = dict()
-        self.outfiles["reads"] = mhopen(f"{out_prefix}-ambig-filtered.fastq", "w")
-        self.outfiles["counts"] = mhopen(f"{out_prefix}-ambig-read-counts.txt", "w")
+    @property
+    def summary(self):
+        return f"ReadsRemoved\tReadsKept\n{self.num_reads_failed}\t{self.num_reads_passed}"

@@ -91,7 +91,6 @@
 
             <a name="readqc"></a>
             <h2>Read QA/QC</h2>
-            <h5>Ambiguous Reads</h5>
             {% if reads_are_paired %}
             <p>
                 If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), both reads in the pair are filtered out prior to read merging and excluded from all subsequent analysis.
@@ -100,22 +99,24 @@
             <table>
                 <tr>
                     <th>Sample</th>
-                    <th class="alnrt">R1 Only</th>
-                    <th class="alnrt">R2 Only</th>
-                    <th class="alnrt">R1 and R2</th>
+                    <th class="alnrt">R1 Only Failed</th>
+                    <th class="alnrt">R2 Only Failed</th>
+                    <th class="alnrt">Pair Failed</th>
                     <th class="alnrt">Pairs Removed</th>
                     <th class="alnrt">Pairs Kept</th>
-
-                  
+                    <th class="alnrt">Total Pairs</th>
+                    <th class="alnrt">Retention</th>
                 </tr>
                 {% for sample, ambig_reads_df in ambiguous_reads.items() %}
                 <tr>
                     <td>{{sample}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1Only"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2Only"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1andR2"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1OnlyFailed"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2OnlyFailed"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsFailed"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsRemoved"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsKept"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["TotalPairs"])}}</td>
+                    <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["PairsKept"] / ambig_reads_df.iloc[0]["TotalPairs"] * 100)}}%</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -129,13 +130,16 @@
                     <th>Sample</th>
                     <th class="alnrt">Reads Removed</th>
                     <th class="alnrt">Reads Kept</th>
-
+                    <th class="alnrt">Total Reads</th>
+                    <th class="alnrt">Retention</th>
                 </tr>
                 {% for sample, ambig_reads_df in ambiguous_reads.items() %}
                 <tr>
-                    <td>{{sample}}</td>  
+                    <td>{{sample}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsKept"])}}</td>    
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
+                    <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["ReadsKept"] / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}%</td>
                 </tr>
                 {% endfor%}
             </table>
@@ -270,7 +274,7 @@
             <br />
 
             <p> The following donut plots show the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
-       
+
             {% for plot in plots["donut"] %}
             <img src="{{plot}}"/>
             {% endfor %}
