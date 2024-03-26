@@ -7,6 +7,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
         <script src="fancyTable.js"></script>
         <style type="text/css">
+            h2 {
+                margin-top: 50px;
+            }
             .container {
                 max-width: 750px;
                 padding-top: 100px;
@@ -144,40 +147,18 @@
                 {% endfor%}
             </table>
             {% endif %}
-            <p>QC reports for the input reads are generated using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a>. Links to reports for each sample are provided below.</p>
+            <p>QC reports for the input reads are generated using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> and summarized into a single report with <a href="https://multiqc.info/" target="_blank">MultiQC</a> A link to the MultiQC report is provided below.</p>
             <blockquote><strong>NOTE</strong>: FastQC was designed for QC of whole-genome shotgun NGS reads prior to genome asssembly. A QC warning or failure for some modules (such as per-base sequence content or sequence duplication levels) may or may not be a concern with MH reads. Interpret results with care!</blockquote>
-
-            {% if "r1readlen" in plots %}
-            <table>
-                <tr><th>Sample</th><th>R1 Report</th><th>R2 Report</th></tr>
-                {% for sample in samples %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td><a href="analysis/{{sample}}/fastqc/R1-fastqc.html" target="_blank">Click here to open in a new tab</a></td>
-                    <td><a href="analysis/{{sample}}/fastqc/R2-fastqc.html" target="_blank">Click here to open in a new tab</a></td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% else %}
-            <table>
-                <tr><th>Sample</th><th>Report</th></tr>
-                {% for sample in samples %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td><a href="analysis/{{sample}}/fastqc/report.html" target="_blank">Click here to open in a new tab</a></td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% endif %}
-
+            <p><a href="analysis/multiqc_report.html",  target="_blank">Click here to open MultiQC report in a new tab</a></p>
+        
             {% if read_length_table is none %}
                 {% if "r1readlen" in plots %}
                     <p>The following ridge plots show the distribution of R1 and R2 read lengths for each sample.</p>
-                    <img src="analysis/r1-read-lengths.png"/>
-                    <img src="analysis/r2-read-lengths.png"/>
+                    <img src="analysis/r1-read-lengths.png" />
+                    <img src="analysis/r2-read-lengths.png" />
                 {% else %}
                     <p>The following ridge plot shows read length distributions for each sample.</p>
-                    <img class="center" src="analysis/read-lengths.png"/>
+                    <img class="center" src="analysis/read-lengths.png" />
                 {% endif %}
             {% else %}
                 <p>Read lengths, uniform for all samples, are shown below.</p>
@@ -233,7 +214,7 @@
                 {% endfor %}
             </table>
             <p>The following ridge plot shows the distribution of merged read lengths for each sample.</p>
-            <img class=center src="analysis/merged-read-lengths.png"/>
+            <img class="center" src="analysis/merged-read-lengths.png" />
             {% endif %}
 
             <a name="readmapping"></a>
@@ -273,11 +254,16 @@
             </div>
             <br />
 
+<<<<<<< HEAD
             <p> The following donut plots show the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
 
             {% for plot in plots["donut"] %}
             <img src="{{plot}}"/>
             {% endfor %}
+=======
+            <p> The following bar graph shows the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
+            <img class="fullwidth" src="analysis/read-mapping-qc.png" />
+>>>>>>> main
             <br />
             <br />
             <p>The following table shows the number of total reads mapped to each marker for each sample. Also shown is the number of repetitive reads, determined by selecting the reads aligned to the marker, mapping them to the entire GRCh38 human reference sequence, and counting the reads that map preferentially to a locus outside the target marker locus.</p>

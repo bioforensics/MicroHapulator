@@ -16,7 +16,7 @@ test4:
 devdeps:
 	pip install --upgrade pip setuptools
 	pip install wheel twine
-	pip install 'black==22.3' 'snakefmt==0.6' 'pytest>=6.0' pytest-cov pytest-xdist myst-parser sphinx sphinx-argparse
+	pip install 'black<25.0.0,>=24.1.1' 'snakefmt>=0.10.0' 'pytest>=6.0' pytest-cov pytest-xdist myst-parser sphinx sphinx-argparse
 
 ## doc:       build HTML documentation
 doc:
