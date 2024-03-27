@@ -12,6 +12,7 @@
 
 from glob import glob
 from microhapulator import api as mhapi
+from microhapulator.filter import AmbigSingleReadFilter
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
@@ -46,22 +47,27 @@ rule multiqc:
         """
 
 
-rule fastq_reads:
+rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        fastq="analysis/{sample}/reads.fastq",
+        filtered_fq="analysis/{sample}/{sample}-ambig-filtered.fastq",
+        copied_fq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
+        counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
+    params:
+        ambig_thresh=config["ambiguous_thresh"],
     run:
         assert len(input) == 1
-        if input[0].endswith(".gz"):
-            shell("gunzip -c {input[0]} > {output.fastq}")
-        else:
-            shell("cp {input[0]} {output.fastq}")
+        ambig_filter = AmbigSingleReadFilter(input[0], output.filtered_fq, params.ambig_thresh)
+        ambig_filter.filter()
+        with open(output.counts, "w") as fh:
+            print(ambig_filter.summary, file=fh)
+        symlink(Path(output.filtered_fq).name, output.copied_fq)
 
 
 rule calculate_read_lengths:
     input:
-        rules.fastq_reads.output.fastq,
+        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
         json="analysis/{sample}/{sample}-read-lengths.json",
     run:

@@ -1,0 +1,2 @@
+R1OnlyFailed	R2OnlyFailed	PairsFailed	PairsRemoved	PairsKept	TotalPairs
+2	1	1	4	6	10

@@ -13,6 +13,7 @@
 from glob import glob
 from itertools import chain
 from microhapulator import api as mhapi
+from microhapulator.filter import AmbigPairedReadFilter
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
@@ -54,12 +55,32 @@ rule multiqc:
         """
 
 
-rule merge:
+rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
+        filtered_r1="analysis/{sample}/{sample}-ambig-filtered-R1.fastq",
+        filtered_r2="analysis/{sample}/{sample}-ambig-filtered-R2.fastq",
+        mates_r1="analysis/{sample}/{sample}-ambig-R1-mates.fastq",
+        mates_r2="analysis/{sample}/{sample}-ambig-R2-mates.fastq",
+        counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
+    params:
+        ambig_thresh=config["ambiguous_thresh"],
+        out_prefix="analysis/{sample}/{sample}",
+    run:
+        ambig_filter = AmbigPairedReadFilter(*input, params.out_prefix, params.ambig_thresh)
+        ambig_filter.filter()
+        with open(output.counts, "w") as fh:
+            print(ambig_filter.summary, file=fh)
+
+
+rule merge:
+    input:
+        r1=rules.filter_ambiguous.output.filtered_r1,
+        r2=rules.filter_ambiguous.output.filtered_r2,
+    output:
         mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
-        linkedfq="analysis/{sample}/reads.fastq",
+        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
         log="analysis/{sample}/flash.log",
     threads: 8
     shell:

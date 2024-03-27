@@ -40,6 +40,7 @@ rule report:
             sample=config["samples"],
             suffix=("qual", "quant", "qual-ref", "quant-ref"),
         ),
+        expand("analysis/{sample}/{sample}-ambig-read-counts.txt", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
@@ -60,6 +61,7 @@ rule report:
             thresh_static=config["thresh_static"],
             thresh_dynamic=config["thresh_dynamic"],
             thresh_file=config["thresh_file"],
+            ambiguous_read_threshold=config["ambiguous_thresh"],
         )
         marker_detail_report(config["samples"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
@@ -105,7 +107,7 @@ rule copy_and_index_marker_data:
 
 rule map_sort_and_index:
     input:
-        fastq="analysis/{sample}/reads.fastq",
+        fastq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
         fasta="marker-refr.fasta",
         idx=expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
     output:
@@ -129,7 +131,7 @@ rule map_full_reference:
         refr=config["hg38path"],
     input:
         full_reference_index_files(config["hg38path"]),
-        fastq="analysis/{sample}/reads.fastq",
+        fastq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
         bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",
