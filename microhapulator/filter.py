@@ -131,7 +131,7 @@ class AmbigSingleReadFilter(SingleReadFilter):
 
 
 class LengthSingleReadFilter(SingleReadFilter):
-    def __init__(self, reads_in, outfile, threshold=100):
+    def __init__(self, reads_in, outfile, threshold=50):
         self.threshold = threshold
         super().__init__(reads_in, outfile)
 
