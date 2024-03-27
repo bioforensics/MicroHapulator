@@ -11,9 +11,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Smart handling of multiple markers at a single locus implemented for `type` and `pipe` (#158).
 - Replaced `parsers` module with a `MicrohapIndex` class and supporting classes (#158).
-- Replaced read length distubition histograms with ridge plots (#167).
-- Replaced read QC donut plots with a stacked bar chart (#168).
-- Replaced FastQC report links with MultiQC link (#169).
+- Numerous updates to the `mhpl8r pipe` HTML report
+    - Replaced read length distubition histograms with ridge plots (#167).
+    - Replaced read QC donut plots with a stacked bar chart (#168).
+    - Replaced FastQC report links with MultiQC link (#169).
+    - Revised report text, added figure captions and table titles (#172).
 
 ### Fixed
 - Bug with inconsistent sorting of read counts for interlocus balance (#159).
