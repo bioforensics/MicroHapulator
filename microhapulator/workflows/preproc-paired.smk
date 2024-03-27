@@ -13,7 +13,7 @@
 from glob import glob
 from itertools import chain
 from microhapulator import api as mhapi
-from microhapulator.filter import AmbigPairedReadFilter
+from microhapulator.filter import AmbigPairedReadFilter, LengthSingleReadFilter
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
@@ -80,7 +80,6 @@ rule merge:
         r2=rules.filter_ambiguous.output.filtered_r2,
     output:
         mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
-        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
         log="analysis/{sample}/flash.log",
     threads: 8
     shell:
@@ -90,14 +89,32 @@ rule merge:
             --output-prefix analysis/{wildcards.sample}/{wildcards.sample} \
             {input} \
             2>&1 | tee {output.log}
-        ln -s {wildcards.sample}.extendedFrags.fastq {output.linkedfq}
         """
+
+
+rule filter_length:
+    input:
+        mergedfq=rules.merge.output.mergedfq,
+    output:
+        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq",
+        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
+        counts="analysis/{sample}/{sample}-length-filtered-read-counts.txt",
+    params:
+        length_thresh=config["length_thresh"],
+    run:
+        length_filter = LengthSingleReadFilter(
+            input.mergedfq, output.length_filtered, params.length_thresh
+        )
+        length_filter.filter()
+        with open(output.counts, "w") as fh:
+            print(length_filter.summary, file=fh)
+        symlink(Path(output.length_filtered).name, output.linkedfq)
 
 
 rule calculate_read_lengths:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
-        rules.merge.output.linkedfq,
+        rules.merge.output.mergedfq,
     output:
         l1="analysis/{sample}/{sample}-r1-read-lengths.json",
         l2="analysis/{sample}/{sample}-r2-read-lengths.json",

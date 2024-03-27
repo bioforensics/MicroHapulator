@@ -12,7 +12,7 @@
 
 from glob import glob
 from microhapulator import api as mhapi
-from microhapulator.filter import AmbigSingleReadFilter
+from microhapulator.filter import AmbigSingleReadFilter, LengthSingleReadFilter
 from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
@@ -52,7 +52,6 @@ rule filter_ambiguous:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
         filtered_fq="analysis/{sample}/{sample}-ambig-filtered.fastq",
-        copied_fq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
         counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
@@ -62,7 +61,25 @@ rule filter_ambiguous:
         ambig_filter.filter()
         with open(output.counts, "w") as fh:
             print(ambig_filter.summary, file=fh)
-        symlink(Path(output.filtered_fq).name, output.copied_fq)
+
+
+rule filter_length:
+    input:
+        fq=rules.filter_ambiguous.output.filtered_fq,
+    output:
+        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq",
+        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
+        counts="analysis/{sample}/{sample}-length-filtered-read-counts.txt",
+    params:
+        length_thresh=config["length_thresh"],
+    run:
+        length_filter = LengthSingleReadFilter(
+            input.fq, output.length_filtered, params.length_thresh
+        )
+        length_filter.filter()
+        with open(output.counts, "w") as fh:
+            print(length_filter.summary, file=fh)
+        symlink(Path(output.length_filtered).name, output.linkedfq)
 
 
 rule calculate_read_lengths:

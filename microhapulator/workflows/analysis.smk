@@ -41,6 +41,9 @@ rule report:
             suffix=("qual", "quant", "qual-ref", "quant-ref"),
         ),
         expand("analysis/{sample}/{sample}-ambig-read-counts.txt", sample=config["samples"]),
+        expand(
+            "analysis/{sample}/{sample}-length-filtered-read-counts.txt", sample=config["samples"]
+        ),
         expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
@@ -62,6 +65,7 @@ rule report:
             thresh_dynamic=config["thresh_dynamic"],
             thresh_file=config["thresh_file"],
             ambiguous_read_threshold=config["ambiguous_thresh"],
+            length_threshold=config["length_thresh"],
         )
         marker_detail_report(config["samples"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")

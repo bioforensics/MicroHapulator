@@ -45,6 +45,12 @@ class PairedReadFilter:
             else:
                 self.counts.pairs_failed += 1
 
+    @property
+    def summary(self):
+        header = "R1OnlyFailed\tR2OnlyFailed\tPairsFailed\tPairsRemoved\tPairsKept\tTotalPairs"
+        count_data = f"{self.counts.r1_failed}\t{self.counts.r2_failed}\t{self.counts.pairs_failed}\t{self.counts.total_pairs_filtered}\t{self.counts.pairs_passed}\t{self.counts.total_pairs}"
+        return f"{header}\n{count_data}"
+
 
 @dataclass
 class PairedReadFilterCounts:
@@ -89,12 +95,6 @@ class AmbigPairedReadFilter(PairedReadFilter):
     def is_ambiguous(self, read):
         return read.seq.count("N") / len(read.seq) > self.threshold
 
-    @property
-    def summary(self):
-        header = "R1OnlyFailed\tR2OnlyFailed\tPairsFailed\tPairsRemoved\tPairsKept\tTotalPairs"
-        count_data = f"{self.counts.r1_failed}\t{self.counts.r2_failed}\t{self.counts.pairs_failed}\t{self.counts.total_pairs_filtered}\t{self.counts.pairs_passed}\t{self.counts.total_pairs}"
-        return f"{header}\n{count_data}"
-
 
 class SingleReadFilter:
     def __init__(self, reads_in, reads_out):
@@ -115,6 +115,10 @@ class SingleReadFilter:
                 else:
                     self.num_reads_failed += 1
 
+    @property
+    def summary(self):
+        return f"ReadsRemoved\tReadsKept\n{self.num_reads_failed}\t{self.num_reads_passed}"
+
 
 class AmbigSingleReadFilter(SingleReadFilter):
     def __init__(self, reads_in, outfile, threshold=0.2):
@@ -125,6 +129,11 @@ class AmbigSingleReadFilter(SingleReadFilter):
         is_ambiguous = read.seq.count("N") / len(read.seq) > self.threshold
         return not is_ambiguous
 
-    @property
-    def summary(self):
-        return f"ReadsRemoved\tReadsKept\n{self.num_reads_failed}\t{self.num_reads_passed}"
+
+class LengthSingleReadFilter(SingleReadFilter):
+    def __init__(self, reads_in, outfile, threshold=100):
+        self.threshold = threshold
+        super().__init__(reads_in, outfile)
+
+    def keep(self, read):
+        return len(read) > self.threshold
