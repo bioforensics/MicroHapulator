@@ -126,7 +126,7 @@
             {% else %}
             <p>
                 If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), it is filtered out prior to read mapping and excluded from all subsequent analysis.
-                The table below shows the number of reads removed fin each sample.
+                The table below shows the number of reads removed from each sample.
             </p>
             <table>
                 <tr>
@@ -254,16 +254,8 @@
             </div>
             <br />
 
-<<<<<<< HEAD
-            <p> The following donut plots show the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
-
-            {% for plot in plots["donut"] %}
-            <img src="{{plot}}"/>
-            {% endfor %}
-=======
             <p> The following bar graph shows the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
             <img class="fullwidth" src="analysis/read-mapping-qc.png" />
->>>>>>> main
             <br />
             <br />
             <p>The following table shows the number of total reads mapped to each marker for each sample. Also shown is the number of repetitive reads, determined by selecting the reads aligned to the marker, mapping them to the entire GRCh38 human reference sequence, and counting the reads that map preferentially to a locus outside the target marker locus.</p>

@@ -98,10 +98,7 @@ class AmbigPairedReadFilter(PairedReadFilter):
 
 class SingleReadFilter:
     def __init__(self, reads_in, reads_out):
-        self.reads_in = mhopen(
-            reads_in,
-            "r",
-        )
+        self.reads_in = mhopen(reads_in, "r")
         self.reads_out = open(reads_out, "w")
         self.num_reads_failed = 0
         self.num_reads_passed = 0
