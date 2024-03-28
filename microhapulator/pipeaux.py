@@ -60,6 +60,14 @@ def parse_balance_stat(logfile):
         return float(stat)
 
 
+def parse_length_filter(logfile):
+    with open(logfile, "r") as fh:
+        next(fh)
+        line = next(fh)
+        removed, kept = line.strip().split()
+        return int(removed), int(kept)
+
+
 def per_marker_typing_rate(samples):
     sample_rates = dict()
     for sample in samples:
@@ -124,6 +132,7 @@ def final_html_report(
     thresh_dynamic=0.02,
     thresh_file=None,
     ambiguous_read_threshold=0.2,
+    length_threshold=50,
 ):
     if reads_are_paired:
         table_func = read_length_table_paired_end
@@ -158,6 +167,7 @@ def final_html_report(
             isna=pd.isna,
             reads_are_paired=reads_are_paired,
             ambiguous_read_threshold=ambiguous_read_threshold,
+            read_length_threshold=length_threshold,
         )
         print(output, file=outfh, end="")
 
@@ -233,6 +243,9 @@ def aggregate_summary(samples, reads_are_paired=True):
     data = list()
     for sample in sorted(samples):
         print(f"[Compiling summary] Sample={sample}", file=sys.stderr)
+        length_failed, length_passed = parse_length_filter(
+            f"analysis/{sample}/{sample}-length-filtered-read-counts.txt"
+        )
         if reads_are_paired:
             totalreads, mergedreads, *_ = parse_flash_summary(f"analysis/{sample}/flash.log")
             mergedrate = mergedreads / totalreads
@@ -241,7 +254,7 @@ def aggregate_summary(samples, reads_are_paired=True):
             mergedreads, mergedrate = None, None
         maptotal, mapped = parse_read_counts(f"analysis/{sample}/{sample}-mapped-reads.txt")
         if reads_are_paired:
-            assert maptotal == mergedreads, (sample, maptotal, mergedreads)
+            assert maptotal == (mergedreads - length_failed), (sample, maptotal, mergedreads)
         else:
             totalreads = maptotal
         frmaptotal, frmapped = parse_read_counts(
@@ -265,6 +278,8 @@ def aggregate_summary(samples, reads_are_paired=True):
             totalreads,
             mergedreads,
             mergedrate,
+            length_failed,
+            length_passed,
             mapped,
             mapped / maptotal,
             frmapped,
@@ -280,6 +295,8 @@ def aggregate_summary(samples, reads_are_paired=True):
         "TotalReads",
         "Merged",
         "MergeRate",
+        "LengthFailed",
+        "LengthPassed",
         "Mapped",
         "MappingRate",
         "MappedFullRefr",

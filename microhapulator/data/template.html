@@ -1,234 +1,324 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>MicroHapulator Report</title>
-        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
-        <script src="fancyTable.js"></script>
-        <style type="text/css">
-            h2 {
-                margin-top: 50px;
-            }
-            .container {
-                max-width: 750px;
-                padding-top: 100px;
-            }
-            .alnrt {
-                text-align: right;
-            }
-            img {
-                margin: 10px auto;
-                width: 48%;
-            }
-            img.small {
-                width: 24.5%;
-            }
-            img.center {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .fullwidth {
-                width: 100%;
-            }
-            table {
-                margin: 12pt auto;
-                width: 100%;
-            }
-            .scrollwrapper {
-                overflow-x: auto;
-            }
-            table.half {
-                margin: 12pt auto 12pt 0;
-                width: 50%;
-            }
-            td, th {
-                padding-right: 10px;
-                white-space: nowrap;
-            }
 
-            blockquote p {
-                font-size: small;
-            }
+<head>
+    <title>MicroHapulator Report</title>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+    <script src="fancyTable.js"></script>
+    <style type="text/css">
+        h2 {
+            margin-top: 50px;
+        }
 
-            blockquote h3 {
-                margin-top: 0;
-            }
+        .container {
+            max-width: 750px;
+            padding-top: 100px;
+        }
 
-            ::-webkit-scrollbar {
-                width: 5px;
-                height: 5px;
-            }
+        .alnrt {
+            text-align: right;
+        }
 
-            ::-webkit-scrollbar-thumb {
-                background: gray;
-                border-radius: 10px;
-            }
-            ::-webkit-scrollbar-track{
-                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-                border-radius: 10px;
-                background-color: #F5F5F5;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>MicroHapulator Report</h1>
-            <p>
-                Report generated at {{date}},<br />
-                using <a href="https://microhapulator.readthedocs.io" target="_blank">MicroHapulator</a> version {{mhpl8rversion}}.
-            </p>
+        img {
+            margin: 10px auto;
+            width: 48%;
+        }
 
-            <h2>Table of Contents</h2>
-            <ol>
-                <li><a href="#readqc">Read QA/QC</a></li>
-                {% if "r1readlen" in plots %}
-                <li><a href="#readmerging">Read Merging</a></li>
-                {% endif %}
-                <li><a href="#readmapping">Read Mapping</a></li>
-                <li><a href="#typing">Haplotype Calling</a></li>
-                <li><a href="#filters">Genotype Calling</a></li>
-            </ol>
-            <p>All statistics presented in this report are aggregated in a single table available at <code>analysis/summary.tsv</code> in the working directory. Full-resolution graphics for each figure are also available in each <code>analysis/{samplename}/</code> subdirectory.</p>
+        img.small {
+            width: 24.5%;
+        }
 
-            <a name="readqc"></a>
-            <h2>Read QA/QC</h2>
-            {% if reads_are_paired %}
-            <p>
-                If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), both reads in the pair are filtered out prior to read merging and excluded from all subsequent analysis.
-                The table below shows the number of read pairs that were removed in each sample and which read(s) in the pair contained too many ambiguous bases.
-            </p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">R1 Only Failed</th>
-                    <th class="alnrt">R2 Only Failed</th>
-                    <th class="alnrt">Pair Failed</th>
-                    <th class="alnrt">Pairs Removed</th>
-                    <th class="alnrt">Pairs Kept</th>
-                    <th class="alnrt">Total Pairs</th>
-                    <th class="alnrt">Retention</th>
-                </tr>
-                {% for sample, ambig_reads_df in ambiguous_reads.items() %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1OnlyFailed"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2OnlyFailed"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsFailed"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsRemoved"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsKept"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["TotalPairs"])}}</td>
-                    <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["PairsKept"] / ambig_reads_df.iloc[0]["TotalPairs"] * 100)}}%</td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% else %}
-            <p>
-                If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), it is filtered out prior to read mapping and excluded from all subsequent analysis.
-                The table below shows the number of reads removed from each sample.
-            </p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Reads Removed</th>
-                    <th class="alnrt">Reads Kept</th>
-                    <th class="alnrt">Total Reads</th>
-                    <th class="alnrt">Retention</th>
-                </tr>
-                {% for sample, ambig_reads_df in ambiguous_reads.items() %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
-                    <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["ReadsKept"] / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}%</td>
-                </tr>
-                {% endfor%}
-            </table>
-            {% endif %}
-            <p>QC reports for the input reads are generated using <a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> and summarized into a single report with <a href="https://multiqc.info/" target="_blank">MultiQC</a> A link to the MultiQC report is provided below.</p>
-            <blockquote><strong>NOTE</strong>: FastQC was designed for QC of whole-genome shotgun NGS reads prior to genome asssembly. A QC warning or failure for some modules (such as per-base sequence content or sequence duplication levels) may or may not be a concern with MH reads. Interpret results with care!</blockquote>
-            <p><a href="analysis/multiqc_report.html",  target="_blank">Click here to open MultiQC report in a new tab</a></p>
-        
-            {% if read_length_table is none %}
-                {% if "r1readlen" in plots %}
-                    <p>The following ridge plots show the distribution of R1 and R2 read lengths for each sample.</p>
-                    <img src="analysis/r1-read-lengths.png" />
-                    <img src="analysis/r2-read-lengths.png" />
-                {% else %}
-                    <p>The following ridge plot shows read length distributions for each sample.</p>
-                    <img class="center" src="analysis/read-lengths.png" />
-                {% endif %}
-            {% else %}
-                <p>Read lengths, uniform for all samples, are shown below.</p>
-                {% if "r1readlen" in plots %}
-                <table class="half">
-                    <tr>
-                        <th>Sample</th>
-                        <th class="alnrt">Length R1</th>
-                        <th class="alnrt">Length R2</th>
-                    </tr>
-                    {% for i, row in read_length_table.iterrows() %}
-                    <tr>
-                        <td>{{ row.Sample }}</td>
-                        <td class="alnrt">{{ row.LengthR1 }}</td>
-                        <td class="alnrt">{{ row.LengthR2 }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% else %}
-                <table class="half">
-                    <tr>
-                        <th>Sample</th>
-                        <th class="alnrt">Length</th>
-                    </tr>
-                    {% for i, row in read_length_table.iterrows() %}
-                    <tr>
-                        <td>{{ row.Sample }}</td>
-                        <td class="alnrt">{{ row.Length }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
-            {% endif %}
+        img.center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
+        .fullwidth {
+            width: 100%;
+        }
+
+        table {
+            margin: 12pt auto;
+            width: 100%;
+        }
+
+        .scrollwrapper {
+            overflow-x: auto;
+        }
+
+        table.half {
+            margin: 12pt auto 12pt 0;
+            width: 50%;
+        }
+
+        td,
+        th {
+            padding-right: 10px;
+            white-space: nowrap;
+        }
+
+        blockquote p {
+            font-size: small;
+        }
+
+        blockquote h3 {
+            margin-top: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: gray;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            background-color: #F5F5F5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>MicroHapulator Report</h1>
+        <p>
+            Report generated at {{date}},<br />
+            using <a href="https://microhapulator.readthedocs.io" target="_blank">MicroHapulator</a> version
+            {{mhpl8rversion}}.
+        </p>
+
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#readqc">Read QA/QC</a></li>
             {% if "r1readlen" in plots %}
-            <a name="readmerging"></a>
-            <h2>Read Merging</h2>
-            <p>Paired end reads are merged using <a href="https://ccb.jhu.edu/software/FLASH/" target="_blank">FLASh</a>.</p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Filtered Reads</th>
-                    <th class="alnrt">Merged Reads</th>
-                    <th class="alnrt">Merge Rate</th>
-                </tr>
-                {% for i, row in summary.iterrows() %}
-                <tr>
-                    <td>{{row.Sample}}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.TotalReads) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.Merged) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.MergeRate * 100) }}%</td>
-                </tr>
-                {% endfor %}
-            </table>
-            <p>The following ridge plot shows the distribution of merged read lengths for each sample.</p>
-            <img class="center" src="analysis/merged-read-lengths.png" />
+            <li><a href="#readmerging">Read Merging</a></li>
             {% endif %}
+            <li><a href="#readmapping">Read Mapping</a></li>
+            <li><a href="#typing">Haplotype Calling</a></li>
+            <li><a href="#filters">Genotype Calling</a></li>
+        </ol>
+        <p>All statistics presented in this report are aggregated in a single table available at
+            <code>analysis/summary.tsv</code> in the working directory. Full-resolution graphics for each figure are
+            also available in each <code>analysis/{samplename}/</code> subdirectory.
+        </p>
 
-            <a name="readmapping"></a>
-            <h2>Read Mapping</h2>
-            <p>Merged reads are aligned to marker reference sequences using <a href="http://bio-bwa.sourceforge.net/bwa.shtml" target="_blank">BWA MEM</a> and formatted/sorted using <a href="http://www.htslib.org/" target="_blank">SAMtools</a>. The reads were also aligned to the full (entire chromosomes) human reference genome, to aid in discriminating between off-target sequences and e.g. contaminant sequences: reads that align to the entire chromosomes but not to the marker sequences represent off-target sequences, while reads that do not align to either are likely contaminants. The reported chi-square statistic is a measure of read coverage imbalance between markers, and can be compared among samples sequenced using the sample panel: the minimum value of 0 represents perfectly uniform coverage across markers, while the maximum value of D occurs when all reads map to a single marker (D represents the degrees of freedom, or the number of markers minus 1).</p>
-            <div class="scrollwrapper">
+        <a name="readqc"></a>
+        <h2>Read QA/QC</h2>
+        <p>QC reports for the input reads are generated using <a
+                href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> and
+            summarized into a single report with <a href="https://multiqc.info/" target="_blank">MultiQC</a> A link to
+            the MultiQC report is provided below.</p>
+        <blockquote><strong>NOTE</strong>: FastQC was designed for QC of whole-genome shotgun NGS reads prior to genome
+            asssembly. A QC warning or failure for some modules (such as per-base sequence content or sequence
+            duplication levels) may or may not be a concern with MH reads. Interpret results with care!</blockquote>
+        <p><a href="analysis/multiqc_report.html" , target="_blank">Click here to open MultiQC report in a new tab</a>
+        </p>
+
+        {% if read_length_table is none %}
+        {% if "r1readlen" in plots %}
+        <p>The following ridge plots show the distribution of R1 and R2 read lengths for each sample.</p>
+        <img src="analysis/r1-read-lengths.png" />
+        <img src="analysis/r2-read-lengths.png" />
+        {% else %}
+        <p>The following ridge plot shows read length distributions for each sample.</p>
+        <img class="center" src="analysis/read-lengths.png" />
+        {% endif %}
+        {% else %}
+        <p>Read lengths, uniform for all samples, are shown below.</p>
+        {% if "r1readlen" in plots %}
+        <table class="half">
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">Length R1</th>
+                <th class="alnrt">Length R2</th>
+            </tr>
+            {% for i, row in read_length_table.iterrows() %}
+            <tr>
+                <td>{{ row.Sample }}</td>
+                <td class="alnrt">{{ row.LengthR1 }}</td>
+                <td class="alnrt">{{ row.LengthR2 }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <table class="half">
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">Length</th>
+            </tr>
+            {% for i, row in read_length_table.iterrows() %}
+            <tr>
+                <td>{{ row.Sample }}</td>
+                <td class="alnrt">{{ row.Length }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        {% endif %}
+        {% if reads_are_paired %}
+        <p>
+            If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), both
+            reads in the pair are filtered out prior to read merging and excluded from all subsequent analysis.
+            The table below shows the number of read pairs that were removed in each sample and which read(s) in the
+            pair contained too many ambiguous bases.
+        </p>
+        <table>
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">R1 Only Failed</th>
+                <th class="alnrt">R2 Only Failed</th>
+                <th class="alnrt">Pair Failed</th>
+                <th class="alnrt">Pairs Removed</th>
+                <th class="alnrt">Pairs Kept</th>
+                <th class="alnrt">Total Pairs</th>
+                <th class="alnrt">Retention</th>
+            </tr>
+            {% for sample, ambig_reads_df in ambiguous_reads.items() %}
+            <tr>
+                <td>{{sample}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1OnlyFailed"])}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2OnlyFailed"])}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsFailed"])}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsRemoved"])}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsKept"])}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["TotalPairs"])}}</td>
+                <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["PairsKept"] /
+                    ambig_reads_df.iloc[0]["TotalPairs"] * 100)}}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>
+            If over {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% of bases in a read are ambiguous ('N'), it is
+            filtered out prior to read mapping and excluded from all subsequent analysis.
+            The table below shows the number of reads removed from each sample.
+        </p>
+        <table>
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">Reads Removed</th>
+                <th class="alnrt">Reads Kept</th>
+                <th class="alnrt">Total Reads</th>
+                <th class="alnrt">Retention</th>
+            </tr>
+            {% for sample, ambig_reads_df in ambiguous_reads.items() %}
+            <tr>
+                <td>{{sample}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"])}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
+                <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"] +
+                    ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
+                <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["ReadsKept"] /
+                    (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}%</td>
+            </tr>
+
+            {% endfor%}
+            {% endif %}
+        </table>
+        {% if not reads_are_paired %}
+        <p> Merged reads less than {{"{:,}".format(read_length_threshold)}} base pairs are filtered out prior to read
+            mapping and excluded from all subsequent analysis. The following table shows the number of merged reads
+            removed from each sample.
+        </p>
+
+        <table>
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">Reads Removed</th>
+                <th class="alnrt">Reads Kept</th>
+                <th class="alnrt">Total Unambiguous Reads</th>
+                <th class="alnrt">Retention</th>
+            </tr>
+            {% for i, row in summary.iterrows() %}
+            <tr>
+                <td>{{row.Sample}}</td>
+                <td class="alnrt">{{"{:,}".format(row.LengthFailed)}}</td>
+                <td class="alnrt">{{"{:,}".format(row.LengthPassed)}}</td>
+                <td class="alnrt">{{"{:,}".format(row.LengthFailed + row.LengthPassed)}}</td>
+                <td class="alnrt">{{"{:.2f}".format(row.LengthPassed / (row.LengthFailed + row.LengthPassed) * 100)}}%
+                </td>
+            </tr>
+        </table>
+        {% endfor%}
+        {% endif %}
+
+        {% if "r1readlen" in plots %}
+        <a name="readmerging"></a>
+        <h2>Read Merging</h2>
+        <p>Paired end reads are merged using <a href="https://ccb.jhu.edu/software/FLASH/" target="_blank">FLASh</a>.
+        </p>
+        <table>
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">Filtered Reads</th>
+                <th class="alnrt">Merged Reads</th>
+                <th class="alnrt">Merge Rate</th>
+            </tr>
+            {% for i, row in summary.iterrows() %}
+            <tr>
+                <td>{{row.Sample}}</td>
+                <td class="alnrt">{{ "{:,}".format(row.TotalReads) }}</td>
+                <td class="alnrt">{{ "{:,}".format(row.Merged) }}</td>
+                <td class="alnrt">{{ "{:.2f}".format(row.MergeRate * 100) }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p>The following ridge plot shows the distribution of merged read lengths for each sample.</p>
+        <img class="center" src="analysis/merged-read-lengths.png" />
+        {% endif %}
+        {% if reads_are_paired %}
+        <p> Merged reads less than {{"{:,}".format(read_length_threshold)}} base pairs are filtered out prior to read
+            mapping and excluded from all subsequent analysis. The following table shows the number of merged reads
+            removed from each sample.
+        </p>
+
+        <table>
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">Reads Removed</th>
+                <th class="alnrt">Reads Kept</th>
+                <th class="alnrt">Total Merged Reads</th>
+                <th class="alnrt">Retention</th>
+            </tr>
+            {% for i, row in summary.iterrows() %}
+            <tr>
+                <td>{{row.Sample}}</td>
+                <td class="alnrt">{{"{:,}".format(row.LengthFailed)}}</td>
+                <td class="alnrt">{{"{:,}".format(row.LengthPassed)}}</td>
+                <td class="alnrt">{{"{:,}".format(row.LengthFailed + row.LengthPassed)}}</td>
+                <td class="alnrt">{{"{:.2f}".format(row.LengthPassed / (row.LengthFailed + row.LengthPassed) * 100)}}%
+                </td>
+            </tr>
+        {% endfor%}
+        </table>
+        {% endif %}
+
+        <a name="readmapping"></a>
+        <h2>Read Mapping</h2>
+        <p>Merged reads are aligned to marker reference sequences using <a
+                href="http://bio-bwa.sourceforge.net/bwa.shtml" target="_blank">BWA MEM</a> and formatted/sorted using
+            <a href="http://www.htslib.org/" target="_blank">SAMtools</a>. The reads were also aligned to the full
+            (entire chromosomes) human reference genome, to aid in discriminating between off-target sequences and e.g.
+            contaminant sequences: reads that align to the entire chromosomes but not to the marker sequences represent
+            off-target sequences, while reads that do not align to either are likely contaminants. The reported
+            chi-square statistic is a measure of read coverage imbalance between markers, and can be compared among
+            samples sequenced using the sample panel: the minimum value of 0 represents perfectly uniform coverage
+            across markers, while the maximum value of D occurs when all reads map to a single marker (D represents the
+            degrees of freedom, or the number of markers minus 1).
+        </p>
+        <div class="scrollwrapper">
             <table>
                 <tr>
                     <th>Sample</th>
-                    {% if "r1readlen" in plots %}
-                    <th class="alnrt">Merged Reads</th>
-                    {% else %}
                     <th class="alnrt">Filtered Reads</th>
-                    {% endif %}
                     <th class="alnrt">Mapped</th>
                     <th class="alnrt">Mapping Rate</th>
                     <th class="alnrt">Mapped (Chrom)</th>
@@ -251,151 +341,185 @@
                 </tr>
                 {% endfor %}
             </table>
-            </div>
-            <br />
+        </div>
+        <br />
 
-            <p> The following bar graph shows the proportions of on target, repetitive, off target, and cotaminant reads. On target reads are those reads that align preferentially to the marker locus when aligned to the full human reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus when aligned to the full reference. Off target reads do not align to any marker sequences but do align elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
-            <img class="fullwidth" src="analysis/read-mapping-qc.png" />
-            <br />
-            <br />
-            <p>The following table shows the number of total reads mapped to each marker for each sample. Also shown is the number of repetitive reads, determined by selecting the reads aligned to the marker, mapping them to the entire GRCh38 human reference sequence, and counting the reads that map preferentially to a locus outside the target marker locus.</p>
-            <blockquote>
-                <h3>Interpretation Hints</h3>
-                <p>The "Mapping Rate (Chrom)" column in the table above indicates the proportion of the reads in the sample that map <em>anywhere</em> to the human genome. The percentage <em>not</em> mapped represents non-human material (typically contamination) in the sample.</p>
-                <p>The difference between the "Mapping Rate" column and the "Mapping Rate (Chrom)" column indicates the proportion of reads in the sample that are off-target <em>with respect to the marker panel</em>: their origin is elsewhere in the genome, and their presence is an artifact of an imperfect enrichment strategy.</p>
-                <p>In the table below, the "Repetitive" column refer to reads that can and do align to a marker reference sequence, but preferentially map elsewhere when aligned to the entire genome. These reads indicate repetitive content in the corresponding marker, which therefore requires extra scrutiny to ensure that reads from alternate loci are not jeopardizing the haplotype calling process. <strong>N/A values in the "Repetitive" column indicate that the marker definition file did not include GRCh38 coordinates for all SNPs, which are required for repetitive analysis.</strong></p>
-            </blockquote>
-            <div class="scrollwrapper">
-                <table id="mapping_rates_table" class="pagination_table">
-                    <thead>
-                        <tr>
-                            <td></td>
-                            {% for sample in typing_rates.keys() %}
-                            <td style="visibility: collapse;">{{sample}}</td>
-                            <td style="font-weight:bold">{{sample}}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <th>Marker</th>
-                            {% for i in range(len(mapping_rates)) %}
-                            <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Reads</th>
-                            <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Repetitive</th>
-                            {% endfor %}
-                            <td></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for markername in markernames %}
-                        <tr>
-                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
-                            {% for sample_data in mapping_rates.values()%}
-                            <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
-                            {% if isna(sample_data.loc[markername, 'RepetitiveReads']) %}
-                            <td class="alnrt" data-sortvalue="0">N/A</td>
-                            {% else %}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'RepetitiveReads']}}">{{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
-                            {% endif %}
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <br />
-
-            <p>The following histograms show the interlocus balance for each sample.</p>
-            {% for plot in plots["locbalance"] %}
-            <img src="{{plot}}" />
-            {% endfor %}
-
-            <a name="typing"></a>
-            <h2>Haplotype Calling</h2>
-            <p>Haplotypes are called empirically on a per-read basis using <code>mhpl8r type</code>. Reads that span all SNPs of interest in the corresponding marker are examined; all other reads are discarded. The haplotype tallies represent a <em>typing result</em> for each sample.</p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Mapped Reads</th>
-                    <th class="alnrt">Typed Reads</th>
-                    <th class="alnrt">Typing Success Rate</th>
-                </tr>
-                {% for i, row in summary.iterrows() %}
-                <tr>
-                    <td>{{row.Sample}}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.Typed) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.TypingRate * 100) }}%</td>
-                </tr>
-                {% endfor %}
-            </table>
-            <br />
-            <p>The table above shows the aggregate typing rate across all markers. The table below shows the typing rate per marker.</p>
-            <div class="scrollwrapper">
-                <table id="typing_rates_table" class="pagination_table">
-                    <thead>
-                        <tr>
-                            <th>Marker</th>
-                            {% for sample in typing_rates.keys() %}
-                            <th class=alnrt style="font-weight:bold">{{sample}}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for markername in markernames %}
-                        <tr>
-                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
-                            {% for sample_data in typing_rates.values()%}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'TypingRate']}}">{{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <a name="filters"></a>
-            <h2>Genotype Calling</h2>
-            <p>
-                Two types of thresholds are applied to each typing result using <code>mhpl8r filter</code> to discriminate between true MH alleles (haplotypes) and false alleles resulting from sequencing error or other artifacts.
-                A static detection threshold, based on a fixed number of reads, is used to filter out low-level noise.
-                A dynamic analytical threshold, based on a percentage of the total reads at the locus (after removing alleles that fail the detection threshold), accounts for fluctuations in the depth of coverage between loci, samples, and runs, and can filter out higher-level noise in most cases.
-                The haplotype tallies, after all filters have been applied, represents the <em>genotype call</em> for that sample.
-            </p>
-            <p>
-                Thresholds were were applied to each marker as shown in the table below.
-                Click on marker names in the table below to see plots of haplotype talles and thresholds in the marker detail report.
-            </p>
-            <table class="half pagination_table">
+        <p> The following bar graph shows the proportions of on target, repetitive, off target, and cotaminant reads. On
+            target reads are those reads that align preferentially to the marker locus when aligned to the full human
+            reference genome. Repetitive reads align to a marker sequence but preferentially align to a different locus
+            when aligned to the full reference. Off target reads do not align to any marker sequences but do align
+            elsewhere in the human genome. Lastly, contaminant reads do not align anywhere in the human genome.</p>
+        <img class="fullwidth" src="analysis/read-mapping-qc.png" />
+        <br />
+        <br />
+        <p>The following table shows the number of total reads mapped to each marker for each sample. Also shown is the
+            number of repetitive reads, determined by selecting the reads aligned to the marker, mapping them to the
+            entire GRCh38 human reference sequence, and counting the reads that map preferentially to a locus outside
+            the target marker locus.</p>
+        <blockquote>
+            <h3>Interpretation Hints</h3>
+            <p>The "Mapping Rate (Chrom)" column in the table above indicates the proportion of the reads in the sample
+                that map <em>anywhere</em> to the human genome. The percentage <em>not</em> mapped represents non-human
+                material (typically contamination) in the sample.</p>
+            <p>The difference between the "Mapping Rate" column and the "Mapping Rate (Chrom)" column indicates the
+                proportion of reads in the sample that are off-target <em>with respect to the marker panel</em>: their
+                origin is elsewhere in the genome, and their presence is an artifact of an imperfect enrichment
+                strategy.</p>
+            <p>In the table below, the "Repetitive" column refer to reads that can and do align to a marker reference
+                sequence, but preferentially map elsewhere when aligned to the entire genome. These reads indicate
+                repetitive content in the corresponding marker, which therefore requires extra scrutiny to ensure that
+                reads from alternate loci are not jeopardizing the haplotype calling process. <strong>N/A values in the
+                    "Repetitive" column indicate that the marker definition file did not include GRCh38 coordinates for
+                    all SNPs, which are required for repetitive analysis.</strong></p>
+        </blockquote>
+        <div class="scrollwrapper">
+            <table id="mapping_rates_table" class="pagination_table">
                 <thead>
                     <tr>
+                        <td></td>
+                        {% for sample in typing_rates.keys() %}
+                        <td style="visibility: collapse;">{{sample}}</td>
+                        <td style="font-weight:bold">{{sample}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
                         <th>Marker</th>
-                        <th class="alnrt">Detection</th>
-                        <th class="alnrt">Analytical</th>
+                        {% for i in range(len(mapping_rates)) %}
+                        <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Reads</th>
+                        <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Repetitive</th>
+                        {% endfor %}
+                        <td></td>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for marker, row in thresholds.iterrows() %}
+                    {% for markername in markernames %}
                     <tr>
-                        <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
-                        <td class="alnrt" data-sortvalue="{{row.Static}}">{{row.Static}}</td>
-                        <td class="alnrt" data-sortvalue="{{row.Dynamic}}">{{"{:.1f}".format(row.Dynamic * 100)}}%</td>
+                        <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a>
+                        </td>
+                        {% for sample_data in mapping_rates.values()%}
+                        <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount' ]}}>
+                            {{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
+                        {% if isna(sample_data.loc[markername, 'RepetitiveReads']) %}
+                        <td class="alnrt" data-sortvalue="0">N/A</td>
+                        {% else %}
+                        <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'RepetitiveReads']}}">
+                            {{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
+                        {% endif %}
+                        {% endfor %}
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
-            <hr />
-
-            <p>
-                For single-source samples, we expect the two alleles at heterozygous loci to have roughly even abundance.
-                The following plots show the <em>relative</em> abundance of the major and minor allele for each marker with a heterozygous genotype (markers are sorted by absolute combined abundance, which is printed above each pair of allele counts).
-                For known DNA mixtures, these plots can be safely ignored.
-                But for suspected single-source samples, if there is substantial imbalance between major and minor allele counts at numerous loci, the sample should be examined more closely for the presence of a minor DNA contributor.
-            </p>
-            {% for plot in plots["hetbalance"] %}
-            <img src="{{plot}}" class="fullwidth" />
-            {% endfor %}
         </div>
-    </body>
+        <br />
+
+        <p>The following histograms show the interlocus balance for each sample.</p>
+        {% for plot in plots["locbalance"] %}
+        <img src="{{plot}}" />
+        {% endfor %}
+
+        <a name="typing"></a>
+        <h2>Haplotype Calling</h2>
+        <p>Haplotypes are called empirically on a per-read basis using <code>mhpl8r type</code>. Reads that span all
+            SNPs of interest in the corresponding marker are examined; all other reads are discarded. The haplotype
+            tallies represent a <em>typing result</em> for each sample.</p>
+        <table>
+            <tr>
+                <th>Sample</th>
+                <th class="alnrt">Mapped Reads</th>
+                <th class="alnrt">Typed Reads</th>
+                <th class="alnrt">Typing Success Rate</th>
+            </tr>
+            {% for i, row in summary.iterrows() %}
+            <tr>
+                <td>{{row.Sample}}</td>
+                <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
+                <td class="alnrt">{{ "{:,}".format(row.Typed) }}</td>
+                <td class="alnrt">{{ "{:.2f}".format(row.TypingRate * 100) }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br />
+        <p>The table above shows the aggregate typing rate across all markers. The table below shows the typing rate per
+            marker.</p>
+        <div class="scrollwrapper">
+            <table id="typing_rates_table" class="pagination_table">
+                <thead>
+                    <tr>
+                        <th>Marker</th>
+                        {% for sample in typing_rates.keys() %}
+                        <th class=alnrt style="font-weight:bold">{{sample}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for markername in markernames %}
+                    <tr>
+                        <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a>
+                        </td>
+                        {% for sample_data in typing_rates.values()%}
+                        <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'TypingRate']}}">
+                            {{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a name="filters"></a>
+        <h2>Genotype Calling</h2>
+        <p>
+            Two types of thresholds are applied to each typing result using <code>mhpl8r filter</code> to discriminate
+            between true MH alleles (haplotypes) and false alleles resulting from sequencing error or other artifacts.
+            A static detection threshold, based on a fixed number of reads, is used to filter out low-level noise.
+            A dynamic analytical threshold, based on a percentage of the total reads at the locus (after removing
+            alleles that fail the detection threshold), accounts for fluctuations in the depth of coverage between loci,
+            samples, and runs, and can filter out higher-level noise in most cases.
+            The haplotype tallies, after all filters have been applied, represents the <em>genotype call</em> for that
+            sample.
+        </p>
+        <p>
+            Thresholds were were applied to each marker as shown in the table below.
+            Click on marker names in the table below to see plots of haplotype talles and thresholds in the marker
+            detail report.
+        </p>
+        <table class="half pagination_table">
+            <thead>
+                <tr>
+                    <th>Marker</th>
+                    <th class="alnrt">Detection</th>
+                    <th class="alnrt">Analytical</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for marker, row in thresholds.iterrows() %}
+                <tr>
+                    <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
+                    <td class="alnrt" data-sortvalue="{{row.Static}}">{{row.Static}}</td>
+                    <td class="alnrt" data-sortvalue="{{row.Dynamic}}">{{"{:.1f}".format(row.Dynamic * 100)}}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr />
+
+        <p>
+            For single-source samples, we expect the two alleles at heterozygous loci to have roughly even abundance.
+            The following plots show the <em>relative</em> abundance of the major and minor allele for each marker with
+            a heterozygous genotype (markers are sorted by absolute combined abundance, which is printed above each pair
+            of allele counts).
+            For known DNA mixtures, these plots can be safely ignored.
+            But for suspected single-source samples, if there is substantial imbalance between major and minor allele
+            counts at numerous loci, the sample should be examined more closely for the presence of a minor DNA
+            contributor.
+        </p>
+        {% for plot in plots["hetbalance"] %}
+        <img src="{{plot}}" class="fullwidth" />
+        {% endfor %}
+    </div>
+</body>
 <script type="text/javascript">
     $(".pagination_table").fancyTable({
         sortColumn: 0,

@@ -1,5 +1,9 @@
 from Bio import SeqIO
-from microhapulator.filter import AmbigPairedReadFilter, AmbigSingleReadFilter
+from microhapulator.filter import (
+    AmbigPairedReadFilter,
+    AmbigSingleReadFilter,
+    LengthSingleReadFilter,
+)
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
@@ -25,6 +29,17 @@ def ambig_seqs_dir_paired(tmp_path_factory):
     ambig_filter.filter()
     with open(tmpdir / "test-ambig-read-counts.txt", "w") as fh:
         print(ambig_filter.summary, file=fh)
+    return tmpdir
+
+
+@pytest.fixture(scope="session")
+def length_filter_dir(tmp_path_factory):
+    tmpdir = tmp_path_factory.mktemp("WD")
+    reads = data_file("too-short.fastq")
+    length_filter = LengthSingleReadFilter(reads, tmpdir / "test-length-filtered.fastq")
+    length_filter.filter()
+    with open(tmpdir / "test-length-filtered-read-counts.txt", "w") as fh:
+        print(length_filter.summary, file=fh)
     return tmpdir
 
 
@@ -68,3 +83,19 @@ def test_filter_ambiguous_paired_counts(ambig_seqs_dir_paired):
     counts_df = pd.read_csv(counts_file, sep="\t")
     expected_counts_df = pd.read_csv(data_file("ambiguous-read-counts-paired.txt"), sep="\t")
     assert counts_df.equals(expected_counts_df)
+
+
+def test_length_filter_fastq(length_filter_dir):
+    filtered_reads_file = length_filter_dir / "test-length-filtered.fastq"
+    assert filtered_reads_file.is_file()
+    assert len(list(SeqIO.parse(filtered_reads_file, "fastq"))) == 8
+
+
+def test_length_filter_counts(length_filter_dir):
+    counts_file = length_filter_dir / "test-length-filtered-read-counts.txt"
+    assert counts_file.is_file()
+    counts_df = pd.read_csv(counts_file, sep="\t")
+    expected_reads_removed = 2
+    expected_reads_kept = 8
+    assert counts_df["ReadsRemoved"][0] == expected_reads_removed
+    assert counts_df["ReadsKept"][0] == expected_reads_kept
