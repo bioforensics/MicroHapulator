@@ -179,49 +179,50 @@
             <table>
                 <tr>
                     <th>Sample</th>
+                    <th class="alnrt">Total Pairs</th>
                     <th class="alnrt">R1 Only Failed</th>
                     <th class="alnrt">R2 Only Failed</th>
                     <th class="alnrt">Pair Failed</th>
                     <th class="alnrt">Pairs Removed</th>
                     <th class="alnrt">Pairs Kept</th>
-                    <th class="alnrt">Total Pairs</th>
                     <th class="alnrt">Retention</th>
                 </tr>
                 {% for sample, ambig_reads_df in ambiguous_reads.items() %}
                 <tr>
                     <td>{{sample}}</td>
+                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["TotalPairs"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1OnlyFailed"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2OnlyFailed"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsFailed"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsRemoved"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsKept"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["TotalPairs"])}}</td>
                     <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["PairsKept"] / ambig_reads_df.iloc[0]["TotalPairs"] * 100)}}%</td>
                 </tr>
                 {% endfor %}
             </table>
             {% else %}
             <p>
-                Prior to subsequent analysis, reads are filtered for ambiguous sequence content.
+                Prior to subsequent analysis, reads are filtered for length and ambiguous sequence content.
                 Any read comprised of more than {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% ambiguous bases (<code>N</code>) is discarded.
-                (This threshold can be configured with the <code>--ambiguous-thresh</code> argument.)
-                The table below shows the number of reads removed from each sample.
+                Reads less than {{"{:,}".format(read_length_threshold)}} bp in length are also excluded from all subsequent analysis.
+                (These thresholds can be configured with the <code>--ambiguous-thresh</code> and <code>--length-thresh</code> arguments.)
             </p>
+            <p class="title"><strong>Table 1.2</strong>: Read filtering metrics.</p>
             <table>
                 <tr>
                     <th>Sample</th>
-                    <th class="alnrt">Reads Removed</th>
-                    <th class="alnrt">Reads Kept</th>
                     <th class="alnrt">Total Reads</th>
-                    <th class="alnrt">Retention</th>
+                    <th class="alnrt">Filtered (Ambiguous)</th>
+                    <th class="alnrt">Filtered (Length)</th>
+                    <th class="alnrt">Reads Kept</th>
                 </tr>
                 {% for sample, ambig_reads_df in ambiguous_reads.items() %}
                 <tr>
                     <td>{{sample}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
                     <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
-                    <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["ReadsKept"] / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}%</td>
+                    <td class="alnrt">{{"{:,} ({:.1f}%)".format(ambig_reads_df.iloc[0]["ReadsRemoved"], ambig_reads_df.iloc[0]["ReadsRemoved"] / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}</td>
+                    <td class="alnrt">{{"{:,} ({:.1f}%)".format(summary[summary.Sample == sample].iloc[0].LengthFailed, summary[summary.Sample == sample].iloc[0].LengthFailed / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}</td>
+                    <td class="alnrt">{{"{:,} ({:.1f}%)".format(summary[summary.Sample == sample].iloc[0].LengthPassed, summary[summary.Sample == sample].iloc[0].LengthPassed / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}</td>
                 </tr>
                 {% endfor%}
             </table>
@@ -230,7 +231,11 @@
             {% if "r1readlen" in plots %}
             <a name="readmerging"></a>
             <h2>Read Merging</h2>
-            <p>Paired end reads are merged using <a href="https://ccb.jhu.edu/software/FLASH/" target="_blank">FLASh</a>.</p>
+            <p>
+                Paired end reads are merged using <a href="https://ccb.jhu.edu/software/FLASH/" target="_blank">FLASh</a>.
+                Merged reads less than {{"{:,}".format(read_length_threshold)}} bp in length are filtered out prior to read mapping and excluded from all subsequent analysis.
+                (This threshold can be configured with the <code>--length-thresh</code> argument.)
+            </p>
             <p class="title"><strong>Table 2.1</strong>: Read merging metrics.</p>
             <table class="half">
                 <tr>
@@ -250,6 +255,27 @@
             </table>
             <img class="center" src="analysis/merged-read-lengths.png" />
             <p class="caption"><strong>Figure 2.2</strong>: Ridge plot showing the length distribution of merged reads.</p>
+
+            <p class="title"><strong>Table 2.3</strong>: Metrics for read length filtering.</p>
+            <table>
+                <tr>
+                    <th>Sample</th>
+                    <th class="alnrt">Total Merged Reads</th>
+                    <th class="alnrt">Reads Removed</th>
+                    <th class="alnrt">Reads Kept</th>
+                    <th class="alnrt">Retention</th>
+                </tr>
+                {% for i, row in summary.iterrows() %}
+                <tr>
+                    <td>{{row.Sample}}</td>
+                    <td class="alnrt">{{"{:,}".format(row.LengthFailed + row.LengthPassed)}}</td>
+                    <td class="alnrt">{{"{:,}".format(row.LengthFailed)}}</td>
+                    <td class="alnrt">{{"{:,}".format(row.LengthPassed)}}</td>
+                    <td class="alnrt">{{"{:.2f}".format(row.LengthPassed / (row.LengthFailed + row.LengthPassed) * 100)}}%
+                    </td>
+                </tr>
+            {% endfor%}
+            </table>
             {% endif %}
 
             <a name="readmapping"></a>
@@ -297,7 +323,6 @@
             </ul>
             <img class="fullwidth" src="analysis/read-mapping-qc.png" />
             <p class="caption"><strong>Figure 3.2</strong>: Bar graph showing the number of reads for each sample, broken down into four categories: on-target, off-target, contaminant, and repetitive.</p>
-            <br />
             <p class="title">
                 <strong>Table 3.3</strong>: The total number of reads mapped to each marker, and the subset of those reads marked as repetitive, broken down by sample.
                 Table columns are sortable, and marker names link to a marker detail page.

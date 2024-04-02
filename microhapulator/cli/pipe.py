@@ -172,6 +172,14 @@ def subparser(subparsers):
         help="filter out reads with more than AT percent of ambiguous characters ('N'); AT=0.2 by default",
     )
     cli.add_argument(
+        "-l",
+        "--length-thresh",
+        metavar="LT",
+        type=float,
+        default=50,
+        help="filter out reads that are less than LT bp long; LT=50 by default",
+    )
+    cli.add_argument(
         "-c",
         "--config",
         metavar="CSV",
@@ -237,6 +245,7 @@ def main(args):
         thresh_file=args.config,
         paired=args.reads_are_paired,
         ambiguous_thresh=args.ambiguous_thresh,
+        length_thresh=args.length_thresh,
         hspace=args.hspace,
     )
     snakefile = resource_filename("microhapulator", "workflows/analysis.smk")

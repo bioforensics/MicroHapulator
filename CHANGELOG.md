@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Filtering of reads with too many ambiguous bases (#165).
+- Filtering of reads below a minumum length (#173).
 
 ### Changed
 - Smart handling of multiple markers at a single locus implemented for `type` and `pipe` (#158).
