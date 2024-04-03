@@ -74,7 +74,7 @@ def test_pipe_gbr_usc10(tmp_path):
     report = tmp_path / "report.html"
     assert report.is_file()
     with open(report, "r") as fh:
-        assert "Read lengths, uniform for all samples, are shown below" in fh.read()
+        assert "Uniform read lengths for each sample" in fh.read()
     expected = pd.read_csv(data_file("gbr-usc-summary.tsv"), sep="\t")
     observed = pd.read_csv(tmp_path / "analysis" / "summary.tsv", sep="\t")
     assert observed.equals(expected)
