@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Bug with inconsistent sorting of read counts for interlocus balance (#159).
 - Bug with counting repetitive reads (#163).
+- Typing rate display in report (#174).
 
 
 ## [0.7.2] 2022-10-12

@@ -264,13 +264,13 @@ def aggregate_summary(samples, reads_are_paired=True):
             frmaptotal == maptotal
         ), f"Sample={sample} fullrefr map total={frmaptotal} map total={maptotal}"
         typing = pd.read_csv(f"analysis/{sample}/{sample}-typing-rate.tsv", sep="\t")
-        num_typed_reads = typing.TypedReads.sum()
-        typing_total_reads = typing.TotalReads.sum()
+        num_typing_success = typing.TypedReads.sum()
+        num_typing_attempted = typing.TotalReads.sum()
         # At some point the following command was causing a failure. I've disabled the check for
         # now, but it's worth following up on to see what might cause this discrepancy.
         # -- Daniel Standage 2022-04-22
         # assert typing_total_reads == mapped, f"Sample={sample} type total={typing_total_reads} mapped={mapped}"
-        typing_rate = num_typed_reads / typing_total_reads
+        typing_rate = num_typing_success / num_typing_attempted
         chisq = parse_balance_stat(f"analysis/{sample}/{sample}-interlocus-balance-chisq.txt")
         tstat = parse_balance_stat(f"analysis/{sample}/{sample}-heterozygote-balance-pttest.txt")
         entry = [
@@ -284,7 +284,8 @@ def aggregate_summary(samples, reads_are_paired=True):
             mapped / maptotal,
             frmapped,
             frmapped / frmaptotal,
-            num_typed_reads,
+            num_typing_success,
+            num_typing_attempted,
             typing_rate,
             chisq,
             tstat,
@@ -301,7 +302,8 @@ def aggregate_summary(samples, reads_are_paired=True):
         "MappingRate",
         "MappedFullRefr",
         "MappingRateFullRefr",
-        "Typed",
+        "TypedSuccess",
+        "TypedAttempted",
         "TypingRate",
         "InterlocChiSq",
         "HetTstat",
