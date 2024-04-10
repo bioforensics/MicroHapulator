@@ -371,7 +371,14 @@
 
             <a name="typing"></a>
             <h2>Haplotype Calling</h2>
-            <p>Haplotypes are called empirically on a per-read basis using <code>mhpl8r type</code>. Reads that span all SNPs of interest in the corresponding marker are examined; all other reads are discarded. If a read maps to multiple markers at the same locus, haplotypes are called for each marker at the locus; therefore, the number of typing events can exceed the number of mapped reads. The haplotype tallies represent a <em>typing result</em> for each sample.</p>
+            <p>Haplotypes are called empirically using <code>mhpl8r type</code>mhpl8r type as follows. MicroHapulator examines each
+                aligned read to determine its suitability for haplotype calling: this is a <em>typing event</em>. If the read
+                alignment spans all SNPs of interest, the typing event is successful and a haplotype call is made. If not, the
+                typing event is failed and no haplotype call is made. (<em>Note that if more than one marker is defined at a given
+                locus, MicroHapulator can attempt multiple typing events per read. In this case the number of <strong>Attempted Typing
+                Events </strong> will exceed the number of <strong>Mapped Reads.</strong></em>) Collectively, the tallies of each observed haplotype represent a
+                typing result for each sample. The typing rate is calculated as the number of successful typing events divided by
+                the total number of attempted typing events.</p>
             <p class="title"><strong>Table 4.1</strong>: Read typing metrics.</p>
             <table>
                 <tr>
