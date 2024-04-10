@@ -371,20 +371,22 @@
 
             <a name="typing"></a>
             <h2>Haplotype Calling</h2>
-            <p>Haplotypes are called empirically on a per-read basis using <code>mhpl8r type</code>. Reads that span all SNPs of interest in the corresponding marker are examined; all other reads are discarded. The haplotype tallies represent a <em>typing result</em> for each sample.</p>
+            <p>Haplotypes are called empirically on a per-read basis using <code>mhpl8r type</code>. Reads that span all SNPs of interest in the corresponding marker are examined; all other reads are discarded. If a read maps to multiple markers at the same locus, haplotypes are called for each marker at the locus; therefore, the number of typing events can exceed the number of mapped reads. The haplotype tallies represent a <em>typing result</em> for each sample.</p>
             <p class="title"><strong>Table 4.1</strong>: Read typing metrics.</p>
             <table>
                 <tr>
                     <th>Sample</th>
                     <th class="alnrt">Mapped Reads</th>
-                    <th class="alnrt">Typed Reads</th>
+                    <th class="alnrt">Attempted Typing Events</th>
+                    <th class="alnrt">Successful Typing Events</th>
                     <th class="alnrt">Typing Success Rate</th>
                 </tr>
                 {% for i, row in summary.iterrows() %}
                 <tr>
                     <td>{{row.Sample}}</td>
                     <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.Typed) }}</td>
+                    <td class="alnrt">{{ "{:,}".format(row.TypedAttempted) }}</td>
+                    <td class="alnrt">{{ "{:,}".format(row.TypedSuccess) }}</td>
                     <td class="alnrt">{{ "{:.2f}".format(row.TypingRate * 100) }}%</td>
                 </tr>
                 {% endfor %}
