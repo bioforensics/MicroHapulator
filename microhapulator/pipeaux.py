@@ -10,6 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from datetime import datetime
 from jinja2 import Template
 import json
@@ -135,14 +136,13 @@ def final_html_report(
     length_threshold=50,
 ):
     if reads_are_paired:
-        table_func = read_length_table_paired_end
-        plot_func = aggregate_plots_paired_end
+        read_length_table = read_length_table_paired_end(samples)
+        plots = aggregate_plots_paired_end(samples)
+        qc = PairedReadQCSummary.collect(samples)
     else:
-        table_func = read_length_table_single_end
-        plot_func = aggregate_plots_single_end
-    read_length_table = table_func(samples)
-    ambiguous_reads = parse_ambig_reads(samples)
-    plots = plot_func(samples)
+        read_length_table = read_length_table_single_end(samples)
+        plots = aggregate_plots_single_end(samples)
+        qc = SingleEndReadQCSummary.collect(samples)
     typing_rates = per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
     thresholds = load_marker_thresholds(marker_names, thresh_file, thresh_static, thresh_dynamic)
@@ -162,7 +162,7 @@ def final_html_report(
             typing_rates=typing_rates,
             mapping_rates=mapping_rates,
             markernames=marker_names,
-            ambiguous_reads=ambiguous_reads,
+            qc=qc,
             len=len,
             isna=pd.isna,
             reads_are_paired=reads_are_paired,
