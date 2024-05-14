@@ -10,6 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from .mapstats import MappingSummary, MappingStats
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from datetime import datetime
 from jinja2 import Template
@@ -143,6 +144,7 @@ def final_html_report(
         read_length_table = read_length_table_single_end(samples)
         plots = aggregate_plots_single_end(samples)
         qc = SingleEndReadQCSummary.collect(samples)
+    mapping_summary = MappingSummary.from_workdir(samples)
     typing_rates = per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
     thresholds = load_marker_thresholds(marker_names, thresh_file, thresh_static, thresh_dynamic)
@@ -163,6 +165,8 @@ def final_html_report(
             mapping_rates=mapping_rates,
             markernames=marker_names,
             qc=qc,
+            mapping_summary=mapping_summary,
+            repetitive_reads_by_marker=mapping_summary.repetitive_reads_by_marker(),
             len=len,
             isna=pd.isna,
             reads_are_paired=reads_are_paired,
@@ -242,7 +246,7 @@ def aggregate_summary(samples, reads_are_paired=True):
         else:
             totalreads = None
             mergedreads, mergedrate = None, None
-        maptotal, mapped = parse_read_counts(f"analysis/{sample}/{sample}-mapped-reads.txt")
+        maptotal, mapped = MappingStats.parse_read_stats(f"analysis/{sample}/{sample}.bam.stats")
         if reads_are_paired:
             assert maptotal == (mergedreads - length_failed), (sample, maptotal, mergedreads)
         else:

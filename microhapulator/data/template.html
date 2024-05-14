@@ -284,26 +284,18 @@
             <table>
                 <tr>
                     <th>Sample</th>
-                    {% if "r1readlen" in plots %}
-                    <th class="alnrt">Merged Reads</th>
-                    {% else %}
                     <th class="alnrt">Filtered Reads</th>
-                    {% endif %}
                     <th class="alnrt">Mapped Reads</th>
                     <th class="alnrt">Mapping Rate</th>
                     <th class="alnrt">Chi-square</th>
                 </tr>
-                {% for i, row in summary.iterrows() %}
+                {% for sample, stats in mapping_summary.items() %}
                 <tr>
-                    <td>{{row.Sample}}</td>
-                    {% if "r1readlen" in plots %}
-                    <td class="alnrt">{{ "{:,}".format(row.Merged) }}</td>
-                    {% else %}
-                    <td class="alnrt">{{ "{:,}".format(row.TotalReads) }}</td>
-                    {% endif %}
-                    <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.MappingRate * 100) }}%</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.InterlocChiSq)}}</td>
+                    <td>{{ sample }}</td>
+                    <td class="alnrt">{{ stats.total_reads }}</td>
+                    <td class="alnrt">{{ stats.mapped_reads }}</td>
+                    <td class="alnrt">{{ stats.mapping_rate }}</td>
+                    <td class="alnrt">{{ stats.chi_square }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -346,15 +338,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for markername in markernames %}
+                        {% for marker, marker_data in repetitive_reads_by_marker.items() %}
                         <tr>
-                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
-                            {% for sample_data in mapping_rates.values()%}
-                            <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
-                            {% if isna(sample_data.loc[markername, 'RepetitiveReads']) %}
+                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
+                            {% for sample in mapping_summary.keys() %}
+                            <td class="alnrt" data-sortvalue="{{ marker_data[sample].mapped }}">{{ "{:,d}".format(marker_data[sample].mapped) }}</td>
+                            {% if isna(marker_data[sample].repetitive) %}
                             <td class="alnrt" data-sortvalue="0">N/A</td>
                             {% else %}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'RepetitiveReads']}}">{{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
+                            <td class="alnrt" data-sortvalue="{{ marker_data[sample].repetitive }}">{{ "{:,d}".format(marker_data[sample].repetitive) }}</td>
                             {% endif %}
                             {% endfor %}
                         </tr>

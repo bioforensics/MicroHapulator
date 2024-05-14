@@ -19,6 +19,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import MicrohapIndex
 from microhapulator import open as mhopen
+from microhapulator.mapstats import MappingStats
 from microhapulator.profile import SimulatedProfile, TypingResult
 import math
 import numpy as np
@@ -825,9 +826,7 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
 
 def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):
     counts = list()
-    with mhopen(marker_mapped, "r") as fh1:
-        total_reads = int(next(fh1).strip().split(": ")[1])
-        marker_mapped_count = int(next(fh1).strip().split(": ")[1])
+    total_reads, marker_mapped_count = MappingStats.parse_read_stats(marker_mapped)
     with mhopen(refr_mapped, "r") as fh2:
         next(fh2)
         refr_mapped_count = int(next(fh2).strip().split(": ")[1])
