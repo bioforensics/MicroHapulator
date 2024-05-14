@@ -47,26 +47,40 @@ class MicrohapIndex:
     @staticmethod
     def parse_definitions_from_csv(path):
         table = pd.read_csv(path, sep=None, engine="python")
-        missing = set(["Marker", "Offset"]) - set(table.columns)
+        MicrohapIndex.check_definition_columns(table)
+        loci = defaultdict(Locus)
+        for markerid, rowgroup in table.groupby("Marker"):
+            offsets = rowgroup.Offset
+            chrom = MicrohapIndex.marker_chromosome(rowgroup)
+            chrom_offsets = MicrohapIndex.chromosome_offsets(rowgroup)
+            marker = MarkerDefinition(markerid, offsets, chrom_offsets, chrom)
+            loci[marker.locus].add(marker)
+        return loci.values()
+
+    @staticmethod
+    def check_definition_columns(table):
+        missing = set(["Marker", "Offset", "Chrom", "OffsetHg38"]) - set(table.columns)
         if len(missing) > 0:
             missing = ", ".join(sorted(missing))
             message = f"column(s) missing from marker definition file: {missing}"
             raise ValueError(message)
-        loci = defaultdict(Locus)
-        for markerid, rowgroup in table.groupby("Marker"):
-            chrom = None
-            offchr = None
-            if "OffsetHg38" in rowgroup and not rowgroup.OffsetHg38.isnull().all():
-                offchr = sorted(rowgroup.OffsetHg38)
-            if "Chrom" in rowgroup:
-                if len(rowgroup.Chrom.unique()) > 1:
-                    chroms = ", ".join(sorted(rowgroup.Chrom.unique()))
-                    message = f"ambiguous chromosome definition for {markerid}: {chroms}"
-                    raise ValueError(message)
-                chrom = rowgroup.Chrom.iloc[0]
-            marker = MarkerDefinition(markerid, rowgroup.Offset, offsets_chrom=offchr, chrom=chrom)
-            loci[marker.locus].add(marker)
-        return loci.values()
+
+    @staticmethod
+    def marker_chromosome(rowgroup):
+        if len(rowgroup.Chrom.unique()) > 1:
+            chroms = ", ".join(sorted(rowgroup.Chrom.unique()))
+            markerid = rowgroup.Marker.iloc[0]
+            message = f"ambiguous chromosome definition for {markerid}: {chroms}"
+            raise ValueError(message)
+        return rowgroup.Chrom.iloc[0]
+
+    @staticmethod
+    def chromosome_offsets(rowgroup):
+        if rowgroup.OffsetHg38.isnull.any():
+            markerid = rowgroup.Marker.iloc[0]
+            message = f"incomplete marker definition for {markerid}, includes null values"
+            raise ValueError(message)
+        return rowgroup.OffsetHg38
 
     @staticmethod
     def parse_sequences_from_fasta(path):
@@ -114,24 +128,6 @@ class MicrohapIndex:
                 extra = ", ".join(sorted(extra))
                 message = f"reference sequences with no marker definition: {extra}"
                 raise ValueError(message)
-
-    @property
-    def has_chrom_offsets(self):
-        positives, negatives = 0, 0
-        for locus, marker in self:
-            if marker.offsets_chrom is not None:
-                for offset in marker.offsets_chrom:
-                    if pd.isna(offset):
-                        negatives += 1
-                        break
-                else:
-                    positives += 1
-            else:
-                negatives += 1
-        if positives > 0 and negatives > 0:
-            message = "index includes marker definitions both with and without complete chromosome offset lists"
-            warn(message)
-        return negatives == 0
 
 
 class Locus:
@@ -194,12 +190,10 @@ class Locus:
 
 
 class MarkerDefinition:
-    def __init__(self, ident, offsets_locus, offsets_chrom=None, chrom=None):
+    def __init__(self, ident, offsets_locus, offsets_chrom, chrom):
         self.identifier = Identifier(ident)
         self.offsets_locus = sorted(map(int, offsets_locus))
-        self.offsets_chrom = None
-        if offsets_chrom is not None:
-            self.offsets_chrom = sorted(map(int, offsets_chrom))
+        self.offsets_chrom = sorted(map(int, offsets_chrom))
         self._chrom = chrom
 
     @property
@@ -225,8 +219,6 @@ class MarkerDefinition:
 
     def span(self, chrom=False):
         if chrom:
-            if self.offsets_chrom is None:
-                raise ValueError(f"cannot retrieve marker span on chromosome without offsets")
             return min(self.offsets_chrom), max(self.offsets_chrom) + 1
         else:
             return min(self.offsets_locus), max(self.offsets_locus) + 1
