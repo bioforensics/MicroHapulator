@@ -53,11 +53,8 @@ def test_load_marker_definitions_missing_column():
 
 def test_load_marker_definitions_minimal():
     defn_file = data_file("def/default-panel-offsets-minimal.tsv")
-    microhaps = MicrohapIndex.from_files(defn_file)
-    markers = [marker for locus, marker in microhaps]
-    assert len(markers) == 22
-    assert markers[0].offsets_chrom is None
-    assert microhaps.has_chrom_offsets is False
+    with pytest.raises(ValueError, match="missing from marker definition file: Chrom, OffsetHg3"):
+        MicrohapIndex.from_files(defn_file)
 
 
 @pytest.mark.parametrize(

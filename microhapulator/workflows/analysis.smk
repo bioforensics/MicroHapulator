@@ -270,12 +270,10 @@ rule repetitive_mapping:
         marker_def="marker-definitions.tsv",
     output:
         counts="analysis/{sample}/{sample}-repetitive-reads.csv",
-    run:
-        microhaps = MicrohapIndex.from_files(input.marker_def)
-        if microhaps.has_chrom_offsets:
-            shell("mhpl8r repetitive {input} --out {output}")
-        else:
-            shell("touch {output}")
+    shell:
+        """
+        mhpl8r repetitive {input} --out {output}
+        """
 
 
 rule read_mapping_qc:

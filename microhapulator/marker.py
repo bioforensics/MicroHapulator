@@ -76,7 +76,7 @@ class MicrohapIndex:
 
     @staticmethod
     def chromosome_offsets(rowgroup):
-        if rowgroup.OffsetHg38.isnull.any():
+        if rowgroup.OffsetHg38.isnull().any():
             markerid = rowgroup.Marker.iloc[0]
             message = f"incomplete marker definition for {markerid}, includes null values"
             raise ValueError(message)
