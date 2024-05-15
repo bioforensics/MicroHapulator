@@ -350,12 +350,8 @@
                         <tr>
                             <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                             {% for sample_data in mapping_rates.values()%}
-                            <td class="alnrt" data-sortvalue={{sample_data.loc[markername, 'ReadCount']}}>{{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
-                            {% if isna(sample_data.loc[markername, 'RepetitiveReads']) %}
-                            <td class="alnrt" data-sortvalue="0">N/A</td>
-                            {% else %}
+                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'ReadCount']}}">{{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
                             <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'RepetitiveReads']}}">{{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
-                            {% endif %}
                             {% endfor %}
                         </tr>
                         {% endfor %}
