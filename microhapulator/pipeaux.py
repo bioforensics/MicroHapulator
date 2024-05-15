@@ -10,10 +10,10 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from datetime import datetime
 from jinja2 import Template
 import json
-from matplotlib import pyplot as plt
 import microhapulator
 import pandas as pd
 from pathlib import Path
@@ -34,6 +34,7 @@ def full_reference_index_files(fasta):
 
 
 def parse_flash_summary(logfile):
+    # FIXME delete once this refactor is through
     with open(logfile, "r") as fh:
         data = fh.read()
         tp = re.search(r"Total pairs:\s+(\d+)", data).group(1)
@@ -133,14 +134,13 @@ def final_html_report(
     length_threshold=50,
 ):
     if reads_are_paired:
-        table_func = read_length_table_paired_end
-        plot_func = aggregate_plots_paired_end
+        read_length_table = read_length_table_paired_end(samples)
+        plots = aggregate_plots_paired_end(samples)
+        qc = PairedReadQCSummary.collect(samples)
     else:
-        table_func = read_length_table_single_end
-        plot_func = aggregate_plots_single_end
-    read_length_table = table_func(samples)
-    ambiguous_reads = parse_ambig_reads(samples)
-    plots = plot_func(samples)
+        read_length_table = read_length_table_single_end(samples)
+        plots = aggregate_plots_single_end(samples)
+        qc = SingleEndReadQCSummary.collect(samples)
     typing_rates = per_marker_typing_rate(samples)
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
     thresholds = load_marker_thresholds(marker_names, thresh_file, thresh_static, thresh_dynamic)
@@ -160,7 +160,7 @@ def final_html_report(
             typing_rates=typing_rates,
             mapping_rates=mapping_rates,
             markernames=marker_names,
-            ambiguous_reads=ambiguous_reads,
+            qc=qc,
             len=len,
             isna=pd.isna,
             reads_are_paired=reads_are_paired,
@@ -198,16 +198,6 @@ def read_length_table_single_end(samples):
     return pd.DataFrame(read_length_data, columns=("Sample", "Length"))
 
 
-def parse_ambig_reads(samples):
-    ambig_read_counts_all = dict()
-    for sample in samples:
-        ambig_reads_df = pd.read_csv(
-            f"analysis/{sample}/{sample}-ambig-read-counts.txt", sep="\t", index_col=None
-        )
-        ambig_read_counts_all[sample] = ambig_reads_df
-    return ambig_read_counts_all
-
-
 def aggregate_plots_paired_end(samples):
     plots = {
         "r1readlen": "",
@@ -217,9 +207,9 @@ def aggregate_plots_paired_end(samples):
         "hetbalance": list(),
         "donut": list(),
     }
-    plots["r1readlen"] = f"analysis/r1-read-lengths.png"
-    plots["r2readlen"] = f"analysis/r2-read-lengths.png"
-    plots["mergedreadlen"] = f"analysis/merged-read-lengths.png"
+    plots["r1readlen"] = "analysis/r1-read-lengths.png"
+    plots["r2readlen"] = "analysis/r2-read-lengths.png"
+    plots["mergedreadlen"] = "analysis/merged-read-lengths.png"
     for sample in samples:
         plots["locbalance"].append(f"analysis/{sample}/{sample}-interlocus-balance.png")
         plots["hetbalance"].append(f"analysis/{sample}/{sample}-heterozygote-balance.png")
@@ -229,7 +219,7 @@ def aggregate_plots_paired_end(samples):
 
 def aggregate_plots_single_end(samples):
     plots = {"readlen": "", "locbalance": list(), "hetbalance": list(), "donut": list()}
-    plots["readlen"] = f"analysis/read-lengths.png"
+    plots["readlen"] = "analysis/read-lengths.png"
     for sample in samples:
         plots["locbalance"].append(f"analysis/{sample}/{sample}-interlocus-balance.png")
         plots["hetbalance"].append(f"analysis/{sample}/{sample}-heterozygote-balance.png")

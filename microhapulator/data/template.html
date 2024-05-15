@@ -187,16 +187,16 @@
                     <th class="alnrt">Pairs Kept</th>
                     <th class="alnrt">Retention</th>
                 </tr>
-                {% for sample, ambig_reads_df in ambiguous_reads.items() %}
+                {% for sample, stats in qc.items() %}
                 <tr>
                     <td>{{sample}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["TotalPairs"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R1OnlyFailed"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["R2OnlyFailed"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsFailed"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsRemoved"])}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["PairsKept"])}}</td>
-                    <td class="alnrt">{{"{:.2f}".format(ambig_reads_df.iloc[0]["PairsKept"] / ambig_reads_df.iloc[0]["TotalPairs"] * 100)}}%</td>
+                    <td class="alnrt">{{stats.ambig.total_reads}}</td>
+                    <td class="alnrt">{{stats.ambig.excluded_r1}}</td>
+                    <td class="alnrt">{{stats.ambig.excluded_r2}}</td>
+                    <td class="alnrt">{{stats.ambig.excluded_both}}</td>
+                    <td class="alnrt">{{stats.ambig.excluded}}</td>
+                    <td class="alnrt">{{stats.ambig.retained}}</td>
+                    <td class="alnrt">{{stats.ambig.retention_rate}}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -216,13 +216,13 @@
                     <th class="alnrt">Filtered (Length)</th>
                     <th class="alnrt">Reads Kept</th>
                 </tr>
-                {% for sample, ambig_reads_df in ambiguous_reads.items() %}
+                {% for sample, stats in qc.items() %}
                 <tr>
                     <td>{{sample}}</td>
-                    <td class="alnrt">{{"{:,}".format(ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"])}}</td>
-                    <td class="alnrt">{{"{:,} ({:.1f}%)".format(ambig_reads_df.iloc[0]["ReadsRemoved"], ambig_reads_df.iloc[0]["ReadsRemoved"] / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}</td>
-                    <td class="alnrt">{{"{:,} ({:.1f}%)".format(summary[summary.Sample == sample].iloc[0].LengthFailed, summary[summary.Sample == sample].iloc[0].LengthFailed / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}</td>
-                    <td class="alnrt">{{"{:,} ({:.1f}%)".format(summary[summary.Sample == sample].iloc[0].LengthPassed, summary[summary.Sample == sample].iloc[0].LengthPassed / (ambig_reads_df.iloc[0]["ReadsRemoved"] + ambig_reads_df.iloc[0]["ReadsKept"]) * 100)}}</td>
+                    <td class="alnrt">{{stats.total_reads}}</td>
+                    <td class="alnrt">{{stats.filtered_ambig}}</td>
+                    <td class="alnrt">{{stats.filtered_length}}</td>
+                    <td class="alnrt">{{stats.retention}}</td>
                 </tr>
                 {% endfor%}
             </table>
@@ -244,12 +244,12 @@
                     <th class="alnrt">Merged Reads</th>
                     <th class="alnrt">Merge Rate</th>
                 </tr>
-                {% for i, row in summary.iterrows() %}
+                {% for sample, stats in qc.items() %}
                 <tr>
-                    <td>{{row.Sample}}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.TotalReads) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.Merged) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.MergeRate * 100) }}%</td>
+                    <td>{{sample}}</td>
+                    <td class="alnrt">{{stats.merge.total_reads}}</td>
+                    <td class="alnrt">{{stats.merge.merged_reads}}</td>
+                    <td class="alnrt">{{stats.merge.merge_rate}}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -265,14 +265,13 @@
                     <th class="alnrt">Reads Kept</th>
                     <th class="alnrt">Retention</th>
                 </tr>
-                {% for i, row in summary.iterrows() %}
+                {% for sample, stats in qc.items() %}
                 <tr>
-                    <td>{{row.Sample}}</td>
-                    <td class="alnrt">{{"{:,}".format(row.LengthFailed + row.LengthPassed)}}</td>
-                    <td class="alnrt">{{"{:,}".format(row.LengthFailed)}}</td>
-                    <td class="alnrt">{{"{:,}".format(row.LengthPassed)}}</td>
-                    <td class="alnrt">{{"{:.2f}".format(row.LengthPassed / (row.LengthFailed + row.LengthPassed) * 100)}}%
-                    </td>
+                    <td>{{sample}}</td>
+                    <td class="alnrt">{{stats.length.total_reads}}</td>
+                    <td class="alnrt">{{stats.length.excluded}}</td>
+                    <td class="alnrt">{{stats.length.kept}}</td>
+                    <td class="alnrt">{{stats.length.retention_rate}}</td>
                 </tr>
             {% endfor%}
             </table>
