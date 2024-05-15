@@ -225,9 +225,6 @@ def validate_panel_config(markerseqs, markerdefn):
     print("[MicroHapulator] validating panel configuration", file=sys.stderr)
     index = MicrohapIndex.from_files(markerdefn, markerseqs)
     index.validate()
-    if not index.has_chrom_offsets:
-        msg = "Chrom and/or OffsetHg38 columns missing from the marker definition, repetitive read alignment analysis will not be performed"
-        warn(msg)
 
 
 def main(args):

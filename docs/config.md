@@ -44,9 +44,8 @@ The list of SNP positions for a microhaplotype is its *marker definition*, and t
 The **Marker** column contains the identifier (name, label, or designator) of a microhaplotype in the panel, and the **Offset** column contains the distance of one SNP from the beginning of the reference sequence.
 For example, if a SNP of interest is the very first nucleotide in the reference, it has a distance of 0 from the beginning of the sequence and thus its offset is `0`.
 If a SNP is the 10th nucleotide, its offset is `9`.
-
 The **Chrom** and **OffsetHg38** columns indicate the position of each SNP in the GRCh38 reference human genome assembly.
-**While these two columns are not strictly required, certain quality control checks in the end-to-end MH analysis pipeline will be disabled if this data is absent.**
+**As of version MicroHapulator version 0.8, these two columns are now required.**
 
 The following command shows how to use MicroHapDB (version 0.8 or greater) to prepare a marker definition file.
 Note that it is identical to the previous command, except that the `--format=fasta` setting was changed to `--format=offsets`.

@@ -147,21 +147,22 @@ def test_type_cli_simple(tmp_path):
     }
 
 
-def test_type_filter_threshold():
-    bam = data_file("bam/dyncut-test-reads.bam")
-    tsv = data_file("def/dyncut-panel.tsv")
-    rslt = mhapi.type(bam, tsv)
-    thresholds = load_marker_thresholds(rslt.markers(), global_static=10, global_dynamic=0.005)
-    rslt.filter(thresholds)
-    assert rslt.haplotypes("MHDBL000018") == set(["C,A,C,T,G", "T,G,C,T,G"])
-    assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
-    rslt = mhapi.type(bam, tsv)
-    thresholds = load_marker_thresholds(rslt.markers(), global_static=4, global_dynamic=0.005)
-    rslt.filter(thresholds)
-    assert rslt.haplotypes("MHDBL000018") == set(
-        ["C,A,C,T,G", "T,G,C,T,G", "C,A,C,T,A", "T,G,C,T,A"]
+@pytest.mark.parametrize(
+    "static,dynamic,genotype",
+    [
+        (5, 0.00005, {"C,A,G,A", "C,G,G,A", "C,T,G,A"}),
+        (10, 0.00005, {"C,A,G,A", "C,G,G,A"}),
+        (5, 0.02, {"C,A,G,A", "C,G,G,A"}),
+        (2000, 0.02, {"C,A,G,A"}),
+    ],
+)
+def test_type_filter_threshold(static, dynamic, genotype):
+    result = TypingResult(fromfile=data_file("prof/srm.json"))
+    thresholds = load_marker_thresholds(
+        result.markers(), global_static=static, global_dynamic=dynamic
     )
-    assert rslt.haplotypes("MHDBL000156") == set(["T,C,A,C", "T,C,G,G"])
+    result.filter(thresholds)
+    assert result.haplotypes("mh05KK-170.v1") == genotype
 
 
 def test_type_no_var_offsets():

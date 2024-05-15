@@ -106,9 +106,7 @@ def marker_details():
     for locus, marker in index:
         marker_offsets = ", ".join([str(o) for o in sorted(marker.offsets_locus)])
         chrom = marker.chrom
-        offsets38 = "N/A"
-        if index.has_chrom_offsets:
-            offsets38 = ", ".join([str(o) for o in sorted(marker.offsets_chrom)])
+        offsets38 = ", ".join([str(o) for o in sorted(marker.offsets_chrom)])
         seq = locus.sequence.strip().upper()
         gc_content = round((seq.count("G") + seq.count("C")) / len(seq) * 100, 2)
         sample_details = [
