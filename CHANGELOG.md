@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
     - Replaced read QC donut plots with a stacked bar chart (#168).
     - Replaced FastQC report links with MultiQC link (#169).
     - Revised report text, added figure captions and table titles (#172).
+- GRCh38 coordinates are now mandatory in marker definitions (#176).
 
 ### Fixed
 - Bug with inconsistent sorting of read counts for interlocus balance (#159).
