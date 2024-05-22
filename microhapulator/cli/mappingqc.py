@@ -43,5 +43,5 @@ def subparser(subparsers):
     cli.add_argument(
         "--title",
         default=None,
-        help="add a title (such as a sample name) to the histogram plot",
+        help="add a title (such as a sample name) to the donut plot",
     )

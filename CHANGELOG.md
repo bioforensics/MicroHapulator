@@ -14,10 +14,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Replaced `parsers` module with a `MicrohapIndex` class and supporting classes (#158).
 - Numerous updates to the `mhpl8r pipe` HTML report
     - Replaced read length distubition histograms with ridge plots (#167).
-    - Replaced read QC donut plots with a stacked bar chart (#168).
+    - Replaced read QC donut plots with a stacked bar chart (#168, #177).
     - Replaced FastQC report links with MultiQC link (#169).
     - Revised report text, added figure captions and table titles (#172).
-    - Streamlined the Python code responsible for generating the report (#175).
+    - Streamlined the Python code responsible for generating the report (#175, #177).
 - GRCh38 coordinates are now mandatory in marker definitions (#176).
 
 ### Fixed
