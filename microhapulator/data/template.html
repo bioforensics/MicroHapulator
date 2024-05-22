@@ -98,7 +98,7 @@
             <h2>Table of Contents</h2>
             <ol>
                 <li><a href="#readqc">Read QA/QC</a></li>
-                {% if "r1readlen" in plots %}
+                {% if reads_are_paired %}
                 <li><a href="#readmerging">Read Merging</a></li>
                 {% endif %}
                 <li><a href="#readmapping">Read Mapping</a></li>
@@ -126,7 +126,7 @@
             <p><a href="analysis/multiqc_report.html",  target="_blank">Click here to open MultiQC report in a new tab</a></p>
 
             {% if read_length_table is none %}
-                {% if "r1readlen" in plots %}
+                {% if reads_are_paired %}
                     <img src="analysis/r1-read-lengths.png" />
                     <img src="analysis/r2-read-lengths.png" />
                     <p class="caption"><strong>Figure 1.1</strong>: Ridge plots showing the length distribution of input R1 (left) and R2 (right) reads.</p>
@@ -135,7 +135,7 @@
                     <p class="caption"><strong>Figure 1.1</strong>: Ridge plot showing the length distribution of input reads.</p>
                 {% endif %}
             {% else %}
-                {% if "r1readlen" in plots %}
+                {% if reads_are_paired %}
                 <p class="title"><strong>Table 1.1</strong>: Uniform read lengths for each sample.</p>
                 <table class="half">
                     <tr>
@@ -228,7 +228,7 @@
             </table>
             {% endif %}
 
-            {% if "r1readlen" in plots %}
+            {% if reads_are_paired %}
             <a name="readmerging"></a>
             <h2>Read Merging</h2>
             <p>
@@ -351,8 +351,8 @@
                 </table>
             </div>
 
-            {% for plot in plots["locbalance"] %}
-            <img src="{{plot}}" />
+            {% for sample in samples %}
+            <img src="analysis/{{sample}}/{{sample}}-interlocus-balance.png" />
             {% endfor %}
             <p class="caption"><strong>Figure 3.4</strong>: Histograms showing the interlocus balance for each sample.</p>
 
@@ -449,8 +449,8 @@
                 For known DNA mixtures, these plots can be safely ignored.
                 But for suspected single-source samples, if there is substantial imbalance between major and minor allele counts at numerous loci, the sample should be examined more closely for the presence of a minor DNA contributor.
             </p>
-            {% for plot in plots["hetbalance"] %}
-            <img src="{{plot}}" class="fullwidth" />
+            {% for sample in samples %}
+            <img src="analysis/{{sample}}/{{sample}}-heterozygote-balance.png" class="fullwidth" />
             {% endfor %}
             <p class="caption"><strong>Figure 5.2</strong>: Bar graphs showing heterozygote balance for all samples.</p>
         </div>

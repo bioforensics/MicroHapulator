@@ -136,11 +136,9 @@ def final_html_report(
 ):
     if reads_are_paired:
         read_length_table = read_length_table_paired_end(samples)
-        plots = aggregate_plots_paired_end(samples)
         qc = PairedReadQCSummary.collect(samples)
     else:
         read_length_table = read_length_table_single_end(samples)
-        plots = aggregate_plots_single_end(samples)
         qc = SingleEndReadQCSummary.collect(samples)
     mapping_summary = MappingSummary.from_workdir(samples)
     typing_rates = per_marker_typing_rate(samples)
@@ -155,7 +153,6 @@ def final_html_report(
             mhpl8rversion=microhapulator.__version__,
             samples=samples,
             summary=summary,
-            plots=plots,
             thresholds=thresholds,
             read_length_table=read_length_table,
             typing_rates=typing_rates,
@@ -197,35 +194,6 @@ def read_length_table_single_end(samples):
             return None
         read_length_data.append((sample, lengths[0]))
     return pd.DataFrame(read_length_data, columns=("Sample", "Length"))
-
-
-def aggregate_plots_paired_end(samples):
-    plots = {
-        "r1readlen": "",
-        "r2readlen": "",
-        "mergedreadlen": "",
-        "locbalance": list(),
-        "hetbalance": list(),
-        "donut": list(),
-    }
-    plots["r1readlen"] = "analysis/r1-read-lengths.png"
-    plots["r2readlen"] = "analysis/r2-read-lengths.png"
-    plots["mergedreadlen"] = "analysis/merged-read-lengths.png"
-    for sample in samples:
-        plots["locbalance"].append(f"analysis/{sample}/{sample}-interlocus-balance.png")
-        plots["hetbalance"].append(f"analysis/{sample}/{sample}-heterozygote-balance.png")
-        plots["donut"].append(f"analysis/{sample}/{sample}-donut.png")
-    return plots
-
-
-def aggregate_plots_single_end(samples):
-    plots = {"readlen": "", "locbalance": list(), "hetbalance": list(), "donut": list()}
-    plots["readlen"] = "analysis/read-lengths.png"
-    for sample in samples:
-        plots["locbalance"].append(f"analysis/{sample}/{sample}-interlocus-balance.png")
-        plots["hetbalance"].append(f"analysis/{sample}/{sample}-heterozygote-balance.png")
-        plots["donut"].append(f"analysis/{sample}/{sample}-donut.png")
-    return plots
 
 
 def aggregate_summary(samples, reads_are_paired=True):
