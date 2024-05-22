@@ -48,7 +48,6 @@ rule report:
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-repetitive-reads.csv", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-donut.png", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
@@ -280,10 +279,9 @@ rule read_mapping_qc:
         repetitive=rules.repetitive_mapping.output.counts,
     output:
         counts="analysis/{sample}/{sample}-read-mapping-qc.csv",
-        plot="analysis/{sample}/{sample}-donut.png",
     shell:
         """
-        mhpl8r mappingqc --marker {input.marker} --refr {input.full_refr} --rep {input.repetitive}  --csv {output.counts}  --figure {output.plot} --title {wildcards.sample}
+        mhpl8r mappingqc {input.marker} {input.full_refr} {input.repetitive} --csv {output.counts}
         """
 
 

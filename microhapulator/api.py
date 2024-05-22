@@ -798,7 +798,7 @@ def consolidate_read_mapping_qc_tables(samples):
     return aggregate_qc_table
 
 
-def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title=None):
+def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure=None, title=None):
     """Count on target, off target, repetitive, and contaminant reads
 
     :param str marker_mapped: path of txt file containing number of reads mapped to marker sequences
@@ -808,6 +808,8 @@ def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure, title
     :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
     """
     data = count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
+    if not figure:
+        return data
     backend = matplotlib.get_backend()
     plt.switch_backend("Agg")
     labels = ["on target", "off target", "contamination", "repetitive"]

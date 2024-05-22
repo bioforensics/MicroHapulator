@@ -1,0 +1,2 @@
+Total reads: 123335
+Mapped reads: 122635

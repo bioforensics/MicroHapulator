@@ -330,7 +330,7 @@
                         </tr>
                         <tr>
                             <th>Marker</th>
-                            {% for i in range(len(mapping_rates)) %}
+                            {% for i in range(len(samples)) %}
                             <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Reads</th>
                             <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Repetitive</th>
                             {% endfor %}
@@ -340,8 +340,8 @@
                     <tbody>
                         {% for marker, marker_data in repetitive_reads_by_marker.items() %}
                         <tr>
-                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
-                            {% for sample_data in mapping_rates.values()%}
+                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
+                            {% for sample in samples %}
                             <td class="alnrt" data-sortvalue="{{ marker_data[sample].mapped }}">{{ "{:,d}".format(marker_data[sample].mapped) }}</td>
                             <td class="alnrt" data-sortvalue="{{ marker_data[sample].repetitive }}">{{ "{:,d}".format(marker_data[sample].repetitive) }}</td>
                             {% endfor %}
