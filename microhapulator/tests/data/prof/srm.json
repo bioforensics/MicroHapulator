@@ -1,0 +1,19 @@
+{
+    "markers": {
+        "mh05KK-170.v1": {
+            "genotype": [],
+            "max_coverage": 4113,
+            "mean_coverage": 4111.9,
+            "min_coverage": 4092,
+            "num_discarded_reads": 6,
+            "typing_result": {
+                "C,A,G,A": 2317,
+                "C,G,G,A": 1789,
+                "C,T,G,A": 9
+            }
+        }
+    },
+    "ploidy": null,
+    "type": "TypingResult",
+    "version": "0.7.2+46.gdda0797.dirty"
+}

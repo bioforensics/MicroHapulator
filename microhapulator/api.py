@@ -751,8 +751,6 @@ def repetitive_mapping(marker_bam_file, fullref_bam_file, markertsv, minbasequal
     )
     marker_bam = pysam.AlignmentFile(marker_bam_file, "rb")
     microhaps = MicrohapIndex.from_files(markertsv)
-    if not microhaps.has_chrom_offsets:
-        raise ValueError("cannot perform repetitive analysis without chromosome offsets")
     reads_to_marker_fullref = get_reads_in_marker_loci(fullref_bam_file, microhaps)
     for locus, marker in microhaps:
         repetitive_count = count_repetitive_reads(
