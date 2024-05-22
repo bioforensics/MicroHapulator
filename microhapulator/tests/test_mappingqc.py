@@ -26,6 +26,8 @@ def test_mappingqc(tmp_path):
         figure,
     )
     exp_data = pd.read_csv(data_file("test-mapping-qc.csv"))
+    print(obs_data)
+    print(exp_data)
     assert obs_data.equals(exp_data)
     assert figure.is_file()
 

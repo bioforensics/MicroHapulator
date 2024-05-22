@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from microhapulator.mapstats import MappingStats
+from microhapulator.mapstats import MappingStats, MappingSummary
 from microhapulator.tests import data_file
 import pytest
 
@@ -24,3 +24,16 @@ def test_load_mapstats_from_workdir():
     assert stats.mapped_reads == "122,058"
     assert stats.mapping_rate == "99.0%"
     assert stats.chi_square == "0.142"
+
+
+def test_load_mapsummary_from_workdir():
+    samples = ("SRM8398-1", "SRM8398-2", "SRM8398-3")
+    summary = MappingSummary.from_workdir(samples, workdir=data_file("mapping_workdir"))
+    assert len(summary.markers) == 29
+    repetitive = summary.repetitive_reads_by_marker()
+    assert repetitive["mh10KK-162.v3"]["SRM8398-1"].repetitive == 108
+    assert repetitive["mh10KK-162.v3"]["SRM8398-2"].repetitive == 92
+    assert repetitive["mh10KK-162.v3"]["SRM8398-3"].repetitive == 107
+    assert repetitive["mh17KK-278.v1"]["SRM8398-1"].repetitive == 0
+    assert repetitive["mh17KK-278.v1"]["SRM8398-2"].repetitive == 0
+    assert repetitive["mh17KK-278.v1"]["SRM8398-3"].repetitive == 0
