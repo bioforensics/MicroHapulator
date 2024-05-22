@@ -342,8 +342,8 @@
                         <tr>
                             <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
                             {% for sample_data in mapping_rates.values()%}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'ReadCount']}}">{{ "{:,d}".format(marker_data[sample].mapped) }}</td>
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'RepetitiveReads']}}">{{ "{:,d}".format(marker_data[sample].repetitive) }}</td>
+                            <td class="alnrt" data-sortvalue="{{ marker_data[sample].mapped }}">{{ "{:,d}".format(marker_data[sample].mapped) }}</td>
+                            <td class="alnrt" data-sortvalue="{{ marker_data[sample].repetitive }}">{{ "{:,d}".format(marker_data[sample].repetitive) }}</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
