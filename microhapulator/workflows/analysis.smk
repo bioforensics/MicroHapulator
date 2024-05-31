@@ -48,7 +48,6 @@ rule report:
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-repetitive-reads.csv", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-donut.png", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
@@ -75,7 +74,7 @@ rule report:
 rule summary:
     input:
         summary_aux_files,
-        expand("analysis/{sample}/{sample}-mapped-reads.txt", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}.bam.stats", sample=config["samples"]),
         expand(
             "analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
             sample=config["samples"],
@@ -117,16 +116,13 @@ rule map_sort_and_index:
     output:
         bam="analysis/{sample}/{sample}.bam",
         bai="analysis/{sample}/{sample}.bam.bai",
-        counts="analysis/{sample}/{sample}-mapped-reads.txt",
+        stats="analysis/{sample}/{sample}.bam.stats",
     threads: 32
     shell:
         """
         bwa mem -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
-        echo -n "Total reads: " > {output.counts}
-        samtools view -c -F 2304 {output.bam} >> {output.counts}
-        echo -n "Mapped reads: " >> {output.counts}
-        samtools view -c -F 2308 {output.bam} >> {output.counts}
+        samtools stats {output.bam} > {output.stats}
         """
 
 
@@ -278,15 +274,14 @@ rule repetitive_mapping:
 
 rule read_mapping_qc:
     input:
-        marker=rules.map_sort_and_index.output.counts,
+        marker=rules.map_sort_and_index.output.stats,
         full_refr=rules.count_fullrefr_mapped_reads.output.counts,
         repetitive=rules.repetitive_mapping.output.counts,
     output:
         counts="analysis/{sample}/{sample}-read-mapping-qc.csv",
-        plot="analysis/{sample}/{sample}-donut.png",
     shell:
         """
-        mhpl8r mappingqc  --marker {input.marker} --refr {input.full_refr} --rep {input.repetitive}  --csv {output.counts}  --figure {output.plot} --title {wildcards.sample}
+        mhpl8r mappingqc {input.marker} {input.full_refr} {input.repetitive} --csv {output.counts}
         """
 
 

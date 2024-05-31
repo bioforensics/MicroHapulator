@@ -1,2 +1,0 @@
-Total reads: 5000
-Mapped reads: 5000

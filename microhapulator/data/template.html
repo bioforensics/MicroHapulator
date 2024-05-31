@@ -98,7 +98,7 @@
             <h2>Table of Contents</h2>
             <ol>
                 <li><a href="#readqc">Read QA/QC</a></li>
-                {% if "r1readlen" in plots %}
+                {% if reads_are_paired %}
                 <li><a href="#readmerging">Read Merging</a></li>
                 {% endif %}
                 <li><a href="#readmapping">Read Mapping</a></li>
@@ -126,7 +126,7 @@
             <p><a href="analysis/multiqc_report.html",  target="_blank">Click here to open MultiQC report in a new tab</a></p>
 
             {% if read_length_table is none %}
-                {% if "r1readlen" in plots %}
+                {% if reads_are_paired %}
                     <img src="analysis/r1-read-lengths.png" />
                     <img src="analysis/r2-read-lengths.png" />
                     <p class="caption"><strong>Figure 1.1</strong>: Ridge plots showing the length distribution of input R1 (left) and R2 (right) reads.</p>
@@ -135,7 +135,7 @@
                     <p class="caption"><strong>Figure 1.1</strong>: Ridge plot showing the length distribution of input reads.</p>
                 {% endif %}
             {% else %}
-                {% if "r1readlen" in plots %}
+                {% if reads_are_paired %}
                 <p class="title"><strong>Table 1.1</strong>: Uniform read lengths for each sample.</p>
                 <table class="half">
                     <tr>
@@ -228,7 +228,7 @@
             </table>
             {% endif %}
 
-            {% if "r1readlen" in plots %}
+            {% if reads_are_paired %}
             <a name="readmerging"></a>
             <h2>Read Merging</h2>
             <p>
@@ -284,26 +284,18 @@
             <table>
                 <tr>
                     <th>Sample</th>
-                    {% if "r1readlen" in plots %}
-                    <th class="alnrt">Merged Reads</th>
-                    {% else %}
                     <th class="alnrt">Filtered Reads</th>
-                    {% endif %}
                     <th class="alnrt">Mapped Reads</th>
                     <th class="alnrt">Mapping Rate</th>
                     <th class="alnrt">Chi-square</th>
                 </tr>
-                {% for i, row in summary.iterrows() %}
+                {% for sample, stats in mapping_summary.items() %}
                 <tr>
-                    <td>{{row.Sample}}</td>
-                    {% if "r1readlen" in plots %}
-                    <td class="alnrt">{{ "{:,}".format(row.Merged) }}</td>
-                    {% else %}
-                    <td class="alnrt">{{ "{:,}".format(row.TotalReads) }}</td>
-                    {% endif %}
-                    <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.MappingRate * 100) }}%</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.InterlocChiSq)}}</td>
+                    <td>{{ sample }}</td>
+                    <td class="alnrt">{{ stats.total_reads }}</td>
+                    <td class="alnrt">{{ stats.mapped_reads }}</td>
+                    <td class="alnrt">{{ stats.mapping_rate }}</td>
+                    <td class="alnrt">{{ stats.chi_square }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -338,7 +330,7 @@
                         </tr>
                         <tr>
                             <th>Marker</th>
-                            {% for i in range(len(mapping_rates)) %}
+                            {% for sample in samples %}
                             <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Reads</th>
                             <th class="alnrt" style="font-weight:bold" data-sortas="numeric">Repetitive</th>
                             {% endfor %}
@@ -346,12 +338,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for markername in markernames %}
+                        {% for marker, marker_data in repetitive_reads_by_marker.items() %}
                         <tr>
-                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
-                            {% for sample_data in mapping_rates.values()%}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'ReadCount']}}">{{"{:,d}".format(sample_data.loc[markername, 'ReadCount'])}}</td>
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'RepetitiveReads']}}">{{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
+                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
+                            {% for sample in samples %}
+                            <td class="alnrt" data-sortvalue="{{ marker_data[sample].mapped }}">{{ "{:,d}".format(marker_data[sample].mapped) }}</td>
+                            <td class="alnrt" data-sortvalue="{{ marker_data[sample].repetitive }}">{{ "{:,d}".format(marker_data[sample].repetitive) }}</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -359,8 +351,8 @@
                 </table>
             </div>
 
-            {% for plot in plots["locbalance"] %}
-            <img src="{{plot}}" />
+            {% for sample in samples %}
+            <img src="analysis/{{sample}}/{{sample}}-interlocus-balance.png" />
             {% endfor %}
             <p class="caption"><strong>Figure 3.4</strong>: Histograms showing the interlocus balance for each sample.</p>
 
@@ -457,8 +449,8 @@
                 For known DNA mixtures, these plots can be safely ignored.
                 But for suspected single-source samples, if there is substantial imbalance between major and minor allele counts at numerous loci, the sample should be examined more closely for the presence of a minor DNA contributor.
             </p>
-            {% for plot in plots["hetbalance"] %}
-            <img src="{{plot}}" class="fullwidth" />
+            {% for sample in samples %}
+            <img src="analysis/{{sample}}/{{sample}}-heterozygote-balance.png" class="fullwidth" />
             {% endfor %}
             <p class="caption"><strong>Figure 5.2</strong>: Bar graphs showing heterozygote balance for all samples.</p>
         </div>
