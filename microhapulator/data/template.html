@@ -94,16 +94,9 @@
                 Report generated at {{date}},<br />
                 using <a href="https://microhapulator.readthedocs.io" target="_blank">MicroHapulator</a> version {{mhpl8rversion}}.
             </p>
-
             <h2>Table of Contents</h2>
-            <ol>
-                <li><a href="#readqc">Read QA/QC</a></li>
-                {% if "r1readlen" in plots %}
-                <li><a href="#readmerging">Read Merging</a></li>
-                {% endif %}
-                <li><a href="#readmapping">Read Mapping</a></li>
-                <li><a href="#typing">Haplotype Calling</a></li>
-                <li><a href="#filters">Genotype Calling</a></li>
+                {% block table_of_contents %}
+                {% endblock %}
             </ol>
             <p>
                 A summary of the statistics presented in this report is aggregated in a single table available at <code>analysis/summary.tsv</code> in the working directory.
@@ -126,187 +119,23 @@
             <p><a href="analysis/multiqc_report.html",  target="_blank">Click here to open MultiQC report in a new tab</a></p>
 
             {% if read_length_table is none %}
-                {% if "r1readlen" in plots %}
-                    <img src="analysis/r1-read-lengths.png" />
-                    <img src="analysis/r2-read-lengths.png" />
-                    <p class="caption"><strong>Figure 1.1</strong>: Ridge plots showing the length distribution of input R1 (left) and R2 (right) reads.</p>
-                {% else %}
-                    <img class="center" src="analysis/read-lengths.png" />
-                    <p class="caption"><strong>Figure 1.1</strong>: Ridge plot showing the length distribution of input reads.</p>
-                {% endif %}
+                {% block read_len_plots %}
+                {% endblock %}
             {% else %}
-                {% if "r1readlen" in plots %}
-                <p class="title"><strong>Table 1.1</strong>: Uniform read lengths for each sample.</p>
-                <table class="half">
-                    <tr>
-                        <th>Sample</th>
-                        <th class="alnrt">Length R1</th>
-                        <th class="alnrt">Length R2</th>
-                    </tr>
-                    {% for i, row in read_length_table.iterrows() %}
-                    <tr>
-                        <td>{{ row.Sample }}</td>
-                        <td class="alnrt">{{ row.LengthR1 }}</td>
-                        <td class="alnrt">{{ row.LengthR2 }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% else %}
-                <p class="title"><strong>Table 1.1</strong>: Uniform read length for each sample.</p>
-                <table class="half">
-                    <tr>
-                        <th>Sample</th>
-                        <th class="alnrt">Length</th>
-                    </tr>
-                    {% for i, row in read_length_table.iterrows() %}
-                    <tr>
-                        <td>{{ row.Sample }}</td>
-                        <td class="alnrt">{{ row.Length }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
+                {% block read_len_table%}
+                {% endblock %}
             {% endif %}
 
-            {% if reads_are_paired %}
-            <p>
-                Prior to subsequent analysis, reads are filtered for ambiguous sequence content.
-                Any read comprised of more than {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% ambiguous bases (<code>N</code>) is discarded, along with its mate.
-                (This threshold can be configured with the <code>--ambiguous-thresh</code> argument.)
-                The table below shows the number of read pairs that were removed from each sample and which read(s) in the pair exceeded the filtering threshold.
-            </p>
-            <p class="title"><strong>Table 1.2</strong>: Metrics for read filtering based on ambiguous content.</p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Total Pairs</th>
-                    <th class="alnrt">R1 Only Failed</th>
-                    <th class="alnrt">R2 Only Failed</th>
-                    <th class="alnrt">Pair Failed</th>
-                    <th class="alnrt">Pairs Removed</th>
-                    <th class="alnrt">Pairs Kept</th>
-                    <th class="alnrt">Retention</th>
-                </tr>
-                {% for sample, stats in qc.items() %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td class="alnrt">{{stats.ambig.total_reads}}</td>
-                    <td class="alnrt">{{stats.ambig.excluded_r1}}</td>
-                    <td class="alnrt">{{stats.ambig.excluded_r2}}</td>
-                    <td class="alnrt">{{stats.ambig.excluded_both}}</td>
-                    <td class="alnrt">{{stats.ambig.excluded}}</td>
-                    <td class="alnrt">{{stats.ambig.retained}}</td>
-                    <td class="alnrt">{{stats.ambig.retention_rate}}</td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% else %}
-            <p>
-                Prior to subsequent analysis, reads are filtered for length and ambiguous sequence content.
-                Any read comprised of more than {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% ambiguous bases (<code>N</code>) is discarded.
-                Reads less than {{"{:,}".format(read_length_threshold)}} bp in length are also excluded from all subsequent analysis.
-                (These thresholds can be configured with the <code>--ambiguous-thresh</code> and <code>--length-thresh</code> arguments.)
-            </p>
-            <p class="title"><strong>Table 1.2</strong>: Read filtering metrics.</p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Total Reads</th>
-                    <th class="alnrt">Filtered (Ambiguous)</th>
-                    <th class="alnrt">Filtered (Length)</th>
-                    <th class="alnrt">Reads Kept</th>
-                </tr>
-                {% for sample, stats in qc.items() %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td class="alnrt">{{stats.total_reads}}</td>
-                    <td class="alnrt">{{stats.filtered_ambig}}</td>
-                    <td class="alnrt">{{stats.filtered_length}}</td>
-                    <td class="alnrt">{{stats.retention}}</td>
-                </tr>
-                {% endfor%}
-            </table>
-            {% endif %}
+            {% block filter_stats %}
+            {% endblock %}
 
-            {% if "r1readlen" in plots %}
-            <a name="readmerging"></a>
-            <h2>Read Merging</h2>
-            <p>
-                Paired end reads are merged using <a href="https://ccb.jhu.edu/software/FLASH/" target="_blank">FLASh</a>.
-                Merged reads less than {{"{:,}".format(read_length_threshold)}} bp in length are filtered out prior to read mapping and excluded from all subsequent analysis.
-                (This threshold can be configured with the <code>--length-thresh</code> argument.)
-            </p>
-            <p class="title"><strong>Table 2.1</strong>: Read merging metrics.</p>
-            <table class="half">
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Filtered Reads</th>
-                    <th class="alnrt">Merged Reads</th>
-                    <th class="alnrt">Merge Rate</th>
-                </tr>
-                {% for sample, stats in qc.items() %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td class="alnrt">{{stats.merge.total_reads}}</td>
-                    <td class="alnrt">{{stats.merge.merged_reads}}</td>
-                    <td class="alnrt">{{stats.merge.merge_rate}}</td>
-                </tr>
-                {% endfor %}
-            </table>
-            <img class="center" src="analysis/merged-read-lengths.png" />
-            <p class="caption"><strong>Figure 2.2</strong>: Ridge plot showing the length distribution of merged reads.</p>
-
-            <p class="title"><strong>Table 2.3</strong>: Metrics for read length filtering.</p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    <th class="alnrt">Total Merged Reads</th>
-                    <th class="alnrt">Reads Removed</th>
-                    <th class="alnrt">Reads Kept</th>
-                    <th class="alnrt">Retention</th>
-                </tr>
-                {% for sample, stats in qc.items() %}
-                <tr>
-                    <td>{{sample}}</td>
-                    <td class="alnrt">{{stats.length.total_reads}}</td>
-                    <td class="alnrt">{{stats.length.excluded}}</td>
-                    <td class="alnrt">{{stats.length.kept}}</td>
-                    <td class="alnrt">{{stats.length.retention_rate}}</td>
-                </tr>
-            {% endfor%}
-            </table>
-            {% endif %}
+            {% block merge_stats %}
+            {% endblock %}
 
             <a name="readmapping"></a>
             <h2>Read Mapping</h2>
-            <p>Filtered {% if reads_are_paired %} and merged {% endif %} reads are aligned to marker reference sequences using <a href="http://bio-bwa.sourceforge.net/bwa.shtml" target="_blank">BWA MEM</a> and formatted, sorted, and indexed using <a href="http://www.htslib.org/" target="_blank">SAMtools</a>.</p>
-            <p class="title"><strong>Table 3.1</strong>: Read mapping metrics.</p>
-            <table>
-                <tr>
-                    <th>Sample</th>
-                    {% if "r1readlen" in plots %}
-                    <th class="alnrt">Merged Reads</th>
-                    {% else %}
-                    <th class="alnrt">Filtered Reads</th>
-                    {% endif %}
-                    <th class="alnrt">Mapped Reads</th>
-                    <th class="alnrt">Mapping Rate</th>
-                    <th class="alnrt">Chi-square</th>
-                </tr>
-                {% for i, row in summary.iterrows() %}
-                <tr>
-                    <td>{{row.Sample}}</td>
-                    {% if "r1readlen" in plots %}
-                    <td class="alnrt">{{ "{:,}".format(row.Merged) }}</td>
-                    {% else %}
-                    <td class="alnrt">{{ "{:,}".format(row.TotalReads) }}</td>
-                    {% endif %}
-                    <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.MappingRate * 100) }}%</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.InterlocChiSq)}}</td>
-                </tr>
-                {% endfor %}
-            </table>
+            {% block read_map_stats %}
+            {% endblock %}
             <br />
             <p>
                 The reported chi-square statistic is a measure of read coverage imbalance between markers, and can be compared among samples sequenced using the sample panel:
