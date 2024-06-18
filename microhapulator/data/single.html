@@ -1,0 +1,62 @@
+{% extends "template.html" %}
+{% block table_of_contents %}
+<li><a href="#readqc">Read QA/QC</a></li>
+<li><a href="#readmapping">Read Mapping</a></li>
+<li><a href="#typing">Haplotype Calling</a></li>
+<li><a href="#filters">Genotype Calling</a></li>
+{% endblock %}
+
+{% block read_len_fig %}
+<img class="center" src="analysis/read-lengths.png" />
+<p class="caption"><strong>Figure 1.1</strong>: Ridge plot showing the length distribution of input reads.</p>
+{% endblock %}
+
+{% block read_len_table %}
+<p class="title"><strong>Table 1.1</strong>: Uniform read length for each sample.</p>
+<table class="half">
+    <tr>
+        <th>Sample</th>
+        <th class="alnrt">Length</th>
+    </tr>
+    {% for i, row in read_length_table.iterrows() %}
+    <tr>
+        <td>{{ row.Sample }}</td>
+        <td class="alnrt">{{ row.Length }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+
+{% block read_filter_stats %}
+<p>
+    Prior to subsequent analysis, reads are filtered for length and ambiguous sequence content.
+    Any read comprised of more than {{"{:.0f}".format(ambiguous_read_threshold * 100)}}% ambiguous bases (<code>N</code>) is discarded.
+    Reads less than {{"{:,}".format(read_length_threshold)}} bp in length are also excluded from all subsequent analysis.
+    (These thresholds can be configured with the <code>--ambiguous-thresh</code> and <code>--length-thresh</code> arguments.)
+</p>
+<p class="title"><strong>Table 1.2</strong>: Read filtering metrics.</p>
+<table>
+    <tr>
+        <th>Sample</th>
+        <th class="alnrt">Total Reads</th>
+        <th class="alnrt">Filtered (Ambiguous)</th>
+        <th class="alnrt">Filtered (Length)</th>
+        <th class="alnrt">Reads Kept</th>
+    </tr>
+    {% for sample, stats in qc.items() %}
+    <tr>
+        <td>{{sample}}</td>
+        <td class="alnrt">{{stats.total_reads}}</td>
+        <td class="alnrt">{{stats.filtered_ambig}}</td>
+        <td class="alnrt">{{stats.filtered_length}}</td>
+        <td class="alnrt">{{stats.retention}}</td>
+    </tr>
+    {% endfor%}
+</table>
+{% endblock %}
+
+{% block read_map_header %}
+<p>Filtered reads are aligned to marker reference sequences using <a href="http://bio-bwa.sourceforge.net/bwa.shtml"
+        target="_blank">BWA MEM</a> and formatted, sorted, and indexed using <a href="http://www.htslib.org/"
+        target="_blank">SAMtools</a>.</p>
+{% endblock %}
