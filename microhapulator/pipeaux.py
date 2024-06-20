@@ -13,7 +13,7 @@
 from .mapstats import MappingSummary, MappingStats
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from datetime import datetime
-from jinja2 import Template
+from jinja2 import FileSystemLoader, Environment, Template
 import json
 import microhapulator
 import pandas as pd
@@ -145,9 +145,14 @@ def final_html_report(
     mapping_rates, marker_names = per_marker_mapping_rate(samples)
     thresholds = load_marker_thresholds(marker_names, thresh_file, thresh_static, thresh_dynamic)
     thresholds.fillna(0, inplace=True)
-    templatefile = resource_filename("microhapulator", "data/template.html")
-    with open(templatefile, "r") as infh, open("report.html", "w") as outfh:
-        template = Template(infh.read())
+    template_loader = FileSystemLoader(resource_filename("microhapulator", "data"))
+    env = Environment(loader=template_loader)
+    if reads_are_paired:
+        template_file = "paired.html"
+    else:
+        template_file = "single.html"
+    template = env.get_template(template_file)
+    with open("report.html", "w") as outfh:
         output = template.render(
             date=datetime.now().replace(microsecond=0).isoformat(),
             mhpl8rversion=microhapulator.__version__,
