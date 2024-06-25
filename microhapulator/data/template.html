@@ -181,7 +181,7 @@
                     <thead>
                         <tr>
                             <td></td>
-                            {% for sample in typing_rates.keys() %}
+                            {% for sample in samples %}
                             <td style="visibility: collapse;">{{sample}}</td>
                             <td style="font-weight:bold">{{sample}}</td>
                             {% endfor %}
@@ -235,13 +235,13 @@
                     <th class="alnrt">Successful Typing Events</th>
                     <th class="alnrt">Typing Success Rate</th>
                 </tr>
-                {% for i, row in summary.iterrows() %}
+                {% for sample, stats in typing_summary.items() %}
                 <tr>
-                    <td>{{row.Sample}}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.TypedAttempted) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.TypedSuccess) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.TypingRate * 100) }}%</td>
+                    <td>{{ sample }}</td>
+                    <td class="alnrt">{{ mapping_summary[sample].mapped_reads }}</td>
+                    <td class="alnrt">{{ stats.attempted }}</td>
+                    <td class="alnrt">{{ stats.successful }}</td>
+                    <td class="alnrt">{{ stats.typing_rate }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -254,7 +254,7 @@
                     <thead>
                         <tr>
                             <th>Marker</th>
-                            {% for sample in typing_rates.keys() %}
+                            {% for sample in typing_summary.keys() %}
                             <th class=alnrt style="font-weight:bold">{{sample}}</th>
                             {% endfor %}
                         </tr>
@@ -262,9 +262,9 @@
                     <tbody>
                         {% for markername in markernames %}
                         <tr>
-                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
-                            {% for sample_data in typing_rates.values()%}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'TypingRate']}}">{{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
+                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{ markername }}</a></td>
+                            {% for summary in typing_summary.values() %}
+                            <td class="alnrt" data-sortvalue="{{ summary.marker_typing_rate(markername) }}">{{ summary.marker_typing_rate(markername) }}%</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}

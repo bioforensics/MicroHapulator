@@ -14,7 +14,6 @@ from glob import glob
 from itertools import chain
 from microhapulator import api as mhapi
 from microhapulator.filter import AmbigPairedReadFilter, LengthSingleReadFilter
-from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
 preproc_aux_files = [

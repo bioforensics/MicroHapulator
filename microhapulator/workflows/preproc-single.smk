@@ -13,7 +13,6 @@
 from glob import glob
 from microhapulator import api as mhapi
 from microhapulator.filter import AmbigSingleReadFilter, LengthSingleReadFilter
-from microhapulator.pipeaux import full_reference_index_files
 from os import symlink
 
 preproc_aux_files = ["analysis/read-lengths.png", "analysis/multiqc_report.html"]

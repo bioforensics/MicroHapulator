@@ -12,6 +12,7 @@
 
 from .mapstats import MappingSummary
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
+from .typestats import TypingSummary
 import json
 import pandas as pd
 from pathlib import Path
@@ -26,7 +27,7 @@ class Reporter:
             self.read_length_table = read_length_table_single_end(samples, workdir=workdir)
             self.qc_summary = SingleEndReadQCSummary.collect(samples, workdir=workdir)
         self.mapping_summary = MappingSummary.from_workdir(samples)
-        self.per_marker_typing_rates = per_marker_typing_rate(samples, workdir=workdir)
+        self.typing_summary = TypingSummary.from_workdir(samples)
         self.per_marker_mapping_rates = per_marker_mapping_rate(samples, workdir=workdir)
         self.thresholds = None
 
@@ -62,15 +63,6 @@ def read_length_table_single_end(samples, workdir="."):
             return None
         read_length_data.append((sample, lengths[0]))
     return pd.DataFrame(read_length_data, columns=("Sample", "Length"))
-
-
-def per_marker_typing_rate(samples, workdir="."):
-    sample_rates = dict()
-    for sample in samples:
-        filename = f"{workdir}/analysis/{sample}/{sample}-typing-rate.tsv"
-        sample_df = pd.read_csv(filename, sep="\t").set_index("Marker")
-        sample_rates[sample] = sample_df
-    return sample_rates
 
 
 def per_marker_mapping_rate(samples, workdir="."):

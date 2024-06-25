@@ -139,12 +139,12 @@
                         <th class="alnrt">Total Reads</th>
                         <th class="alnrt">Typing Rate</th>
                     </tr>
-                    {% for sample, sample_data in typing_rates.items()%}
+                    {% for sample, stats in typing_summary.items()%}
                     <tr>
                         <td>{{sample}}</td>
-                        <td class="alnrt">{{ "{:,.0f}".format(sample_data.loc[markername, 'TypedReads']) }}</td>
-                        <td class="alnrt">{{ "{:,.0f}".format(sample_data.loc[markername, 'TotalReads'])}}</td>
-                        <td class="alnrt">{{ "{:.2f}".format(sample_data.loc[markername, 'TypingRate'] * 100)}}%</td>
+                        <td class="alnrt">{{ stats.successful }}</td>
+                        <td class="alnrt">{{ stats.total_reads }}</td>
+                        <td class="alnrt">{{ stats.typing_rate }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -152,11 +152,10 @@
 
                 <h4>Genotype Calls</h4>
                 <p>
-                    The following plots show all MH alleles (haplotypes) observed at this marker, sample by sample. In
-                    each plot, the red dotted line shows the threshold used for that sample to discriminate between true
-                    MH alleles and noise/artifacts and make a final genotype determination.
+                    The following plots show all MH alleles (haplotypes) observed at this marker, sample by sample.
+                    In each plot, the red dotted line shows the threshold used for that sample to discriminate between true MH alleles and noise/artifacts and make a final genotype determination.
                 </p>
-                {% for sample in typing_rates.keys(): %}
+                {% for sample in typing_summary.keys(): %}
                 <img src="analysis/{{sample}}/callplots/{{markername}}.png" />
                 {% endfor %}
             </div>

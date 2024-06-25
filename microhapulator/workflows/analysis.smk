@@ -14,16 +14,20 @@ import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
 from microhapulator.marker import MicrohapIndex
-from microhapulator.pipeaux import (
-    full_reference_index_files,
-    final_html_report,
-    aggregate_summary,
-    marker_detail_report,
-)
+from microhapulator.pipeaux import final_html_report, marker_detail_report
 from microhapulator.profile import TypingResult
 import pandas as pd
 from pkg_resources import resource_filename
 import shutil
+
+
+def full_reference_index_files(fasta):
+    filename = fasta
+    filenames = []
+    for suffix in ("amb", "ann", "bwt", "pac", "sa"):
+        idxfile = f"{filename}.{suffix}"
+        filenames.append(idxfile)
+    return filenames
 
 
 include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
@@ -31,7 +35,6 @@ include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
 
 rule report:
     input:
-        "analysis/summary.tsv",
         "analysis/read-mapping-qc.png",
         preproc_aux_files,
         expand("analysis/{sample}/{sample}-type.json", sample=config["samples"]),
@@ -48,6 +51,7 @@ rule report:
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/callplots/.done", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-repetitive-reads.csv", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
@@ -55,10 +59,8 @@ rule report:
         "report.html",
         "marker-detail-report.html",
     run:
-        summary = pd.read_csv("analysis/summary.tsv", sep="\t")
         final_html_report(
             config["samples"],
-            summary,
             reads_are_paired=config["paired"],
             thresh_static=config["thresh_static"],
             thresh_dynamic=config["thresh_dynamic"],
@@ -69,27 +71,6 @@ rule report:
         marker_detail_report(config["samples"], reads_are_paired=config["paired"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
         shutil.copy(jsfile, "fancyTable.js")
-
-
-rule summary:
-    input:
-        summary_aux_files,
-        expand("analysis/{sample}/{sample}.bam.stats", sample=config["samples"]),
-        expand(
-            "analysis/{sample}/fullrefr/{sample}-fullrefr-mapped-reads.txt",
-            sample=config["samples"],
-        ),
-        expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
-        expand("analysis/{sample}/{sample}-interlocus-balance-chisq.txt", sample=config["samples"]),
-        expand(
-            "analysis/{sample}/{sample}-heterozygote-balance-pttest.txt",
-            sample=config["samples"],
-        ),
-    output:
-        tsv="analysis/summary.tsv",
-    run:
-        summary = aggregate_summary(config["samples"], config["paired"])
-        summary.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
 
 
 rule copy_and_index_marker_data:
