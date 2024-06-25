@@ -66,7 +66,7 @@ rule report:
             ambiguous_read_threshold=config["ambiguous_thresh"],
             length_threshold=config["length_thresh"],
         )
-        marker_detail_report(config["samples"])
+        marker_detail_report(config["samples"], reads_are_paired=config["paired"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
         shutil.copy(jsfile, "fancyTable.js")
 

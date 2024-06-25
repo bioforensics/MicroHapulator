@@ -99,7 +99,6 @@
             <ol>
                 {% block table_of_contents %}
                 {% endblock %}
-
             </ol>
             <p>
                 A summary of the statistics presented in this report is aggregated in a single table available at <code>analysis/summary.tsv</code> in the working directory.
@@ -217,14 +216,16 @@
 
             <a name="typing"></a>
             <h2>Haplotype Calling</h2>
-            <p>Haplotypes are called empirically using <code>mhpl8r type</code>mhpl8r type as follows. MicroHapulator examines each
-                aligned read to determine its suitability for haplotype calling: this is a <em>typing event</em>. If the read
-                alignment spans all SNPs of interest, the typing event is successful and a haplotype call is made. If not, the
-                typing event is failed and no haplotype call is made. (<em>Note that if more than one marker is defined at a given
-                locus, MicroHapulator can attempt multiple typing events per read. In this case the number of <strong>Attempted Typing
-                Events </strong> will exceed the number of <strong>Mapped Reads.</strong></em>) Collectively, the tallies of each observed haplotype represent a
-                typing result for each sample. The typing rate is calculated as the number of successful typing events divided by
-                the total number of attempted typing events.</p>
+            <p>
+                Haplotypes are called empirically using <code>mhpl8r type</code> as follows.
+                MicroHapulator examines each aligned read to determine its suitability for haplotype calling: this is a <em>typing event</em>.
+                If the read alignment spans all SNPs of interest, the typing event is successful and a haplotype call is made.
+                If not, the typing event is failed and no haplotype call is made.
+                (<em>Note that if more than one marker is defined at a given locus, MicroHapulator can attempt multiple typing events per read.
+                In this case the number of <strong>Attempted Typing Events</strong> will exceed the number of <strong>Mapped Reads</strong>.</em>)
+                Collectively, the tallies of each observed haplotype represent a typing result for each sample.
+                The typing rate is calculated as the number of successful typing events divided by the total number of attempted typing events.
+            </p>
             <p class="title"><strong>Table 4.1</strong>: Read typing metrics.</p>
             <table>
                 <tr>

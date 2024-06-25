@@ -12,12 +12,11 @@
 
 from .mapstats import MappingSummary, MappingStats
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
+from .reporter import Reporter
 from datetime import datetime
 from jinja2 import FileSystemLoader, Environment, Template
-import json
 import microhapulator
 import pandas as pd
-from pathlib import Path
 from microhapulator import load_marker_thresholds
 from microhapulator.marker import MicrohapIndex
 from pkg_resources import resource_filename
@@ -70,36 +69,6 @@ def parse_length_filter(logfile):
         return int(removed), int(kept)
 
 
-def per_marker_typing_rate(samples):
-    sample_rates = dict()
-    for sample in samples:
-        filename = f"analysis/{sample}/{sample}-typing-rate.tsv"
-        sample_df = pd.read_csv(filename, sep="\t").set_index("Marker")
-        sample_rates[sample] = sample_df
-    return sample_rates
-
-
-def per_marker_mapping_rate(samples):
-    sample_rates = dict()
-    for sample in samples:
-        total_reads_filename = f"analysis/{sample}/{sample}-marker-read-counts.csv"
-        total_df = pd.read_csv(total_reads_filename).set_index("Marker")
-        expected_count = total_df["ReadCount"].sum() / len(total_df)
-        total_df["ExpectedObservedRatio"] = round(total_df["ReadCount"] / expected_count, 2)
-        repetitive_filename = Path(f"analysis/{sample}/{sample}-repetitive-reads.csv")
-        if repetitive_filename.stat().st_size > 0:
-            repetitive_df = pd.read_csv(repetitive_filename).set_index("Marker")
-            sample_df = pd.concat([total_df, repetitive_df], axis=1)
-            sample_df["RepetitiveRate"] = sample_df["RepetitiveReads"] / sample_df["ReadCount"]
-        else:
-            sample_df = total_df
-            sample_df["RepetitiveReads"] = None
-            sample_df["RepetitiveRate"] = None
-        sample_rates[sample] = sample_df
-    marker_names = sample_df.index
-    return sample_rates, marker_names
-
-
 def marker_details():
     index = MicrohapIndex.from_files("marker-definitions.tsv", "marker-refr.fasta")
     all_marker_details = list()
@@ -134,16 +103,10 @@ def final_html_report(
     ambiguous_read_threshold=0.2,
     length_threshold=50,
 ):
-    if reads_are_paired:
-        read_length_table = read_length_table_paired_end(samples)
-        qc = PairedReadQCSummary.collect(samples)
-    else:
-        read_length_table = read_length_table_single_end(samples)
-        qc = SingleEndReadQCSummary.collect(samples)
-    mapping_summary = MappingSummary.from_workdir(samples)
-    typing_rates = per_marker_typing_rate(samples)
-    mapping_rates, marker_names = per_marker_mapping_rate(samples)
-    thresholds = load_marker_thresholds(marker_names, thresh_file, thresh_static, thresh_dynamic)
+    reporter = Reporter(samples, reads_are_paired=reads_are_paired)
+    thresholds = load_marker_thresholds(
+        reporter.marker_names, thresh_file, thresh_static, thresh_dynamic
+    )
     thresholds.fillna(0, inplace=True)
     template_loader = FileSystemLoader(resource_filename("microhapulator", "data"))
     env = Environment(loader=template_loader)
@@ -159,46 +122,18 @@ def final_html_report(
             samples=samples,
             summary=summary,
             thresholds=thresholds,
-            read_length_table=read_length_table,
-            typing_rates=typing_rates,
-            mapping_rates=mapping_rates,
-            markernames=marker_names,
-            qc=qc,
-            mapping_summary=mapping_summary,
-            repetitive_reads_by_marker=mapping_summary.repetitive_reads_by_marker(),
+            read_length_table=reporter.read_length_table,
+            typing_rates=reporter.per_marker_typing_rates,
+            mapping_rates=reporter.per_marker_mapping_rates,
+            markernames=reporter.marker_names,
+            qc=reporter.qc_summary,
+            mapping_summary=reporter.mapping_summary,
+            repetitive_reads_by_marker=reporter.mapping_summary.repetitive_reads_by_marker(),
             reads_are_paired=reads_are_paired,
             ambiguous_read_threshold=ambiguous_read_threshold,
             read_length_threshold=length_threshold,
         )
         print(output, file=outfh, end="")
-
-
-def read_length_table_paired_end(samples):
-    read_length_data = list()
-    for sample in samples:
-        with open(f"analysis/{sample}/{sample}-r1-read-lengths.json", "r") as fh:
-            r1lengths = json.load(fh)
-            r1lengths = list(set(r1lengths))
-        with open(f"analysis/{sample}/{sample}-r2-read-lengths.json", "r") as fh:
-            r2lengths = json.load(fh)
-            r2lengths = list(set(r2lengths))
-        if len(r1lengths) != 1 or len(r2lengths) != 1:
-            return None
-        read_length_data.append((sample, r1lengths[0], r2lengths[0]))
-    else:
-        return pd.DataFrame(read_length_data, columns=("Sample", "LengthR1", "LengthR2"))
-
-
-def read_length_table_single_end(samples):
-    read_length_data = list()
-    for sample in samples:
-        with open(f"analysis/{sample}/{sample}-read-lengths.json", "r") as fh:
-            lengths = json.load(fh)
-            lengths = list(set(lengths))
-        if len(lengths) != 1:
-            return None
-        read_length_data.append((sample, lengths[0]))
-    return pd.DataFrame(read_length_data, columns=("Sample", "Length"))
 
 
 def aggregate_summary(samples, reads_are_paired=True):
@@ -273,8 +208,8 @@ def aggregate_summary(samples, reads_are_paired=True):
     return pd.DataFrame(data, columns=colnames)
 
 
-def marker_detail_report(samples):
-    mapping_rates, marker_names = per_marker_mapping_rate(samples)
+def marker_detail_report(samples, reads_are_paired=True):
+    reporter = Reporter(samples, reads_are_paired=reads_are_paired)
     marker_details_table = marker_details()
     templatefile = resource_filename("microhapulator", "data/marker_details_template.html")
     with open(templatefile, "r") as infh, open("marker-detail-report.html", "w") as outfh:
@@ -282,9 +217,9 @@ def marker_detail_report(samples):
         output = template.render(
             date=datetime.now().replace(microsecond=0).isoformat(),
             mhpl8rversion=microhapulator.__version__,
-            mapping_rates=mapping_rates,
-            typing_rates=per_marker_typing_rate(samples),
-            markernames=sorted(marker_names),
+            mapping_rates=reporter.per_marker_mapping_rates,
+            typing_rates=reporter.per_marker_typing_rates,
+            markernames=sorted(reporter.marker_names),
             marker_details_table=marker_details_table,
             isna=pd.isna,
         )
