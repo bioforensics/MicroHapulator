@@ -11,11 +11,11 @@
 # -------------------------------------------------------------------------------------------------
 
 from .reporter import Reporter
+from .thresholds import ThresholdIndex
 from datetime import datetime
-from jinja2 import FileSystemLoader, Environment, Template
+from jinja2 import Template
 import microhapulator
 import pandas as pd
-from microhapulator import load_marker_thresholds
 from microhapulator.marker import MicrohapIndex
 from pkg_resources import resource_filename
 
@@ -29,40 +29,21 @@ def final_html_report(
     ambiguous_read_threshold=0.2,
     length_threshold=50,
 ):
-    reporter = Reporter(samples, reads_are_paired=reads_are_paired)
-    thresholds = load_marker_thresholds(
-        reporter.marker_names, thresh_file, thresh_static, thresh_dynamic
+    thresholds = ThresholdIndex.load(
+        configfile=thresh_file,
+        global_static=thresh_static,
+        global_dynamic=thresh_dynamic,
+        ambiguous=ambiguous_read_threshold,
+        min_read_length=length_threshold,
     )
-    thresholds.fillna(0, inplace=True)
-    template_loader = FileSystemLoader(resource_filename("microhapulator", "data"))
-    env = Environment(loader=template_loader)
-    if reads_are_paired:
-        template_file = "paired.html"
-    else:
-        template_file = "single.html"
-    template = env.get_template(template_file)
+    reporter = Reporter(samples, thresholds, reads_are_paired=reads_are_paired)
     with open("report.html", "w") as outfh:
-        output = template.render(
-            date=datetime.now().replace(microsecond=0).isoformat(),
-            mhpl8rversion=microhapulator.__version__,
-            samples=samples,
-            thresholds=thresholds,
-            read_length_table=reporter.read_length_table,
-            typing_summary=reporter.typing_summary,
-            mapping_rates=reporter.per_marker_mapping_rates,
-            markernames=reporter.marker_names,
-            qc=reporter.qc_summary,
-            mapping_summary=reporter.mapping_summary,
-            repetitive_reads_by_marker=reporter.mapping_summary.repetitive_reads_by_marker(),
-            reads_are_paired=reads_are_paired,
-            ambiguous_read_threshold=ambiguous_read_threshold,
-            read_length_threshold=length_threshold,
-        )
+        output = reporter.render()
         print(output, file=outfh, end="")
 
 
 def marker_detail_report(samples, reads_are_paired=True):
-    reporter = Reporter(samples, reads_are_paired=reads_are_paired)
+    reporter = Reporter(samples, ThresholdIndex(), reads_are_paired=reads_are_paired)
     marker_details_table = marker_details()
     templatefile = resource_filename("microhapulator", "data/marker_details_template.html")
     with open(templatefile, "r") as infh, open("marker-detail-report.html", "w") as outfh:

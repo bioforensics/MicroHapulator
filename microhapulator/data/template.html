@@ -293,11 +293,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for marker, row in thresholds.iterrows() %}
+                    {% for marker in markernames %}
                     <tr>
-                        <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
-                        <td class="alnrt" data-sortvalue="{{row.Static}}">{{row.Static}}</td>
-                        <td class="alnrt" data-sortvalue="{{row.Dynamic}}">{{"{:.1f}".format(row.Dynamic * 100)}}%</td>
+                        <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ marker }}</a></td>
+                        <td class="alnrt" data-sortvalue="{{ thresholds.get(marker)[0] }}">{{ thresholds.get(marker)[0] }}</td>
+                        <td class="alnrt" data-sortvalue="{{ thresholds.get(marker)[1] }}">{{ "{:.1f}".format(thresholds.get(marker)[1] * 100) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>

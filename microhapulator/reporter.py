@@ -13,13 +13,20 @@
 from .mapstats import MappingSummary
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from .typestats import TypingSummary
+from datetime import datetime
+from jinja2 import FileSystemLoader, Environment
+import microhapulator
 import json
 import pandas as pd
 from pathlib import Path
+from pkg_resources import resource_filename
 
 
 class Reporter:
-    def __init__(self, samples, workdir=".", reads_are_paired=True):
+    def __init__(self, samples, thresholds, workdir=".", reads_are_paired=True):
+        self.samples = sorted(samples)
+        self.thresholds = thresholds
+        self.reads_are_paired = reads_are_paired
         if reads_are_paired:
             self.read_length_table = read_length_table_paired_end(samples, workdir=workdir)
             self.qc_summary = PairedReadQCSummary.collect(samples, workdir=workdir)
@@ -29,12 +36,37 @@ class Reporter:
         self.mapping_summary = MappingSummary.from_workdir(samples)
         self.typing_summary = TypingSummary.from_workdir(samples)
         self.per_marker_mapping_rates = per_marker_mapping_rate(samples, workdir=workdir)
-        self.thresholds = None
 
     @property
     def marker_names(self):
         for sample_rates in self.per_marker_mapping_rates.values():
             return sample_rates.index
+
+    def render(self):
+        template_loader = FileSystemLoader(resource_filename("microhapulator", "data"))
+        env = Environment(loader=template_loader)
+        if self.reads_are_paired:
+            template_file = "paired.html"
+        else:
+            template_file = "single.html"
+        template = env.get_template(template_file)
+        output = template.render(
+            date=datetime.now().replace(microsecond=0).isoformat(),
+            mhpl8rversion=microhapulator.__version__,
+            samples=self.samples,
+            thresholds=self.thresholds,
+            read_length_table=self.read_length_table,
+            typing_summary=self.typing_summary,
+            mapping_rates=self.per_marker_mapping_rates,
+            markernames=self.marker_names,
+            qc=self.qc_summary,
+            mapping_summary=self.mapping_summary,
+            repetitive_reads_by_marker=self.mapping_summary.repetitive_reads_by_marker(),
+            reads_are_paired=self.reads_are_paired,
+            ambiguous_read_threshold=self.thresholds.ambiguous,
+            read_length_threshold=self.thresholds.min_read_length,
+        )
+        return output
 
 
 def read_length_table_paired_end(samples, workdir="."):
@@ -82,5 +114,4 @@ def per_marker_mapping_rate(samples, workdir="."):
             sample_df["RepetitiveReads"] = None
             sample_df["RepetitiveRate"] = None
         sample_rates[sample] = sample_df
-    # marker_names = sample_df.index #FIXME
     return sample_rates
