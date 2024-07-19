@@ -10,11 +10,13 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from .details import MarkerDetails
+from .marker import MicrohapIndex
 from .mapstats import MappingSummary
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from .typestats import TypingSummary
 from datetime import datetime
-from jinja2 import FileSystemLoader, Environment
+from jinja2 import FileSystemLoader, Environment, Template
 import microhapulator
 import json
 import pandas as pd
@@ -22,7 +24,7 @@ from pathlib import Path
 from pkg_resources import resource_filename
 
 
-class Reporter:
+class OverviewReporter:
     def __init__(self, samples, thresholds, workdir=".", reads_are_paired=True):
         self.samples = sorted(samples)
         self.thresholds = thresholds
@@ -67,6 +69,37 @@ class Reporter:
             read_length_threshold=self.thresholds.min_read_length,
         )
         return output
+
+
+class DetailReporter:
+    def __init__(self, samples, workdir="."):
+        self.typing_summary = TypingSummary.from_workdir(samples)
+        self.per_marker_mapping_rates = per_marker_mapping_rate(samples, workdir=workdir)
+        index = MicrohapIndex.from_files(
+            Path(workdir) / "marker-definitions.tsv",
+            Path(workdir) / "marker-refr.fasta",
+        )
+        self.marker_details = list(MarkerDetails.from_index(index))
+
+    @property
+    def marker_names(self):
+        for sample_rates in self.per_marker_mapping_rates.values():
+            return sample_rates.index
+
+    def render(self):
+        templatefile = resource_filename("microhapulator", "data/marker_details_template.html")
+        with open(templatefile, "r") as fh:
+            template = Template(fh.read())
+            output = template.render(
+                date=datetime.now().replace(microsecond=0).isoformat(),
+                mhpl8rversion=microhapulator.__version__,
+                mapping_rates=self.per_marker_mapping_rates,
+                typing_summary=self.typing_summary,
+                markernames=sorted(self.marker_names),
+                marker_details=self.marker_details,
+                isna=pd.isna,
+            )
+            return output
 
 
 def read_length_table_paired_end(samples, workdir="."):

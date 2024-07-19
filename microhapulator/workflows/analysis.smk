@@ -14,9 +14,8 @@ import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
 from microhapulator.marker import MicrohapIndex
-from microhapulator.pipeaux import marker_detail_report
 from microhapulator.profile import TypingResult
-from microhapulator.reporter import Reporter
+from microhapulator.reporter import OverviewReporter, DetailReporter
 from microhapulator.thresholds import ThresholdIndex
 import pandas as pd
 from pkg_resources import resource_filename
@@ -63,11 +62,14 @@ rule report:
             ambiguous=config["ambiguous_thresh"],
             min_read_length=config["length_thresh"],
         )
-        reporter = Reporter(config["samples"], thresholds, reads_are_paired=config["paired"])
-        with open(output.main, "w") as outfh:
-            output = reporter.render()
-            print(output, file=outfh, end="")
-        marker_detail_report(config["samples"], reads_are_paired=config["paired"])
+        reporter = OverviewReporter(
+            config["samples"], thresholds, reads_are_paired=config["paired"]
+        )
+        with open(output.main, "w") as fh:
+            print(reporter.render(), file=fh, end="")
+        reporter = DetailReporter(config["samples"])
+        with open(output.detail, "w") as fh:
+            print(reporter.render(), file=fh, end="")
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
         shutil.copy(jsfile, "fancyTable.js")
 

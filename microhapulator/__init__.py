@@ -23,6 +23,7 @@ del get_versions
 
 @contextmanager
 def open(filename, mode):
+    filename = str(filename)
     if mode not in ("r", "w"):
         raise ValueError('invalid mode "{}"'.format(mode))
     if filename in ["-", None]:
@@ -68,4 +69,3 @@ from .marker import MicrohapIndex
 from . import profile
 from . import api
 from . import cli
-from . import pipeaux
