@@ -12,7 +12,7 @@
 
 from glob import glob
 from microhapulator import api as mhapi
-from microhapulator.filter import AmbigSingleReadFilter, LengthSingleReadFilter
+from microhapulator.pipe.filter import AmbigSingleReadFilter, LengthSingleReadFilter
 from os import symlink
 
 preproc_aux_files = ["analysis/read-lengths.png", "analysis/multiqc_report.html"]

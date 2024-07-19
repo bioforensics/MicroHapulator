@@ -23,7 +23,6 @@ del get_versions
 
 @contextmanager
 def open(filename, mode):
-    filename = str(filename)
     if mode not in ("r", "w"):
         raise ValueError('invalid mode "{}"'.format(mode))
     if filename in ["-", None]:
@@ -31,7 +30,7 @@ def open(filename, mode):
         yield filehandle
     else:
         openfunc = builtins.open
-        if filename.endswith(".gz"):
+        if str(filename).endswith(".gz"):
             openfunc = gzopen
             mode += "t"
         with openfunc(filename, mode) as filehandle:

@@ -578,10 +578,7 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     return result
 
 
-def calculate_read_lengths(
-    fastq,
-    lengthsfile,
-):
+def calculate_read_lengths(fastq, lengthsfile):
     """Count read lengths
 
     :param str fastq: path of a FASTQ file containing NGS reads

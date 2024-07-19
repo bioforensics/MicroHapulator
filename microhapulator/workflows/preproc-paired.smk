@@ -11,7 +11,6 @@
 # -------------------------------------------------------------------------------------------------
 
 from glob import glob
-from itertools import chain
 from microhapulator import api as mhapi
 from microhapulator.pipe.filter import AmbigPairedReadFilter, LengthSingleReadFilter
 from os import symlink

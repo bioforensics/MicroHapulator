@@ -16,6 +16,7 @@ from microhapulator import load_marker_frequencies
 from microhapulator import open as mhopen
 import microhapulator.api as mhapi
 from microhapulator.profile import Profile
+import sys
 
 
 def subparser(subparsers):
