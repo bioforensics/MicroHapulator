@@ -342,12 +342,9 @@ class TypingResult(Profile):
         """
         for marker, mdata in self.data["markers"].items():
             static, dynamic = None, None
-            if thresholds is not None and marker in thresholds.index:
-                static, dynamic = thresholds.loc[marker]
+            if thresholds is not None:
+                static, dynamic = thresholds.get(marker)
             self.data["markers"][marker]["genotype"] = list()
-            if static is None and dynamic is None:
-                # No thresholds for calling haplotypes, just report raw haplotype counts
-                continue
             self.data["markers"][marker]["thresholds"] = dict()
             hapcounts = mdata["typing_result"]
             genotype_call = set()

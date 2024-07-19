@@ -11,4 +11,3 @@
 # -------------------------------------------------------------------------------------------------
 
 from .reporter import OverviewReporter, DetailReporter
-from .thresholds import ThresholdIndex

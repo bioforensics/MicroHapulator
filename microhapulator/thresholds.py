@@ -54,14 +54,13 @@ class ThresholdIndex:
         )
         if configfile:
             config = pd.read_csv(configfile, sep=None, engine="python")
-            config = config.fillna(0).astype({"Static": "Int64"})
             missing = set(["Marker", "Static", "Dynamic"]) - set(config.columns)
             if len(missing) > 0:
                 missingstr = ",".join(sorted(missing))
                 raise ValueError(f"filter config file missing column(s): {missingstr}")
             if len(config.Marker) != len(config.Marker.unique()):
                 raise ValueError("filter config file contains duplicate entries for some markers")
-            config = config.set_index("Marker", drop=True)
+            config = config.fillna(0).astype({"Static": "Int64"}).set_index("Marker", drop=True)
             for marker, row in config.iterrows():
                 index.set(marker, static=row.Static, dynamic=row.Dynamic)
         return index

@@ -46,28 +46,3 @@ def test_load_marker_frequencies_missing_or_bad_columns(tsv):
     message = r"column\(s\) missing from marker frequency file: Haplotype"
     with pytest.raises(ValueError, match=message):
         microhapulator.load_marker_frequencies(data_file(tsv))
-
-
-def test_load_marker_filters():
-    markers = ("mh01XYZ-1", "mh02XYZ-2", "mh02XYZ-3")
-    configfile = data_file("filters.csv")
-    thresholds = microhapulator.load_marker_thresholds(
-        markers, configfile=configfile, global_static=10, global_dynamic=0.015
-    )
-    print(thresholds)
-    assert thresholds.shape == (3, 2)
-    assert thresholds.loc["mh01XYZ-1", "Static"] == 5
-    assert thresholds.loc["mh02XYZ-2", "Static"] == 10
-    assert thresholds.loc["mh02XYZ-3", "Static"] == 10
-    assert thresholds.loc["mh01XYZ-1", "Dynamic"] == pytest.approx(0.001)
-    assert thresholds.loc["mh02XYZ-2", "Dynamic"] == pytest.approx(0.015)
-    assert thresholds.loc["mh02XYZ-3", "Dynamic"] == pytest.approx(0.015)
-
-
-def test_load_marker_filters_default():
-    markers = ("mh04ZZZ-1", "mh06ZZZ-2", "mh19ZZZ-3", "mh22ZZZ-4")
-    thresholds = microhapulator.load_marker_thresholds(markers)
-    assert thresholds.shape == (4, 2)
-    for marker, row in thresholds.iterrows():
-        assert row.Static == 5
-        assert row.Dynamic == pytest.approx(0.02)

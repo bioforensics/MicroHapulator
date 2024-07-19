@@ -11,8 +11,9 @@
 # -------------------------------------------------------------------------------------------------
 
 from microhapulator import api as mhapi
-from microhapulator.pipe import OverviewReporter, DetailReporter, ThresholdIndex
+from microhapulator.pipe import OverviewReporter, DetailReporter
 from microhapulator.profile import TypingResult
+from microhapulator.thresholds import ThresholdIndex
 from pkg_resources import resource_filename
 import shutil
 
