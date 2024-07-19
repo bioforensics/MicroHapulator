@@ -10,14 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import matplotlib
-from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
-from microhapulator.marker import MicrohapIndex
+from microhapulator.pipe import OverviewReporter, DetailReporter, ThresholdIndex
 from microhapulator.profile import TypingResult
-from microhapulator.reporter import OverviewReporter, DetailReporter
-from microhapulator.thresholds import ThresholdIndex
-import pandas as pd
 from pkg_resources import resource_filename
 import shutil
 

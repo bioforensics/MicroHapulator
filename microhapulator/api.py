@@ -19,7 +19,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import MicrohapIndex
 from microhapulator import open as mhopen
-from microhapulator.mapstats import MappingStats
+from microhapulator.pipe.mapstats import MappingStats
 from microhapulator.profile import SimulatedProfile, TypingResult
 import numpy as np
 import os

@@ -11,13 +11,13 @@
 # -------------------------------------------------------------------------------------------------
 
 from .details import MarkerDetails
-from .marker import MicrohapIndex
 from .mapstats import MappingSummary
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from .typestats import TypingSummary
 from datetime import datetime
 from jinja2 import FileSystemLoader, Environment, Template
 import microhapulator
+from microhapulator.marker import MicrohapIndex
 import json
 import pandas as pd
 from pathlib import Path
