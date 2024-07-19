@@ -103,7 +103,7 @@ def per_marker_mapping_rate(samples, workdir="."):
         total_reads_filename = f"{workdir}/analysis/{sample}/{sample}-marker-read-counts.csv"
         total_df = pd.read_csv(total_reads_filename).set_index("Marker")
         expected_count = total_df["ReadCount"].sum() / len(total_df)
-        total_df["ExpectedObservedRatio"] = round(total_df["ReadCount"] / expected_count, 2)
+        total_df["ExpectedObservedRatio"] = total_df["ReadCount"] / expected_count
         repetitive_filename = Path(f"{workdir}/analysis/{sample}/{sample}-repetitive-reads.csv")
         if repetitive_filename.stat().st_size > 0:
             repetitive_df = pd.read_csv(repetitive_filename).set_index("Marker")

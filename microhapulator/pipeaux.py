@@ -20,28 +20,6 @@ from microhapulator.marker import MicrohapIndex
 from pkg_resources import resource_filename
 
 
-def final_html_report(
-    samples,
-    reads_are_paired=True,
-    thresh_static=10,
-    thresh_dynamic=0.02,
-    thresh_file=None,
-    ambiguous_read_threshold=0.2,
-    length_threshold=50,
-):
-    thresholds = ThresholdIndex.load(
-        configfile=thresh_file,
-        global_static=thresh_static,
-        global_dynamic=thresh_dynamic,
-        ambiguous=ambiguous_read_threshold,
-        min_read_length=length_threshold,
-    )
-    reporter = Reporter(samples, thresholds, reads_are_paired=reads_are_paired)
-    with open("report.html", "w") as outfh:
-        output = reporter.render()
-        print(output, file=outfh, end="")
-
-
 def marker_detail_report(samples, reads_are_paired=True):
     reporter = Reporter(samples, ThresholdIndex(), reads_are_paired=reads_are_paired)
     marker_details_table = marker_details()

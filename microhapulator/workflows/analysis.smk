@@ -14,8 +14,10 @@ import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import api as mhapi
 from microhapulator.marker import MicrohapIndex
-from microhapulator.pipeaux import final_html_report, marker_detail_report
+from microhapulator.pipeaux import marker_detail_report
 from microhapulator.profile import TypingResult
+from microhapulator.reporter import Reporter
+from microhapulator.thresholds import ThresholdIndex
 import pandas as pd
 from pkg_resources import resource_filename
 import shutil
@@ -56,18 +58,20 @@ rule report:
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/fancyTable.js"),
     output:
-        "report.html",
-        "marker-detail-report.html",
+        main="report.html",
+        detail="marker-detail-report.html",
     run:
-        final_html_report(
-            config["samples"],
-            reads_are_paired=config["paired"],
-            thresh_static=config["thresh_static"],
-            thresh_dynamic=config["thresh_dynamic"],
-            thresh_file=config["thresh_file"],
-            ambiguous_read_threshold=config["ambiguous_thresh"],
-            length_threshold=config["length_thresh"],
+        thresholds = ThresholdIndex.load(
+            configfile=config["thresh_file"],
+            global_static=config["thresh_static"],
+            global_dynamic=config["thresh_dynamic"],
+            ambiguous=config["ambiguous_thresh"],
+            min_read_length=config["length_thresh"],
         )
+        reporter = Reporter(config["samples"], thresholds, reads_are_paired=config["paired"])
+        with open(output.main, "w") as outfh:
+            output = reporter.render()
+            print(output, file=outfh, end="")
         marker_detail_report(config["samples"], reads_are_paired=config["paired"])
         jsfile = resource_filename("microhapulator", "data/fancyTable.js")
         shutil.copy(jsfile, "fancyTable.js")
