@@ -602,6 +602,7 @@ def read_length_dist(
     edgecolor=None,
 ):
     """Plot distribution of read lengths
+
     :param list lengthsfiles: list of JSON files containing read lengths for each sample
     :param str plotfile: path of a graphic file to create
     :param str xlabel: label for the X axis

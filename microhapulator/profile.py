@@ -338,7 +338,7 @@ class TypingResult(Profile):
         represent a percentage of the total read count at the marker, after any haplotypes failing
         a static threshold are discarded.
 
-        :param pandas.DataFrame thresholds: tabular data structure containing static and dynamic thresholds for each marker; two required columns, with marker name as index: **Static** and **Dynamic**
+        :param ThresholdIndex thresholds: data structure containing static and dynamic thresholds
         """
         for marker, mdata in self.data["markers"].items():
             static, dynamic = None, None
