@@ -71,25 +71,23 @@
             </select>
             <input id="searchbar" type="search" onsearch="search_marker()" name="search" placeholder="Search markers...">
             <br />
-            {% for markername in markernames %}
-            <div class="marker_details" id={{markername}} style="display:none">
+            {% for details in marker_details %}
+            <div class="marker_details" id={{details.identifier}} style="display:none">
                 <h4>Microhaplotype Length</h4>
-                <p>{{marker_details_table.loc[markername,'Length']}} bp</p>
+                <p>{{ details.seq_length }} bp</p>
                 <br />
 
                 <h4>%GC content</h4>
-                <p>{{marker_details_table.loc[markername,'GC']}}%</p>
+                <p>{{ "{:.2f}".format(details.gc_content) }}%</p>
                 <br />
 
                 <h4>SNP Offsets</h4>
-                <p><strong>Locus</strong>: <span class="offsets">{{marker_details_table.loc[markername,'Offsets']}}</span></p>
-                {% if not isna(marker_details_table.loc[markername,"Chrom"]) %}
-                <p><strong>GRCh38 {{marker_details_table.loc[markername,"Chrom"]}}</strong>: {{marker_details_table.loc[markername,"Hg38Offset"]}}</p>
-                {% endif %}
+                <p><strong>Locus</strong>: <span class="offsets">{{ details.marker_offsets }}</span></p>
+                <p><strong>GRCh38 {{ details.chromosome }}</strong>: {{ details.chrom_offsets }}</p>
                 <br />
 
                 <h4>Microhaplotype Sequence (SNPs in red) </h4>
-                <div class="sequence">{{marker_details_table.loc[markername,"Sequence"]}}</div>
+                <div class="sequence">{{ details.sequence }}</div>
                 <br />
 
                 <h4>Read Mapping</h4>
@@ -113,14 +111,14 @@
                     {% for sample, sample_data in mapping_rates.items()%}
                     <tr>
                         <td>{{sample}}</td>
-                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[markername,'ReadCount'])}}</td>
-                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'ExpectedObservedRatio'])}}</td>
-                        {% if isna(sample_data.loc[markername, 'RepetitiveReads']) %}
+                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[details.identifier,'ReadCount'])}}</td>
+                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[details.identifier, 'ExpectedObservedRatio'])}}</td>
+                        {% if isna(sample_data.loc[details.identifier, 'RepetitiveReads']) %}
                         <td class="alnrt">N/A</td>
                         <td class="alnrt">N/A</td>
                         {% else %}
-                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[markername, 'RepetitiveReads'])}}</td>
-                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[markername, 'RepetitiveRate']*100)}}%</td>
+                        <td class="alnrt">{{"{:,d}".format(sample_data.loc[details.identifier, 'RepetitiveReads'])}}</td>
+                        <td class="alnrt">{{"{:.2f}".format(sample_data.loc[details.identifier, 'RepetitiveRate']*100)}}%</td>
                         {% endif %}
                     </tr>
                     {% endfor %}
@@ -156,7 +154,7 @@
                     In each plot, the red dotted line shows the threshold used for that sample to discriminate between true MH alleles and noise/artifacts and make a final genotype determination.
                 </p>
                 {% for sample in typing_summary.keys(): %}
-                <img src="analysis/{{sample}}/callplots/{{markername}}.png" />
+                <img src="analysis/{{sample}}/callplots/{{details.identifier}}.png" />
                 {% endfor %}
             </div>
             {% endfor %}

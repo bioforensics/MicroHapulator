@@ -24,12 +24,7 @@ import shutil
 
 
 def full_reference_index_files(fasta):
-    filename = fasta
-    filenames = []
-    for suffix in ("amb", "ann", "bwt", "pac", "sa"):
-        idxfile = f"{filename}.{suffix}"
-        filenames.append(idxfile)
-    return filenames
+    return [f"{fasta}.{sfx}" for sfx in ("amb", "ann", "bwt", "pac", "sa")]
 
 
 include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"

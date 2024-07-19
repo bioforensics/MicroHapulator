@@ -10,6 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from .details import MarkerDetails
 from .reporter import Reporter
 from .thresholds import ThresholdIndex
 from datetime import datetime
@@ -22,7 +23,8 @@ from pkg_resources import resource_filename
 
 def marker_detail_report(samples, reads_are_paired=True):
     reporter = Reporter(samples, ThresholdIndex(), reads_are_paired=reads_are_paired)
-    marker_details_table = marker_details()
+    index = MicrohapIndex.from_files("marker-definitions.tsv", "marker-refr.fasta")
+    marker_details = list(MarkerDetails.from_index(index))
     templatefile = resource_filename("microhapulator", "data/marker_details_template.html")
     with open(templatefile, "r") as infh, open("marker-detail-report.html", "w") as outfh:
         template = Template(infh.read())
@@ -32,31 +34,7 @@ def marker_detail_report(samples, reads_are_paired=True):
             mapping_rates=reporter.per_marker_mapping_rates,
             typing_summary=reporter.typing_summary,
             markernames=sorted(reporter.marker_names),
-            marker_details_table=marker_details_table,
+            marker_details=marker_details,
             isna=pd.isna,
         )
         print(output, file=outfh, end="")
-
-
-def marker_details():
-    index = MicrohapIndex.from_files("marker-definitions.tsv", "marker-refr.fasta")
-    all_marker_details = list()
-    for locus, marker in index:
-        marker_offsets = ", ".join([str(o) for o in sorted(marker.offsets_locus)])
-        chrom = marker.chrom
-        offsets38 = ", ".join([str(o) for o in sorted(marker.offsets_chrom)])
-        seq = locus.sequence.strip().upper()
-        gc_content = round((seq.count("G") + seq.count("C")) / len(seq) * 100, 2)
-        sample_details = [
-            marker.id,
-            len(seq),
-            gc_content,
-            marker_offsets,
-            seq,
-            chrom,
-            offsets38,
-        ]
-        all_marker_details.append(sample_details)
-    col_names = ["Marker", "Length", "GC", "Offsets", "Sequence", "Chrom", "Hg38Offset"]
-    marker_details_table = pd.DataFrame(all_marker_details, columns=col_names).set_index("Marker")
-    return marker_details_table
