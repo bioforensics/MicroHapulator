@@ -329,7 +329,7 @@ class TypingResult(Profile):
     def record_haplotype(self, marker, haplotype, count):
         self.data["markers"][marker]["typing_result"][haplotype] = count
 
-    def filter(self, thresholds=None):
+    def filter(self, thresholds):
         """Apply static and/or dynamic thresholds to distinguish true and false haplotypes
 
         Thresholds are applied to the haplotype read counts of a raw typing result. Static integer
@@ -341,9 +341,6 @@ class TypingResult(Profile):
         :param ThresholdIndex thresholds: data structure containing static and dynamic thresholds
         """
         for marker, mdata in self.data["markers"].items():
-            static, dynamic = None, None
-            if thresholds is not None:
-                static, dynamic = thresholds.get(marker)
             self.data["markers"][marker]["genotype"] = list()
             self.data["markers"][marker]["thresholds"] = dict()
             hapcounts = mdata["typing_result"]
@@ -351,6 +348,7 @@ class TypingResult(Profile):
             filtered = set()
             totalcount = sum(hapcounts.values())
             filteredcount = 0
+            static, dynamic = thresholds.get(marker)
             if static is not None and not pd.isna(static) and static > 0:
                 self.data["markers"][marker]["thresholds"]["static"] = int(static)
                 for haplotype, count in hapcounts.items():

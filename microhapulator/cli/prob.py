@@ -16,7 +16,19 @@ from microhapulator import load_marker_frequencies
 from microhapulator import open as mhopen
 import microhapulator.api as mhapi
 from microhapulator.profile import Profile
-import sys
+
+
+def main(args):
+    prof1 = Profile(fromfile=args.profile1)
+    prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
+    frequencies = load_marker_frequencies(args.freq)
+    result = mhapi.prob(frequencies, prof1, prof2=prof2, erate=args.erate)
+    key = "random_match_probability" if prof2 is None else "likelihood_ratio"
+    data = {
+        key: "{:.3E}".format(result),
+    }
+    with mhopen(args.out, "w") as fh:
+        json.dump(data, fh, indent=4)
 
 
 def subparser(subparsers):
@@ -44,16 +56,3 @@ def subparser(subparsers):
         default=None,
         help="typing result or simulated genotype in JSON format; optional",
     )
-
-
-def main(args):
-    prof1 = Profile(fromfile=args.profile1)
-    prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
-    frequencies = load_marker_frequencies(args.freq)
-    result = mhapi.prob(frequencies, prof1, prof2=prof2, erate=args.erate)
-    key = "random_match_probability" if prof2 is None else "likelihood_ratio"
-    data = {
-        key: "{:.3E}".format(result),
-    }
-    with mhopen(args.out, "w") as fh:
-        json.dump(data, fh, indent=4)
