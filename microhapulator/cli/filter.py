@@ -11,11 +11,18 @@
 # -------------------------------------------------------------------------------------------------
 
 
-import microhapulator.api as mhapi
-from microhapulator import load_marker_thresholds
+from microhapulator import ThresholdIndex
 from microhapulator.profile import TypingResult
-import pandas as pd
 import sys
+
+
+def main(args):
+    result = TypingResult(fromfile=args.result)
+    thresholds = ThresholdIndex.load(
+        args.config, global_static=args.static, global_dynamic=args.dynamic
+    )
+    result.filter(thresholds)
+    result.dump(args.out)
 
 
 def subparser(subparsers):
@@ -52,10 +59,3 @@ def subparser(subparsers):
         help="CSV file specifying marker-specific thresholds to override global thresholds; three required columns: 'Marker' for the marker name; 'Static' and 'Dynamic' for marker-specific thresholds",
     )
     cli.add_argument("result", help="MicroHapulator typing result in JSON format")
-
-
-def main(args):
-    result = TypingResult(fromfile=args.result)
-    thresholds = load_marker_thresholds(result.markers(), args.config, args.static, args.dynamic)
-    result.filter(thresholds)
-    result.dump(args.out)

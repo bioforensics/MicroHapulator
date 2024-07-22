@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------------------------------
-# Copyright (c) 2018, DHS.
+# Copyright (c) 2024, DHS.
 #
 # This file is part of MicroHapulator (https://github.com/bioforensics/microhapulator) and is
 # licensed under the BSD license: see LICENSE.txt.
@@ -10,14 +10,4 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from ._version import get_versions
-
-__version__ = get_versions()["version"]
-del get_versions
-
-from .load import open, load_marker_frequencies
-from .marker import MicrohapIndex
-from .thresholds import ThresholdIndex
-from . import profile
-from . import api
-from . import cli
+from .reporter import OverviewReporter, DetailReporter

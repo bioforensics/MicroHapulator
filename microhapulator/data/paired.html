@@ -1,4 +1,6 @@
 {% extends "template.html" %}
+
+
 {% block table_of_contents %}
 <li><a href="#readqc">Read QA/QC</a></li>
 <li><a href="#readmerging">Read Merging</a></li>
@@ -7,11 +9,13 @@
 <li><a href="#filters">Genotype Calling</a></li>
 {% endblock %}
 
+
 {% block read_len_fig %}
 <img src="analysis/r1-read-lengths.png" />
 <img src="analysis/r2-read-lengths.png" />
 <p class="caption"><strong>Figure 1.1</strong>: Ridge plots showing the length distribution of input R1 (left) and R2 (right) reads.</p>
 {% endblock %}
+
 
 {% block read_len_table %}
 <p class="title"><strong>Table 1.1</strong>: Uniform read lengths for each sample.</p>
@@ -30,6 +34,7 @@
     {% endfor %}
 </table>
 {% endblock %}
+
 
 {% block read_filter_stats %}
 <p>
@@ -113,6 +118,7 @@
 {% endfor %}
 </table>
 {% endblock %}
+
 
 {% block read_map_header %}
 <p>Filtered and merged reads are aligned to marker reference sequences using <a href="http://bio-bwa.sourceforge.net/bwa.shtml" target="_blank">BWA MEM</a> and formatted, sorted, and indexed using <a href="http://www.htslib.org/" target="_blank">SAMtools</a>.</p>

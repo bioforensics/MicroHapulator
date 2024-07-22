@@ -99,7 +99,6 @@
             <ol>
                 {% block table_of_contents %}
                 {% endblock %}
-
             </ol>
             <p>
                 A summary of the statistics presented in this report is aggregated in a single table available at <code>analysis/summary.tsv</code> in the working directory.
@@ -182,7 +181,7 @@
                     <thead>
                         <tr>
                             <td></td>
-                            {% for sample in typing_rates.keys() %}
+                            {% for sample in samples %}
                             <td style="visibility: collapse;">{{sample}}</td>
                             <td style="font-weight:bold">{{sample}}</td>
                             {% endfor %}
@@ -217,14 +216,16 @@
 
             <a name="typing"></a>
             <h2>Haplotype Calling</h2>
-            <p>Haplotypes are called empirically using <code>mhpl8r type</code>mhpl8r type as follows. MicroHapulator examines each
-                aligned read to determine its suitability for haplotype calling: this is a <em>typing event</em>. If the read
-                alignment spans all SNPs of interest, the typing event is successful and a haplotype call is made. If not, the
-                typing event is failed and no haplotype call is made. (<em>Note that if more than one marker is defined at a given
-                locus, MicroHapulator can attempt multiple typing events per read. In this case the number of <strong>Attempted Typing
-                Events </strong> will exceed the number of <strong>Mapped Reads.</strong></em>) Collectively, the tallies of each observed haplotype represent a
-                typing result for each sample. The typing rate is calculated as the number of successful typing events divided by
-                the total number of attempted typing events.</p>
+            <p>
+                Haplotypes are called empirically using <code>mhpl8r type</code> as follows.
+                MicroHapulator examines each aligned read to determine its suitability for haplotype calling: this is a <em>typing event</em>.
+                If the read alignment spans all SNPs of interest, the typing event is successful and a haplotype call is made.
+                If not, the typing event is failed and no haplotype call is made.
+                (<em>Note that if more than one marker is defined at a given locus, MicroHapulator can attempt multiple typing events per read.
+                In this case the number of <strong>Attempted Typing Events</strong> will exceed the number of <strong>Mapped Reads</strong>.</em>)
+                Collectively, the tallies of each observed haplotype represent a typing result for each sample.
+                The typing rate is calculated as the number of successful typing events divided by the total number of attempted typing events.
+            </p>
             <p class="title"><strong>Table 4.1</strong>: Read typing metrics.</p>
             <table>
                 <tr>
@@ -234,13 +235,13 @@
                     <th class="alnrt">Successful Typing Events</th>
                     <th class="alnrt">Typing Success Rate</th>
                 </tr>
-                {% for i, row in summary.iterrows() %}
+                {% for sample, stats in typing_summary.items() %}
                 <tr>
-                    <td>{{row.Sample}}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.Mapped) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.TypedAttempted) }}</td>
-                    <td class="alnrt">{{ "{:,}".format(row.TypedSuccess) }}</td>
-                    <td class="alnrt">{{ "{:.2f}".format(row.TypingRate * 100) }}%</td>
+                    <td>{{ sample }}</td>
+                    <td class="alnrt">{{ mapping_summary[sample].mapped_reads }}</td>
+                    <td class="alnrt">{{ stats.attempted }}</td>
+                    <td class="alnrt">{{ stats.successful }}</td>
+                    <td class="alnrt">{{ stats.typing_rate }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -253,7 +254,7 @@
                     <thead>
                         <tr>
                             <th>Marker</th>
-                            {% for sample in typing_rates.keys() %}
+                            {% for sample in typing_summary.keys() %}
                             <th class=alnrt style="font-weight:bold">{{sample}}</th>
                             {% endfor %}
                         </tr>
@@ -261,9 +262,9 @@
                     <tbody>
                         {% for markername in markernames %}
                         <tr>
-                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{markername}}</a></td>
-                            {% for sample_data in typing_rates.values()%}
-                            <td class="alnrt" data-sortvalue="{{sample_data.loc[markername, 'TypingRate']}}">{{"{:,.2f}".format(sample_data.loc[markername, 'TypingRate']*100)}}%</td>
+                            <td><a href="marker-detail-report.html?marker={{markername}}" target="_blank">{{ markername }}</a></td>
+                            {% for summary in typing_summary.values() %}
+                            <td class="alnrt" data-sortvalue="{{ summary.marker_typing_rate(markername) }}">{{ summary.marker_typing_rate(markername) }}%</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -292,11 +293,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for marker, row in thresholds.iterrows() %}
+                    {% for marker in markernames %}
                     <tr>
-                        <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{marker}}</a></td>
-                        <td class="alnrt" data-sortvalue="{{row.Static}}">{{row.Static}}</td>
-                        <td class="alnrt" data-sortvalue="{{row.Dynamic}}">{{"{:.1f}".format(row.Dynamic * 100)}}%</td>
+                        <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ marker }}</a></td>
+                        <td class="alnrt" data-sortvalue="{{ thresholds.get(marker)[0] }}">{{ thresholds.get(marker)[0] }}</td>
+                        <td class="alnrt" data-sortvalue="{{ thresholds.get(marker)[1] }}">{{ "{:.1f}".format(thresholds.get(marker)[1] * 100) }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -12,16 +12,15 @@
 
 
 from Bio import SeqIO
-from collections import namedtuple, defaultdict, Counter
+from collections import namedtuple, defaultdict
 import json
 from math import ceil
 import matplotlib
 from matplotlib import pyplot as plt
 from microhapulator import MicrohapIndex
 from microhapulator import open as mhopen
-from microhapulator.mapstats import MappingStats
+from microhapulator.pipe.mapstats import MappingStats
 from microhapulator.profile import SimulatedProfile, TypingResult
-import math
 import numpy as np
 import os
 import pandas as pd
@@ -579,10 +578,7 @@ def type(bamfile, markertsv, minbasequal=10, max_depth=1e6):
     return result
 
 
-def calculate_read_lengths(
-    fastq,
-    lengthsfile,
-):
+def calculate_read_lengths(fastq, lengthsfile):
     """Count read lengths
 
     :param str fastq: path of a FASTQ file containing NGS reads
@@ -606,6 +602,7 @@ def read_length_dist(
     edgecolor=None,
 ):
     """Plot distribution of read lengths
+
     :param list lengthsfiles: list of JSON files containing read lengths for each sample
     :param str plotfile: path of a graphic file to create
     :param str xlabel: label for the X axis
@@ -683,7 +680,7 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
             count_dict = {allele: count for allele, count in count_dict.items() if count >= static}
         counts = count_dict.values()
         alleles = count_dict.keys()
-        fig = plt.figure(figsize=(4, 4), dpi=150)
+        plt.figure(figsize=(4, 4), dpi=150)
         plt.bar(range(len(counts)), counts, color="#999999")
         if len(counts) == 1:
             plt.xticks(range(len(counts)), labels=alleles)
@@ -693,7 +690,7 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
         plt.ylabel("Read Count", fontsize=14)
         if "thresholds" in mdata and "dynamic" in mdata["thresholds"]:
             dynamic = mdata["thresholds"]["dynamic"]
-            plt.axhline(y=dynamic, color="#e41a1c", linestyle="--", label=f"Dynamic Threshold")
+            plt.axhline(y=dynamic, color="#e41a1c", linestyle="--", label="Dynamic Threshold")
             plt.legend()
         plt.gca().yaxis.grid(True, color="#DDDDDD")
         plt.gca().set_axisbelow(True)

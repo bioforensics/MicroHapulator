@@ -11,10 +11,10 @@
 # -------------------------------------------------------------------------------------------------
 
 import microhapulator
-from microhapulator import load_marker_thresholds
 import microhapulator.api as mhapi
 from microhapulator.profile import TypingResult
 from microhapulator.tests import data_file
+from microhapulator.thresholds import ThresholdIndex
 import pytest
 from shutil import copyfile
 
@@ -158,9 +158,7 @@ def test_type_cli_simple(tmp_path):
 )
 def test_type_filter_threshold(static, dynamic, genotype):
     result = TypingResult(fromfile=data_file("prof/srm.json"))
-    thresholds = load_marker_thresholds(
-        result.markers(), global_static=static, global_dynamic=dynamic
-    )
+    thresholds = ThresholdIndex.load(global_static=static, global_dynamic=dynamic)
     result.filter(thresholds)
     assert result.haplotypes("mh05KK-170.v1") == genotype
 

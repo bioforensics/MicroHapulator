@@ -18,6 +18,19 @@ import microhapulator.api as mhapi
 from microhapulator.profile import Profile
 
 
+def main(args):
+    prof1 = Profile(fromfile=args.profile1)
+    prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
+    frequencies = load_marker_frequencies(args.freq)
+    result = mhapi.prob(frequencies, prof1, prof2=prof2, erate=args.erate)
+    key = "random_match_probability" if prof2 is None else "likelihood_ratio"
+    data = {
+        key: "{:.3E}".format(result),
+    }
+    with mhopen(args.out, "w") as fh:
+        json.dump(data, fh, indent=4)
+
+
 def subparser(subparsers):
     desc = "Compute a profile random match probability (RMP) or an RMP-based likelihood ratio (LR) test"
     cli = subparsers.add_parser("prob", description=desc)
@@ -43,16 +56,3 @@ def subparser(subparsers):
         default=None,
         help="typing result or simulated genotype in JSON format; optional",
     )
-
-
-def main(args):
-    prof1 = Profile(fromfile=args.profile1)
-    prof2 = Profile(fromfile=args.profile2) if args.profile2 else None
-    frequencies = load_marker_frequencies(args.freq)
-    result = mhapi.prob(frequencies, prof1, prof2=prof2, erate=args.erate)
-    key = "random_match_probability" if prof2 is None else "likelihood_ratio"
-    data = {
-        key: "{:.3E}".format(result),
-    }
-    with mhopen(args.out, "w") as fh:
-        json.dump(data, fh, indent=4)

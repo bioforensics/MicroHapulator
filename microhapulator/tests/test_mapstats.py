@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from microhapulator.mapstats import MappingStats, MappingSummary
+from microhapulator.pipe.mapstats import MappingStats, MappingSummary
 from microhapulator.tests import data_file
 import pytest
 

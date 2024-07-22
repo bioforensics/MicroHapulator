@@ -1,4 +1,6 @@
 {% extends "template.html" %}
+
+
 {% block table_of_contents %}
 <li><a href="#readqc">Read QA/QC</a></li>
 <li><a href="#readmapping">Read Mapping</a></li>
@@ -6,10 +8,12 @@
 <li><a href="#filters">Genotype Calling</a></li>
 {% endblock %}
 
+
 {% block read_len_fig %}
 <img class="center" src="analysis/read-lengths.png" />
 <p class="caption"><strong>Figure 1.1</strong>: Ridge plot showing the length distribution of input reads.</p>
 {% endblock %}
+
 
 {% block read_len_table %}
 <p class="title"><strong>Table 1.1</strong>: Uniform read length for each sample.</p>
@@ -26,6 +30,7 @@
     {% endfor %}
 </table>
 {% endblock %}
+
 
 {% block read_filter_stats %}
 <p>
@@ -54,6 +59,7 @@
     {% endfor%}
 </table>
 {% endblock %}
+
 
 {% block read_map_header %}
 <p>Filtered reads are aligned to marker reference sequences using <a href="http://bio-bwa.sourceforge.net/bwa.shtml"
