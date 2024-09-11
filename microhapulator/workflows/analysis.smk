@@ -46,10 +46,13 @@ rule report:
         expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
-        resource_filename("microhapulator", "data/fancyTable.js"),
+        resource_filename("microhapulator", "data/third-party/bootstrap.min.css"),
+        resource_filename("microhapulator", "data/third-party/fancyTable.js"),
+        resource_filename("microhapulator", "data/third-party/jquery-ui.min.js"),
+        resource_filename("microhapulator", "data/third-party/jquery.min.js"),
     output:
-        main="report.html",
-        detail="marker-detail-report.html",
+        main="report/report.html",
+        detail="report/marker-detail-report.html",
     run:
         thresholds = ThresholdIndex.load(
             configfile=config["thresh_file"],
@@ -66,8 +69,13 @@ rule report:
         reporter = DetailReporter(config["samples"])
         with open(output.detail, "w") as fh:
             print(reporter.render(), file=fh, end="")
-        jsfile = resource_filename("microhapulator", "data/fancyTable.js")
-        shutil.copy(jsfile, "fancyTable.js")
+        tpdir = resource_filename("microhapulator", "data/third-party/")
+        shell("mkdir -p report/img/")
+        shell("cp analysis/*.png report/img")
+        shell("cp -r {tpdir} report/assets")
+        for sample in config["samples"]:
+            shell("cp analysis/{sample}/*.png report/img/")
+            shell("cp -r analysis/{sample}/callplots/ report/img/{sample}-callplots/")
 
 
 rule copy_and_index_marker_data:

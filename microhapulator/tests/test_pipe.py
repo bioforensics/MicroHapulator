@@ -71,7 +71,7 @@ def test_pipe_gbr_usc10(tmp_path):
     observed = TypingResult(fromfile=tmp_path / "analysis" / "gbr-usc" / "gbr-usc-type.json")
     diff = list(mhapi.diff(observed, expected))
     assert len(diff) == 0
-    report = tmp_path / "report.html"
+    report = tmp_path / "report" / "report.html"
     assert report.is_file()
     with open(report, "r") as fh:
         assert "Uniform read lengths for each sample" in fh.read()
@@ -83,6 +83,7 @@ def test_pipe_gbr_usc10(tmp_path):
     call_pngs = glob(str(tmp_path / "analysis" / "*" / "callplots" / "*.png"))
     assert len(call_pngs) == 10
     assert (tmp_path / "analysis" / "read-mapping-qc.png").is_file()
+    assert (tmp_path / "report" / "img" / "read-mapping-qc.png").is_file()
 
 
 def test_pipe_jpt_usc10_single(tmp_path):
@@ -105,7 +106,7 @@ def test_pipe_jpt_usc10_single(tmp_path):
     observed = TypingResult(fromfile=tmp_path / "analysis" / "jpt-usc10" / "jpt-usc10-type.json")
     diff = list(mhapi.diff(observed, expected))
     assert len(diff) == 0
-    report = tmp_path / "report.html"
+    report = tmp_path / "report" / "report.html"
     assert report.is_file()
     with open(report, "r") as fh:
         assert "Read Merging" not in fh.read()

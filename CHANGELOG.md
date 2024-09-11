@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [Unreleased]
+
+### Changed
+- Updated the working directory structure so report is more easily shared (#181).
+
+
 ## [0.8] 2024-07-23
 
 ### Added

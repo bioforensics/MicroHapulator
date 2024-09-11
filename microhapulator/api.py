@@ -680,7 +680,7 @@ def plot_haplotype_calls(result, outdir, sample=None, plot_marker_name=True, ign
             count_dict = {allele: count for allele, count in count_dict.items() if count >= static}
         counts = count_dict.values()
         alleles = count_dict.keys()
-        plt.figure(figsize=(4, 4), dpi=150)
+        plt.figure(figsize=(4, 4), dpi=100)
         plt.bar(range(len(counts)), counts, color="#999999")
         if len(counts) == 1:
             plt.xticks(range(len(counts)), labels=alleles)
