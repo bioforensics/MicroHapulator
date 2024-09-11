@@ -2,10 +2,10 @@
 <html>
     <head>
         <title>MicroHapulator Report</title>
-        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" media="screen">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
-        <script src="fancyTable.js"></script>
+        <link rel="stylesheet" href="assets/bootstrap.min.css" media="screen">
+        <script src="assets/jquery.min.js"></script>
+        <script src="assets/jquery-ui.min.js"></script>
+        <script src="assets/fancyTable.js"></script>
         <style type="text/css">
             h2 {
                 margin-top: 50px;
@@ -170,7 +170,7 @@
                 <li><strong>Contaminant</strong>: read does not map to the human reference genome</li>
                 <li><strong>Repetitive</strong>: read maps to the expected MH loci, but also (preferentially) to other locations in the human reference genome</li>
             </ul>
-            <img class="fullwidth" src="analysis/read-mapping-qc.png" />
+            <img class="fullwidth" src="img/read-mapping-qc.png" />
             <p class="caption"><strong>Figure 3.2</strong>: Bar graph showing the number of reads for each sample, broken down into four categories: on-target, off-target, contaminant, and repetitive.</p>
             <p class="title">
                 <strong>Table 3.3</strong>: The total number of reads mapped to each marker, and the subset of those reads marked as repetitive, broken down by sample.
@@ -210,7 +210,7 @@
             </div>
 
             {% for sample in samples %}
-            <img src="analysis/{{sample}}/{{sample}}-interlocus-balance.png" />
+            <img src="img/{{sample}}-interlocus-balance.png" />
             {% endfor %}
             <p class="caption"><strong>Figure 3.4</strong>: Histograms showing the interlocus balance for each sample.</p>
 
@@ -310,7 +310,7 @@
                 But for suspected single-source samples, if there is substantial imbalance between major and minor allele counts at numerous loci, the sample should be examined more closely for the presence of a minor DNA contributor.
             </p>
             {% for sample in samples %}
-            <img src="analysis/{{sample}}/{{sample}}-heterozygote-balance.png" class="fullwidth" />
+            <img src="img/{{sample}}-heterozygote-balance.png" class="fullwidth" />
             {% endfor %}
             <p class="caption"><strong>Figure 5.2</strong>: Bar graphs showing heterozygote balance for all samples.</p>
         </div>
