@@ -101,8 +101,10 @@
                 {% endblock %}
             </ol>
             <p>
-                A summary of the statistics presented in this report is aggregated in a single table available at <code>analysis/summary.tsv</code> in the working directory.
-                Full-resolution graphics for each figure are also available in each <code>analysis/{samplename}/</code> subdirectory.
+                The data and statistics from which this report is populated are available in their entirety in the MicroHapulator working directory.
+                Per-sample results and full-resolution graphics are available in each <code>analysis/{samplename}</code> subdirectory in the working directory.
+                The entire working directory is large and not convenient for sharing.
+                Accordingly, graphics, JavaScript, and CSS assets are copied to the <code>report/</code> directory, which can then be compressed in a ZIP archive that should be better suited for e.g. email transfer.
             </p>
 
             <a name="readqc"></a>
