@@ -7,7 +7,7 @@ Using conda to install and manage these packages and their dependencies is recom
 See [this page](https://bioconda.github.io/user/install.html#set-up-channels) for instructions on configuring conda to enable installing packages from the bioconda channel.
 
 ```
-conda create --name microhapulator -y python=3.8 microhapulator
+conda create --name microhapulator -y python=3.11 microhapulator
 conda activate microhapulator
 mhpl8r --help
 ```
