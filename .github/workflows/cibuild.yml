@@ -22,10 +22,15 @@ jobs:
         curl -L -O http://ccb.jhu.edu/software/FLASH/FLASH-1.2.11-Linux-x86_64.tar.gz && tar -xzf FLASH-1.2.11-Linux-x86_64.tar.gz && sudo cp FLASH-1.2.11-Linux-x86_64/flash /usr/local/bin/ && rm -r FLASH-1.2.11*
         python -m pip install --upgrade pip
         pip install .
-        mv microhapulator mhpl8r_src
         mhpl8r getrefr
         make devdeps
     - name: Test with pytest
-      run: make test
+      run: |
+        # Move the source code so the tests run on the *installed* code (which is where the
+        # reference genome index is placed) rather than the source code
+        mv microhapulator mhpl8r_src
+        make test
+        # Move the code back for style check
+        mv mhpl8r_src microhapulator
     - name: Style check
       run: make style
