@@ -78,4 +78,4 @@ def main(args):
     else:
         message = "[MicroHapulator] building Minimap2 index, this will take some time..."
         print(message, file=sys.stderr)
-        run(["minimap2", "-d", index_path, "-k", "21", "-w", "11", hg38path], check=True)
+        run(["minimap2", "-d", str(index_path), "-k", "21", "-w", "11", str(hg38path)], check=True)

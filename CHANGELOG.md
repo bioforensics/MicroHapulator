@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Updated the working directory structure so report is more easily shared (#181).
+- Replaced BWA MEM with Minimap2 for read alignment (#182).
 
 
 ## [0.8] 2024-07-23

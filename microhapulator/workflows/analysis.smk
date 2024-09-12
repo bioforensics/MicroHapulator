@@ -18,10 +18,6 @@ from pkg_resources import resource_filename
 import shutil
 
 
-def full_reference_index_files(fasta):
-    return [f"{fasta}.{sfx}" for sfx in ("amb", "ann", "bwt", "pac", "sa")]
-
-
 include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
 
 
@@ -234,10 +230,10 @@ rule plot_haplotype_calls:
 
 rule download_and_index_full_reference:
     output:
-        full_reference_index_files(config["hg38path"]),
+        fasta=config["hg38path"],
+        index=config["hg38index"],
     shell:
         """
-        echo 'WARNING: if you have not previously downloaded and indexed the GRCh38 assembly for use with MicroHapulator, this can take an hour or more!!!'
         mhpl8r getrefr
         """
 
