@@ -87,19 +87,19 @@ This step can be skipped for single-end reads.
 ### Preprocessing: read alignment
 
 Merged reads must then be aligned to marker reference sequences before haplotypes can be called.
-In this manual we use the [bwa mem](http://bio-bwa.sourceforge.net/bwa.shtml) algorithm, but other algorithms such as [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) would also be appropriate to use here.
+In this manual we use the [Minimap2](https://lh3.github.io/minimap2/minimap2.html) algorithm, but other algorithms such as [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) or [bwa mem](http://bio-bwa.sourceforge.net/bwa.shtml) would also be appropriate to use here.
 
 First, the marker reference sequences must be indexed to allow NGS read alignment.
 (Note, this only needs to be done once for each reference sequence file.)
 
 ```
-bwa index marker-refr.fasta
+minimap2 -d marker-refr.mmi -k 21 -w 11 marker-refr.fasta
 ```
 
 The we align, sort, and index the merged reads.
 
 ```
-bwa mem marker-refr.fasta EVD1.extendedFrags.fastq | samtools view -bS | samtools sort -o EVD1-reads.bam -
+minimap2 -ax sr marker-refr.mmi EVD1.extendedFrags.fastq | samtools view -bS | samtools sort -o EVD1-reads.bam -
 samtools index EVD1-reads.bam
 ```
 
