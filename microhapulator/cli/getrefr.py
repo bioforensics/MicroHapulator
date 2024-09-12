@@ -72,14 +72,10 @@ def main(args):
         )
     if compute_shasum(hg38path) != checksum:
         raise ValueError(f"checksum failed for {str(hg38path)}")
-    index_present = True
-    for suffix in ("amb", "ann", "bwt", "pac", "sa"):
-        idxfile = Path(f"{str(hg38path)}.{suffix}")
-        if not idxfile.is_file():
-            index_present = False
-            break
-    if index_present:
-        print(f"[MicroHapulator] BWA index present, good to go!", file=sys.stderr)
+    index_path = Path(resource_filename("microhapulator", "data/hg38.mmi"))
+    if index_path.is_file():
+        print("[MicroHapulator] Minimap2 index present, good to go!", file=sys.stderr)
     else:
-        print(f"[MicroHapulator] building BWA index, this will take some time...", file=sys.stderr)
-        run(["bwa", "index", str(hg38path)], check=True)
+        message = "[MicroHapulator] building Minimap2 index, this will take some time..."
+        print(message, file=sys.stderr)
+        run(["minimap2", "-d", str(index_path), "-k", "21", "-w", "11", str(hg38path)], check=True)

@@ -18,10 +18,6 @@ from pkg_resources import resource_filename
 import shutil
 
 
-def full_reference_index_files(fasta):
-    return [f"{fasta}.{sfx}" for sfx in ("amb", "ann", "bwt", "pac", "sa")]
-
-
 include: "preproc-paired.smk" if config["paired"] else "preproc-single.smk"
 
 
@@ -83,22 +79,21 @@ rule copy_and_index_marker_data:
         tsv=config["mhdefn"],
         fasta=config["mhrefr"],
     output:
-        expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
         fasta="marker-refr.fasta",
+        index="marker-refr.mmi",
         tsv="marker-definitions.tsv",
     shell:
         """
         cp {input.tsv} {output.tsv}
         cp {input.fasta} {output.fasta}
-        bwa index {output.fasta}
+        minimap2 -d {output.index} -k 21 -w 11 {output.fasta}
         """
 
 
 rule map_sort_and_index:
     input:
         fastq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
-        fasta="marker-refr.fasta",
-        idx=expand("marker-refr.fasta.{suffix}", suffix=("amb", "ann", "bwt", "pac", "sa")),
+        index="marker-refr.mmi",
     output:
         bam="analysis/{sample}/{sample}.bam",
         bai="analysis/{sample}/{sample}.bam.bai",
@@ -106,17 +101,15 @@ rule map_sort_and_index:
     threads: 32
     shell:
         """
-        bwa mem -t {threads} {input.fasta} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
+        minimap2 -ax sr -t {threads} {input.index} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
         samtools stats {output.bam} > {output.stats}
         """
 
 
 rule map_full_reference:
-    params:
-        refr=config["hg38path"],
     input:
-        full_reference_index_files(config["hg38path"]),
+        index=config["hg38index"],
         fastq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
@@ -124,7 +117,7 @@ rule map_full_reference:
     threads: 32
     shell:
         """
-        bwa mem -t {threads} {params.refr} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
+        minimap2 -ax sr -t {threads} {input.index} {input.fastq} | samtools view -b | samtools sort -o {output.bam}
         samtools index {output.bam}
         """
 
@@ -237,10 +230,10 @@ rule plot_haplotype_calls:
 
 rule download_and_index_full_reference:
     output:
-        full_reference_index_files(config["hg38path"]),
+        fasta=config["hg38path"],
+        index=config["hg38index"],
     shell:
         """
-        echo 'WARNING: if you have not previously downloaded and indexed the GRCh38 assembly for use with MicroHapulator, this can take an hour or more!!!'
         mhpl8r getrefr
         """
 

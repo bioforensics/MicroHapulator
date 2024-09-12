@@ -6,11 +6,11 @@ help: Makefile
 
 ## test:      execute the automated test suite
 test:
-	pytest -m "not known_failing" --cov=microhapulator --doctest-modules microhapulator/
+	pytest -m "not known_failing" --cov=microhapulator --doctest-modules --pyargs microhapulator
 
 ## test4:     execute the automated test suite in multithreaded mode
 test4:
-	pytest -m "not known_failing" -n 4 --cov=microhapulator --doctest-modules microhapulator/
+	pytest -m "not known_failing" -n 4 --cov=microhapulator --doctest-modules --pyargs microhapulator
 
 ## devdeps:   install development dependencies
 devdeps:

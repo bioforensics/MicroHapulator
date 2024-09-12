@@ -18,13 +18,19 @@ jobs:
     - name: Install
       run: |
         sudo apt-get update
-        sudo apt-get install bwa samtools fastqc
+        sudo apt-get install minimap2 samtools fastqc
         curl -L -O http://ccb.jhu.edu/software/FLASH/FLASH-1.2.11-Linux-x86_64.tar.gz && tar -xzf FLASH-1.2.11-Linux-x86_64.tar.gz && sudo cp FLASH-1.2.11-Linux-x86_64/flash /usr/local/bin/ && rm -r FLASH-1.2.11*
         python -m pip install --upgrade pip
         pip install .
+        mhpl8r getrefr
         make devdeps
-        curl -L https://osf.io/wuzm6/download --output bwa_index.tar.gz && tar -xzf bwa_index.tar.gz && cp bwa_index/* /home/runner/work/MicroHapulator/MicroHapulator/microhapulator/data/ && rm -r bwa_index*
     - name: Test with pytest
-      run: make test
+      run: |
+        # Move the source code so the tests run on the *installed* code (which is where the
+        # reference genome index is placed) rather than the source code
+        mv microhapulator mhpl8r_src
+        make test
+        # Move the code back for style check
+        mv mhpl8r_src microhapulator
     - name: Style check
       run: make style

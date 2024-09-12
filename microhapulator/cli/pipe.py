@@ -204,6 +204,12 @@ def subparser(subparsers):
         # Hidden option for testing purposes
     )
     cli.add_argument(
+        "--hg38idx",
+        default=resource_filename("microhapulator", "data/hg38.mmi"),
+        help=SUPPRESS,
+        # Hidden option for testing purposes
+    )
+    cli.add_argument(
         "--hspace",
         metavar="HS",
         default=-0.7,
@@ -237,6 +243,7 @@ def main(args):
         mhrefr=Path(args.markerrefr).resolve(),
         mhdefn=Path(args.markerdefn).resolve(),
         hg38path=Path(args.hg38).resolve(),
+        hg38index=Path(args.hg38idx).resolve(),
         thresh_static=args.static,
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
