@@ -35,7 +35,7 @@ def open(filename, mode):
 
 def load_marker_frequencies(tsvfile):
     frequencies = pd.read_csv(tsvfile, sep="\t")
-    missing = set(["Marker", "Allele", "Frequency"]) - set(frequencies.columns)
+    missing = set(["Marker", "Haplotype", "Frequency"]) - set(frequencies.columns)
     if len(missing) > 0:
         message = "column(s) missing from marker frequency file: " + ", ".join(sorted(missing))
         raise ValueError(message)

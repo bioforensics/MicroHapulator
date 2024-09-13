@@ -183,7 +183,7 @@ class Profile(object):
             variants = [list() for _ in range(len(offsets))]
             for i in sorted(self.haploindexes()):
                 haplotype = self.haplotypes(markerid, index=i).pop()
-                for snp, allelelist in zip(haplotype.split("|"), variants):
+                for snp, allelelist in zip(haplotype.split(","), variants):
                     allelelist.append(snp)
             for offset, snps in zip(offsets, variants):
                 haplostr = "|".join(snps)
