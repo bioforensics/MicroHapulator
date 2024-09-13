@@ -176,7 +176,7 @@ class Profile(object):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
     def bedstream(self, mhindex):
-        mhindex.validate(symmetric=True)
+        mhindex.validate(refrids=self.markers(), symmetric=True)
         for markerid in sorted(self.markers()):
             marker = mhindex.markers[markerid]
             offsets = marker.offsets_locus
