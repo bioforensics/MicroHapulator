@@ -495,10 +495,10 @@ def sim(frequencies, seed=None):
     for haploindex in range(2):
         for marker in markers:
             haplofreqs = frequencies[frequencies.Marker == marker]
-            haplotypes = list(haplofreqs.Haplotype)
+            alleles = list(haplofreqs.Allele)
             freqs = list(haplofreqs.Frequency)
             freqs = [x / sum(freqs) for x in freqs]
-            sampled_haplotype = np.random.choice(haplotypes, p=freqs)
+            sampled_haplotype = np.random.choice(alleles, p=freqs)
             profile.add(haploindex, marker, sampled_haplotype)
     message = f"simulated microhaplotype variation at {len(markers)} markers"
     print("[MicroHapulator::sim]", message, file=sys.stderr)

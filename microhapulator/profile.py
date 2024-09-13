@@ -176,14 +176,14 @@ class Profile(object):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
     def bedstream(self, mhindex):
-        mhindex.validate(refrids=self.markers(), symmetric=True)
+        mhindex.validate(symmetric=True)
         for markerid in sorted(self.markers()):
             marker = mhindex.markers[markerid]
             offsets = marker.offsets_locus
             variants = [list() for _ in range(len(offsets))]
             for i in sorted(self.haploindexes()):
                 haplotype = self.haplotypes(markerid, index=i).pop()
-                for snp, allelelist in zip(haplotype.split(","), variants):
+                for snp, allelelist in zip(haplotype.split("|"), variants):
                     allelelist.append(snp)
             for offset, snps in zip(offsets, variants):
                 haplostr = "|".join(snps)

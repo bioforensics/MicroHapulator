@@ -63,8 +63,7 @@ def main(args):
         print("[MicroHapulator::sim]", message, file=sys.stderr)
     if args.haplo_seq:
         index = MicrohapIndex.from_files(args.markers, fasta_path=args.sequences)
-        index.validate()
-        index.validate(refrids=frequencies.Marker.unique(), symmetric=True)
+        index.validate(symmetric=True)
         with open(args.haplo_seq, "w") as fh:
             for defline, sequence in profile.haploseqs(index):
                 print(">", defline, "\n", sequence, sep="", file=fh)

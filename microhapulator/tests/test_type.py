@@ -177,3 +177,14 @@ def test_type_marker_with_no_coverage():
     result = mhapi.type(bam, tsv)
     for marker, mdata in result.data["markers"].items():
         assert "genotype" in mdata
+
+
+def test_type_marker_has_indel_spanning_snp():
+    bam = data_file("bam/indel_snp.bam")
+    tsv = data_file("def/indel_snp.tsv")
+    result = mhapi.type(bam, tsv)
+    assert "mh09WL-026" in result.data["markers"]
+    for allele in result.data["markers"]["mh09WL-026"]["typing_result"]:
+        snp_alleles = allele.split(",")
+        assert len(snp_alleles) == 6
+        assert snp_alleles[-2] == "-"
