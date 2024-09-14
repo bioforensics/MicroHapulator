@@ -23,12 +23,28 @@ class TypingSummary(dict):
             summary[sample] = TypingStats.from_workdir(sample, workdir=workdir)
         return summary
 
+    @property
+    def has_high_discard_markers(self):
+        for stats in self.values():
+            if len(stats.high_discard_rates) > 0:
+                return True
+        return False
+
+    @property
+    def high_discard_markers(self):
+        rates = list()
+        for sample, stats in self.items():
+            for marker, rate in stats.high_discard_rates.items():
+                rates.append((marker, sample, rate))
+        return sorted(rates)
+
 
 @dataclass
 class TypingStats:
     attempted_events: Dict[str, int]
     successful_events: Dict[str, int]
     typing_rates: Dict[str, float]
+    high_discard_rates: Dict[str, float]
 
     @property
     def attempted(self):
@@ -70,4 +86,7 @@ class TypingStats:
             attempted[marker] = row.TotalReads
             successful[marker] = row.TypedReads
             rates[marker] = row.TypingRate
-        return cls(attempted, successful, rates)
+        filename = f"{workdir}/analysis/{sample}/{sample}-discard-rate.tsv"
+        table = pd.read_csv(filename, sep="\t")
+        high_discard = table.set_index("Marker")["DiscardRate"].to_dict()
+        return cls(attempted, successful, rates, high_discard)

@@ -67,6 +67,7 @@ class OverviewReporter:
             reads_are_paired=self.reads_are_paired,
             ambiguous_read_threshold=self.thresholds.ambiguous,
             read_length_threshold=self.thresholds.min_read_length,
+            discard_alert_threshold=self.thresholds.discard_alert,
         )
         return output
 

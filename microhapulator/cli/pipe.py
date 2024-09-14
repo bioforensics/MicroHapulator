@@ -180,6 +180,14 @@ def subparser(subparsers):
         help="filter out reads that are less than LT bp long; LT=50 by default",
     )
     cli.add_argument(
+        "-D",
+        "--discard-alert",
+        metavar="DA",
+        type=float,
+        default=0.25,
+        help="issue an alert in the final report for each marker whose read discard rate (proportion of reads that could not be typed) exceeds DA; by default DA=0.25",
+    )
+    cli.add_argument(
         "-c",
         "--config",
         metavar="CSV",
@@ -250,6 +258,7 @@ def main(args):
         paired=args.reads_are_paired,
         ambiguous_thresh=args.ambiguous_thresh,
         length_thresh=args.length_thresh,
+        thresh_discard_alert=args.discard_alert,
         hspace=args.hspace,
     )
     snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
