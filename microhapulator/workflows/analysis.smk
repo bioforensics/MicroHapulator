@@ -174,7 +174,6 @@ rule check_discard_rate:
         rates = result.typing_rate()
         rates["DiscardRate"] = 1.0 - rates.TypingRate
         rates = rates[rates.DiscardRate > params.threshold]
-        rates = rates[["Marker", "DiscardRate"]]
         rates.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
 
 

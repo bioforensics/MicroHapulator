@@ -32,11 +32,13 @@ class TypingSummary(dict):
 
     @property
     def high_discard_markers(self):
-        rates = list()
+        tables = list()
         for sample, stats in self.items():
-            for marker, rate in stats.high_discard_rates.items():
-                rates.append((marker, sample, rate))
-        return sorted(rates)
+            table = stats.high_discard_rates
+            table["Sample"] = sample
+            tables.append(table)
+        table = pd.concat(tables)
+        return table.sort_values(["Marker", "Sample"])
 
     @property
     def has_high_gap_markers(self):
@@ -47,11 +49,13 @@ class TypingSummary(dict):
 
     @property
     def high_gap_markers(self):
-        rates = list()
+        tables = list()
         for sample, stats in self.items():
-            for marker, rate in stats.high_gap_rates.items():
-                rates.append((marker, sample, rate))
-        return sorted(rates)
+            table = stats.high_gap_rates
+            table["Sample"] = sample
+            tables.append(table)
+        table = pd.concat(tables)
+        return table.sort_values(["Marker", "Sample"])
 
 
 @dataclass
@@ -59,8 +63,8 @@ class TypingStats:
     attempted_events: Dict[str, int]
     successful_events: Dict[str, int]
     typing_rates: Dict[str, float]
-    high_discard_rates: Dict[str, float]
-    high_gap_rates: Dict[str, float]
+    high_discard_rates: pd.DataFrame
+    high_gap_rates: pd.DataFrame
 
     @property
     def attempted(self):
@@ -103,9 +107,7 @@ class TypingStats:
             successful[marker] = row.TypedReads
             rates[marker] = row.TypingRate
         filename = f"{workdir}/analysis/{sample}/{sample}-discard-rate.tsv"
-        table = pd.read_csv(filename, sep="\t")
-        high_discard = table.set_index("Marker")["DiscardRate"].to_dict()
+        high_discard = pd.read_csv(filename, sep="\t")
         filename = f"{workdir}/analysis/{sample}/{sample}-gapped-rate.tsv"
-        table = pd.read_csv(filename, sep="\t")
-        high_gap = table.set_index("Marker")["GappedRate"].to_dict()
+        high_gap = pd.read_csv(filename, sep="\t")
         return cls(attempted, successful, rates, high_discard, high_gap)

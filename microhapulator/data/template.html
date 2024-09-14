@@ -284,15 +284,19 @@
                         <tr>
                             <th>Marker</th>
                             <th>Sample</th>
+                            <th class="alnrt">Discarded Reads</th>
+                            <th class="alnrt">Total Reads</th>
                             <th class="alnrt">% Reads Discarded</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for (marker, sample, rate) in typing_summary.high_discard_markers %}
+                        {% for n, row in typing_summary.high_discard_markers.iterrows() %}
                         <tr>
-                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ marker }}</a></td>
-                            <td>{{ sample }}</td>
-                            <td class="alnrt">{{ "{:.1f}".format(rate * 100) }}%</td>
+                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ row.Marker }}</a></td>
+                            <td>{{ row.Sample }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.TotalReads - row.TypedReads) }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.TotalReads) }}</td>
+                            <td class="alnrt">{{ "{:.1f}".format(row.DiscardRate * 100) }}%</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -310,15 +314,19 @@
                         <tr>
                             <th>Marker</th>
                             <th>Sample</th>
-                            <th class="alnrt">% Reads Containing Gaps</th>
+                            <th class="alnrt">Reads Containing Gaps</th>
+                            <th class="alnrt">Typed Reads</th>
+                            <th class="alnrt">% Gapped Reads</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for (marker, sample, rate) in typing_summary.high_gap_markers %}
+                        {% for n, row in typing_summary.high_gap_markers.iterrows() %}
                         <tr>
-                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ marker }}</a></td>
-                            <td>{{ sample }}</td>
-                            <td class="alnrt">{{ "{:.1f}".format(rate * 100) }}%</td>
+                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ row.Marker }}</a></td>
+                            <td>{{ row.Sample }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.GappedReads) }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.TypedReads) }}</td>
+                            <td class="alnrt">{{ "{:.1f}".format(row.GappedRate * 100) }}%</td>
                         </tr>
                         {% endfor %}
                     </tbody>
