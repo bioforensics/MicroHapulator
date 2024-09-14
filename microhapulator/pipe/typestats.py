@@ -38,6 +38,21 @@ class TypingSummary(dict):
                 rates.append((marker, sample, rate))
         return sorted(rates)
 
+    @property
+    def has_high_gap_markers(self):
+        for stats in self.values():
+            if len(stats.high_gap_rates) > 0:
+                return True
+        return False
+
+    @property
+    def high_gap_markers(self):
+        rates = list()
+        for sample, stats in self.items():
+            for marker, rate in stats.high_gap_rates.items():
+                rates.append((marker, sample, rate))
+        return sorted(rates)
+
 
 @dataclass
 class TypingStats:
@@ -45,6 +60,7 @@ class TypingStats:
     successful_events: Dict[str, int]
     typing_rates: Dict[str, float]
     high_discard_rates: Dict[str, float]
+    high_gap_rates: Dict[str, float]
 
     @property
     def attempted(self):
@@ -89,4 +105,7 @@ class TypingStats:
         filename = f"{workdir}/analysis/{sample}/{sample}-discard-rate.tsv"
         table = pd.read_csv(filename, sep="\t")
         high_discard = table.set_index("Marker")["DiscardRate"].to_dict()
-        return cls(attempted, successful, rates, high_discard)
+        filename = f"{workdir}/analysis/{sample}/{sample}-gapped-rate.tsv"
+        table = pd.read_csv(filename, sep="\t")
+        high_gap = table.set_index("Marker")["GappedRate"].to_dict()
+        return cls(attempted, successful, rates, high_discard, high_gap)

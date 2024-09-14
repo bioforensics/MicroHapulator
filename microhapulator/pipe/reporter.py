@@ -68,6 +68,7 @@ class OverviewReporter:
             ambiguous_read_threshold=self.thresholds.ambiguous,
             read_length_threshold=self.thresholds.min_read_length,
             discard_alert_threshold=self.thresholds.discard_alert,
+            gap_alert_threshold=self.thresholds.gap_alert,
         )
         return output
 

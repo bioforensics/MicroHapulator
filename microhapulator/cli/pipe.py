@@ -188,6 +188,14 @@ def subparser(subparsers):
         help="issue an alert in the final report for each marker whose read discard rate (proportion of reads that could not be typed) exceeds DA; by default DA=0.25",
     )
     cli.add_argument(
+        "-G",
+        "--gap-alert",
+        metavar="GA",
+        type=float,
+        default=0.05,
+        help="issue an alert in the final report for each marker whose gap rate (proportion of reads containing one or more gap alleles) exceeds DA; by default DA=0.25",
+    )
+    cli.add_argument(
         "-c",
         "--config",
         metavar="CSV",
@@ -259,6 +267,7 @@ def main(args):
         ambiguous_thresh=args.ambiguous_thresh,
         length_thresh=args.length_thresh,
         thresh_discard_alert=args.discard_alert,
+        thresh_gap_alert=args.gap_alert,
         hspace=args.hspace,
     )
     snakefile = resource_filename("microhapulator", "workflows/analysis.smk")

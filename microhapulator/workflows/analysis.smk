@@ -41,6 +41,7 @@ rule report:
         expand("analysis/{sample}/{sample}-repetitive-reads.csv", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-typing-rate.tsv", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-discard-rate.tsv", sample=config["samples"]),
+        expand("analysis/{sample}/{sample}-gapped-rate.tsv", sample=config["samples"]),
         resource_filename("microhapulator", "data/template.html"),
         resource_filename("microhapulator", "data/marker_details_template.html"),
         resource_filename("microhapulator", "data/third-party/bootstrap.min.css"),
@@ -58,6 +59,7 @@ rule report:
             ambiguous=config["ambiguous_thresh"],
             min_read_length=config["length_thresh"],
             discard_alert=config["thresh_discard_alert"],
+            gap_alert=config["thresh_gap_alert"],
         )
         reporter = OverviewReporter(
             config["samples"], thresholds, reads_are_paired=config["paired"]
@@ -173,6 +175,20 @@ rule check_discard_rate:
         rates["DiscardRate"] = 1.0 - rates.TypingRate
         rates = rates[rates.DiscardRate > params.threshold]
         rates = rates[["Marker", "DiscardRate"]]
+        rates.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
+
+
+rule check_gapped_rate:
+    input:
+        json=rules.call_haplotypes.output.typing_result,
+    output:
+        tsv="analysis/{sample}/{sample}-gapped-rate.tsv",
+    params:
+        threshold=float(config["thresh_gap_alert"]),
+    run:
+        result = TypingResult(fromfile=input.json)
+        rates = result.gap_rate()
+        rates = rates[rates.GappedRate > params.threshold]
         rates.to_csv(output.tsv, sep="\t", index=False, float_format="%.4f")
 
 
