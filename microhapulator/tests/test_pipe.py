@@ -18,8 +18,6 @@ from microhapulator.profile import SimulatedProfile, TypingResult
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
-from shutil import copyfile
-from subprocess import run
 
 
 def test_validate_sample_input_files():
@@ -92,7 +90,7 @@ def test_pipe_gbr_usc10(tmp_path):
     gapped_rate = pd.read_csv(gapped_file, sep="\t")
     assert len(gapped_rate) == 4
     assert list(gapped_rate.Marker) == ["mh02USC-2pA", "mh04USC-4pA", "mh06USC-6pA", "mh09USC-9pA"]
-    assert list(gapped_rate.TypedReads) == [2, 2, 2, 2]
+    assert list(gapped_rate.GappedReads) == [2, 2, 2, 2]
 
 
 def test_pipe_jpt_usc10_single(tmp_path):
