@@ -437,7 +437,7 @@ class TypingResult(Profile):
                 rate = num_gap_reads / num_typed_reads
             entry = (marker, num_typed_reads, num_gap_reads, rate)
             data.append(entry)
-        return pd.DataFrame(data, columns=["Marker", "GappedReads", "TypedReads", "GappedRate"])
+        return pd.DataFrame(data, columns=["Marker", "TypedReads", "GappedReads", "GappedRate"])
 
     @property
     def gttype(self):
