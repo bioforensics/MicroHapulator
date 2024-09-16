@@ -14,13 +14,24 @@ import pandas as pd
 
 
 class ThresholdIndex:
-    def __init__(self, static=5, dynamic=0.035, ambiguous=0.2, min_read_length=50, workdir="."):
+    def __init__(
+        self,
+        static=5,
+        dynamic=0.035,
+        ambiguous=0.2,
+        min_read_length=50,
+        discard_alert=0.25,
+        gap_alert=0.05,
+        workdir=".",
+    ):
         self.global_static = static
         self.global_dynamic = dynamic
         self.marker_static = {}
         self.marker_dynamic = {}
         self.ambiguous = ambiguous
         self.min_read_length = min_read_length
+        self.discard_alert = discard_alert
+        self.gap_alert = gap_alert
 
     def set(self, marker, static=None, dynamic=None):
         if static:
@@ -45,12 +56,16 @@ class ThresholdIndex:
         global_dynamic=0.02,
         ambiguous=0.2,
         min_read_length=50,
+        discard_alert=0.25,
+        gap_alert=0.05,
     ):
         index = cls(
             static=global_static,
             dynamic=global_dynamic,
             ambiguous=ambiguous,
             min_read_length=min_read_length,
+            discard_alert=discard_alert,
+            gap_alert=gap_alert,
         )
         if configfile:
             config = pd.read_csv(configfile, sep=None, engine="python")

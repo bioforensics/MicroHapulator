@@ -64,6 +64,7 @@ def test_pipe_gbr_usc10(tmp_path):
         "--threads=1",
         "--static=5",
         "--dynamic=0.02",
+        "--gap-alert=0.001",
     ]
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.pipe.main(args)
@@ -74,7 +75,10 @@ def test_pipe_gbr_usc10(tmp_path):
     report = tmp_path / "report" / "report.html"
     assert report.is_file()
     with open(report, "r") as fh:
-        assert "Uniform read lengths for each sample" in fh.read()
+        contents = fh.read()
+        assert "Uniform read lengths for each sample" in contents
+        assert "Table 4.3" not in contents
+        assert "Table 4.4" in contents
     profile = tmp_path / "analysis" / "gbr-usc" / "profiles" / "gbr-usc-quant.csv"
     assert profile.is_file()
     expected = pd.read_csv(data_file("gbr-usc-profile.csv"))
@@ -84,6 +88,11 @@ def test_pipe_gbr_usc10(tmp_path):
     assert len(call_pngs) == 10
     assert (tmp_path / "analysis" / "read-mapping-qc.png").is_file()
     assert (tmp_path / "report" / "img" / "read-mapping-qc.png").is_file()
+    gapped_file = tmp_path / "analysis" / "gbr-usc" / "gbr-usc-gapped-rate.tsv"
+    gapped_rate = pd.read_csv(gapped_file, sep="\t")
+    assert len(gapped_rate) == 4
+    assert list(gapped_rate.Marker) == ["mh02USC-2pA", "mh04USC-4pA", "mh06USC-6pA", "mh09USC-9pA"]
+    assert list(gapped_rate.TypedReads) == [2, 2, 2, 2]
 
 
 def test_pipe_jpt_usc10_single(tmp_path):

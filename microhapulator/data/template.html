@@ -273,6 +273,66 @@
                     </tbody>
                 </table>
             </div>
+            {% if typing_summary.has_high_discard_markers %}
+            <p class="title">
+                <strong>Table 4.3</strong>: The following markers contain a large proportion of discarded reads (untyped reads that do not span all SNPs at the locus).
+                Markers with &gt;{{ "{:.1f}".format(discard_alert_threshold * 100) }}% discarded reads are shown here—this behavior can be configured with the <code>--discard-alert</code> option (e.g. <code>--discard-alert={{ discard_alert_threshold }}</code>).
+            </p>
+            <div class="scrollwrapper">
+                <table id="discard_rates_table" class="pagination_table">
+                    <thead>
+                        <tr>
+                            <th>Marker</th>
+                            <th>Sample</th>
+                            <th class="alnrt">Discarded Reads</th>
+                            <th class="alnrt">Total Reads</th>
+                            <th class="alnrt">% Reads Discarded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for n, row in typing_summary.high_discard_markers.iterrows() %}
+                        <tr>
+                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ row.Marker }}</a></td>
+                            <td>{{ row.Sample }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.TotalReads - row.TypedReads) }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.TotalReads) }}</td>
+                            <td class="alnrt">{{ "{:.1f}".format(row.DiscardRate * 100) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            {% if typing_summary.has_high_gap_markers %}
+            <p class="title">
+                <strong>Table 4.4</strong>: The following markers contain a large proportion of reads with gap alleles (reads with alignment gaps spanning one or more SNPs at the locus).
+                Markers with &gt;{{ "{:.1f}".format(gap_alert_threshold * 100) }}% discarded reads are shown here—this behavior can be configured with the <code>--gap-alert</code> option (e.g. <code>--gap-alert={{ gap_alert_threshold }}</code>).
+            </p>
+            <div class="scrollwrapper">
+                <table id="gap_rates_table" class="pagination_table">
+                    <thead>
+                        <tr>
+                            <th>Marker</th>
+                            <th>Sample</th>
+                            <th class="alnrt">Reads Containing Gaps</th>
+                            <th class="alnrt">Typed Reads</th>
+                            <th class="alnrt">% Gapped Reads</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for n, row in typing_summary.high_gap_markers.iterrows() %}
+                        <tr>
+                            <td><a href="marker-detail-report.html?marker={{marker}}" target="_blank">{{ row.Marker }}</a></td>
+                            <td>{{ row.Sample }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.GappedReads) }}</td>
+                            <td class="alnrt">{{ "{:,d}".format(row.TypedReads) }}</td>
+                            <td class="alnrt">{{ "{:.1f}".format(row.GappedRate * 100) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
 
             <a name="filters"></a>
             <h2>Genotype Calling</h2>

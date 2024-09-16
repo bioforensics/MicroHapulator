@@ -23,12 +23,48 @@ class TypingSummary(dict):
             summary[sample] = TypingStats.from_workdir(sample, workdir=workdir)
         return summary
 
+    @property
+    def has_high_discard_markers(self):
+        for stats in self.values():
+            if len(stats.high_discard_rates) > 0:
+                return True
+        return False
+
+    @property
+    def high_discard_markers(self):
+        tables = list()
+        for sample, stats in self.items():
+            table = stats.high_discard_rates
+            table["Sample"] = sample
+            tables.append(table)
+        table = pd.concat(tables)
+        return table.sort_values(["Marker", "Sample"])
+
+    @property
+    def has_high_gap_markers(self):
+        for stats in self.values():
+            if len(stats.high_gap_rates) > 0:
+                return True
+        return False
+
+    @property
+    def high_gap_markers(self):
+        tables = list()
+        for sample, stats in self.items():
+            table = stats.high_gap_rates
+            table["Sample"] = sample
+            tables.append(table)
+        table = pd.concat(tables)
+        return table.sort_values(["Marker", "Sample"])
+
 
 @dataclass
 class TypingStats:
     attempted_events: Dict[str, int]
     successful_events: Dict[str, int]
     typing_rates: Dict[str, float]
+    high_discard_rates: pd.DataFrame
+    high_gap_rates: pd.DataFrame
 
     @property
     def attempted(self):
@@ -70,4 +106,8 @@ class TypingStats:
             attempted[marker] = row.TotalReads
             successful[marker] = row.TypedReads
             rates[marker] = row.TypingRate
-        return cls(attempted, successful, rates)
+        filename = f"{workdir}/analysis/{sample}/{sample}-discard-rate.tsv"
+        high_discard = pd.read_csv(filename, sep="\t")
+        filename = f"{workdir}/analysis/{sample}/{sample}-gapped-rate.tsv"
+        high_gap = pd.read_csv(filename, sep="\t")
+        return cls(attempted, successful, rates, high_discard, high_gap)

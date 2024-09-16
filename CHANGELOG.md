@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Alignment gaps are now marked instead of ignored (#185).
+- Tables were added to the final report to list markers with large numbers of discarded reads or reads containing gaps (#186).
 
 
 ## [0.8.1] 2024-09-12

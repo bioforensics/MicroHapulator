@@ -424,6 +424,21 @@ class TypingResult(Profile):
             data["TypingRate"].append(rate)
         return pd.DataFrame(data)
 
+    def gap_rate(self):
+        data = []
+        for marker, mdata in self.data["markers"].items():
+            num_typed_reads, num_gap_reads = 0, 0
+            for mhallele, count in mdata["typing_result"].items():
+                num_typed_reads += count
+                if "-" in mhallele:
+                    num_gap_reads += count
+            rate = 0.0
+            if num_typed_reads > 0 and num_gap_reads > 0:
+                rate = num_gap_reads / num_typed_reads
+            entry = (marker, num_typed_reads, num_gap_reads, rate)
+            data.append(entry)
+        return pd.DataFrame(data, columns=["Marker", "GappedReads", "TypedReads", "GappedRate"])
+
     @property
     def gttype(self):
         return "TypingResult"
