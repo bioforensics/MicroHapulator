@@ -193,7 +193,7 @@ def subparser(subparsers):
         metavar="GA",
         type=float,
         default=0.05,
-        help="issue an alert in the final report for each marker whose gap rate (proportion of reads containing one or more gap alleles) exceeds DA; by default DA=0.25",
+        help="issue an alert in the final report for each marker whose gap rate (proportion of reads containing one or more gap alleles) exceeds DA; by default DA=0.05",
     )
     cli.add_argument(
         "-c",
