@@ -89,7 +89,7 @@ rule merge:
             --output-prefix analysis/{wildcards.sample}/{wildcards.sample} \
             {input} \
             2>&1 | tee {output.log}
-        bgzip analysis/{wildcards.sample}/*.extendedFrags.fastq analysis/{wildcards.sample}/*.notCombined_?.fastq
+        bgzip analysis/{wildcards.sample}/{wildcards.sample}.extendedFrags.fastq analysis/{wildcards.sample}/{wildcards.sample}.notCombined_*.fastq
         """
 
 
