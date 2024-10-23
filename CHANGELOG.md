@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [Unreleased]
+
+### Changed
+- Intermediate FASTQ files are now bgzip compressed to reduce storage requirements (#189).
+
+
 ## [0.8.4] 2024-09-16
 
 ### Fixed
