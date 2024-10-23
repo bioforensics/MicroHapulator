@@ -90,6 +90,7 @@ rule merge:
             {input} \
             2>&1 | tee {output.log}
         bgzip analysis/{wildcards.sample}/{wildcards.sample}.extendedFrags.fastq analysis/{wildcards.sample}/{wildcards.sample}.notCombined_*.fastq
+        ls -lhp analysis/{wildcards.sample}/*.fastq*
         """
 
 
