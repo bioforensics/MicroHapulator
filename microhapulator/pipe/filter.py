@@ -12,6 +12,7 @@
 
 from Bio import SeqIO
 from dataclasses import dataclass
+from gzip import open as gzopen
 from microhapulator import open as mhopen
 
 
@@ -70,10 +71,10 @@ class PairedReadFilterCounts:
 
 class PairedReadOutputStream:
     def __init__(self, prefix):
-        self.r1 = open(f"{prefix}-ambig-filtered-R1.fastq", "w")
-        self.r2 = open(f"{prefix}-ambig-filtered-R2.fastq", "w")
-        self.r1_mates = open(f"{prefix}-ambig-R1-mates.fastq", "w")
-        self.r2_mates = open(f"{prefix}-ambig-R2-mates.fastq", "w")
+        self.r1 = gzopen(f"{prefix}-ambig-filtered-R1.fastq.gz", "wt")
+        self.r2 = gzopen(f"{prefix}-ambig-filtered-R2.fastq.gz", "wt")
+        self.r1_mates = gzopen(f"{prefix}-ambig-R1-mates.fastq.gz", "wt")
+        self.r2_mates = gzopen(f"{prefix}-ambig-R2-mates.fastq.gz", "wt")
 
     def __del__(self):
         self.r1.close()
@@ -99,7 +100,7 @@ class AmbigPairedReadFilter(PairedReadFilter):
 class SingleReadFilter:
     def __init__(self, reads_in, reads_out):
         self.reads_in = mhopen(reads_in, "r")
-        self.reads_out = open(reads_out, "w")
+        self.reads_out = gzopen(reads_out, "wt")
         self.num_reads_failed = 0
         self.num_reads_passed = 0
 

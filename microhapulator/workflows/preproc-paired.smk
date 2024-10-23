@@ -57,10 +57,10 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered_r1="analysis/{sample}/{sample}-ambig-filtered-R1.fastq",
-        filtered_r2="analysis/{sample}/{sample}-ambig-filtered-R2.fastq",
-        mates_r1="analysis/{sample}/{sample}-ambig-R1-mates.fastq",
-        mates_r2="analysis/{sample}/{sample}-ambig-R2-mates.fastq",
+        filtered_r1="analysis/{sample}/{sample}-ambig-filtered-R1.fastq.gz",
+        filtered_r2="analysis/{sample}/{sample}-ambig-filtered-R2.fastq.gz",
+        mates_r1="analysis/{sample}/{sample}-ambig-R1-mates.fastq.gz",
+        mates_r2="analysis/{sample}/{sample}-ambig-R2-mates.fastq.gz",
         counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
@@ -77,7 +77,9 @@ rule merge:
         r1=rules.filter_ambiguous.output.filtered_r1,
         r2=rules.filter_ambiguous.output.filtered_r2,
     output:
-        mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq",
+        mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq.gz",
+        orphan1fq="analysis/{sample}/{sample}.notCombined_1.fastq.gz",
+        orphan2fq="analysis/{sample}/{sample}.notCombined_2.fastq.gz",
         log="analysis/{sample}/flash.log",
     threads: 8
     shell:
@@ -87,6 +89,7 @@ rule merge:
             --output-prefix analysis/{wildcards.sample}/{wildcards.sample} \
             {input} \
             2>&1 | tee {output.log}
+        bgzip analysis/{wildcards.sample}/*.extendedFrags.fastq analysis/{wildcards.sample}/*.notCombined_?.fastq
         """
 
 
@@ -94,8 +97,8 @@ rule filter_length:
     input:
         mergedfq=rules.merge.output.mergedfq,
     output:
-        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq",
-        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
+        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq.gz",
+        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq.gz",
         counts="analysis/{sample}/{sample}-length-filtered-read-counts.txt",
     params:
         length_thresh=config["length_thresh"],

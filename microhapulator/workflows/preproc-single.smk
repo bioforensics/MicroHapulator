@@ -50,7 +50,7 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered_fq="analysis/{sample}/{sample}-ambig-filtered.fastq",
+        filtered_fq="analysis/{sample}/{sample}-ambig-filtered.fastq.gz",
         counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
@@ -66,8 +66,8 @@ rule filter_length:
     input:
         fq=rules.filter_ambiguous.output.filtered_fq,
     output:
-        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq",
-        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq",
+        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq.gz",
+        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq.gz",
         counts="analysis/{sample}/{sample}-length-filtered-read-counts.txt",
     params:
         length_thresh=config["length_thresh"],
