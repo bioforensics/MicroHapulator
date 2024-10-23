@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------------------------
 
 from Bio import SeqIO
+from gzip import open as gzopen
 from microhapulator.pipe.filter import (
     AmbigPairedReadFilter,
     AmbigSingleReadFilter,
@@ -25,7 +26,7 @@ import pytest
 def ambig_seqs_dir_single(tmp_path_factory):
     tmpdir = tmp_path_factory.mktemp("WD")
     reads = data_file("ambiguous-single-end.fastq")
-    ambig_filter = AmbigSingleReadFilter(reads, tmpdir / "test-ambig-filtered.fastq")
+    ambig_filter = AmbigSingleReadFilter(reads, tmpdir / "test-ambig-filtered.fastq.gz")
     ambig_filter.filter()
     with open(tmpdir / "test-ambig-read-counts.txt", "w") as fh:
         print(ambig_filter.summary, file=fh)
@@ -48,7 +49,7 @@ def ambig_seqs_dir_paired(tmp_path_factory):
 def length_filter_dir(tmp_path_factory):
     tmpdir = tmp_path_factory.mktemp("WD")
     reads = data_file("too-short.fastq")
-    length_filter = LengthSingleReadFilter(reads, tmpdir / "test-length-filtered.fastq")
+    length_filter = LengthSingleReadFilter(reads, tmpdir / "test-length-filtered.fastq.gz")
     length_filter.filter()
     with open(tmpdir / "test-length-filtered-read-counts.txt", "w") as fh:
         print(length_filter.summary, file=fh)
@@ -56,9 +57,10 @@ def length_filter_dir(tmp_path_factory):
 
 
 def test_filter_ambiguous_single_fastq(ambig_seqs_dir_single):
-    filtered_reads_file = ambig_seqs_dir_single / "test-ambig-filtered.fastq"
+    filtered_reads_file = ambig_seqs_dir_single / "test-ambig-filtered.fastq.gz"
     assert filtered_reads_file.is_file()
-    assert len(list(SeqIO.parse(filtered_reads_file, "fastq"))) == 8
+    with gzopen(filtered_reads_file, "rt") as fh:
+        assert len(list(SeqIO.parse(fh, "fastq"))) == 8
 
 
 def test_filter_ambiguous_single_counts(ambig_seqs_dir_single):
@@ -72,21 +74,23 @@ def test_filter_ambiguous_single_counts(ambig_seqs_dir_single):
 
 
 def test_filter_ambiguous_paired_fastq(ambig_seqs_dir_paired):
-    filtered_r1_file = ambig_seqs_dir_paired / "test-ambig-filtered-R1.fastq"
-    filtered_r2_file = ambig_seqs_dir_paired / "test-ambig-filtered-R2.fastq"
+    filtered_r1_file = ambig_seqs_dir_paired / "test-ambig-filtered-R1.fastq.gz"
+    filtered_r2_file = ambig_seqs_dir_paired / "test-ambig-filtered-R2.fastq.gz"
     assert filtered_r1_file.is_file()
     assert filtered_r2_file.is_file()
-    assert len(list(SeqIO.parse(filtered_r1_file, "fastq"))) == 6
-    assert len(list(SeqIO.parse(filtered_r2_file, "fastq"))) == 6
+    with gzopen(filtered_r1_file, "rt") as fh1, gzopen(filtered_r2_file, "rt") as fh2:
+        assert len(list(SeqIO.parse(fh1, "fastq"))) == 6
+        assert len(list(SeqIO.parse(fh2, "fastq"))) == 6
 
 
-def test_filter_ambiguous_paried_mates(ambig_seqs_dir_paired):
-    r1_mates_file = ambig_seqs_dir_paired / "test-ambig-R1-mates.fastq"
-    r2_mates_file = ambig_seqs_dir_paired / "test-ambig-R2-mates.fastq"
+def test_filter_ambiguous_paired_mates(ambig_seqs_dir_paired):
+    r1_mates_file = ambig_seqs_dir_paired / "test-ambig-R1-mates.fastq.gz"
+    r2_mates_file = ambig_seqs_dir_paired / "test-ambig-R2-mates.fastq.gz"
     assert r1_mates_file.is_file()
     assert r2_mates_file.is_file()
-    assert len(list(SeqIO.parse(r1_mates_file, "fastq"))) == 2
-    assert len(list(SeqIO.parse(r2_mates_file, "fastq"))) == 1
+    with gzopen(r1_mates_file, "rt") as fh1, gzopen(r2_mates_file, "rt") as fh2:
+        assert len(list(SeqIO.parse(fh1, "fastq"))) == 2
+        assert len(list(SeqIO.parse(fh2, "fastq"))) == 1
 
 
 def test_filter_ambiguous_paired_counts(ambig_seqs_dir_paired):
@@ -98,9 +102,10 @@ def test_filter_ambiguous_paired_counts(ambig_seqs_dir_paired):
 
 
 def test_length_filter_fastq(length_filter_dir):
-    filtered_reads_file = length_filter_dir / "test-length-filtered.fastq"
+    filtered_reads_file = length_filter_dir / "test-length-filtered.fastq.gz"
     assert filtered_reads_file.is_file()
-    assert len(list(SeqIO.parse(filtered_reads_file, "fastq"))) == 8
+    with gzopen(filtered_reads_file, "rt") as fh:
+        assert len(list(SeqIO.parse(fh, "fastq"))) == 8
 
 
 def test_length_filter_counts(length_filter_dir):
