@@ -1,538 +1,564 @@
 {
     "markers": {
         "MHDBL000013": {
-            "typing_result": {
-                "A,A,C,T": 9,
-                "A,G,C,C": 20,
-                "A,G,C,T": 16
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,C,T",
+                    "haplotype": "A:A:C:T",
                     "index": null
                 },
                 {
-                    "haplotype": "A,G,C,C",
+                    "haplotype": "A:G:C:C",
                     "index": null
                 },
                 {
-                    "haplotype": "A,G,C,T",
+                    "haplotype": "A:G:C:T",
                     "index": null
                 }
             ],
             "max_coverage": 59,
             "mean_coverage": 50.9,
             "min_coverage": 1,
-            "num_discarded_reads": 14
+            "num_discarded_reads": 14,
+            "typing_result": {
+                "A,A,C,T": 9,
+                "A,G,C,C": 20,
+                "A,G,C,T": 16
+            }
         },
         "MHDBL000017": {
-            "typing_result": {
-                "A,A,G,C,C": 1,
-                "A,A,G,C,T": 3,
-                "T,A,G,C,T": 6,
-                "T,G,G,C,C": 26
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,G,C,T",
+                    "haplotype": "A:A:G:C:T",
                     "index": null
                 },
                 {
-                    "haplotype": "T,A,G,C,T",
+                    "haplotype": "T:A:G:C:T",
                     "index": null
                 },
                 {
-                    "haplotype": "T,G,G,C,C",
+                    "haplotype": "T:G:G:C:C",
                     "index": null
                 }
             ],
             "max_coverage": 64,
             "mean_coverage": 55.2,
             "min_coverage": 2,
-            "num_discarded_reads": 28
+            "num_discarded_reads": 28,
+            "typing_result": {
+                "A,A,G,C,C": 1,
+                "A,A,G,C,T": 3,
+                "T,A,G,C,T": 6,
+                "T,G,G,C,C": 26
+            }
         },
         "MHDBL000030": {
-            "typing_result": {
-                "A,A,T,C": 3,
-                "A,C,C,C": 2,
-                "A,C,C,G": 18,
-                "G,C,C,C": 1,
-                "G,C,C,G": 34
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,T,C",
+                    "haplotype": "A:A:T:C",
                     "index": null
                 },
                 {
-                    "haplotype": "A,C,C,G",
+                    "haplotype": "A:C:C:G",
                     "index": null
                 },
                 {
-                    "haplotype": "G,C,C,G",
+                    "haplotype": "G:C:C:G",
                     "index": null
                 }
             ],
             "max_coverage": 73,
             "mean_coverage": 62.9,
             "min_coverage": 1,
-            "num_discarded_reads": 15
+            "num_discarded_reads": 15,
+            "typing_result": {
+                "A,A,T,C": 3,
+                "A,C,C,C": 2,
+                "A,C,C,G": 18,
+                "G,C,C,C": 1,
+                "G,C,C,G": 34
+            }
         },
         "MHDBL000048": {
-            "typing_result": {
-                "A,A,T": 21,
-                "A,C,C": 6,
-                "A,C,T": 19,
-                "C,C,C": 8
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,T",
+                    "haplotype": "A:A:T",
                     "index": null
                 },
                 {
-                    "haplotype": "A,C,C",
+                    "haplotype": "A:C:C",
                     "index": null
                 },
                 {
-                    "haplotype": "A,C,T",
+                    "haplotype": "A:C:T",
                     "index": null
                 },
                 {
-                    "haplotype": "C,C,C",
+                    "haplotype": "C:C:C",
                     "index": null
                 }
             ],
             "max_coverage": 63,
             "mean_coverage": 54.4,
             "min_coverage": 2,
-            "num_discarded_reads": 9
+            "num_discarded_reads": 9,
+            "typing_result": {
+                "A,A,T": 21,
+                "A,C,C": 6,
+                "A,C,T": 19,
+                "C,C,C": 8
+            }
         },
         "MHDBL000060": {
-            "typing_result": {
-                "C,C,C,T": 5,
-                "C,T,C,C": 7,
-                "T,T,C,T": 14,
-                "T,T,T,C": 19
-            },
             "genotype": [
                 {
-                    "haplotype": "C,C,C,T",
+                    "haplotype": "C:C:C:T",
                     "index": null
                 },
                 {
-                    "haplotype": "C,T,C,C",
+                    "haplotype": "C:T:C:C",
                     "index": null
                 },
                 {
-                    "haplotype": "T,T,C,T",
+                    "haplotype": "T:T:C:T",
                     "index": null
                 },
                 {
-                    "haplotype": "T,T,T,C",
+                    "haplotype": "T:T:T:C",
                     "index": null
                 }
             ],
             "max_coverage": 56,
             "mean_coverage": 48.3,
             "min_coverage": 1,
-            "num_discarded_reads": 11
+            "num_discarded_reads": 11,
+            "typing_result": {
+                "C,C,C,T": 5,
+                "C,T,C,C": 7,
+                "T,T,C,T": 14,
+                "T,T,T,C": 19
+            }
         },
         "MHDBL000066": {
-            "typing_result": {
-                "G,A,G": 17,
-                "G,G,A": 20,
-                "G,G,G": 16
-            },
             "genotype": [
                 {
-                    "haplotype": "G,A,G",
+                    "haplotype": "G:A:G",
                     "index": null
                 },
                 {
-                    "haplotype": "G,G,A",
+                    "haplotype": "G:G:A",
                     "index": null
                 },
                 {
-                    "haplotype": "G,G,G",
+                    "haplotype": "G:G:G",
                     "index": null
                 }
             ],
             "max_coverage": 57,
             "mean_coverage": 49.5,
             "min_coverage": 1,
-            "num_discarded_reads": 4
+            "num_discarded_reads": 4,
+            "typing_result": {
+                "G,A,G": 17,
+                "G,G,A": 20,
+                "G,G,G": 16
+            }
         },
         "MHDBL000074": {
-            "typing_result": {
-                "A,A,A": 14,
-                "A,A,T": 7,
-                "A,T,T": 21,
-                "T,T,T": 10
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,A",
+                    "haplotype": "A:A:A",
                     "index": null
                 },
                 {
-                    "haplotype": "A,A,T",
+                    "haplotype": "A:A:T",
                     "index": null
                 },
                 {
-                    "haplotype": "A,T,T",
+                    "haplotype": "A:T:T",
                     "index": null
                 },
                 {
-                    "haplotype": "T,T,T",
+                    "haplotype": "T:T:T",
                     "index": null
                 }
             ],
             "max_coverage": 56,
             "mean_coverage": 48.1,
             "min_coverage": 1,
-            "num_discarded_reads": 4
+            "num_discarded_reads": 4,
+            "typing_result": {
+                "A,A,A": 14,
+                "A,A,T": 7,
+                "A,T,T": 21,
+                "T,T,T": 10
+            }
         },
         "MHDBL000081": {
-            "typing_result": {
-                "A,A,A,A,G": 14,
-                "A,C,A,A,A": 6,
-                "C,C,A,A,A": 27
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,A,A,G",
+                    "haplotype": "A:A:A:A:G",
                     "index": null
                 },
                 {
-                    "haplotype": "A,C,A,A,A",
+                    "haplotype": "A:C:A:A:A",
                     "index": null
                 },
                 {
-                    "haplotype": "C,C,A,A,A",
+                    "haplotype": "C:C:A:A:A",
                     "index": null
                 }
             ],
             "max_coverage": 66,
             "mean_coverage": 57.1,
             "min_coverage": 2,
-            "num_discarded_reads": 19
+            "num_discarded_reads": 19,
+            "typing_result": {
+                "A,A,A,A,G": 14,
+                "A,C,A,A,A": 6,
+                "C,C,A,A,A": 27
+            }
         },
         "MHDBL000092": {
-            "typing_result": {
-                "C,A,G": 4,
-                "G,A,G": 2,
-                "G,G,A": 42,
-                "G,G,G": 6
-            },
             "genotype": [
                 {
-                    "haplotype": "C,A,G",
+                    "haplotype": "C:A:G",
                     "index": null
                 },
                 {
-                    "haplotype": "G,G,A",
+                    "haplotype": "G:G:A",
                     "index": null
                 },
                 {
-                    "haplotype": "G,G,G",
+                    "haplotype": "G:G:G",
                     "index": null
                 }
             ],
             "max_coverage": 62,
             "mean_coverage": 53.3,
             "min_coverage": 1,
-            "num_discarded_reads": 8
+            "num_discarded_reads": 8,
+            "typing_result": {
+                "C,A,G": 4,
+                "G,A,G": 2,
+                "G,G,A": 42,
+                "G,G,G": 6
+            }
         },
         "MHDBL000105": {
-            "typing_result": {
-                "A,C,A,T": 4,
-                "A,C,G,C": 26,
-                "A,T,A,C": 21,
-                "G,C,A,C": 2,
-                "G,T,A,C": 1
-            },
             "genotype": [
                 {
-                    "haplotype": "A,C,A,T",
+                    "haplotype": "A:C:A:T",
                     "index": null
                 },
                 {
-                    "haplotype": "A,C,G,C",
+                    "haplotype": "A:C:G:C",
                     "index": null
                 },
                 {
-                    "haplotype": "A,T,A,C",
+                    "haplotype": "A:T:A:C",
                     "index": null
                 }
             ],
             "max_coverage": 60,
             "mean_coverage": 51.7,
             "min_coverage": 1,
-            "num_discarded_reads": 6
+            "num_discarded_reads": 6,
+            "typing_result": {
+                "A,C,A,T": 4,
+                "A,C,G,C": 26,
+                "A,T,A,C": 21,
+                "G,C,A,C": 2,
+                "G,T,A,C": 1
+            }
         },
         "MHDBL000111": {
-            "typing_result": {
-                "A,T,G,A,A": 29,
-                "G,C,A,A,A": 3,
-                "G,C,A,T,G": 20
-            },
             "genotype": [
                 {
-                    "haplotype": "A,T,G,A,A",
+                    "haplotype": "A:T:G:A:A",
                     "index": null
                 },
                 {
-                    "haplotype": "G,C,A,T,G",
+                    "haplotype": "G:C:A:T:G",
                     "index": null
                 }
             ],
             "max_coverage": 61,
             "mean_coverage": 52.9,
             "min_coverage": 1,
-            "num_discarded_reads": 9
+            "num_discarded_reads": 9,
+            "typing_result": {
+                "A,T,G,A,A": 29,
+                "G,C,A,A,A": 3,
+                "G,C,A,T,G": 20
+            }
         },
         "MHDBL000128": {
-            "typing_result": {
-                "A,C,C,G": 20,
-                "A,T,C,G": 29,
-                "T,C,T,G": 4,
-                "T,T,C,G": 3,
-                "T,T,T,G": 1
-            },
             "genotype": [
                 {
-                    "haplotype": "A,C,C,G",
+                    "haplotype": "A:C:C:G",
                     "index": null
                 },
                 {
-                    "haplotype": "A,T,C,G",
+                    "haplotype": "A:T:C:G",
                     "index": null
                 },
                 {
-                    "haplotype": "T,C,T,G",
+                    "haplotype": "T:C:T:G",
                     "index": null
                 },
                 {
-                    "haplotype": "T,T,C,G",
+                    "haplotype": "T:T:C:G",
                     "index": null
                 }
             ],
             "max_coverage": 63,
             "mean_coverage": 54.3,
             "min_coverage": 1,
-            "num_discarded_reads": 6
+            "num_discarded_reads": 6,
+            "typing_result": {
+                "A,C,C,G": 20,
+                "A,T,C,G": 29,
+                "T,C,T,G": 4,
+                "T,T,C,G": 3,
+                "T,T,T,G": 1
+            }
         },
         "MHDBL000131": {
-            "typing_result": {
-                "C,T,G,A": 16,
-                "T,T,G,A": 20,
-                "T,T,G,C": 9
-            },
             "genotype": [
                 {
-                    "haplotype": "C,T,G,A",
+                    "haplotype": "C:T:G:A",
                     "index": null
                 },
                 {
-                    "haplotype": "T,T,G,A",
+                    "haplotype": "T:T:G:A",
                     "index": null
                 },
                 {
-                    "haplotype": "T,T,G,C",
+                    "haplotype": "T:T:G:C",
                     "index": null
                 }
             ],
             "max_coverage": 58,
             "mean_coverage": 49.7,
             "min_coverage": 1,
-            "num_discarded_reads": 13
+            "num_discarded_reads": 13,
+            "typing_result": {
+                "C,T,G,A": 16,
+                "T,T,G,A": 20,
+                "T,T,G,C": 9
+            }
         },
         "MHDBL000138": {
-            "typing_result": {
-                "A,A,C,A": 4,
-                "G,A,C,A": 2,
-                "G,A,C,G": 17,
-                "G,A,T,A": 28,
-                "G,A,T,G": 1
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,C,A",
+                    "haplotype": "A:A:C:A",
                     "index": null
                 },
                 {
-                    "haplotype": "G,A,C,G",
+                    "haplotype": "G:A:C:G",
                     "index": null
                 },
                 {
-                    "haplotype": "G,A,T,A",
+                    "haplotype": "G:A:T:A",
                     "index": null
                 }
             ],
             "max_coverage": 66,
             "mean_coverage": 56.9,
             "min_coverage": 2,
-            "num_discarded_reads": 14
+            "num_discarded_reads": 14,
+            "typing_result": {
+                "A,A,C,A": 4,
+                "G,A,C,A": 2,
+                "G,A,C,G": 17,
+                "G,A,T,A": 28,
+                "G,A,T,G": 1
+            }
         },
         "MHDBL000145": {
-            "typing_result": {
-                "G,A,A": 25,
-                "G,A,G": 2,
-                "G,G,G": 14
-            },
             "genotype": [
                 {
-                    "haplotype": "G,A,A",
+                    "haplotype": "G:A:A",
                     "index": null
                 },
                 {
-                    "haplotype": "G,G,G",
+                    "haplotype": "G:G:G",
                     "index": null
                 }
             ],
             "max_coverage": 53,
             "mean_coverage": 45.4,
             "min_coverage": 1,
-            "num_discarded_reads": 12
+            "num_discarded_reads": 12,
+            "typing_result": {
+                "G,A,A": 25,
+                "G,A,G": 2,
+                "G,G,G": 14
+            }
         },
         "MHDBL000147": {
-            "typing_result": {
-                "A,A,A,A": 26,
-                "A,A,A,T": 1,
-                "A,A,T,T": 24
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,A,A",
+                    "haplotype": "A:A:A:A",
                     "index": null
                 },
                 {
-                    "haplotype": "A,A,T,T",
+                    "haplotype": "A:A:T:T",
                     "index": null
                 }
             ],
             "max_coverage": 61,
             "mean_coverage": 52.5,
             "min_coverage": 1,
-            "num_discarded_reads": 10
+            "num_discarded_reads": 10,
+            "typing_result": {
+                "A,A,A,A": 26,
+                "A,A,A,T": 1,
+                "A,A,T,T": 24
+            }
         },
         "MHDBL000156": {
-            "typing_result": {
-                "T,C,A,C": 28,
-                "T,C,A,G": 16
-            },
             "genotype": [
                 {
-                    "haplotype": "T,C,A,C",
+                    "haplotype": "T:C:A:C",
                     "index": null
                 },
                 {
-                    "haplotype": "T,C,A,G",
+                    "haplotype": "T:C:A:G",
                     "index": null
                 }
             ],
             "max_coverage": 58,
             "mean_coverage": 49.8,
             "min_coverage": 1,
-            "num_discarded_reads": 14
+            "num_discarded_reads": 14,
+            "typing_result": {
+                "T,C,A,C": 28,
+                "T,C,A,G": 16
+            }
         },
         "MHDBL000172": {
-            "typing_result": {
-                "C,A,A,G": 6,
-                "C,A,G,A": 4,
-                "C,A,G,G": 2,
-                "C,G,G,A": 35
-            },
             "genotype": [
                 {
-                    "haplotype": "C,A,A,G",
+                    "haplotype": "C:A:A:G",
                     "index": null
                 },
                 {
-                    "haplotype": "C,A,G,A",
+                    "haplotype": "C:A:G:A",
                     "index": null
                 },
                 {
-                    "haplotype": "C,G,G,A",
+                    "haplotype": "C:G:G:A",
                     "index": null
                 }
             ],
             "max_coverage": 57,
             "mean_coverage": 49.1,
             "min_coverage": 1,
-            "num_discarded_reads": 10
+            "num_discarded_reads": 10,
+            "typing_result": {
+                "C,A,A,G": 6,
+                "C,A,G,A": 4,
+                "C,A,G,G": 2,
+                "C,G,G,A": 35
+            }
         },
         "MHDBL000195": {
-            "typing_result": {
-                "T,C,A,A": 2,
-                "T,C,G,G": 11,
-                "T,G,A,A": 17,
-                "T,G,G,G": 18
-            },
             "genotype": [
                 {
-                    "haplotype": "T,C,G,G",
+                    "haplotype": "T:C:G:G",
                     "index": null
                 },
                 {
-                    "haplotype": "T,G,A,A",
+                    "haplotype": "T:G:A:A",
                     "index": null
                 },
                 {
-                    "haplotype": "T,G,G,G",
+                    "haplotype": "T:G:G:G",
                     "index": null
                 }
             ],
             "max_coverage": 64,
             "mean_coverage": 55.2,
             "min_coverage": 1,
-            "num_discarded_reads": 16
+            "num_discarded_reads": 16,
+            "typing_result": {
+                "T,C,A,A": 2,
+                "T,C,G,G": 11,
+                "T,G,A,A": 17,
+                "T,G,G,G": 18
+            }
         },
         "MHDBL000197": {
-            "typing_result": {
-                "A,A,T,A,C": 1,
-                "A,A,T,A,T": 1,
-                "A,A,T,T,C": 39,
-                "A,A,T,T,T": 30
-            },
             "genotype": [
                 {
-                    "haplotype": "A,A,T,T,C",
+                    "haplotype": "A:A:T:T:C",
                     "index": null
                 },
                 {
-                    "haplotype": "A,A,T,T,T",
+                    "haplotype": "A:A:T:T:T",
                     "index": null
                 }
             ],
             "max_coverage": 76,
             "mean_coverage": 65.4,
             "min_coverage": 2,
-            "num_discarded_reads": 5
+            "num_discarded_reads": 5,
+            "typing_result": {
+                "A,A,T,A,C": 1,
+                "A,A,T,A,T": 1,
+                "A,A,T,T,C": 39,
+                "A,A,T,T,T": 30
+            }
         },
         "MHDBL000204": {
-            "typing_result": {
-                "C,C,A,G,T,G": 3,
-                "C,T,A,G,C,C": 5,
-                "C,T,A,G,T,G": 34
-            },
             "genotype": [
                 {
-                    "haplotype": "C,T,A,G,C,C",
+                    "haplotype": "C:T:A:G:C:C",
                     "index": null
                 },
                 {
-                    "haplotype": "C,T,A,G,T,G",
+                    "haplotype": "C:T:A:G:T:G",
                     "index": null
                 }
             ],
             "max_coverage": 67,
             "mean_coverage": 57.8,
             "min_coverage": 1,
-            "num_discarded_reads": 25
+            "num_discarded_reads": 25,
+            "typing_result": {
+                "C,C,A,G,T,G": 3,
+                "C,T,A,G,C,C": 5,
+                "C,T,A,G,T,G": 34
+            }
         },
         "MHDBL000212": {
+            "genotype": [
+                {
+                    "haplotype": "A:C:C:A:T",
+                    "index": null
+                },
+                {
+                    "haplotype": "A:C:T:A:T",
+                    "index": null
+                },
+                {
+                    "haplotype": "G:C:C:A:C",
+                    "index": null
+                },
+                {
+                    "haplotype": "G:C:C:C:T",
+                    "index": null
+                },
+                {
+                    "haplotype": "G:T:C:A:C",
+                    "index": null
+                }
+            ],
+            "max_coverage": 50,
+            "mean_coverage": 43.8,
+            "min_coverage": 1,
+            "num_discarded_reads": 10,
             "typing_result": {
                 "A,C,C,A,T": 15,
                 "A,C,T,A,A": 1,
@@ -540,33 +566,7 @@
                 "G,C,C,A,C": 14,
                 "G,C,C,C,T": 2,
                 "G,T,C,A,C": 2
-            },
-            "genotype": [
-                {
-                    "haplotype": "A,C,C,A,T",
-                    "index": null
-                },
-                {
-                    "haplotype": "A,C,T,A,T",
-                    "index": null
-                },
-                {
-                    "haplotype": "G,C,C,A,C",
-                    "index": null
-                },
-                {
-                    "haplotype": "G,C,C,C,T",
-                    "index": null
-                },
-                {
-                    "haplotype": "G,T,C,A,C",
-                    "index": null
-                }
-            ],
-            "max_coverage": 50,
-            "mean_coverage": 43.8,
-            "min_coverage": 1,
-            "num_discarded_reads": 10
+            }
         }
     },
     "ploidy": null,

@@ -3,11 +3,11 @@
         "mh01AT-04": {
             "genotype": [
                 {
-                    "haplotype": "G,T,G",
+                    "haplotype": "G:T:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,G,G",
+                    "haplotype": "G:G:G",
                     "index": 1
                 }
             ]
@@ -15,11 +15,11 @@
         "mh11AT-22": {
             "genotype": [
                 {
-                    "haplotype": "T,A",
+                    "haplotype": "T:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,G",
+                    "haplotype": "T:G",
                     "index": 1
                 }
             ]
@@ -27,11 +27,11 @@
         "mh16AT-33": {
             "genotype": [
                 {
-                    "haplotype": "A,C,A",
+                    "haplotype": "A:C:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,C,A",
+                    "haplotype": "A:C:A",
                     "index": 1
                 }
             ]

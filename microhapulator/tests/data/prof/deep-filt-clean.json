@@ -3,10 +3,10 @@
         "mh01XYZ-1": {
             "genotype": [
                 {
-                    "haplotype": "C,G,C,C,G,G,C,T,T,C,C"
+                    "haplotype": "C:G:C:C:G:G:C:T:T:C:C"
                 },
                 {
-                    "haplotype": "G,G,C,C,G,G,T,T,T,C,T"
+                    "haplotype": "G:G:C:C:G:G:T:T:T:C:T"
                 }
             ],
             "max_coverage": 18465,
@@ -71,10 +71,10 @@
         "mh02XYZ-2": {
             "genotype": [
                 {
-                    "haplotype": "G,T,A,G,C,A,T,A,G,G,C"
+                    "haplotype": "G:T:A:G:C:A:T:A:G:G:C"
                 },
                 {
-                    "haplotype": "G,T,A,G,C,G,T,A,G,G,C"
+                    "haplotype": "G:T:A:G:C:G:T:A:G:G:C"
                 }
             ],
             "max_coverage": 20811,
@@ -142,10 +142,10 @@
         "mh02XYZ-3": {
             "genotype": [
                 {
-                    "haplotype": "C,C,G,G,A,C,C,G,A"
+                    "haplotype": "C:C:G:G:A:C:C:G:A"
                 },
                 {
-                    "haplotype": "C,T,A,A,G,C,C,A,A"
+                    "haplotype": "C:T:A:A:G:C:C:A:A"
                 }
             ],
             "max_coverage": 21666,

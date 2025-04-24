@@ -3,19 +3,19 @@
         "mh01KK-001": {
             "genotype": [
                 {
-                    "haplotype": "C,A,G,C",
+                    "haplotype": "C:A:G:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "C,A,G,C",
+                    "haplotype": "C:A:G:C",
                     "index": 1
                 },
                 {
-                    "haplotype": "C,G,G,C",
+                    "haplotype": "C:G:G:C",
                     "index": 2
                 },
                 {
-                    "haplotype": "C,A,G,C",
+                    "haplotype": "C:A:G:C",
                     "index": 3
                 }
             ]
@@ -23,19 +23,19 @@
         "mh01KK-106": {
             "genotype": [
                 {
-                    "haplotype": "T,A,G,G",
+                    "haplotype": "T:A:G:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "C,A,A,G",
+                    "haplotype": "C:A:A:G",
                     "index": 1
                 },
                 {
-                    "haplotype": "C,A,A,G",
+                    "haplotype": "C:A:A:G",
                     "index": 2
                 },
                 {
-                    "haplotype": "C,A,G,G",
+                    "haplotype": "C:A:G:G",
                     "index": 3
                 }
             ]
@@ -43,19 +43,19 @@
         "mh01KK-117": {
             "genotype": [
                 {
-                    "haplotype": "A,G,C,C",
+                    "haplotype": "A:G:C:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,A,G,T",
+                    "haplotype": "A:A:G:T",
                     "index": 1
                 },
                 {
-                    "haplotype": "C,A,C,C",
+                    "haplotype": "C:A:C:C",
                     "index": 2
                 },
                 {
-                    "haplotype": "A,A,C,T",
+                    "haplotype": "A:A:C:T",
                     "index": 3
                 }
             ]
@@ -63,19 +63,19 @@
         "mh01KK-205": {
             "genotype": [
                 {
-                    "haplotype": "T,C,A,G",
+                    "haplotype": "T:C:A:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,C,A,G",
+                    "haplotype": "T:C:A:G",
                     "index": 1
                 },
                 {
-                    "haplotype": "T,C,A,G",
+                    "haplotype": "T:C:A:G",
                     "index": 2
                 },
                 {
-                    "haplotype": "T,C,A,G",
+                    "haplotype": "T:C:A:G",
                     "index": 3
                 }
             ]
@@ -83,19 +83,19 @@
         "mh10KK-163": {
             "genotype": [
                 {
-                    "haplotype": "T,A,A,C,C",
+                    "haplotype": "T:A:A:C:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,A,G,C,T",
+                    "haplotype": "A:A:G:C:T",
                     "index": 1
                 },
                 {
-                    "haplotype": "T,G,G,C,C",
+                    "haplotype": "T:G:G:C:C",
                     "index": 2
                 },
                 {
-                    "haplotype": "T,A,A,C,T",
+                    "haplotype": "T:A:A:C:T",
                     "index": 3
                 }
             ]

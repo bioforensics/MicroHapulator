@@ -3,7 +3,7 @@
         "mh06KK-026": {
             "genotype": [
                 {
-                    "haplotype": "G,C,G"
+                    "haplotype": "G:C:G"
                 }
             ],
             "max_coverage": 3754,
@@ -27,10 +27,10 @@
         "mh06KK-080": {
             "genotype": [
                 {
-                    "haplotype": "A,G"
+                    "haplotype": "A:G"
                 },
                 {
-                    "haplotype": "C,G"
+                    "haplotype": "C:G"
                 }
             ],
             "max_coverage": 3744,
@@ -51,7 +51,7 @@
         "mh06KK-101": {
             "genotype": [
                 {
-                    "haplotype": "G,G"
+                    "haplotype": "G:G"
                 }
             ],
             "max_coverage": 3754,
@@ -71,10 +71,10 @@
         "mh07KK-030": {
             "genotype": [
                 {
-                    "haplotype": "A,C,C"
+                    "haplotype": "A:C:C"
                 },
                 {
-                    "haplotype": "G,C,C"
+                    "haplotype": "G:C:C"
                 }
             ],
             "max_coverage": 3744,

@@ -3,11 +3,11 @@
         "mh01USC-1pA": {
             "genotype": [
                 {
-                    "haplotype": "A,T,G,C",
+                    "haplotype": "A:T:G:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,T,G,C",
+                    "haplotype": "A:T:G:C",
                     "index": 1
                 }
             ]
@@ -15,11 +15,11 @@
         "mh02USC-2pA": {
             "genotype": [
                 {
-                    "haplotype": "T,C,G,A",
+                    "haplotype": "T:C:G:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,A,A,T",
+                    "haplotype": "T:A:A:T",
                     "index": 1
                 }
             ]
@@ -27,11 +27,11 @@
         "mh03USC-3pA": {
             "genotype": [
                 {
-                    "haplotype": "C,C,G,T",
+                    "haplotype": "C:C:G:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,C,G,T",
+                    "haplotype": "A:C:G:T",
                     "index": 1
                 }
             ]
@@ -39,11 +39,11 @@
         "mh04USC-4pA": {
             "genotype": [
                 {
-                    "haplotype": "C,T,C,A",
+                    "haplotype": "C:T:C:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,G,C,A",
+                    "haplotype": "G:G:C:A",
                     "index": 1
                 }
             ]
@@ -51,11 +51,11 @@
         "mh05USC-5pA": {
             "genotype": [
                 {
-                    "haplotype": "A,C,T,G",
+                    "haplotype": "A:C:T:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,C,A,G",
+                    "haplotype": "A:C:A:G",
                     "index": 1
                 }
             ]
@@ -63,11 +63,11 @@
         "mh06USC-6pA": {
             "genotype": [
                 {
-                    "haplotype": "G,C,T",
+                    "haplotype": "G:C:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "C,C,A",
+                    "haplotype": "C:C:A",
                     "index": 1
                 }
             ]
@@ -75,11 +75,11 @@
         "mh07USC-7pA": {
             "genotype": [
                 {
-                    "haplotype": "A,G,T,C",
+                    "haplotype": "A:G:T:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,G,T,C",
+                    "haplotype": "A:G:T:C",
                     "index": 1
                 }
             ]
@@ -87,11 +87,11 @@
         "mh08USC-8pA": {
             "genotype": [
                 {
-                    "haplotype": "A,G,T,G",
+                    "haplotype": "A:G:T:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,G,T,A",
+                    "haplotype": "G:G:T:A",
                     "index": 1
                 }
             ]
@@ -99,11 +99,11 @@
         "mh09USC-9pA": {
             "genotype": [
                 {
-                    "haplotype": "A,T,C,A,A",
+                    "haplotype": "A:T:C:A:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,T,C,A,C",
+                    "haplotype": "G:T:C:A:C",
                     "index": 1
                 }
             ]
@@ -111,11 +111,11 @@
         "mh10USC-10pA": {
             "genotype": [
                 {
-                    "haplotype": "T,G,G",
+                    "haplotype": "T:G:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,G,G",
+                    "haplotype": "A:G:G",
                     "index": 1
                 }
             ]

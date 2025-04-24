@@ -3,11 +3,11 @@
         "MHDBL000013": {
             "genotype": [
                 {
-                    "haplotype": "A,A,C,T",
+                    "haplotype": "A:A:C:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,G,C,C",
+                    "haplotype": "A:G:C:C",
                     "index": 1
                 }
             ]
@@ -15,11 +15,11 @@
         "MHDBL000017": {
             "genotype": [
                 {
-                    "haplotype": "T,G,G,C,C",
+                    "haplotype": "T:G:G:C:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,A,G,C,T",
+                    "haplotype": "A:A:G:C:T",
                     "index": 1
                 }
             ]
@@ -27,11 +27,11 @@
         "MHDBL000030": {
             "genotype": [
                 {
-                    "haplotype": "A,C,C,C",
+                    "haplotype": "A:C:C:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,C,C,G",
+                    "haplotype": "G:C:C:G",
                     "index": 1
                 }
             ]
@@ -39,11 +39,11 @@
         "MHDBL000048": {
             "genotype": [
                 {
-                    "haplotype": "C,C,T",
+                    "haplotype": "C:C:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,A,T",
+                    "haplotype": "A:A:T",
                     "index": 1
                 }
             ]
@@ -51,11 +51,11 @@
         "MHDBL000060": {
             "genotype": [
                 {
-                    "haplotype": "T,T,T,C",
+                    "haplotype": "T:T:T:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,T,T,C",
+                    "haplotype": "T:T:T:C",
                     "index": 1
                 }
             ]
@@ -63,11 +63,11 @@
         "MHDBL000066": {
             "genotype": [
                 {
-                    "haplotype": "G,G,A",
+                    "haplotype": "G:G:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,G,G",
+                    "haplotype": "A:G:G",
                     "index": 1
                 }
             ]
@@ -75,11 +75,11 @@
         "MHDBL000074": {
             "genotype": [
                 {
-                    "haplotype": "T,T,T",
+                    "haplotype": "T:T:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,T,T",
+                    "haplotype": "T:T:T",
                     "index": 1
                 }
             ]
@@ -87,11 +87,11 @@
         "MHDBL000081": {
             "genotype": [
                 {
-                    "haplotype": "A,C,A,A,G",
+                    "haplotype": "A:C:A:A:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,C,G,G,A",
+                    "haplotype": "A:C:G:G:A",
                     "index": 1
                 }
             ]
@@ -99,11 +99,11 @@
         "MHDBL000092": {
             "genotype": [
                 {
-                    "haplotype": "G,G,G",
+                    "haplotype": "G:G:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,G,G",
+                    "haplotype": "G:G:G",
                     "index": 1
                 }
             ]
@@ -111,11 +111,11 @@
         "MHDBL000105": {
             "genotype": [
                 {
-                    "haplotype": "A,C,A,T",
+                    "haplotype": "A:C:A:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,C,A,T",
+                    "haplotype": "A:C:A:T",
                     "index": 1
                 }
             ]
@@ -123,11 +123,11 @@
         "MHDBL000111": {
             "genotype": [
                 {
-                    "haplotype": "G,C,G,T,A",
+                    "haplotype": "G:C:G:T:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,C,A,T,G",
+                    "haplotype": "G:C:A:T:G",
                     "index": 1
                 }
             ]
@@ -135,11 +135,11 @@
         "MHDBL000128": {
             "genotype": [
                 {
-                    "haplotype": "A,T,C,G",
+                    "haplotype": "A:T:C:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,C,C,G",
+                    "haplotype": "A:C:C:G",
                     "index": 1
                 }
             ]
@@ -147,11 +147,11 @@
         "MHDBL000131": {
             "genotype": [
                 {
-                    "haplotype": "T,T,G,C",
+                    "haplotype": "T:T:G:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,C,G,A",
+                    "haplotype": "T:C:G:A",
                     "index": 1
                 }
             ]
@@ -159,11 +159,11 @@
         "MHDBL000138": {
             "genotype": [
                 {
-                    "haplotype": "G,A,C,A",
+                    "haplotype": "G:A:C:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,G,C,G",
+                    "haplotype": "G:G:C:G",
                     "index": 1
                 }
             ]
@@ -171,11 +171,11 @@
         "MHDBL000145": {
             "genotype": [
                 {
-                    "haplotype": "G,A,A",
+                    "haplotype": "G:A:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,A,A",
+                    "haplotype": "G:A:A",
                     "index": 1
                 }
             ]
@@ -183,11 +183,11 @@
         "MHDBL000147": {
             "genotype": [
                 {
-                    "haplotype": "A,A,T,T",
+                    "haplotype": "A:A:T:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,A,A,T",
+                    "haplotype": "T:A:A:T",
                     "index": 1
                 }
             ]
@@ -195,11 +195,11 @@
         "MHDBL000156": {
             "genotype": [
                 {
-                    "haplotype": "T,C,A,G",
+                    "haplotype": "T:C:A:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,C,G,G",
+                    "haplotype": "T:C:G:G",
                     "index": 1
                 }
             ]
@@ -207,11 +207,11 @@
         "MHDBL000172": {
             "genotype": [
                 {
-                    "haplotype": "C,G,A,G",
+                    "haplotype": "C:G:A:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "C,G,G,A",
+                    "haplotype": "C:G:G:A",
                     "index": 1
                 }
             ]
@@ -219,11 +219,11 @@
         "MHDBL000195": {
             "genotype": [
                 {
-                    "haplotype": "T,G,A,A",
+                    "haplotype": "T:G:A:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,G,G,G",
+                    "haplotype": "T:G:G:G",
                     "index": 1
                 }
             ]
@@ -231,11 +231,11 @@
         "MHDBL000197": {
             "genotype": [
                 {
-                    "haplotype": "A,A,T,T,C",
+                    "haplotype": "A:A:T:T:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,A,T,T,C",
+                    "haplotype": "A:A:T:T:C",
                     "index": 1
                 }
             ]
@@ -243,11 +243,11 @@
         "MHDBL000204": {
             "genotype": [
                 {
-                    "haplotype": "C,C,A,G,T,G",
+                    "haplotype": "C:C:A:G:T:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "C,C,A,G,T,G",
+                    "haplotype": "C:C:A:G:T:G",
                     "index": 1
                 }
             ]
@@ -255,11 +255,11 @@
         "MHDBL000212": {
             "genotype": [
                 {
-                    "haplotype": "A,C,C,A,T",
+                    "haplotype": "A:C:C:A:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,C,C,A,T",
+                    "haplotype": "A:C:C:A:T",
                     "index": 1
                 }
             ]

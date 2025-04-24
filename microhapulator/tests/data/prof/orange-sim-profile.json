@@ -3,11 +3,11 @@
         "mh07CP-004": {
             "genotype": [
                 {
-                    "haplotype": "A,A,T,A,T",
+                    "haplotype": "A:A:T:A:T",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,T,A,T,C",
+                    "haplotype": "T:T:A:T:C",
                     "index": 1
                 }
             ]
@@ -15,11 +15,11 @@
         "mh14CP-003": {
             "genotype": [
                 {
-                    "haplotype": "A,G,G",
+                    "haplotype": "A:G:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "G,A,A",
+                    "haplotype": "G:A:A",
                     "index": 1
                 }
             ]

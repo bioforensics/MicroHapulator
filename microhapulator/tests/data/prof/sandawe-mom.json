@@ -3,11 +3,11 @@
         "mh08KK-032": {
             "genotype": [
                 {
-                    "haplotype": "T,G",
+                    "haplotype": "T:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,G",
+                    "haplotype": "T:G",
                     "index": 1
                 }
             ]
