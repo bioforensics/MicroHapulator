@@ -32,7 +32,7 @@ def test_load_marker_frequencies(tsv, nrows, value):
 def test_load_marker_frequencies_extra_column_ok():
     freqs = microhapulator.load_marker_frequencies(data_file("freq/korea-5loc-freq-extracol.tsv"))
     assert list(freqs.columns) == ["Marker", "Allele", "Frequency", "Foo"]
-    assert freqs.Allele.iloc[1] == "C,A,G,G"
+    assert freqs.Allele.iloc[1] == "C:A:G:G"
 
 
 @pytest.mark.parametrize(

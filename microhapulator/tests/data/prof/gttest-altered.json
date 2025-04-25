@@ -12,10 +12,10 @@
             "min_coverage": 2,
             "num_discarded_reads": 82,
             "typing_result": {
-                "C,C,A,C": 1,
-                "C,C,A,G": 415,
-                "C,C,A,T": 1,
-                "C,T,A,G": 1
+                "C:C:A:C": 1,
+                "C:C:A:G": 415,
+                "C:C:A:T": 1,
+                "C:T:A:G": 1
             }
         },
         "MHDBL000009": {
@@ -30,7 +30,7 @@
             "min_coverage": 10,
             "num_discarded_reads": 48,
             "typing_result": {
-                "T,G,A": 451
+                "T:G:A": 451
             }
         },
         "MHDBL000013": {
@@ -45,8 +45,8 @@
             "min_coverage": 11,
             "num_discarded_reads": 122,
             "typing_result": {
-                "A,A,G,A": 3,
-                "A,A,G,C": 375
+                "A:A:G:A": 3,
+                "A:A:G:C": 375
             }
         },
         "MHDBL000019": {
@@ -65,10 +65,10 @@
             "min_coverage": 13,
             "num_discarded_reads": 48,
             "typing_result": {
-                "C,A,A": 1,
-                "C,A,C": 1,
-                "C,C,A": 219,
-                "C,C,C": 229
+                "C:A:A": 1,
+                "C:A:C": 1,
+                "C:C:A": 219,
+                "C:C:C": 229
             }
         },
         "MHDBL000020": {
@@ -87,10 +87,10 @@
             "min_coverage": 10,
             "num_discarded_reads": 81,
             "typing_result": {
-                "G,A,G": 199,
-                "G,A,T": 1,
-                "T,G,A": 215,
-                "T,G,G": 1
+                "G:A:G": 199,
+                "G:A:T": 1,
+                "T:G:A": 215,
+                "T:G:G": 1
             }
         },
         "MHDBL000027": {
@@ -105,7 +105,7 @@
             "min_coverage": 7,
             "num_discarded_reads": 28,
             "typing_result": {
-                "C,G": 468
+                "C:G": 468
             }
         },
         "MHDBL000030": {
@@ -124,9 +124,9 @@
             "min_coverage": 11,
             "num_discarded_reads": 164,
             "typing_result": {
-                "A,C,C,G": 169,
-                "A,C,T,A": 2,
-                "A,C,T,G": 163
+                "A:C:C:G": 169,
+                "A:C:T:A": 2,
+                "A:C:T:G": 163
             }
         },
         "MHDBL000036": {
@@ -145,9 +145,9 @@
             "min_coverage": 10,
             "num_discarded_reads": 68,
             "typing_result": {
-                "A,C,A": 1,
-                "A,C,G": 220,
-                "G,C,T": 207
+                "A:C:A": 1,
+                "A:C:G": 220,
+                "G:C:T": 207
             }
         },
         "MHDBL000038": {
@@ -166,10 +166,10 @@
             "min_coverage": 1,
             "num_discarded_reads": 122,
             "typing_result": {
-                "C,G,A,A": 1,
-                "C,G,A,T": 182,
-                "T,A,A,C": 1,
-                "T,A,A,T": 192
+                "C:G:A:A": 1,
+                "C:G:A:T": 182,
+                "T:A:A:C": 1,
+                "T:A:A:T": 192
             }
         },
         "MHDBL000048": {
@@ -188,8 +188,8 @@
             "min_coverage": 9,
             "num_discarded_reads": 53,
             "typing_result": {
-                "A,C,C": 227,
-                "C,C,C": 217
+                "A:C:C": 227,
+                "C:C:C": 217
             }
         },
         "MHDBL000051": {
@@ -208,11 +208,11 @@
             "min_coverage": 1,
             "num_discarded_reads": 102,
             "typing_result": {
-                "A,A,G,C": 1,
-                "A,A,T,C": 197,
-                "C,A,G,T": 1,
-                "C,A,T,A": 1,
-                "C,A,T,T": 196
+                "A:A:G:C": 1,
+                "A:A:T:C": 197,
+                "C:A:G:T": 1,
+                "C:A:T:A": 1,
+                "C:A:T:T": 196
             }
         },
         "MHDBL000055": {
@@ -231,8 +231,8 @@
             "min_coverage": 2,
             "num_discarded_reads": 46,
             "typing_result": {
-                "T,A": 222,
-                "T,G": 227
+                "T:A": 222,
+                "T:G": 227
             }
         },
         "MHDBL000056": {
@@ -247,8 +247,8 @@
             "min_coverage": 6,
             "num_discarded_reads": 78,
             "typing_result": {
-                "C,C,G": 420,
-                "C,T,G": 1
+                "C:C:G": 420,
+                "C:T:G": 1
             }
         },
         "MHDBL000063": {
@@ -263,9 +263,9 @@
             "min_coverage": 3,
             "num_discarded_reads": 75,
             "typing_result": {
-                "C,A,C,T": 1,
-                "C,G,C,T": 421,
-                "C,G,T,T": 1
+                "C:A:C:T": 1,
+                "C:G:C:T": 421,
+                "C:G:T:T": 1
             }
         },
         "MHDBL000066": {
@@ -284,8 +284,8 @@
             "min_coverage": 8,
             "num_discarded_reads": 56,
             "typing_result": {
-                "A,G,G": 220,
-                "G,A,G": 222
+                "A:G:G": 220,
+                "G:A:G": 222
             }
         },
         "MHDBL000068": {
@@ -304,8 +304,8 @@
             "min_coverage": 6,
             "num_discarded_reads": 71,
             "typing_result": {
-                "G,C": 218,
-                "G,T": 208
+                "G:C": 218,
+                "G:T": 208
             }
         },
         "MHDBL000072": {
@@ -324,8 +324,8 @@
             "min_coverage": 11,
             "num_discarded_reads": 37,
             "typing_result": {
-                "C,C": 233,
-                "C,T": 228
+                "C:C": 233,
+                "C:T": 228
             }
         },
         "MHDBL000080": {
@@ -344,10 +344,10 @@
             "min_coverage": 9,
             "num_discarded_reads": 82,
             "typing_result": {
-                "T,A,A": 202,
-                "T,A,T": 1,
-                "T,C,G": 209,
-                "T,C,T": 2
+                "T:A:A": 202,
+                "T:A:T": 1,
+                "T:C:G": 209,
+                "T:C:T": 2
             }
         },
         "MHDBL000085": {
@@ -362,8 +362,8 @@
             "min_coverage": 4,
             "num_discarded_reads": 72,
             "typing_result": {
-                "G,A,T,A": 427,
-                "G,A,T,G": 1
+                "G:A:T:A": 427,
+                "G:A:T:G": 1
             }
         },
         "MHDBL000092": {
@@ -382,10 +382,10 @@
             "min_coverage": 1,
             "num_discarded_reads": 50,
             "typing_result": {
-                "A,G,G": 1,
-                "G,G,A": 223,
-                "G,G,G": 224,
-                "T,G,A": 1
+                "A:G:G": 1,
+                "G:G:A": 223,
+                "G:G:G": 224,
+                "T:G:A": 1
             }
         },
         "MHDBL000095": {
@@ -404,10 +404,10 @@
             "min_coverage": 5,
             "num_discarded_reads": 72,
             "typing_result": {
-                "A,A": 206,
-                "A,G": 3,
-                "G,A": 216,
-                "G,C": 1
+                "A:A": 206,
+                "A:G": 3,
+                "G:A": 216,
+                "G:C": 1
             }
         },
         "MHDBL000103": {
@@ -422,8 +422,8 @@
             "min_coverage": 6,
             "num_discarded_reads": 41,
             "typing_result": {
-                "C,G": 2,
-                "C,T": 450
+                "C:G": 2,
+                "C:T": 450
             }
         },
         "MHDBL000105": {
@@ -442,9 +442,9 @@
             "min_coverage": 9,
             "num_discarded_reads": 56,
             "typing_result": {
-                "A,C,G,C": 222,
-                "G,T,A,C": 217,
-                "G,T,C,C": 1
+                "A:C:G:C": 222,
+                "G:T:A:C": 217,
+                "G:T:C:C": 1
             }
         },
         "MHDBL000108": {
@@ -463,9 +463,9 @@
             "min_coverage": 1,
             "num_discarded_reads": 66,
             "typing_result": {
-                "A,G,A,A": 217,
-                "G,G,A,A": 1,
-                "G,G,A,G": 216
+                "A:G:A:A": 217,
+                "G:G:A:A": 1,
+                "G:G:A:G": 216
             }
         },
         "MHDBL000111": {
@@ -484,8 +484,8 @@
             "min_coverage": 1,
             "num_discarded_reads": 104,
             "typing_result": {
-                "G,C,A,T,G": 199,
-                "G,C,G,T,A": 195
+                "G:C:A:T:G": 199,
+                "G:C:G:T:A": 195
             }
         },
         "MHDBL000113": {
@@ -504,9 +504,9 @@
             "min_coverage": 9,
             "num_discarded_reads": 83,
             "typing_result": {
-                "A,T,G": 2,
-                "C,T,G": 209,
-                "T,T,G": 204
+                "A:T:G": 2,
+                "C:T:G": 209,
+                "T:T:G": 204
             }
         },
         "MHDBL000115": {
@@ -521,10 +521,10 @@
             "min_coverage": 10,
             "num_discarded_reads": 198,
             "typing_result": {
-                "A,T,T,G,G,A": 297,
-                "A,T,T,G,G,C": 2,
-                "A,T,T,G,G,G": 2,
-                "T,T,T,G,G,A": 1
+                "A:T:T:G:G:A": 297,
+                "A:T:T:G:G:C": 2,
+                "A:T:T:G:G:G": 2,
+                "T:T:T:G:G:A": 1
             }
         },
         "MHDBL000129": {
@@ -539,7 +539,7 @@
             "min_coverage": 11,
             "num_discarded_reads": 46,
             "typing_result": {
-                "T,T,C": 453
+                "T:T:C": 453
             }
         },
         "MHDBL000131": {
@@ -554,9 +554,9 @@
             "min_coverage": 9,
             "num_discarded_reads": 87,
             "typing_result": {
-                "A,T,G,A": 1,
-                "C,T,G,A": 411,
-                "C,T,G,T": 1
+                "A:T:G:A": 1,
+                "C:T:G:A": 411,
+                "C:T:G:T": 1
             }
         },
         "MHDBL000132": {
@@ -571,8 +571,8 @@
             "min_coverage": 5,
             "num_discarded_reads": 46,
             "typing_result": {
-                "T,A,C": 451,
-                "T,C,C": 1
+                "T:A:C": 451,
+                "T:C:C": 1
             }
         },
         "MHDBL000135": {
@@ -591,8 +591,8 @@
             "min_coverage": 11,
             "num_discarded_reads": 79,
             "typing_result": {
-                "G,C,T": 206,
-                "G,T,C": 212
+                "G:C:T": 206,
+                "G:T:C": 212
             }
         },
         "MHDBL000142": {
@@ -611,8 +611,8 @@
             "min_coverage": 6,
             "num_discarded_reads": 44,
             "typing_result": {
-                "C,A": 220,
-                "G,G": 234
+                "C:A": 220,
+                "G:G": 234
             }
         },
         "MHDBL000145": {
@@ -627,9 +627,9 @@
             "min_coverage": 1,
             "num_discarded_reads": 66,
             "typing_result": {
-                "G,A,A": 431,
-                "G,A,C": 1,
-                "G,A,G": 2
+                "G:A:A": 431,
+                "G:A:C": 1,
+                "G:A:G": 2
             }
         },
         "MHDBL000147": {
@@ -648,9 +648,9 @@
             "min_coverage": 1,
             "num_discarded_reads": 45,
             "typing_result": {
-                "A,A,A,A": 227,
-                "A,C,A,T": 1,
-                "A,T,A,T": 224
+                "A:A:A:A": 227,
+                "A:C:A:T": 1,
+                "A:T:A:T": 224
             }
         },
         "MHDBL000148": {
@@ -665,7 +665,7 @@
             "min_coverage": 10,
             "num_discarded_reads": 25,
             "typing_result": {
-                "T,C": 471
+                "T:C": 471
             }
         },
         "MHDBL000153": {
@@ -680,7 +680,7 @@
             "min_coverage": 8,
             "num_discarded_reads": 106,
             "typing_result": {
-                "G,A,C,C": 394
+                "G:A:C:C": 394
             }
         },
         "MHDBL000156": {
@@ -699,9 +699,9 @@
             "min_coverage": 8,
             "num_discarded_reads": 91,
             "typing_result": {
-                "C,T,A,G": 197,
-                "C,T,G,G": 1,
-                "T,C,A,G": 210
+                "C:T:A:G": 197,
+                "C:T:G:G": 1,
+                "T:C:A:G": 210
             }
         },
         "MHDBL000163": {
@@ -720,12 +720,12 @@
             "min_coverage": 7,
             "num_discarded_reads": 131,
             "typing_result": {
-                "C,G,A,A,A": 1,
-                "C,G,A,A,T": 187,
-                "C,G,A,C,T": 1,
-                "C,G,A,G,T": 1,
-                "C,G,C,A,T": 1,
-                "C,G,G,A,T": 177
+                "C:G:A:A:A": 1,
+                "C:G:A:A:T": 187,
+                "C:G:A:C:T": 1,
+                "C:G:A:G:T": 1,
+                "C:G:C:A:T": 1,
+                "C:G:G:A:T": 177
             }
         },
         "MHDBL000167": {
@@ -744,10 +744,10 @@
             "min_coverage": 6,
             "num_discarded_reads": 90,
             "typing_result": {
-                "G,C,A": 209,
-                "G,C,C": 1,
-                "G,C,G": 197,
-                "G,C,T": 1
+                "G:C:A": 209,
+                "G:C:C": 1,
+                "G:C:G": 197,
+                "G:C:T": 1
             }
         },
         "MHDBL000185": {
@@ -766,10 +766,10 @@
             "min_coverage": 8,
             "num_discarded_reads": 118,
             "typing_result": {
-                "T,C,G,G": 190,
-                "T,C,G,T": 1,
-                "T,T,T,G": 188,
-                "T,T,T,T": 3
+                "T:C:G:G": 190,
+                "T:C:G:T": 1,
+                "T:T:T:G": 188,
+                "T:T:T:T": 3
             }
         },
         "MHDBL000187": {
@@ -788,9 +788,9 @@
             "min_coverage": 7,
             "num_discarded_reads": 51,
             "typing_result": {
-                "A,A,G": 221,
-                "A,A,T": 223,
-                "C,A,T": 1
+                "A:A:G": 221,
+                "A:A:T": 223,
+                "C:A:T": 1
             }
         },
         "MHDBL000195": {
@@ -809,10 +809,10 @@
             "min_coverage": 5,
             "num_discarded_reads": 131,
             "typing_result": {
-                "T,C,A,A": 180,
-                "T,C,A,G": 1,
-                "T,C,G,A": 184,
-                "T,C,G,G": 2
+                "T:C:A:A": 180,
+                "T:C:A:G": 1,
+                "T:C:G:A": 184,
+                "T:C:G:G": 2
             }
         },
         "MHDBL000197": {
@@ -827,9 +827,9 @@
             "min_coverage": 10,
             "num_discarded_reads": 67,
             "typing_result": {
-                "A,A,T,C,C": 1,
-                "A,A,T,T,C": 428,
-                "T,A,T,T,C": 2
+                "A:A:T:C:C": 1,
+                "A:A:T:T:C": 428,
+                "T:A:T:T:C": 2
             }
         },
         "MHDBL000199": {
@@ -844,8 +844,8 @@
             "min_coverage": 5,
             "num_discarded_reads": 50,
             "typing_result": {
-                "G,C,C": 447,
-                "G,C,T": 1
+                "G:C:C": 447,
+                "G:C:T": 1
             }
         },
         "MHDBL000200": {
@@ -864,8 +864,8 @@
             "min_coverage": 1,
             "num_discarded_reads": 43,
             "typing_result": {
-                "C,G": 229,
-                "T,G": 225
+                "C:G": 229,
+                "T:G": 225
             }
         },
         "MHDBL000204": {
@@ -884,10 +884,10 @@
             "min_coverage": 5,
             "num_discarded_reads": 178,
             "typing_result": {
-                "C,T,A,G,T,G": 159,
-                "T,T,A,G,G,G": 1,
-                "T,T,A,G,T,A": 1,
-                "T,T,A,G,T,G": 161
+                "C:T:A:G:T:G": 159,
+                "T:T:A:G:G:G": 1,
+                "T:T:A:G:T:A": 1,
+                "T:T:A:G:T:G": 161
             }
         },
         "MHDBL000205": {
@@ -906,8 +906,8 @@
             "min_coverage": 1,
             "num_discarded_reads": 49,
             "typing_result": {
-                "T,A": 221,
-                "T,G": 226
+                "T:A": 221,
+                "T:G": 226
             }
         },
         "MHDBL000207": {
@@ -926,10 +926,10 @@
             "min_coverage": 1,
             "num_discarded_reads": 49,
             "typing_result": {
-                "A,A,G": 1,
-                "A,C,G": 229,
-                "G,C,T": 218,
-                "G,T,T": 1
+                "A:A:G": 1,
+                "A:C:G": 229,
+                "G:C:T": 218,
+                "G:T:T": 1
             }
         },
         "MHDBL000211": {
@@ -948,8 +948,8 @@
             "min_coverage": 11,
             "num_discarded_reads": 54,
             "typing_result": {
-                "C,A,A": 223,
-                "T,A,A": 223
+                "C:A:A": 223,
+                "T:A:A": 223
             }
         },
         "MHDBL000212": {
@@ -968,9 +968,9 @@
             "min_coverage": 3,
             "num_discarded_reads": 113,
             "typing_result": {
-                "A,C,C,A,T": 1,
-                "A,C,T,A,T": 188,
-                "G,C,C,A,C": 196
+                "A:C:C:A:T": 1,
+                "A:C:T:A:T": 188,
+                "G:C:C:A:C": 196
             }
         }
     },

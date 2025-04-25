@@ -22,8 +22,8 @@ def test_diff_basic():
     gt2 = SimulatedProfile(fromfile=data_file("prof/diff-comp-2.json"))
     diff = list(mhapi.diff(gt1, gt2))
     assert diff == [
-        ("MHDBL000140", {"C,C,A,A"}, {"C,C,T,A"}),
-        ("MHDBL000163", {"A,A,G,A,T"}, {"C,G,A,A,T"}),
+        ("MHDBL000140", {"C:C:A:A"}, {"C:C:T:A"}),
+        ("MHDBL000163", {"A:A:G:A:T"}, {"C:G:A:A:T"}),
     ]
 
 
@@ -75,9 +75,9 @@ def test_diff_large():
         "MHDBL000211",
         "MHDBL000212",
     ]
-    assert diff[9] == ("MHDBL000047", set(), {"T,T"})
-    assert diff[17] == ("MHDBL000101", {"C,C,C,T"}, {"T,C,C,C"})
-    assert diff[21] == ("MHDBL000112", {"G,G,A,C"}, set())
+    assert diff[9] == ("MHDBL000047", set(), {"T:T"})
+    assert diff[17] == ("MHDBL000101", {"C:C:C:T"}, {"T:C:C:C"})
+    assert diff[21] == ("MHDBL000112", {"G:G:A:C"}, set())
 
 
 def test_diff_cli():
@@ -98,7 +98,7 @@ def test_diff2():
     gt1 = SimulatedProfile(fromfile=data_file("prof/euramer-sim-gt.json"))
     gt2 = SimulatedProfile(fromfile=data_file("prof/euramer-inf-gt.json"))
     diff = list(mhapi.diff(gt1, gt2))
-    assert diff == [("MHDBL000018", set(), {"T,G,C,T,A"})]
+    assert diff == [("MHDBL000018", set(), {"T:G:C:T:A"})]
 
 
 def test_diff_nonmatching_alleles():
@@ -107,6 +107,6 @@ def test_diff_nonmatching_alleles():
     diff = list(mhapi.diff(p1, p2))
     print(diff)
     assert diff == [
-        ("mh07CP-004", set(), {"T,T,T,A,T", "A,A,T,A,T"}),
-        ("mh09KK-157", set(), {"G,C,C,A,T"}),
+        ("mh07CP-004", set(), {"T:T:T:A:T", "A:A:T:A:T"}),
+        ("mh09KK-157", set(), {"G:C:C:A:T"}),
     ]

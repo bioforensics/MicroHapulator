@@ -20,16 +20,16 @@
             "min_coverage": 3,
             "num_discarded_reads": 1123,
             "typing_result": {
-                "A,A,A,T": 2,
-                "A,A,C,G": 1,
-                "A,A,C,T": 1705,
-                "A,A,T,T": 1,
-                "A,C,C,C": 1,
-                "A,G,C,A": 2,
-                "A,G,C,C": 846,
-                "A,G,C,G": 2,
-                "A,G,C,T": 866,
-                "A,G,T,T": 1
+                "A:A:A:T": 2,
+                "A:A:C:G": 1,
+                "A:A:C:T": 1705,
+                "A:A:T:T": 1,
+                "A:C:C:C": 1,
+                "A:G:C:A": 2,
+                "A:G:C:C": 846,
+                "A:G:C:G": 2,
+                "A:G:C:T": 866,
+                "A:G:T:T": 1
             }
         },
         "MHDBL000017": {
@@ -48,14 +48,14 @@
             "min_coverage": 3,
             "num_discarded_reads": 1887,
             "typing_result": {
-                "T,A,G,C,C": 4,
-                "T,A,G,C,G": 3,
-                "T,A,G,C,T": 621,
-                "T,G,G,A,C": 2,
-                "T,G,G,C,A": 9,
-                "T,G,G,C,C": 2005,
-                "T,G,G,C,G": 4,
-                "T,G,G,C,T": 5
+                "T:A:G:C:C": 4,
+                "T:A:G:C:G": 3,
+                "T:A:G:C:T": 621,
+                "T:G:G:A:C": 2,
+                "T:G:G:C:A": 9,
+                "T:G:G:C:C": 2005,
+                "T:G:G:C:G": 4,
+                "T:G:G:C:T": 5
             }
         },
         "MHDBL000030": {
@@ -74,23 +74,23 @@
             "min_coverage": 2,
             "num_discarded_reads": 1298,
             "typing_result": {
-                "A,A,C,G": 1,
-                "A,C,C,A": 1,
-                "A,C,C,G": 826,
-                "A,C,C,T": 1,
-                "A,C,T,G": 1,
-                "A,T,C,G": 1,
-                "G,A,C,G": 3,
-                "G,C,A,G": 3,
-                "G,C,C,A": 4,
-                "G,C,C,C": 2,
-                "G,C,C,G": 2385,
-                "G,C,C,T": 6,
-                "G,C,G,G": 2,
-                "G,C,T,G": 2,
-                "G,G,C,G": 1,
-                "G,T,C,G": 1,
-                "T,C,C,G": 1
+                "A:A:C:G": 1,
+                "A:C:C:A": 1,
+                "A:C:C:G": 826,
+                "A:C:C:T": 1,
+                "A:C:T:G": 1,
+                "A:T:C:G": 1,
+                "G:A:C:G": 3,
+                "G:C:A:G": 3,
+                "G:C:C:A": 4,
+                "G:C:C:C": 2,
+                "G:C:C:G": 2385,
+                "G:C:C:T": 6,
+                "G:C:G:G": 2,
+                "G:C:T:G": 2,
+                "G:G:C:G": 1,
+                "G:T:C:G": 1,
+                "T:C:C:G": 1
             }
         },
         "MHDBL000048": {
@@ -117,11 +117,11 @@
             "min_coverage": 1,
             "num_discarded_reads": 426,
             "typing_result": {
-                "A,A,T": 1025,
-                "A,C,C": 1037,
-                "A,C,T": 1012,
-                "C,C,C": 1030,
-                "C,C,T": 1
+                "A:A:T": 1025,
+                "A:C:C": 1037,
+                "A:C:T": 1012,
+                "C:C:C": 1030,
+                "C:C:T": 1
             }
         },
         "MHDBL000060": {
@@ -148,18 +148,18 @@
             "min_coverage": 2,
             "num_discarded_reads": 719,
             "typing_result": {
-                "C,C,C,A": 1,
-                "C,C,C,G": 1,
-                "C,C,C,T": 954,
-                "C,C,T,T": 1,
-                "C,T,C,C": 970,
-                "C,T,C,G": 1,
-                "C,T,C,T": 1,
-                "G,T,T,C": 1,
-                "T,T,C,T": 946,
-                "T,T,T,A": 1,
-                "T,T,T,C": 940,
-                "T,T,T,T": 2
+                "C:C:C:A": 1,
+                "C:C:C:G": 1,
+                "C:C:C:T": 954,
+                "C:C:T:T": 1,
+                "C:T:C:C": 970,
+                "C:T:C:G": 1,
+                "C:T:C:T": 1,
+                "G:T:T:C": 1,
+                "T:T:C:T": 946,
+                "T:T:T:A": 1,
+                "T:T:T:C": 940,
+                "T:T:T:T": 2
             }
         },
         "MHDBL000066": {
@@ -182,15 +182,15 @@
             "min_coverage": 2,
             "num_discarded_reads": 426,
             "typing_result": {
-                "A,A,G": 1,
-                "A,G,G": 1,
-                "G,A,G": 2058,
-                "G,C,G": 1,
-                "G,G,A": 1035,
-                "G,G,G": 1006,
-                "G,G,T": 2,
-                "G,T,A": 1,
-                "G,T,G": 1
+                "A:A:G": 1,
+                "A:G:G": 1,
+                "G:A:G": 2058,
+                "G:C:G": 1,
+                "G:G:A": 1035,
+                "G:G:G": 1006,
+                "G:G:T": 2,
+                "G:T:A": 1,
+                "G:T:G": 1
             }
         },
         "MHDBL000074": {
@@ -217,12 +217,12 @@
             "min_coverage": 2,
             "num_discarded_reads": 454,
             "typing_result": {
-                "A,A,A": 1027,
-                "A,A,T": 1011,
-                "A,T,T": 1015,
-                "T,A,A": 1,
-                "T,T,G": 1,
-                "T,T,T": 1039
+                "A:A:A": 1027,
+                "A:A:T": 1011,
+                "A:T:T": 1015,
+                "T:A:A": 1,
+                "T:T:G": 1,
+                "T:T:T": 1039
             }
         },
         "MHDBL000081": {
@@ -245,16 +245,16 @@
             "min_coverage": 3,
             "num_discarded_reads": 920,
             "typing_result": {
-                "A,A,A,A,G": 911,
-                "A,A,G,A,G": 1,
-                "A,C,A,A,A": 900,
-                "A,C,A,A,C": 3,
-                "A,C,A,G,A": 1,
-                "C,C,A,A,A": 1799,
-                "C,C,A,A,C": 2,
-                "C,C,A,A,T": 1,
-                "C,T,A,A,G": 1,
-                "G,C,A,A,A": 1
+                "A:A:A:A:G": 911,
+                "A:A:G:A:G": 1,
+                "A:C:A:A:A": 900,
+                "A:C:A:A:C": 3,
+                "A:C:A:G:A": 1,
+                "C:C:A:A:A": 1799,
+                "C:C:A:A:C": 2,
+                "C:C:A:A:T": 1,
+                "C:T:A:A:G": 1,
+                "G:C:A:A:A": 1
             }
         },
         "MHDBL000092": {
@@ -277,15 +277,15 @@
             "min_coverage": 80,
             "num_discarded_reads": 458,
             "typing_result": {
-                "A,A,G": 1,
-                "A,G,G": 1,
-                "C,A,G": 1043,
-                "C,A,T": 1,
-                "C,T,G": 1,
-                "G,A,A": 3,
-                "G,G,A": 2020,
-                "G,G,G": 1018,
-                "G,G,T": 1
+                "A:A:G": 1,
+                "A:G:G": 1,
+                "C:A:G": 1043,
+                "C:A:T": 1,
+                "C:T:G": 1,
+                "G:A:A": 3,
+                "G:G:A": 2020,
+                "G:G:G": 1018,
+                "G:G:T": 1
             }
         },
         "MHDBL000105": {
@@ -312,13 +312,13 @@
             "min_coverage": 1,
             "num_discarded_reads": 585,
             "typing_result": {
-                "A,A,A,C": 1,
-                "A,C,A,T": 980,
-                "A,C,G,C": 983,
-                "A,T,A,C": 1004,
-                "C,T,A,C": 1,
-                "G,T,A,C": 984,
-                "T,T,A,C": 1
+                "A:A:A:C": 1,
+                "A:C:A:T": 980,
+                "A:C:G:C": 983,
+                "A:T:A:C": 1004,
+                "C:T:A:C": 1,
+                "G:T:A:C": 984,
+                "T:T:A:C": 1
             }
         },
         "MHDBL000111": {
@@ -337,19 +337,19 @@
             "min_coverage": 3,
             "num_discarded_reads": 886,
             "typing_result": {
-                "A,A,G,A,A": 1,
-                "A,T,A,A,A": 2,
-                "A,T,G,A,A": 2715,
-                "A,T,G,A,C": 2,
-                "A,T,G,A,G": 3,
-                "A,T,G,A,T": 2,
-                "A,T,G,C,A": 1,
-                "A,T,G,G,A": 1,
-                "C,T,G,A,A": 1,
-                "G,C,A,T,G": 918,
-                "G,C,A,T,T": 2,
-                "G,T,G,A,A": 1,
-                "T,T,G,A,A": 1
+                "A:A:G:A:A": 1,
+                "A:T:A:A:A": 2,
+                "A:T:G:A:A": 2715,
+                "A:T:G:A:C": 2,
+                "A:T:G:A:G": 3,
+                "A:T:G:A:T": 2,
+                "A:T:G:C:A": 1,
+                "A:T:G:G:A": 1,
+                "C:T:G:A:A": 1,
+                "G:C:A:T:G": 918,
+                "G:C:A:T:T": 2,
+                "G:T:G:A:A": 1,
+                "T:T:G:A:A": 1
             }
         },
         "MHDBL000128": {
@@ -372,19 +372,19 @@
             "min_coverage": 86,
             "num_discarded_reads": 595,
             "typing_result": {
-                "A,C,A,G": 1,
-                "A,C,C,G": 988,
-                "A,G,C,G": 1,
-                "A,T,C,A": 1,
-                "A,T,C,C": 1,
-                "A,T,C,G": 1971,
-                "A,T,T,G": 3,
-                "C,C,C,G": 2,
-                "C,T,C,G": 1,
-                "T,C,T,A": 1,
-                "T,C,T,C": 1,
-                "T,C,T,G": 971,
-                "T,C,T,T": 1
+                "A:C:A:G": 1,
+                "A:C:C:G": 988,
+                "A:G:C:G": 1,
+                "A:T:C:A": 1,
+                "A:T:C:C": 1,
+                "A:T:C:G": 1971,
+                "A:T:T:G": 3,
+                "C:C:C:G": 2,
+                "C:T:C:G": 1,
+                "T:C:T:A": 1,
+                "T:C:T:C": 1,
+                "T:C:T:G": 971,
+                "T:C:T:T": 1
             }
         },
         "MHDBL000131": {
@@ -407,17 +407,17 @@
             "min_coverage": 2,
             "num_discarded_reads": 725,
             "typing_result": {
-                "C,G,G,A": 1,
-                "C,T,G,A": 970,
-                "C,T,G,C": 1,
-                "C,T,T,A": 1,
-                "G,T,G,A": 1,
-                "T,A,G,A": 1,
-                "T,T,C,A": 1,
-                "T,T,G,A": 1894,
-                "T,T,G,C": 950,
-                "T,T,G,G": 3,
-                "T,T,G,T": 3
+                "C:G:G:A": 1,
+                "C:T:G:A": 970,
+                "C:T:G:C": 1,
+                "C:T:T:A": 1,
+                "G:T:G:A": 1,
+                "T:A:G:A": 1,
+                "T:T:C:A": 1,
+                "T:T:G:A": 1894,
+                "T:T:G:C": 950,
+                "T:T:G:G": 3,
+                "T:T:G:T": 3
             }
         },
         "MHDBL000138": {
@@ -436,20 +436,20 @@
             "min_coverage": 3,
             "num_discarded_reads": 1114,
             "typing_result": {
-                "A,A,T,A": 1,
-                "G,A,A,A": 1,
-                "G,A,C,A": 2,
-                "G,A,C,C": 1,
-                "G,A,C,G": 867,
-                "G,A,C,T": 2,
-                "G,A,G,A": 1,
-                "G,A,T,A": 2538,
-                "G,A,T,C": 4,
-                "G,A,T,G": 3,
-                "G,A,T,T": 2,
-                "G,T,C,G": 1,
-                "G,T,T,A": 1,
-                "T,A,T,A": 1
+                "A:A:T:A": 1,
+                "G:A:A:A": 1,
+                "G:A:C:A": 2,
+                "G:A:C:C": 1,
+                "G:A:C:G": 867,
+                "G:A:C:T": 2,
+                "G:A:G:A": 1,
+                "G:A:T:A": 2538,
+                "G:A:T:C": 4,
+                "G:A:T:G": 3,
+                "G:A:T:T": 2,
+                "G:T:C:G": 1,
+                "G:T:T:A": 1,
+                "T:A:T:A": 1
             }
         },
         "MHDBL000145": {
@@ -468,14 +468,14 @@
             "min_coverage": 2,
             "num_discarded_reads": 616,
             "typing_result": {
-                "G,A,A": 2931,
-                "G,A,C": 1,
-                "G,A,G": 3,
-                "G,A,T": 2,
-                "G,C,A": 1,
-                "G,G,G": 988,
-                "G,G,T": 3,
-                "T,A,A": 1
+                "G:A:A": 2931,
+                "G:A:C": 1,
+                "G:A:G": 3,
+                "G:A:T": 2,
+                "G:C:A": 1,
+                "G:G:G": 988,
+                "G:G:T": 3,
+                "T:A:A": 1
             }
         },
         "MHDBL000147": {
@@ -494,14 +494,14 @@
             "min_coverage": 1,
             "num_discarded_reads": 545,
             "typing_result": {
-                "A,A,A,A": 2990,
-                "A,A,A,C": 1,
-                "A,A,A,G": 1,
-                "A,A,A,T": 1,
-                "A,A,T,C": 1,
-                "A,A,T,T": 993,
-                "A,G,A,A": 1,
-                "T,A,A,A": 1
+                "A:A:A:A": 2990,
+                "A:A:A:C": 1,
+                "A:A:A:G": 1,
+                "A:A:A:T": 1,
+                "A:A:T:C": 1,
+                "A:A:T:T": 993,
+                "A:G:A:A": 1,
+                "T:A:A:A": 1
             }
         },
         "MHDBL000156": {
@@ -520,12 +520,12 @@
             "min_coverage": 2,
             "num_discarded_reads": 797,
             "typing_result": {
-                "T,C,A,C": 2814,
-                "T,C,A,G": 934,
-                "T,C,A,T": 2,
-                "T,C,G,C": 1,
-                "T,C,G,G": 1,
-                "T,T,A,C": 1
+                "T:C:A:C": 2814,
+                "T:C:A:G": 934,
+                "T:C:A:T": 2,
+                "T:C:G:C": 1,
+                "T:C:G:G": 1,
+                "T:T:A:C": 1
             }
         },
         "MHDBL000172": {
@@ -548,18 +548,18 @@
             "min_coverage": 3,
             "num_discarded_reads": 837,
             "typing_result": {
-                "A,G,G,A": 1,
-                "C,A,A,A": 5,
-                "C,A,A,G": 901,
-                "C,A,C,A": 1,
-                "C,A,G,A": 919,
-                "C,A,G,C": 3,
-                "C,A,G,G": 1,
-                "C,A,T,G": 1,
-                "C,G,G,A": 1873,
-                "C,G,G,C": 2,
-                "C,G,G,G": 3,
-                "C,G,G,T": 1
+                "A:G:G:A": 1,
+                "C:A:A:A": 5,
+                "C:A:A:G": 901,
+                "C:A:C:A": 1,
+                "C:A:G:A": 919,
+                "C:A:G:C": 3,
+                "C:A:G:G": 1,
+                "C:A:T:G": 1,
+                "C:G:G:A": 1873,
+                "C:G:G:C": 2,
+                "C:G:G:G": 3,
+                "C:G:G:T": 1
             }
         },
         "MHDBL000195": {
@@ -582,16 +582,16 @@
             "min_coverage": 81,
             "num_discarded_reads": 1081,
             "typing_result": {
-                "T,C,G,A": 3,
-                "T,C,G,G": 1726,
-                "T,C,G,T": 1,
-                "T,G,A,A": 845,
-                "T,G,A,C": 2,
-                "T,G,A,G": 5,
-                "T,G,A,T": 1,
-                "T,G,G,A": 1,
-                "T,G,G,C": 2,
-                "T,G,G,G": 871
+                "T:C:G:A": 3,
+                "T:C:G:G": 1726,
+                "T:C:G:T": 1,
+                "T:G:A:A": 845,
+                "T:G:A:C": 2,
+                "T:G:A:G": 5,
+                "T:G:A:T": 1,
+                "T:G:G:A": 1,
+                "T:G:G:C": 2,
+                "T:G:G:G": 871
             }
         },
         "MHDBL000197": {
@@ -610,15 +610,15 @@
             "min_coverage": 1,
             "num_discarded_reads": 570,
             "typing_result": {
-                "A,A,T,A,T": 1,
-                "A,A,T,C,C": 2,
-                "A,A,T,T,C": 2957,
-                "A,A,T,T,G": 1,
-                "A,A,T,T,T": 1003,
-                "A,G,T,T,C": 2,
-                "G,A,T,T,C": 1,
-                "T,T,A,T,T": 1,
-                "T,T,T,T,C": 1
+                "A:A:T:A:T": 1,
+                "A:A:T:C:C": 2,
+                "A:A:T:T:C": 2957,
+                "A:A:T:T:G": 1,
+                "A:A:T:T:T": 1003,
+                "A:G:T:T:C": 2,
+                "G:A:T:T:C": 1,
+                "T:T:A:T:T": 1,
+                "T:T:T:T:C": 1
             }
         },
         "MHDBL000204": {
@@ -637,19 +637,19 @@
             "min_coverage": 84,
             "num_discarded_reads": 1511,
             "typing_result": {
-                "C,T,A,A,C,C": 1,
-                "C,T,A,C,T,G": 1,
-                "C,T,A,G,A,C": 1,
-                "C,T,A,G,C,A": 6,
-                "C,T,A,G,C,C": 1516,
-                "C,T,A,G,C,G": 4,
-                "C,T,A,G,C,T": 4,
-                "C,T,A,G,G,C": 1,
-                "C,T,A,G,T,A": 2,
-                "C,T,A,G,T,C": 5,
-                "C,T,A,G,T,G": 1495,
-                "C,T,A,G,T,T": 4,
-                "C,T,T,G,T,G": 1
+                "C:T:A:A:C:C": 1,
+                "C:T:A:C:T:G": 1,
+                "C:T:A:G:A:C": 1,
+                "C:T:A:G:C:A": 6,
+                "C:T:A:G:C:C": 1516,
+                "C:T:A:G:C:G": 4,
+                "C:T:A:G:C:T": 4,
+                "C:T:A:G:G:C": 1,
+                "C:T:A:G:T:A": 2,
+                "C:T:A:G:T:C": 5,
+                "C:T:A:G:T:G": 1495,
+                "C:T:A:G:T:T": 4,
+                "C:T:T:G:T:G": 1
             }
         },
         "MHDBL000212": {
@@ -672,19 +672,19 @@
             "min_coverage": 71,
             "num_discarded_reads": 938,
             "typing_result": {
-                "A,A,C,A,T": 1,
-                "A,A,T,A,T": 2,
-                "A,C,C,A,T": 879,
-                "A,C,C,G,T": 1,
-                "A,C,T,A,A": 1,
-                "A,C,T,A,C": 1,
-                "A,C,T,A,G": 3,
-                "A,C,T,A,T": 1795,
-                "A,T,T,A,T": 1,
-                "G,C,C,A,A": 1,
-                "G,C,C,A,C": 914,
-                "G,C,C,A,G": 1,
-                "G,C,C,A,T": 1
+                "A:A:C:A:T": 1,
+                "A:A:T:A:T": 2,
+                "A:C:C:A:T": 879,
+                "A:C:C:G:T": 1,
+                "A:C:T:A:A": 1,
+                "A:C:T:A:C": 1,
+                "A:C:T:A:G": 3,
+                "A:C:T:A:T": 1795,
+                "A:T:T:A:T": 1,
+                "G:C:C:A:A": 1,
+                "G:C:C:A:C": 914,
+                "G:C:C:A:G": 1,
+                "G:C:C:A:T": 1
             }
         }
     },
