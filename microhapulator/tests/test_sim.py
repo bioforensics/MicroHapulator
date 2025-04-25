@@ -73,3 +73,10 @@ def test_main_haplo_seq(tmp_path):
     expected = SimulatedProfile(fromfile=data_file("prof/orange-sim-profile.json"))
     assert observed == expected
     assert filecmp.cmp(hapseq, data_file("orange-haplo.fasta"))
+
+
+def test_multidef():
+    freqs = pd.read_csv(data_file("pashtun-sim/tiny-panel-multidef-freq.tsv"), sep="\t")
+    msg = "simulating profiles with multiple allele definitions at a locus is not permitted"
+    with pytest.raises(ValueError, match=msg):
+        _ = mhapi.sim(freqs)

@@ -265,3 +265,15 @@ def test_regression_seq_locus_names_in_refr():
         pass
     numfragments = n * 2
     assert numfragments == pytest.approx(1000, abs=50)
+
+
+def test_seq_multidef():
+    profile = Profile(fromfile=data_file("pashtun-sim/tiny-panel-multidef-bogus-profile.json"))
+    index = MicrohapIndex.from_files(
+        data_file("pashtun-sim/tiny-panel-multidef.tsv"),
+        data_file("pashtun-sim/tiny-panel-multidef.fasta"),
+    )
+    sequencer = mhapi.seq([profile], index, totalreads=1000)
+    msg = "simulating sequencing of profiles with multiple allele definitions at a locus is not permitted"
+    with pytest.raises(ValueError, match=msg):
+        _ = list(sequencer)
