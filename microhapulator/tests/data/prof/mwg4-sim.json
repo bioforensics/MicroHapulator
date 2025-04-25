@@ -1,0 +1,58 @@
+{
+    "markers": {
+        "mh03USC-3qC.v2": {
+            "genotype": [
+                {
+                    "haplotype": "C,T,A,C,C,G,G",
+                    "index": 0
+                },
+                {
+                    "haplotype": "G,T,G,T,C,A,G",
+                    "index": 1
+                }
+            ]
+        },
+        "mh04WL-052.v1": {
+            "genotype": [
+                {
+                    "haplotype": "A,C,C,G,A,G,T,C,C",
+                    "index": 0
+                },
+                {
+                    "haplotype": "G,T,C,A,A,G,C,T,C",
+                    "index": 1
+                }
+            ]
+        },
+        "mh06SCUZJ-0528857": {
+            "genotype": [
+                {
+                    "haplotype": "A,A,C,T,G,T,T",
+                    "index": 0
+                },
+                {
+                    "haplotype": "G,A,C,T,G,T,C",
+                    "index": 1
+                }
+            ]
+        },
+        "mh17FHL-005.v3": {
+            "genotype": [
+                {
+                    "haplotype": "A,G,C,C,T,T",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,G,T,T,T,T",
+                    "index": 1
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "HaploSeed": 1278493438
+    },
+    "ploidy": 2,
+    "type": "SimulatedProfile",
+    "version": "0.8.4+3.g41bc147"
+}

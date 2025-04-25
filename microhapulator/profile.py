@@ -79,6 +79,9 @@ class Profile(object):
     def markers(self):
         return set(self.data["markers"])
 
+    def loci(self):
+        return set(m.split(".")[0] for m in self.markers())
+
     def haplotypes(self, markerid, index=None):
         if markerid not in self.data["markers"]:
             return set()
@@ -176,7 +179,7 @@ class Profile(object):
         return json.dumps(self.data, indent=4, sort_keys=True)
 
     def bedstream(self, mhindex):
-        mhindex.validate(refrids=self.markers(), symmetric=True)
+        mhindex.validate(refrids=self.loci(), symmetric=True)
         for markerid in sorted(self.markers()):
             marker = mhindex.markers[markerid]
             offsets = marker.offsets_locus
