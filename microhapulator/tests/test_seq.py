@@ -36,7 +36,7 @@ def test_proportions(n, totalreads, prop, result):
 
 def test_proportions_failure_modes():
     message = r"mismatch between contributor number and proportions"
-    with pytest.raises(ValueError, match=message) as ve:
+    with pytest.raises(ValueError, match=message):
         mhapi.calc_n_reads_from_proportions(3, 1000, [0.6, 0.4])
 
 
@@ -250,6 +250,30 @@ def test_main_out_three_filenames(capsys):
         data_file("prof/orange-sim-profile.json"),
     ]
     with pytest.raises(SystemExit):
-        args = microhapulator.cli.get_parser().parse_args(arglist)
+        _ = microhapulator.cli.get_parser().parse_args(arglist)
     terminal = capsys.readouterr()
     assert "expected 1 or 2 output filenames, got 3" in terminal.err
+
+
+def test_regression_seq_locus_names_in_refr():
+    profile = Profile(fromfile=data_file("prof/mwg4-sim.json"))
+    index = MicrohapIndex.from_files(
+        data_file("def/mwg4-offsets.tsv"), data_file("refr/mwg4-refr.fasta")
+    )
+    sequencer = mhapi.seq([profile], index, totalreads=1000)
+    for n, read1, read2 in sequencer:
+        pass
+    numfragments = n * 2
+    assert numfragments == pytest.approx(1000, abs=50)
+
+
+def test_seq_multidef():
+    profile = Profile(fromfile=data_file("pashtun-sim/tiny-panel-multidef-bogus-profile.json"))
+    index = MicrohapIndex.from_files(
+        data_file("pashtun-sim/tiny-panel-multidef.tsv"),
+        data_file("pashtun-sim/tiny-panel-multidef.fasta"),
+    )
+    sequencer = mhapi.seq([profile], index, totalreads=1000)
+    msg = "simulating sequencing of profiles with multiple allele definitions at a locus is not permitted"
+    with pytest.raises(ValueError, match=msg):
+        _ = list(sequencer)

@@ -449,6 +449,7 @@ def seq(
     :param str sig: an optional signature (prefix) to apply to all simulated reads
     :yields: for each read pair, a tuple (I, X, Y) where I is a serial index, X is the forward read (R1), and Y is the reverse read (R2)
     """
+    check_profiles_for_multiple_alleles(profiles)
     n = len(profiles)
     if seeds is None:
         seeds = [np.random.randint(1, 2**32 - 1) for _ in range(n)]
@@ -476,6 +477,13 @@ def seq(
         reads_sequenced = data[0]
 
 
+def check_profiles_for_multiple_alleles(profiles):
+    for profile in profiles:
+        if len(profile.loci()) < len(profile.markers()):
+            msg = "simulating sequencing of profiles with multiple allele definitions at a locus is not permitted"
+            raise ValueError(msg)
+
+
 def sim(frequencies, seed=None):
     """Simulate a diploid genotype from the specified microhaplotype frequencies
 
@@ -484,6 +492,7 @@ def sim(frequencies, seed=None):
     :returns: a simulated genotype profile for all markers specified in the haplotype frequencies
     :rtype: microhapulator.profile.SimulatedProfile
     """
+    check_frequencies_for_multiple_alleles(frequencies)
     profile = SimulatedProfile(ploidy=2)
     if seed is None:
         seed = np.random.randint(2**32 - 1)
@@ -503,6 +512,14 @@ def sim(frequencies, seed=None):
     message = f"simulated microhaplotype variation at {len(markers)} markers"
     print("[MicroHapulator::sim]", message, file=sys.stderr)
     return profile
+
+
+def check_frequencies_for_multiple_alleles(frequencies):
+    marker_ids = set(frequencies.Marker)
+    locus_ids = set(frequencies.Marker.apply(lambda m: m.split(".")[0]))
+    if len(locus_ids) < len(marker_ids):
+        msg = "simulating profiles with multiple allele definitions at a locus is not permitted"
+        raise ValueError(msg)
 
 
 def check_index(bamfile):
