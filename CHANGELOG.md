@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Intermediate FASTQ files are now bgzip compressed to reduce storage requirements (#189).
 
+### Fixed
+- Bug with handling marker vs. locus identifiers when running `mhpl8r seq` (#190).
+
 
 ## [0.8.4] 2024-09-16
 
