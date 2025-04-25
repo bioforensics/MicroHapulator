@@ -1,0 +1,58 @@
+{
+    "markers": {
+        "mh13KK-218.v1": {
+            "genotype": [
+                {
+                    "haplotype": "C,T,C,C",
+                    "index": 0
+                },
+                {
+                    "haplotype": "C,T,C,T",
+                    "index": 1
+                }
+            ]
+        },
+        "mh13KK-218.v6": {
+            "genotype": [
+                {
+                    "haplotype": "G,C,C,C,T",
+                    "index": 0
+                },
+                {
+                    "haplotype": "G,T,T,T,T",
+                    "index": 1
+                }
+            ]
+        },
+        "mh21KK-320.v1": {
+            "genotype": [
+                {
+                    "haplotype": "G,G,C,G",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,A,C,A",
+                    "index": 1
+                }
+            ]
+        },
+        "mh21KK-320.v5": {
+            "genotype": [
+                {
+                    "haplotype": "A,A,C,A,A",
+                    "index": 0
+                },
+                {
+                    "haplotype": "A,A,C,A,A",
+                    "index": 1
+                }
+            ]
+        }
+    },
+    "metadata": {
+        "HaploSeed": 3674659513
+    },
+    "ploidy": 2,
+    "type": "SimulatedProfile",
+    "version": "0.8.4+4.g45db76e.dirty"
+}
