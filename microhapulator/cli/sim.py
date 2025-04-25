@@ -10,7 +10,7 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-
+from microhapulator import open as mhopen
 from microhapulator import load_marker_frequencies
 import microhapulator.api as mhapi
 from microhapulator.marker import MicrohapIndex
@@ -57,7 +57,7 @@ def subparser(subparsers):
 def main(args):
     frequencies = load_marker_frequencies(args.freq)
     profile = mhapi.sim(frequencies, seed=args.seed)
-    with open(args.out, "w") as fh:
+    with mhopen(args.out, "w") as fh:
         profile.dump(fh)
         message = "profile JSON written to {:s}".format(fh.name)
         print("[MicroHapulator::sim]", message, file=sys.stderr)
