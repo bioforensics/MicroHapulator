@@ -100,14 +100,14 @@ class TypingStats:
     @classmethod
     def from_workdir(cls, sample, workdir="."):
         attempted, successful, rates = {}, {}, {}
-        filename = f"{workdir}/analysis/{sample}/{sample}-typing-rate.tsv"
+        filename = f"{workdir}/analysis/{sample}/typing/{sample}-typing-rate.tsv"
         table = pd.read_csv(filename, sep="\t").set_index("Marker")
         for marker, row in table.iterrows():
             attempted[marker] = row.TotalReads
             successful[marker] = row.TypedReads
             rates[marker] = row.TypingRate
-        filename = f"{workdir}/analysis/{sample}/{sample}-discard-rate.tsv"
+        filename = f"{workdir}/analysis/{sample}/typing/{sample}-discard-rate.tsv"
         high_discard = pd.read_csv(filename, sep="\t")
-        filename = f"{workdir}/analysis/{sample}/{sample}-gapped-rate.tsv"
+        filename = f"{workdir}/analysis/{sample}/typing/{sample}-gapped-rate.tsv"
         high_gap = pd.read_csv(filename, sep="\t")
         return cls(attempted, successful, rates, high_discard, high_gap)

@@ -136,11 +136,15 @@ def read_length_table_single_end(samples, workdir="."):
 def per_marker_mapping_rate(samples, workdir="."):
     sample_rates = dict()
     for sample in samples:
-        total_reads_filename = f"{workdir}/analysis/{sample}/{sample}-marker-read-counts.csv"
+        total_reads_filename = (
+            f"{workdir}/analysis/{sample}/alignment/{sample}-marker-read-counts.csv"
+        )
         total_df = pd.read_csv(total_reads_filename).set_index("Marker")
         expected_count = total_df["ReadCount"].sum() / len(total_df)
         total_df["ExpectedObservedRatio"] = total_df["ReadCount"] / expected_count
-        repetitive_filename = Path(f"{workdir}/analysis/{sample}/{sample}-repetitive-reads.csv")
+        repetitive_filename = Path(
+            f"{workdir}/analysis/{sample}/alignment/{sample}-repetitive-reads.csv"
+        )
         if repetitive_filename.stat().st_size > 0:
             repetitive_df = pd.read_csv(repetitive_filename).set_index("Marker")
             sample_df = pd.concat([total_df, repetitive_df], axis=1)

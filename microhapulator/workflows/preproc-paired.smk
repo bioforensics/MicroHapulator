@@ -72,6 +72,7 @@ rule filter_ambiguous:
         ambig_thresh=config["ambiguous_thresh"],
         out_prefix="analysis/{sample}/preprocessing/{sample}",
     run:
+        print("DEBUG", wildcards.sample, input)
         ambig_filter = AmbigPairedReadFilter(*input, params.out_prefix, params.ambig_thresh)
         ambig_filter.filter()
         with open(output.counts, "w") as fh:
