@@ -27,27 +27,6 @@ def test_microhapulator_open():
             pass
 
 
-# These parameters and the following two test functions are mostly just smoke tests to make sure
-# the code doesn't go up in flames when data is written to stdout.
-# @pytest.fixture(params=[
-#     ("diff", [data_file("prof/euramer-sim-gt.json"), data_file("prof/euramer-inf-gt.json")]),
-#     ("dist", [data_file("prof/euramer-sim-gt.json"), data_file("prof/euramer-inf-gt.json")]),
-#     ("sim", [data_file("pashtun-sim/tiny-panel-multidef-freq.tsv")]),
-#     ("unite", [data_file("prof/swedish-mom.json"), data_file("prof/swedish-dad.json")]),
-# ])
-# def stdout_regress_param(request):
-#     return request.param
-#
-#
-# def test_regression_stdout(stdout_regress_param, capsys, tmp_path):
-#     command, infiles = stdout_regress_param
-#     main([command, *infiles, "-o", outfile])
-#     terminal = capsys.readouterr()
-#     assert terminal.out == ""
-#     main([command, *infiles])
-#     assert terminal.out != ""
-
-
 @pytest.mark.parametrize(
     "command, infiles",
     [
@@ -57,7 +36,7 @@ def test_microhapulator_open():
         ("unite", [data_file("prof/swedish-mom.json"), data_file("prof/swedish-dad.json")]),
     ],
 )
-def test_regression_output_file(command, infiles, capsys, tmp_path):
+def test_regression_output_file_or_stdout(command, infiles, capsys, tmp_path):
     # This is mostly just a smoke test to make sure the code doesn't go up in flames when data is
     # written to stdout.
     outfile = str(tmp_path / "output.data")
