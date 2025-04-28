@@ -59,8 +59,9 @@ def main(args):
     profile = mhapi.sim(frequencies, seed=args.seed)
     with mhopen(args.out, "w") as fh:
         profile.dump(fh)
-        message = "profile JSON written to {:s}".format(fh.name)
-        print("[MicroHapulator::sim]", message, file=sys.stderr)
+        if hasattr(fh, "name"):
+            message = "profile JSON written to {:s}".format(fh.name)
+            print("[MicroHapulator::sim]", message, file=sys.stderr)
     if args.haplo_seq:
         index = MicrohapIndex.from_files(args.markers, fasta_path=args.sequences)
         index.validate()

@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Bug with handling marker vs. locus identifiers when running `mhpl8r seq` (#190).
+- Bug with writing output to terminal for some commands (#191).
 
 
 ## [0.8.4] 2024-09-16
