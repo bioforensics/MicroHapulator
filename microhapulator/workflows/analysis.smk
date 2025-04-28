@@ -31,9 +31,13 @@ rule report:
             sample=config["samples"],
             suffix=("qual", "quant", "qual-ref", "quant-ref"),
         ),
-        expand("analysis/{sample}/{sample}-ambig-read-counts.txt", sample=config["samples"]),
         expand(
-            "analysis/{sample}/{sample}-length-filtered-read-counts.txt", sample=config["samples"]
+            "analysis/{sample}/preprocessing/{sample}-ambig-read-counts.txt",
+            sample=config["samples"],
+        ),
+        expand(
+            "analysis/{sample}/preprocessing/{sample}-length-filtered-read-counts.txt",
+            sample=config["samples"],
         ),
         expand("analysis/{sample}/{sample}-interlocus-balance.png", sample=config["samples"]),
         expand("analysis/{sample}/{sample}-heterozygote-balance.png", sample=config["samples"]),
@@ -96,7 +100,7 @@ rule copy_and_index_marker_data:
 
 rule map_sort_and_index:
     input:
-        fastq="analysis/{sample}/{sample}-preprocessed-reads.fastq.gz",
+        fastq="analysis/{sample}/preprocessing/{sample}-preprocessed-reads.fastq.gz",
         index="marker-refr.mmi",
     output:
         bam="analysis/{sample}/{sample}.bam",
@@ -114,7 +118,7 @@ rule map_sort_and_index:
 rule map_full_reference:
     input:
         index=config["hg38index"],
-        fastq="analysis/{sample}/{sample}-preprocessed-reads.fastq.gz",
+        fastq="analysis/{sample}/preprocessing/{sample}-preprocessed-reads.fastq.gz",
     output:
         bam="analysis/{sample}/fullrefr/{sample}-fullrefr.bam",
         bai="analysis/{sample}/fullrefr/{sample}-fullrefr.bam.bai",

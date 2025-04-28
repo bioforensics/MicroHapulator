@@ -10,16 +10,16 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from glob import glob
 from microhapulator import api as mhapi
 from microhapulator.pipe.filter import AmbigPairedReadFilter, LengthSingleReadFilter
 from os import symlink
+from pathlib import Path
 
 preproc_aux_files = [
-    "analysis/r1-read-lengths.png",
-    "analysis/r2-read-lengths.png",
-    "analysis/merged-read-lengths.png",
-    "analysis/multiqc_report.html",
+    "report/img/r1-read-lengths.png",
+    "report/img/r2-read-lengths.png",
+    "report/img/merged-read-lengths.png",
+    "report/multiqc_report.html",
 ]
 
 
@@ -30,26 +30,32 @@ rule fastqc:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        r1="analysis/{sample}/fastqc/R1-fastqc.html",
-        r2="analysis/{sample}/fastqc/R2-fastqc.html",
+        r1="analysis/{sample}/preprocessing/fastqc/R1-fastqc.html",
+        r2="analysis/{sample}/preprocessing/fastqc/R2-fastqc.html",
+    params:
+        outdir="analysis/{sample}/preprocessing/fastqc/",
     threads: 2
     run:
-        shell("fastqc --outdir analysis/{wildcards.sample}/fastqc/ --threads {threads} {input}")
-        outfiles = sorted(glob(f"analysis/{wildcards.sample}/fastqc/*.html"))
+        shell("fastqc --outdir {params.outdir} --threads {threads} {input}")
+        outfiles = sorted(Path(params.outdir).glob("*.html"))
         for end, outfile in enumerate(outfiles, 1):
             outfile = Path(outfile)
-            linkfile = f"analysis/{wildcards.sample}/fastqc/R{end}-fastqc.html"
+            linkfile = f"{params.outdir}/R{end}-fastqc.html"
             symlink(outfile.name, linkfile)
 
 
 rule multiqc:
     input:
-        expand("analysis/{sample}/fastqc/R{end}-fastqc.html", sample=config["samples"], end=(1, 2)),
+        expand(
+            "analysis/{sample}/preprocessing/fastqc/R{end}-fastqc.html",
+            sample=config["samples"],
+            end=(1, 2),
+        ),
     output:
-        report="analysis/multiqc_report.html",
+        report="report/multiqc_report.html",
     shell:
         """
-        multiqc analysis/*/fastqc --outdir analysis
+        multiqc analysis/*/preprocessing/fastqc --outdir report
         """
 
 
@@ -57,14 +63,14 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered_r1="analysis/{sample}/{sample}-ambig-filtered-R1.fastq.gz",
-        filtered_r2="analysis/{sample}/{sample}-ambig-filtered-R2.fastq.gz",
-        mates_r1="analysis/{sample}/{sample}-ambig-R1-mates.fastq.gz",
-        mates_r2="analysis/{sample}/{sample}-ambig-R2-mates.fastq.gz",
-        counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
+        filtered_r1="analysis/{sample}/preprocessing/{sample}-ambig-filtered-R1.fastq.gz",
+        filtered_r2="analysis/{sample}/preprocessing/{sample}-ambig-filtered-R2.fastq.gz",
+        mates_r1="analysis/{sample}/preprocessing/{sample}-ambig-R1-mates.fastq.gz",
+        mates_r2="analysis/{sample}/preprocessing/{sample}-ambig-R2-mates.fastq.gz",
+        counts="analysis/{sample}/preprocessing/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
-        out_prefix="analysis/{sample}/{sample}",
+        out_prefix="analysis/{sample}/preprocessing/{sample}",
     run:
         ambig_filter = AmbigPairedReadFilter(*input, params.out_prefix, params.ambig_thresh)
         ambig_filter.filter()
@@ -77,21 +83,24 @@ rule merge:
         r1=rules.filter_ambiguous.output.filtered_r1,
         r2=rules.filter_ambiguous.output.filtered_r2,
     output:
-        mergedfq="analysis/{sample}/{sample}.extendedFrags.fastq.gz",
-        orphan1fq="analysis/{sample}/{sample}.notCombined_1.fastq.gz",
-        orphan2fq="analysis/{sample}/{sample}.notCombined_2.fastq.gz",
-        log="analysis/{sample}/flash.log",
+        mergedfq="analysis/{sample}/preprocessing/flash/{sample}.extendedFrags.fastq.gz",
+        orphan1fq="analysis/{sample}/preprocessing/flash/{sample}.notCombined_1.fastq.gz",
+        orphan2fq="analysis/{sample}/preprocessing/flash/{sample}.notCombined_2.fastq.gz",
+    log:
+        "analysis/{sample}/preprocessing/flash/flash.log",
+    params:
+        prefix="analysis/{sample}/preprocessing/flash/{sample}",
     threads: 8
     shell:
         """
         flash --min-overlap=25 --max-overlap=300 --allow-outies \
             --threads={threads} --max-mismatch-density=0.25 \
-            --output-prefix analysis/{wildcards.sample}/{wildcards.sample} \
+            --output-prefix {params.prefix} \
             {input} \
-            2>&1 | tee {output.log}
-        bgzip analysis/{wildcards.sample}/{wildcards.sample}.extendedFrags.fastq
-        bgzip analysis/{wildcards.sample}/{wildcards.sample}.notCombined_1.fastq
-        bgzip analysis/{wildcards.sample}/{wildcards.sample}.notCombined_2.fastq
+            2>&1 | tee {log}
+        bgzip {params.prefix}.extendedFrags.fastq
+        bgzip {params.prefix}.notCombined_1.fastq
+        bgzip {params.prefix}.notCombined_2.fastq
         """
 
 
@@ -99,9 +108,9 @@ rule filter_length:
     input:
         mergedfq=rules.merge.output.mergedfq,
     output:
-        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq.gz",
-        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq.gz",
-        counts="analysis/{sample}/{sample}-length-filtered-read-counts.txt",
+        length_filtered="analysis/{sample}/preprocessing/{sample}-length-filtered.fastq.gz",
+        linkedfq="analysis/{sample}/preprocessing/{sample}-preprocessed-reads.fastq.gz",
+        counts="analysis/{sample}/preprocessing/{sample}-length-filtered-read-counts.txt",
     params:
         length_thresh=config["length_thresh"],
     run:
@@ -119,9 +128,9 @@ rule calculate_read_lengths:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
         rules.merge.output.mergedfq,
     output:
-        l1="analysis/{sample}/{sample}-r1-read-lengths.json",
-        l2="analysis/{sample}/{sample}-r2-read-lengths.json",
-        merged="analysis/{sample}/{sample}-merged-read-lengths.json",
+        l1="analysis/{sample}/preprocessing/{sample}-r1-read-lengths.json",
+        l2="analysis/{sample}/preprocessing/{sample}-r2-read-lengths.json",
+        merged="analysis/{sample}/preprocessing/{sample}-merged-read-lengths.json",
     run:
         mhapi.calculate_read_lengths(
             input[0],
@@ -136,15 +145,22 @@ rule calculate_read_lengths:
 
 rule plot_read_length_distributions:
     input:
-        r1s=expand("analysis/{sample}/{sample}-r1-read-lengths.json", sample=config["samples"]),
-        r2s=expand("analysis/{sample}/{sample}-r2-read-lengths.json", sample=config["samples"]),
+        r1s=expand(
+            "analysis/{sample}/preprocessing/{sample}-r1-read-lengths.json",
+            sample=config["samples"],
+        ),
+        r2s=expand(
+            "analysis/{sample}/preprocessing/{sample}-r2-read-lengths.json",
+            sample=config["samples"],
+        ),
         merged=expand(
-            "analysis/{sample}/{sample}-merged-read-lengths.json", sample=config["samples"]
+            "analysis/{sample}/preprocessing/{sample}-merged-read-lengths.json",
+            sample=config["samples"],
         ),
     output:
-        r1="analysis/r1-read-lengths.png",
-        r2="analysis/r2-read-lengths.png",
-        merged="analysis/merged-read-lengths.png",
+        r1="report/img/r1-read-lengths.png",
+        r2="report/img/r2-read-lengths.png",
+        merged="report/img/merged-read-lengths.png",
     run:
         mhapi.read_length_dist(
             input.r1s,

@@ -68,9 +68,10 @@ class PairedReadQCSummary:
 
     @classmethod
     def from_workdir(cls, wdpath, sample):
-        ambig_path = f"{wdpath}/analysis/{sample}/{sample}-ambig-read-counts.txt"
-        merge_path = f"{wdpath}/analysis/{sample}/flash.log"
-        length_path = f"{wdpath}/analysis/{sample}/{sample}-length-filtered-read-counts.txt"
+        prefix = f"{wdpath}/analysis/{sample}/preprocessing/"
+        ambig_path = f"{prefix}/{sample}-ambig-read-counts.txt"
+        merge_path = f"{prefix}/flash/flash.log"
+        length_path = f"{prefix}/{sample}-length-filtered-read-counts.txt"
         ambig_stats = PairedAmbiguityFilterStats.from_txt(ambig_path)
         merge_stats = ReadMergingStats.from_log(merge_path)
         length_stats = FilterStats.from_txt(length_path)

@@ -20,7 +20,79 @@ from pkg_resources import resource_filename
 from shutil import copy
 from snakemake import snakemake
 import sys
-from warnings import warn
+
+
+def main(args):
+    validate_panel_config(args.markerrefr, args.markerdefn)
+    samples, filenames = get_input_files(args.samples, args.seqpath, args.reads_are_paired)
+    workingfiles = link_or_copy_input(filenames, args.workdir, docopy=args.copy_input)
+    config = dict(
+        samples=samples,
+        readfiles=workingfiles,
+        mhrefr=Path(args.markerrefr).resolve(),
+        mhdefn=Path(args.markerdefn).resolve(),
+        hg38path=Path(args.hg38).resolve(),
+        hg38index=Path(args.hg38idx).resolve(),
+        thresh_static=args.static,
+        thresh_dynamic=args.dynamic,
+        thresh_file=args.config,
+        paired=args.reads_are_paired,
+        ambiguous_thresh=args.ambiguous_thresh,
+        length_thresh=args.length_thresh,
+        thresh_discard_alert=args.discard_alert,
+        thresh_gap_alert=args.gap_alert,
+        hspace=args.hspace,
+    )
+    snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
+    success = snakemake(
+        snakefile,
+        cores=args.threads,
+        printshellcmds=True,
+        dryrun=args.dryrun,
+        config=config,
+        workdir=args.workdir,
+    )
+    if not success:
+        return 1
+
+
+def validate_panel_config(markerseqs, markerdefn):
+    print("[MicroHapulator] validating panel configuration", file=sys.stderr)
+    index = MicrohapIndex.from_files(markerdefn, markerseqs)
+    index.validate()
+
+
+def get_input_files(sample_names, seqpath, reads_are_paired=True, suffixes=None):
+    """Find input files for each sample
+
+    This function traverses `seqpath` and any of its sub-directories for FASTQ files. Any FASTQ
+    file matching one of the sample names is stored in a dictionary with that sample name. Then the
+    function checks each sample to test whether the number of files found matches the number of
+    expected files. Files for samples that pass this test are stored in a list to be passed to
+    Snakemake. (I would prefer to pass the data as a dictionary, but Snakemake complains when the
+    config object is a nested dictionary. So instead we'll reconstruct the dictionary from this
+    list in the Snakefile.)
+    """
+    if suffixes is None:
+        suffixes = (".fastq", ".fastq.gz", ".fq", ".fq.gz")
+    sample_names = check_sample_names(sample_names)
+    files = defaultdict(list)
+    for filepath in traverse(seqpath):
+        if not filepath.name.endswith(suffixes):
+            continue
+        for sample in sample_names:
+            if sample in filepath.name:
+                files[sample].append(filepath)
+    final_file_list = list()
+    for sample in sample_names:
+        filelist = files[sample]
+        filelist_ok = validate_sample_input_files(len(filelist), sample, reads_are_paired)
+        if filelist_ok:
+            final_file_list.extend(filelist)
+    unique_file_names = set([filepath.name for filepath in final_file_list])
+    if len(unique_file_names) != len(final_file_list):
+        raise ValueError("duplicate FASTQ file names found; refusing to proceed")
+    return sample_names, final_file_list
 
 
 def check_sample_names(samples):
@@ -74,39 +146,6 @@ def validate_sample_input_files(numfiles, sample, reads_are_paired=True):
         )
         raise ValueError(message)
     return True
-
-
-def get_input_files(sample_names, seqpath, reads_are_paired=True, suffixes=None):
-    """Find input files for each sample
-
-    This function traverses `seqpath` and any of its sub-directories for FASTQ files. Any FASTQ
-    file matching one of the sample names is stored in a dictionary with that sample name. Then the
-    function checks each sample to test whether the number of files found matches the number of
-    expected files. Files for samples that pass this test are stored in a list to be passed to
-    Snakemake. (I would prefer to pass the data as a dictionary, but Snakemake complains when the
-    config object is a nested dictionary. So instead we'll reconstruct the dictionary from this
-    list in the Snakefile.)
-    """
-    if suffixes is None:
-        suffixes = (".fastq", ".fastq.gz", ".fq", ".fq.gz")
-    sample_names = check_sample_names(sample_names)
-    files = defaultdict(list)
-    for filepath in traverse(seqpath):
-        if not filepath.name.endswith(suffixes):
-            continue
-        for sample in sample_names:
-            if sample in filepath.name:
-                files[sample].append(filepath)
-    final_file_list = list()
-    for sample in sample_names:
-        filelist = files[sample]
-        filelist_ok = validate_sample_input_files(len(filelist), sample, reads_are_paired)
-        if filelist_ok:
-            final_file_list.extend(filelist)
-    unique_file_names = set([filepath.name for filepath in final_file_list])
-    if len(unique_file_names) != len(final_file_list):
-        raise ValueError("duplicate FASTQ file names found; refusing to proceed")
-    return sample_names, final_file_list
 
 
 def link_or_copy_input(filenames, workdir, docopy=False):
@@ -241,43 +280,3 @@ def subparser(subparsers):
         nargs="+",
         help="list of sample names or path to .txt file containing sample names",
     )
-
-
-def validate_panel_config(markerseqs, markerdefn):
-    print("[MicroHapulator] validating panel configuration", file=sys.stderr)
-    index = MicrohapIndex.from_files(markerdefn, markerseqs)
-    index.validate()
-
-
-def main(args):
-    validate_panel_config(args.markerrefr, args.markerdefn)
-    samples, filenames = get_input_files(args.samples, args.seqpath, args.reads_are_paired)
-    workingfiles = link_or_copy_input(filenames, args.workdir, docopy=args.copy_input)
-    config = dict(
-        samples=samples,
-        readfiles=workingfiles,
-        mhrefr=Path(args.markerrefr).resolve(),
-        mhdefn=Path(args.markerdefn).resolve(),
-        hg38path=Path(args.hg38).resolve(),
-        hg38index=Path(args.hg38idx).resolve(),
-        thresh_static=args.static,
-        thresh_dynamic=args.dynamic,
-        thresh_file=args.config,
-        paired=args.reads_are_paired,
-        ambiguous_thresh=args.ambiguous_thresh,
-        length_thresh=args.length_thresh,
-        thresh_discard_alert=args.discard_alert,
-        thresh_gap_alert=args.gap_alert,
-        hspace=args.hspace,
-    )
-    snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
-    success = snakemake(
-        snakefile,
-        cores=args.threads,
-        printshellcmds=True,
-        dryrun=args.dryrun,
-        config=config,
-        workdir=args.workdir,
-    )
-    if not success:
-        return 1
