@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Intermediate FASTQ files are now bgzip compressed to reduce storage requirements (#189).
+- Colons are now used instead of commas to separate SNP alleles in microhap alleles (#192).
 
 ### Fixed
 - Bug with handling marker vs. locus identifiers when running `mhpl8r seq` (#190).
