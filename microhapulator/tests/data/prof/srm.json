@@ -7,9 +7,9 @@
             "min_coverage": 4092,
             "num_discarded_reads": 6,
             "typing_result": {
-                "C,A,G,A": 2317,
-                "C,G,G,A": 1789,
-                "C,T,G,A": 9
+                "C:A:G:A": 2317,
+                "C:G:G:A": 1789,
+                "C:T:G:A": 9
             }
         }
     },

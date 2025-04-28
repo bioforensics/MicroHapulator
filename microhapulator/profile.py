@@ -110,7 +110,7 @@ class Profile(object):
                 nhaps = len(haplotypes)
                 msg = f"cannot compute random match prob. for marker with {nhaps} haplotypes"
                 raise RandomMatchError(msg)
-            result = freqs[(freqs.Marker == marker) & (freqs.Haplotype.isin(haplotypes))]
+            result = freqs[(freqs.Marker == marker) & (freqs.Allele.isin(haplotypes))]
             if len(haplotypes) == 1:
                 p = minfreq
                 if len(result) == 1:
@@ -186,7 +186,7 @@ class Profile(object):
             variants = [list() for _ in range(len(offsets))]
             for i in sorted(self.haploindexes()):
                 haplotype = self.haplotypes(markerid, index=i).pop()
-                for snp, allelelist in zip(haplotype.split(","), variants):
+                for snp, allelelist in zip(haplotype.split(":"), variants):
                     allelelist.append(snp)
             for offset, snps in zip(offsets, variants):
                 haplostr = "|".join(snps)
@@ -273,7 +273,7 @@ class SimulatedProfile(Profile):
             profile = SimulatedProfile(ploidy=ploidy)
             for marker, allele_list in marker_alleles.items():
                 for i, haplotype in enumerate(allele_list):
-                    profile.add(i, marker, ",".join(haplotype))
+                    profile.add(i, marker, ":".join(haplotype))
             return profile
 
     def merge(profiles):

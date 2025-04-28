@@ -1,89 +1,89 @@
 {
     "markers": {
-        "mh06KK-080": {
-            "typing_result": {
-                "C,A": 4,
-                "C,G": 3391,
-                "C,T": 1,
-                "T,G": 1
-            },
-            "genotype": [
-                {
-                    "haplotype": "C,G",
-                    "index": null
-                }
-            ],
-            "max_coverage": 3744,
-            "mean_coverage": 3224.4,
-            "min_coverage": 61,
-            "num_discarded_reads": 324
-        },
         "mh06KK-026": {
-            "typing_result": {
-                "A,C,G": 1,
-                "G,A,G": 1,
-                "G,C,A": 1,
-                "G,C,C": 1,
-                "G,C,G": 3333,
-                "G,C,T": 1,
-                "G,T,G": 1
-            },
             "genotype": [
                 {
-                    "haplotype": "G,C,G",
+                    "haplotype": "G:C:G",
                     "index": null
                 }
             ],
             "max_coverage": 3754,
             "mean_coverage": 3224.4,
             "min_coverage": 68,
-            "num_discarded_reads": 412
-        },
-        "mh06KK-101": {
+            "num_discarded_reads": 412,
             "typing_result": {
-                "A,A": 1581,
-                "A,C": 1,
-                "A,G": 5,
-                "A,T": 2,
-                "G,A": 2,
-                "G,G": 1560,
-                "G,T": 1
-            },
+                "A:C:G": 1,
+                "G:A:G": 1,
+                "G:C:A": 1,
+                "G:C:C": 1,
+                "G:C:G": 3333,
+                "G:C:T": 1,
+                "G:T:G": 1
+            }
+        },
+        "mh06KK-080": {
             "genotype": [
                 {
-                    "haplotype": "A,A",
+                    "haplotype": "C:G",
+                    "index": null
+                }
+            ],
+            "max_coverage": 3744,
+            "mean_coverage": 3224.4,
+            "min_coverage": 61,
+            "num_discarded_reads": 324,
+            "typing_result": {
+                "C:A": 4,
+                "C:G": 3391,
+                "C:T": 1,
+                "T:G": 1
+            }
+        },
+        "mh06KK-101": {
+            "genotype": [
+                {
+                    "haplotype": "A:A",
                     "index": null
                 },
                 {
-                    "haplotype": "G,G",
+                    "haplotype": "G:G",
                     "index": null
                 }
             ],
             "max_coverage": 3754,
             "mean_coverage": 3214.2,
             "min_coverage": 1,
-            "num_discarded_reads": 593
+            "num_discarded_reads": 593,
+            "typing_result": {
+                "A:A": 1581,
+                "A:C": 1,
+                "A:G": 5,
+                "A:T": 2,
+                "G:A": 2,
+                "G:G": 1560,
+                "G:T": 1
+            }
         },
         "mh07KK-030": {
-            "typing_result": {
-                "A,A,C": 3,
-                "A,C,A": 3,
-                "A,C,C": 3302,
-                "A,C,G": 1,
-                "A,C,T": 3,
-                "A,T,C": 1,
-                "C,C,C": 1
-            },
             "genotype": [
                 {
-                    "haplotype": "A,C,C",
+                    "haplotype": "A:C:C",
                     "index": null
                 }
             ],
             "max_coverage": 3744,
             "mean_coverage": 3215.5,
             "min_coverage": 1,
-            "num_discarded_reads": 426
+            "num_discarded_reads": 426,
+            "typing_result": {
+                "A:A:C": 3,
+                "A:C:A": 3,
+                "A:C:C": 3302,
+                "A:C:G": 1,
+                "A:C:T": 3,
+                "A:T:C": 1,
+                "C:C:C": 1
+            }
         }
     },
     "ploidy": null,

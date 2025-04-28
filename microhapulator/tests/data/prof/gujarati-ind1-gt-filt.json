@@ -3,7 +3,7 @@
         "mh06KK-026": {
             "genotype": [
                 {
-                    "haplotype": "G,C,G"
+                    "haplotype": "G:C:G"
                 }
             ],
             "max_coverage": 3754,
@@ -15,19 +15,19 @@
                 "static": 5
             },
             "typing_result": {
-                "C,C,G": 1,
-                "G,A,G": 1,
-                "G,C,G": 3337,
-                "G,C,T": 1,
-                "G,G,G": 2,
-                "G,T,G": 1,
-                "T,C,G": 1
+                "C:C:G": 1,
+                "G:A:G": 1,
+                "G:C:G": 3337,
+                "G:C:T": 1,
+                "G:G:G": 2,
+                "G:T:G": 1,
+                "T:C:G": 1
             }
         },
         "mh06KK-080": {
             "genotype": [
                 {
-                    "haplotype": "C,G"
+                    "haplotype": "C:G"
                 }
             ],
             "max_coverage": 3744,
@@ -39,19 +39,19 @@
                 "static": 5
             },
             "typing_result": {
-                "C,A": 3,
-                "C,G": 3436,
-                "C,T": 3,
-                "T,G": 1
+                "C:A": 3,
+                "C:G": 3436,
+                "C:T": 3,
+                "T:G": 1
             }
         },
         "mh06KK-101": {
             "genotype": [
                 {
-                    "haplotype": "A,A"
+                    "haplotype": "A:A"
                 },
                 {
-                    "haplotype": "G,G"
+                    "haplotype": "G:G"
                 }
             ],
             "max_coverage": 3754,
@@ -63,23 +63,23 @@
                 "static": 5
             },
             "typing_result": {
-                "A,A": 1577,
-                "A,C": 1,
-                "A,G": 1,
-                "A,T": 1,
-                "G,A": 3,
-                "G,C": 2,
-                "G,G": 1557,
-                "G,T": 2
+                "A:A": 1577,
+                "A:C": 1,
+                "A:G": 1,
+                "A:T": 1,
+                "G:A": 3,
+                "G:C": 2,
+                "G:G": 1557,
+                "G:T": 2
             }
         },
         "mh07KK-030": {
             "genotype": [
                 {
-                    "haplotype": "A,C,C"
+                    "haplotype": "A:C:C"
                 },
                 {
-                    "haplotype": "G,C,C"
+                    "haplotype": "G:C:C"
                 }
             ],
             "max_coverage": 3744,
@@ -91,15 +91,15 @@
                 "static": 5
             },
             "typing_result": {
-                "A,C,A": 2,
-                "A,C,C": 1669,
-                "A,T,C": 1,
-                "G,C,A": 2,
-                "G,C,C": 1651,
-                "G,C,G": 1,
-                "G,C,T": 2,
-                "G,T,C": 2,
-                "T,C,C": 1
+                "A:C:A": 2,
+                "A:C:C": 1669,
+                "A:T:C": 1,
+                "G:C:A": 2,
+                "G:C:C": 1651,
+                "G:C:G": 1,
+                "G:C:T": 2,
+                "G:T:C": 2,
+                "T:C:C": 1
             }
         }
     },

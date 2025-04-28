@@ -3,11 +3,11 @@
         "mh01KK-205": {
             "genotype": [
                 {
-                    "haplotype": "T,T,A,G",
+                    "haplotype": "T:T:A:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,T,G,G",
+                    "haplotype": "T:T:G:G",
                     "index": 1
                 }
             ]
@@ -15,11 +15,11 @@
         "mh02KK-005": {
             "genotype": [
                 {
-                    "haplotype": "G,A",
+                    "haplotype": "G:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,G",
+                    "haplotype": "A:G",
                     "index": 1
                 }
             ]
@@ -27,11 +27,11 @@
         "mh03KK-006": {
             "genotype": [
                 {
-                    "haplotype": "A,A",
+                    "haplotype": "A:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,A",
+                    "haplotype": "A:A",
                     "index": 1
                 }
             ]

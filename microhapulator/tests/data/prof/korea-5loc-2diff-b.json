@@ -1,13 +1,25 @@
 {
     "markers": {
-        "mh10KK-163": {
+        "mh05KK-170": {
             "genotype": [
                 {
-                    "haplotype": "T,A,G,C,T",
+                    "haplotype": "C:G:G:G",
                     "index": 0
                 },
                 {
-                    "haplotype": "T,G,G,T,C",
+                    "haplotype": "C:G:G:G",
+                    "index": 1
+                }
+            ]
+        },
+        "mh10KK-163": {
+            "genotype": [
+                {
+                    "haplotype": "T:A:G:C:T",
+                    "index": 0
+                },
+                {
+                    "haplotype": "T:G:G:T:C",
                     "index": 1
                 }
             ]
@@ -15,11 +27,11 @@
         "mh10KK-169": {
             "genotype": [
                 {
-                    "haplotype": "C,G,T,T,A",
+                    "haplotype": "C:G:T:T:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "C,G,T,T,A",
+                    "haplotype": "C:G:T:T:A",
                     "index": 1
                 }
             ]
@@ -27,11 +39,11 @@
         "mh13KK-218": {
             "genotype": [
                 {
-                    "haplotype": "C,T,T,C",
+                    "haplotype": "C:T:T:C",
                     "index": 0
                 },
                 {
-                    "haplotype": "C,T,C,T",
+                    "haplotype": "C:T:C:T",
                     "index": 1
                 }
             ]
@@ -39,23 +51,11 @@
         "mh21KK-320": {
             "genotype": [
                 {
-                    "haplotype": "G,G,C,A",
+                    "haplotype": "G:G:C:A",
                     "index": 0
                 },
                 {
-                    "haplotype": "A,A,C,G",
-                    "index": 1
-                }
-            ]
-        },
-        "mh05KK-170": {
-            "genotype": [
-                {
-                    "haplotype": "C,G,G,G",
-                    "index": 0
-                },
-                {
-                    "haplotype": "C,G,G,G",
+                    "haplotype": "A:A:C:G",
                     "index": 1
                 }
             ]

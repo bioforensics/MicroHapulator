@@ -504,7 +504,7 @@ def sim(frequencies, seed=None):
     for haploindex in range(2):
         for marker in markers:
             haplofreqs = frequencies[frequencies.Marker == marker]
-            haplotypes = list(haplofreqs.Haplotype)
+            haplotypes = list(haplofreqs.Allele)
             freqs = list(haplofreqs.Frequency)
             freqs = [x / sum(freqs) for x in freqs]
             sampled_haplotype = np.random.choice(haplotypes, p=freqs)
@@ -561,7 +561,7 @@ def tally_haplotypes(bam, mhindex, minbasequal=10, max_depth=1e6):
             if len(htlist) < len(marker.offsets_locus):
                 discarded += 1
                 continue
-            htstr = ",".join(htlist)
+            htstr = ":".join(htlist)
             haplotypes[htstr] += 1
         yield marker.id, cov_pos, haplotypes, discarded
         totaldiscarded += discarded
