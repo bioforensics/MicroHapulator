@@ -12,12 +12,12 @@
 
 
 from collections import defaultdict
-from happer.mutate import mutate
 from io import StringIO
 import json
 import jsonschema
 from microhapulator import __version__
 from microhapulator import open as mhopen
+from microhapulator.happer.mutate import mutate
 from numpy.random import choice
 from pkg_resources import resource_filename
 import pandas as pd

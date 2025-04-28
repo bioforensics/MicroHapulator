@@ -29,6 +29,7 @@ setup(
     packages=[
         "microhapulator",
         "microhapulator.cli",
+        "microhapulator.happer",
         "microhapulator.pipe",
         "microhapulator.tests",
     ],
@@ -43,7 +44,6 @@ setup(
     include_package_data=True,
     install_requires=[
         "biopython",
-        "happer>=0.1",
         "insilicoseq>=1.5.4,<2.0",
         "jsonschema>=4.0",
         "matplotlib>=3.0",
@@ -59,7 +59,12 @@ setup(
         "termgraph>=0.5",
         "tqdm>=4.0",
     ],
-    entry_points={"console_scripts": ["mhpl8r = microhapulator.cli:main"]},
+    entry_points={
+        "console_scripts": [
+            "mhpl8r = microhapulator.cli:main",
+            "happer = microhapulator.happer.__main__:main",
+        ]
+    },
     classifiers=[
         "Environment :: Console",
         "Framework :: IPython",

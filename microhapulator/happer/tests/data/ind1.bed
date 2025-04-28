@@ -1,0 +1,6 @@
+# comment line
+chr1	55	56	A|C
+chr1	66	67	C|G	ThisShouldBeIgnored
+
+chr1	77	78	G|T
+chr1	88	89	T|A
