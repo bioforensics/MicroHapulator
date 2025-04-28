@@ -54,7 +54,7 @@ def download_is_needed(url, filepath, checksum):
 
 def subparser(subparsers):
     desc = "Download and index a GRCh38 assembly file suitable as a whole-genome mapping reference"
-    cli = subparsers.add_parser("getrefr", description=desc)
+    subparsers.add_parser("getrefr", description=desc)
 
 
 def main(args):
