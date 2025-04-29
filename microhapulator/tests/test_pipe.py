@@ -67,7 +67,9 @@ def test_pipe_gbr_usc10(tmp_path):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.pipe.main(args)
     expected = SimulatedProfile(fromfile=data_file("prof/gbr-usc10-sim.json"))
-    observed = TypingResult(fromfile=tmp_path / "analysis" / "gbr-usc" / "gbr-usc-type.json")
+    observed = TypingResult(
+        fromfile=tmp_path / "analysis" / "gbr-usc" / "03typing" / "gbr-usc-type.json"
+    )
     diff = list(mhapi.diff(observed, expected))
     assert len(diff) == 0
     report = tmp_path / "report" / "report.html"
@@ -77,16 +79,15 @@ def test_pipe_gbr_usc10(tmp_path):
         assert "Uniform read lengths for each sample" in contents
         assert "Table 4.3" not in contents
         assert "Table 4.4" in contents
-    profile = tmp_path / "analysis" / "gbr-usc" / "profiles" / "gbr-usc-quant.csv"
+    profile = tmp_path / "analysis" / "gbr-usc" / "04profiles" / "gbr-usc-quant.csv"
     assert profile.is_file()
     expected = pd.read_csv(data_file("gbr-usc-profile.csv"))
     observed = pd.read_csv(profile)
     assert observed.equals(expected)
-    call_pngs = glob(str(tmp_path / "analysis" / "*" / "callplots" / "*.png"))
+    call_pngs = glob(str(tmp_path / "analysis" / "*" / "03typing" / "callplots" / "*.png"))
     assert len(call_pngs) == 10
-    assert (tmp_path / "analysis" / "read-mapping-qc.png").is_file()
     assert (tmp_path / "report" / "img" / "read-mapping-qc.png").is_file()
-    gapped_file = tmp_path / "analysis" / "gbr-usc" / "gbr-usc-gapped-rate.tsv"
+    gapped_file = tmp_path / "analysis" / "gbr-usc" / "03typing" / "gbr-usc-gapped-rate.tsv"
     gapped_rate = pd.read_csv(gapped_file, sep="\t")
     assert len(gapped_rate) == 4
     assert list(gapped_rate.Marker) == ["mh02USC-2pA", "mh04USC-4pA", "mh06USC-6pA", "mh09USC-9pA"]
@@ -110,7 +111,9 @@ def test_pipe_jpt_usc10_single(tmp_path):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.pipe.main(args)
     expected = SimulatedProfile(fromfile=data_file("prof/jpt-usc10-sim.json"))
-    observed = TypingResult(fromfile=tmp_path / "analysis" / "jpt-usc10" / "jpt-usc10-type.json")
+    observed = TypingResult(
+        fromfile=tmp_path / "analysis" / "jpt-usc10" / "03typing" / "jpt-usc10-type.json"
+    )
     diff = list(mhapi.diff(observed, expected))
     assert len(diff) == 0
     report = tmp_path / "report" / "report.html"
