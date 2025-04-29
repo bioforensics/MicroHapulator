@@ -107,7 +107,7 @@ class DetailReporter:
 def read_length_table_paired_end(samples, workdir="."):
     read_length_data = list()
     for sample in samples:
-        prefix = f"{workdir}/analysis/{sample}/preprocessing"
+        prefix = f"{workdir}/analysis/{sample}/01preprocessing"
         with open(f"{prefix}/{sample}-r1-read-lengths.json", "r") as fh:
             r1lengths = json.load(fh)
             r1lengths = list(set(r1lengths))
@@ -124,7 +124,8 @@ def read_length_table_paired_end(samples, workdir="."):
 def read_length_table_single_end(samples, workdir="."):
     read_length_data = list()
     for sample in samples:
-        with open(f"{workdir}/analysis/{sample}/{sample}-read-lengths.json", "r") as fh:
+        path = f"{workdir}/analysis/{sample}/01preprocessing/{sample}-read-lengths.json"
+        with open(path, "r") as fh:
             lengths = json.load(fh)
             lengths = list(set(lengths))
         if len(lengths) != 1:
@@ -137,13 +138,13 @@ def per_marker_mapping_rate(samples, workdir="."):
     sample_rates = dict()
     for sample in samples:
         total_reads_filename = (
-            f"{workdir}/analysis/{sample}/alignment/{sample}-marker-read-counts.csv"
+            f"{workdir}/analysis/{sample}/02alignment/{sample}-marker-read-counts.csv"
         )
         total_df = pd.read_csv(total_reads_filename).set_index("Marker")
         expected_count = total_df["ReadCount"].sum() / len(total_df)
         total_df["ExpectedObservedRatio"] = total_df["ReadCount"] / expected_count
         repetitive_filename = Path(
-            f"{workdir}/analysis/{sample}/alignment/{sample}-repetitive-reads.csv"
+            f"{workdir}/analysis/{sample}/02alignment/{sample}-repetitive-reads.csv"
         )
         if repetitive_filename.stat().st_size > 0:
             repetitive_df = pd.read_csv(repetitive_filename).set_index("Marker")

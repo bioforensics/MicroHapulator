@@ -30,10 +30,10 @@ rule fastqc:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        r1="analysis/{sample}/preprocessing/fastqc/R1-fastqc.html",
-        r2="analysis/{sample}/preprocessing/fastqc/R2-fastqc.html",
+        r1="analysis/{sample}/01preprocessing/fastqc/R1-fastqc.html",
+        r2="analysis/{sample}/01preprocessing/fastqc/R2-fastqc.html",
     params:
-        outdir="analysis/{sample}/preprocessing/fastqc/",
+        outdir="analysis/{sample}/01preprocessing/fastqc/",
     threads: 2
     run:
         shell("fastqc --outdir {params.outdir} --threads {threads} {input}")
@@ -47,7 +47,7 @@ rule fastqc:
 rule multiqc:
     input:
         expand(
-            "analysis/{sample}/preprocessing/fastqc/R{end}-fastqc.html",
+            "analysis/{sample}/01preprocessing/fastqc/R{end}-fastqc.html",
             sample=config["samples"],
             end=(1, 2),
         ),
@@ -55,7 +55,7 @@ rule multiqc:
         report="report/multiqc_report.html",
     shell:
         """
-        multiqc analysis/*/preprocessing/fastqc --outdir report
+        multiqc analysis/*/01preprocessing/fastqc --outdir report
         """
 
 
@@ -63,14 +63,14 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered_r1="analysis/{sample}/preprocessing/{sample}-ambig-filtered-R1.fastq.gz",
-        filtered_r2="analysis/{sample}/preprocessing/{sample}-ambig-filtered-R2.fastq.gz",
-        mates_r1="analysis/{sample}/preprocessing/{sample}-ambig-R1-mates.fastq.gz",
-        mates_r2="analysis/{sample}/preprocessing/{sample}-ambig-R2-mates.fastq.gz",
-        counts="analysis/{sample}/preprocessing/{sample}-ambig-read-counts.txt",
+        filtered_r1="analysis/{sample}/01preprocessing/{sample}-ambig-filtered-R1.fastq.gz",
+        filtered_r2="analysis/{sample}/01preprocessing/{sample}-ambig-filtered-R2.fastq.gz",
+        mates_r1="analysis/{sample}/01preprocessing/{sample}-ambig-R1-mates.fastq.gz",
+        mates_r2="analysis/{sample}/01preprocessing/{sample}-ambig-R2-mates.fastq.gz",
+        counts="analysis/{sample}/01preprocessing/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
-        out_prefix="analysis/{sample}/preprocessing/{sample}",
+        out_prefix="analysis/{sample}/01preprocessing/{sample}",
     run:
         print("DEBUG", wildcards.sample, input)
         ambig_filter = AmbigPairedReadFilter(*input, params.out_prefix, params.ambig_thresh)
@@ -84,13 +84,13 @@ rule merge:
         r1=rules.filter_ambiguous.output.filtered_r1,
         r2=rules.filter_ambiguous.output.filtered_r2,
     output:
-        mergedfq="analysis/{sample}/preprocessing/flash/{sample}.extendedFrags.fastq.gz",
-        orphan1fq="analysis/{sample}/preprocessing/flash/{sample}.notCombined_1.fastq.gz",
-        orphan2fq="analysis/{sample}/preprocessing/flash/{sample}.notCombined_2.fastq.gz",
+        mergedfq="analysis/{sample}/01preprocessing/flash/{sample}.extendedFrags.fastq.gz",
+        orphan1fq="analysis/{sample}/01preprocessing/flash/{sample}.notCombined_1.fastq.gz",
+        orphan2fq="analysis/{sample}/01preprocessing/flash/{sample}.notCombined_2.fastq.gz",
     log:
-        "analysis/{sample}/preprocessing/flash/flash.log",
+        "analysis/{sample}/01preprocessing/flash/flash.log",
     params:
-        prefix="analysis/{sample}/preprocessing/flash/{sample}",
+        prefix="analysis/{sample}/01preprocessing/flash/{sample}",
     threads: 8
     shell:
         """
@@ -109,9 +109,9 @@ rule filter_length:
     input:
         mergedfq=rules.merge.output.mergedfq,
     output:
-        length_filtered="analysis/{sample}/preprocessing/{sample}-length-filtered.fastq.gz",
-        linkedfq="analysis/{sample}/preprocessing/{sample}-preprocessed-reads.fastq.gz",
-        counts="analysis/{sample}/preprocessing/{sample}-length-filtered-read-counts.txt",
+        length_filtered="analysis/{sample}/01preprocessing/{sample}-length-filtered.fastq.gz",
+        linkedfq="analysis/{sample}/01preprocessing/{sample}-preprocessed-reads.fastq.gz",
+        counts="analysis/{sample}/01preprocessing/{sample}-length-filtered-read-counts.txt",
     params:
         length_thresh=config["length_thresh"],
     run:
@@ -129,9 +129,9 @@ rule calculate_read_lengths:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
         rules.merge.output.mergedfq,
     output:
-        l1="analysis/{sample}/preprocessing/{sample}-r1-read-lengths.json",
-        l2="analysis/{sample}/preprocessing/{sample}-r2-read-lengths.json",
-        merged="analysis/{sample}/preprocessing/{sample}-merged-read-lengths.json",
+        l1="analysis/{sample}/01preprocessing/{sample}-r1-read-lengths.json",
+        l2="analysis/{sample}/01preprocessing/{sample}-r2-read-lengths.json",
+        merged="analysis/{sample}/01preprocessing/{sample}-merged-read-lengths.json",
     run:
         mhapi.calculate_read_lengths(
             input[0],
@@ -147,15 +147,15 @@ rule calculate_read_lengths:
 rule plot_read_length_distributions:
     input:
         r1s=expand(
-            "analysis/{sample}/preprocessing/{sample}-r1-read-lengths.json",
+            "analysis/{sample}/01preprocessing/{sample}-r1-read-lengths.json",
             sample=config["samples"],
         ),
         r2s=expand(
-            "analysis/{sample}/preprocessing/{sample}-r2-read-lengths.json",
+            "analysis/{sample}/01preprocessing/{sample}-r2-read-lengths.json",
             sample=config["samples"],
         ),
         merged=expand(
-            "analysis/{sample}/preprocessing/{sample}-merged-read-lengths.json",
+            "analysis/{sample}/01preprocessing/{sample}-merged-read-lengths.json",
             sample=config["samples"],
         ),
     output:

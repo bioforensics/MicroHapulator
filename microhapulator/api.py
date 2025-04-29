@@ -807,7 +807,7 @@ def aggregate_read_mapping_qc(samples, outpath):
 def consolidate_read_mapping_qc_tables(samples):
     sample_qc_tables = list()
     for sample in samples:
-        infile = f"analysis/{sample}/alignment/{sample}-read-mapping-qc.csv"
+        infile = f"analysis/{sample}/02alignment/{sample}-read-mapping-qc.csv"
         sample_qc_table = pd.read_csv(infile)
         sample_qc_table["Sample"] = sample
         sample_qc_tables.append(sample_qc_table)

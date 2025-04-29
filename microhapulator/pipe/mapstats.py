@@ -71,7 +71,7 @@ class MappingStats:
 
     @classmethod
     def from_workdir(cls, sample, workdir="."):
-        align_dir = Path(workdir) / "analysis" / sample / "alignment"
+        align_dir = Path(workdir) / "analysis" / sample / "02alignment"
         stats_file = align_dir / f"{sample}.bam.stats"
         chisq_file = align_dir / f"{sample}-interlocus-balance-chisq.txt"
         rep_file = align_dir / f"{sample}-repetitive-reads.csv"
