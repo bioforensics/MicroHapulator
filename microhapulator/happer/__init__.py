@@ -14,6 +14,5 @@ from .allele import Allele
 from .mutablestring import MutableString
 from . import mutate
 from . import seqio
-from . import tests
 from . import __main__
 from .__main__ import get_parser
