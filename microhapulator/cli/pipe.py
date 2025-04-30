@@ -13,10 +13,10 @@
 
 from argparse import SUPPRESS
 from collections import defaultdict
+from importlib.resources import files
 from microhapulator.marker import MicrohapIndex
 from os import cpu_count, symlink
 from pathlib import Path
-from pkg_resources import resource_filename
 from shutil import copy
 from snakemake import snakemake
 import sys
@@ -43,7 +43,7 @@ def main(args):
         thresh_gap_alert=args.gap_alert,
         hspace=args.hspace,
     )
-    snakefile = resource_filename("microhapulator", "workflows/analysis.smk")
+    snakefile = files("microhapulator") / "workflows" / "analysis.smk"
     success = snakemake(
         snakefile,
         cores=args.threads,
@@ -254,13 +254,13 @@ def subparser(subparsers):
     )
     cli.add_argument(
         "--hg38",
-        default=resource_filename("microhapulator", "data/hg38.fasta.gz"),
+        default=files("microhapulator") / "data" / "hg38.fasta.gz",
         help=SUPPRESS,
         # Hidden option for testing purposes
     )
     cli.add_argument(
         "--hg38idx",
-        default=resource_filename("microhapulator", "data/hg38.mmi"),
+        default=files("microhapulator") / "data" / "hg38.mmi",
         help=SUPPRESS,
         # Hidden option for testing purposes
     )
