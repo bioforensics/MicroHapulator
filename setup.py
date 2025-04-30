@@ -47,7 +47,7 @@ setup(
         "insilicoseq>=1.5.4,<2.0",
         "jsonschema>=4.0",
         "matplotlib>=3.0",
-        "microhapdb>=0.10.1",
+        "microhapdb>=0.12",
         "multiqc>=1.14",
         "nbformat>=5.0,<5.6",
         "numpy>=1.19",

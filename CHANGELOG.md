@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Intermediate FASTQ files are now bgzip compressed to reduce storage requirements (#189).
 - Colons are now used instead of commas to separate SNP alleles in microhap alleles (#192).
+- Implemented Python 3.12 support by integrating happer package and increasing minimum version of MicroHapDB dependency (#193).
 - Updated working directory organization to provide additional structure (#194).
 
 ### Fixed
