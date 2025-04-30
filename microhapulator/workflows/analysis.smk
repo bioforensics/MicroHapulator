@@ -303,10 +303,9 @@ rule read_mapping_qc:
         repetitive=rules.repetitive_mapping.output.counts,
     output:
         counts="analysis/{sample}/02alignment/{sample}-read-mapping-qc.csv",
-    shell:
-        """
-        mhpl8r mappingqc {input.marker} {input.full_refr} {input.repetitive} --csv {output.counts}
-        """
+    run:
+        results = mhapi.read_mapping_qc(input.marker, input.full_refr, input.repetitive)
+        results.to_csv(output.counts, index=False)
 
 
 rule aggregate_read_mapping_qc:

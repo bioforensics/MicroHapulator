@@ -10,8 +10,10 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+import microhapulator.api as mhapi
 from microhapulator.pipe.mapstats import MappingStats, MappingSummary
 from microhapulator.tests import data_file
+import pandas as pd
 import pytest
 
 
@@ -37,3 +39,14 @@ def test_load_mapsummary_from_workdir():
     assert repetitive["mh17KK-278.v1"]["SRM8398-1"].repetitive == 0
     assert repetitive["mh17KK-278.v1"]["SRM8398-2"].repetitive == 0
     assert repetitive["mh17KK-278.v1"]["SRM8398-3"].repetitive == 0
+
+
+def test_mappingqc(tmp_path):
+    align_dir = data_file("mapping_workdir/analysis/SRM8398-2/02alignment/")
+    obs_data = mhapi.read_mapping_qc(
+        f"{align_dir}/SRM8398-2.bam.stats",
+        f"{align_dir}/fullrefr/SRM8398-2-fullrefr-mapped-reads.txt",
+        f"{align_dir}/SRM8398-2-repetitive-reads.csv",
+    )
+    exp_data = pd.read_csv(data_file("test-mapping-qc.csv"))
+    assert obs_data.equals(exp_data)
