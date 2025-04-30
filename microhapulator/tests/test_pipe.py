@@ -67,9 +67,11 @@ def test_pipe_gbr_usc10(tmp_path):
     args = microhapulator.cli.get_parser().parse_args(arglist)
     microhapulator.cli.pipe.main(args)
     expected = SimulatedProfile(fromfile=data_file("prof/gbr-usc10-sim.json"))
+    print("DEBUGger", *list((tmp_path / "analysis" / "gbr-usc" / "03typing").glob("*")), sep="\n")
     observed = TypingResult(
         fromfile=tmp_path / "analysis" / "gbr-usc" / "03typing" / "gbr-usc-type.json"
     )
+    assert False
     diff = list(mhapi.diff(observed, expected))
     assert len(diff) == 0
     report = tmp_path / "report" / "report.html"
