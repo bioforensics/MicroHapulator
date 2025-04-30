@@ -11,14 +11,14 @@
 # -------------------------------------------------------------------------------------------------
 
 import argparse
-import happer
+from microhapulator import __version__, happer
 import sys
 
 
 def get_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-v", "--version", action="version", version="happer v{}".format(happer.__version__)
+        "-v", "--version", action="version", version="happer v{}".format(__version__)
     )
     parser.add_argument(
         "-o",
@@ -46,6 +46,6 @@ def main(args=None):
             get_parser().parse_args(["-h"])
         args = get_parser().parse_args()
 
-    versionmessage = "[happer] running version {}".format(happer.__version__)
+    versionmessage = "[happer] running version {}".format(__version__)
     print(versionmessage, file=sys.stderr)
     happer.mutate.main(args)

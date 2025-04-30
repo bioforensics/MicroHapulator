@@ -10,8 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-import happer
-from happer import MutableString
+from . import seqio
+from .allele import parse_alleles
+from .mutablestring import MutableString
 import re
 
 
@@ -66,8 +67,7 @@ def populate_haplotype_index(allelestream):
 
 
 def mutate(seqstream, alleles):
-    allelestream = happer.allele.parse_alleles(alleles)
-    ploidy, haplotypes = populate_haplotype_index(allelestream)
+    ploidy, haplotypes = populate_haplotype_index(parse_alleles(alleles))
 
     for defline, sequence in seqstream:
         haploseqs = list()
@@ -88,8 +88,8 @@ def main(args):
     seq = open(args.seqfile, "r")
     als = open(args.bed, "r")
     out = open(args.out, "w")
-    seqstream = happer.seqio.parse_fasta(seq)
+    seqstream = seqio.parse_fasta(seq)
     for defline, haploseq in mutate(seqstream, als):
         print(">", defline, sep="", file=out)
-        happer.seqio.format(haploseq, out)
+        seqio.format(haploseq, out)
     out.close()
