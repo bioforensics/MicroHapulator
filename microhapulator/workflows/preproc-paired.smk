@@ -41,7 +41,7 @@ rule fastqc:
         for end, outfile in enumerate(outfiles, 1):
             outfile = Path(outfile)
             # Snakemake f-strings break with Python 3.12: https://github.com/snakemake/snakemake/issues/2648
-            linkfile = params.outdir + "/R" + end + "-fastqc.html"
+            linkfile = "{}/R{}-fastqc.html".format(params.outdir, end)
             symlink(outfile.name, linkfile)
 
 

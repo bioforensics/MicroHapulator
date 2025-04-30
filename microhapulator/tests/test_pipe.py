@@ -70,7 +70,6 @@ def test_pipe_gbr_usc10(tmp_path):
     observed = TypingResult(
         fromfile=tmp_path / "analysis" / "gbr-usc" / "03typing" / "gbr-usc-type.json"
     )
-    assert False
     diff = list(mhapi.diff(observed, expected))
     assert len(diff) == 0
     report = tmp_path / "report" / "report.html"
