@@ -71,10 +71,11 @@ class MappingStats:
 
     @classmethod
     def from_workdir(cls, sample, workdir="."):
-        stats_file = Path(workdir) / "analysis" / sample / f"{sample}.bam.stats"
-        chisq_file = Path(workdir) / "analysis" / sample / f"{sample}-interlocus-balance-chisq.txt"
-        rep_file = Path(workdir) / "analysis" / sample / f"{sample}-repetitive-reads.csv"
-        counts_file = Path(workdir) / "analysis" / sample / f"{sample}-marker-read-counts.csv"
+        align_dir = Path(workdir) / "analysis" / sample / "02alignment"
+        stats_file = align_dir / f"{sample}.bam.stats"
+        chisq_file = align_dir / f"{sample}-interlocus-balance-chisq.txt"
+        rep_file = align_dir / f"{sample}-repetitive-reads.csv"
+        counts_file = align_dir / f"{sample}-marker-read-counts.csv"
         total_reads, mapped_reads = MappingStats.parse_read_stats(stats_file)
         chi_square = MappingStats.parse_chi_square_stat(chisq_file)
         map_read_counts = pd.read_csv(counts_file).set_index("Marker")["ReadCount"].to_dict()

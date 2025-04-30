@@ -807,7 +807,7 @@ def aggregate_read_mapping_qc(samples, outpath):
 def consolidate_read_mapping_qc_tables(samples):
     sample_qc_tables = list()
     for sample in samples:
-        infile = f"analysis/{sample}/{sample}-read-mapping-qc.csv"
+        infile = f"analysis/{sample}/02alignment/{sample}-read-mapping-qc.csv"
         sample_qc_table = pd.read_csv(infile)
         sample_qc_table["Sample"] = sample
         sample_qc_tables.append(sample_qc_table)
@@ -815,30 +815,14 @@ def consolidate_read_mapping_qc_tables(samples):
     return aggregate_qc_table
 
 
-def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped, figure=None, title=None):
+def read_mapping_qc(marker_mapped, refr_mapped, repetitive_mapped):
     """Count on target, off target, repetitive, and contaminant reads
 
     :param str marker_mapped: path of txt file containing number of reads mapped to marker sequences
     :param str refr_mapped: path of txt file containing number of reads mapped to the full human reference genome
     :param str repetitive_mapped: path of txt file containing number of reads mapped preferentially to non-marker loci in the human reference genome
-    :param str output: path where the png file of the plot will be saved
-    :param str sample: name of the sample to be included as the plot title; by default no sample name is shown
     """
-    data = count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
-    if not figure:
-        return data
-    backend = matplotlib.get_backend()
-    plt.switch_backend("Agg")
-    labels = ["on target", "off target", "contamination", "repetitive"]
-    plt.pie(data.values[0])
-    circle = plt.Circle((0, 0), 0.7, color="white")
-    plt.gca().add_artist(circle)
-    plt.title(title, fontsize=14)
-    plt.legend(labels=labels[: len(data.values[0])], bbox_to_anchor=(1.05, 1.0), loc="upper left")
-    plt.savefig(figure, bbox_inches="tight", dpi=300)
-    plt.close("all")
-    plt.switch_backend(backend)
-    return data
+    return count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped)
 
 
 def count_mapped_read_types(marker_mapped, refr_mapped, repetitive_mapped):

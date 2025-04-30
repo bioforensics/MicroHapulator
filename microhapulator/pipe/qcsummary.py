@@ -46,8 +46,10 @@ class SingleEndReadQCSummary:
 
     @classmethod
     def from_workdir(cls, wdpath, sample):
-        ambig_path = f"{wdpath}/analysis/{sample}/{sample}-ambig-read-counts.txt"
-        length_path = f"{wdpath}/analysis/{sample}/{sample}-length-filtered-read-counts.txt"
+        ambig_path = f"{wdpath}/analysis/{sample}/01preprocessing/{sample}-ambig-read-counts.txt"
+        length_path = (
+            f"{wdpath}/analysis/{sample}/01preprocessing/{sample}-length-filtered-read-counts.txt"
+        )
         ambig_stats = FilterStats.from_txt(ambig_path)
         length_stats = FilterStats.from_txt(length_path)
         return cls(ambig_stats, length_stats)
@@ -68,9 +70,10 @@ class PairedReadQCSummary:
 
     @classmethod
     def from_workdir(cls, wdpath, sample):
-        ambig_path = f"{wdpath}/analysis/{sample}/{sample}-ambig-read-counts.txt"
-        merge_path = f"{wdpath}/analysis/{sample}/flash.log"
-        length_path = f"{wdpath}/analysis/{sample}/{sample}-length-filtered-read-counts.txt"
+        prefix = f"{wdpath}/analysis/{sample}/01preprocessing/"
+        ambig_path = f"{prefix}/{sample}-ambig-read-counts.txt"
+        merge_path = f"{prefix}/flash/flash.log"
+        length_path = f"{prefix}/{sample}-length-filtered-read-counts.txt"
         ambig_stats = PairedAmbiguityFilterStats.from_txt(ambig_path)
         merge_stats = ReadMergingStats.from_log(merge_path)
         length_stats = FilterStats.from_txt(length_path)

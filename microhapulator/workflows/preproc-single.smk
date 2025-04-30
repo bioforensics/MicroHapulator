@@ -15,7 +15,7 @@ from microhapulator import api as mhapi
 from microhapulator.pipe.filter import AmbigSingleReadFilter, LengthSingleReadFilter
 from os import symlink
 
-preproc_aux_files = ["analysis/read-lengths.png", "analysis/multiqc_report.html"]
+preproc_aux_files = ["report/img/read-lengths.png", "report/multiqc_report.html"]
 
 
 summary_aux_files = list()
@@ -25,24 +25,25 @@ rule fastqc:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        html="analysis/{sample}/fastqc/report.html",
+        html="analysis/{sample}/01preprocessing/fastqc/report.html",
+    params:
+        outdir="analysis/{sample}/01preprocessing/fastqc/",
     run:
-        shell("fastqc --outdir analysis/{wildcards.sample}/fastqc/ --threads {threads} {input}")
-        outfiles = sorted(glob(f"analysis/{wildcards.sample}/fastqc/*.html"))
+        shell("fastqc --outdir {params.outdir} {input}")
+        outfiles = sorted(Path(params.outdir).glob("*.html"))
         assert len(outfiles) == 1
         outfile = Path(outfiles[0])
-        linkfile = f"analysis/{wildcards.sample}/fastqc/report.html"
-        symlink(outfile.name, linkfile)
+        symlink(outfile.name, output[0])
 
 
 rule multiqc:
     input:
-        expand("analysis/{sample}/fastqc/report.html", sample=config["samples"]),
+        expand("analysis/{sample}/01preprocessing/fastqc/report.html", sample=config["samples"]),
     output:
-        report="analysis/multiqc_report.html",
+        report="report/multiqc_report.html",
     shell:
         """
-        multiqc analysis/*/fastqc --outdir analysis
+        multiqc analysis/*/01preprocessing/fastqc --outdir report
         """
 
 
@@ -50,8 +51,8 @@ rule filter_ambiguous:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        filtered_fq="analysis/{sample}/{sample}-ambig-filtered.fastq.gz",
-        counts="analysis/{sample}/{sample}-ambig-read-counts.txt",
+        filtered_fq="analysis/{sample}/01preprocessing/{sample}-ambig-filtered.fastq.gz",
+        counts="analysis/{sample}/01preprocessing/{sample}-ambig-read-counts.txt",
     params:
         ambig_thresh=config["ambiguous_thresh"],
     run:
@@ -66,9 +67,9 @@ rule filter_length:
     input:
         fq=rules.filter_ambiguous.output.filtered_fq,
     output:
-        length_filtered="analysis/{sample}/{sample}-length-filtered.fastq.gz",
-        linkedfq="analysis/{sample}/{sample}-preprocessed-reads.fastq.gz",
-        counts="analysis/{sample}/{sample}-length-filtered-read-counts.txt",
+        length_filtered="analysis/{sample}/01preprocessing/{sample}-length-filtered.fastq.gz",
+        linkedfq="analysis/{sample}/01preprocessing/{sample}-preprocessed-reads.fastq.gz",
+        counts="analysis/{sample}/01preprocessing/{sample}-length-filtered-read-counts.txt",
     params:
         length_thresh=config["length_thresh"],
     run:
@@ -85,7 +86,7 @@ rule calculate_read_lengths:
     input:
         lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
     output:
-        json="analysis/{sample}/{sample}-read-lengths.json",
+        json="analysis/{sample}/01preprocessing/{sample}-read-lengths.json",
     run:
         mhapi.calculate_read_lengths(
             input[0],
@@ -95,9 +96,12 @@ rule calculate_read_lengths:
 
 rule plot_read_length_distributions:
     input:
-        reads=expand("analysis/{sample}/{sample}-read-lengths.json", sample=config["samples"]),
+        reads=expand(
+            "analysis/{sample}/01preprocessing/{sample}-read-lengths.json",
+            sample=config["samples"],
+        ),
     output:
-        png="analysis/read-lengths.png",
+        png="report/img/read-lengths.png",
     run:
         mhapi.read_length_dist(
             input.reads,
