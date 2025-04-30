@@ -15,13 +15,13 @@ from .mapstats import MappingSummary
 from .qcsummary import PairedReadQCSummary, SingleEndReadQCSummary
 from .typestats import TypingSummary
 from datetime import datetime
+from importlib.resources import files
 from jinja2 import FileSystemLoader, Environment, Template
 import microhapulator
 from microhapulator.marker import MicrohapIndex
 import json
 import pandas as pd
 from pathlib import Path
-from pkg_resources import resource_filename
 
 
 class OverviewReporter:
@@ -45,7 +45,7 @@ class OverviewReporter:
             return sample_rates.index
 
     def render(self):
-        template_loader = FileSystemLoader(resource_filename("microhapulator", "data"))
+        template_loader = FileSystemLoader(files("microhapulator") / "data")
         env = Environment(loader=template_loader)
         if self.reads_are_paired:
             template_file = "paired.html"
@@ -89,7 +89,7 @@ class DetailReporter:
             return sample_rates.index
 
     def render(self):
-        templatefile = resource_filename("microhapulator", "data/marker_details_template.html")
+        templatefile = files("microhapulator") / "data" / "marker_details_template.html"
         with open(templatefile, "r") as fh:
             template = Template(fh.read())
             output = template.render(

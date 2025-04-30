@@ -10,15 +10,9 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from ._version import get_versions
-
-__version__ = get_versions()["version"]
-del get_versions
-
-from .load import open, load_marker_frequencies
-from .marker import MicrohapIndex
-from .thresholds import ThresholdIndex
-from . import profile
-from . import api
-from . import cli
-from . import happer
+from .allele import Allele
+from .mutablestring import MutableString
+from . import mutate
+from . import seqio
+from . import __main__
+from .__main__ import get_parser

@@ -40,7 +40,8 @@ rule fastqc:
         outfiles = sorted(Path(params.outdir).glob("*.html"))
         for end, outfile in enumerate(outfiles, 1):
             outfile = Path(outfile)
-            linkfile = f"{params.outdir}/R{end}-fastqc.html"
+            # Snakemake f-strings break with Python 3.12: https://github.com/snakemake/snakemake/issues/2648
+            linkfile = "{}/R{}-fastqc.html".format(params.outdir, end)
             symlink(outfile.name, linkfile)
 
 
@@ -72,7 +73,6 @@ rule filter_ambiguous:
         ambig_thresh=config["ambiguous_thresh"],
         out_prefix="analysis/{sample}/01preprocessing/{sample}",
     run:
-        print("DEBUG", wildcards.sample, input)
         ambig_filter = AmbigPairedReadFilter(*input, params.out_prefix, params.ambig_thresh)
         ambig_filter.filter()
         with open(output.counts, "w") as fh:

@@ -269,7 +269,9 @@ rule plot_haplotype_calls:
     run:
         result = TypingResult(fromfile=input.result)
         mhapi.plot_haplotype_calls(
-            result, f"analysis/{wildcards.sample}/03typing/callplots", sample=wildcards.sample
+            result,
+            "analysis/{}/03typing/callplots".format(wildcards.sample),
+            sample=wildcards.sample,
         )
 
 

@@ -12,14 +12,14 @@
 
 
 from collections import defaultdict
-from happer.mutate import mutate
+from importlib.resources import files
 from io import StringIO
 import json
 import jsonschema
 from microhapulator import __version__
 from microhapulator import open as mhopen
+from microhapulator.happer.mutate import mutate
 from numpy.random import choice
-from pkg_resources import resource_filename
 import pandas as pd
 from pathlib import Path
 import sys
@@ -32,7 +32,7 @@ class RandomMatchError(ValueError):
 
 
 def load_schema():
-    with mhopen(resource_filename("microhapulator", "data/profile-schema.json"), "r") as fh:
+    with mhopen(files("microhapulator") / "data/profile-schema.json", "r") as fh:
         return json.load(fh)
 
 

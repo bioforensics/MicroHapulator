@@ -12,8 +12,7 @@
 
 
 from hashlib import sha1
-from pathlib import Path
-from pkg_resources import resource_filename
+from importlib.resources import files
 from subprocess import run
 import sys
 from tqdm import tqdm
@@ -60,7 +59,7 @@ def subparser(subparsers):
 def main(args):
     url = "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/seqs_for_alignment_pipelines.ucsc_ids/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz"
     checksum = "70fb7af4dff26bffdf27dbef80caf1f0359d488f"
-    hg38path = Path(resource_filename("microhapulator", "data/hg38.fasta.gz"))
+    hg38path = files("microhapulator") / "data" / "hg38.fasta.gz"
     if download_is_needed(url, hg38path, checksum):
         print("[MicroHapulator] downloading GRCh38 reference genome", file=sys.stderr)
         with ProgressBar(unit="B", unit_scale=True, miniters=1, desc=hg38path.name) as pb:
@@ -72,7 +71,7 @@ def main(args):
         )
     if compute_shasum(hg38path) != checksum:
         raise ValueError(f"checksum failed for {str(hg38path)}")
-    index_path = Path(resource_filename("microhapulator", "data/hg38.mmi"))
+    index_path = files("microhapulator") / "data" / "hg38.mmi"
     if index_path.is_file():
         print("[MicroHapulator] Minimap2 index present, good to go!", file=sys.stderr)
     else:

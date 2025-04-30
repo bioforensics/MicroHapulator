@@ -10,15 +10,8 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
-from ._version import get_versions
+from importlib.resources import files
 
-__version__ = get_versions()["version"]
-del get_versions
 
-from .load import open, load_marker_frequencies
-from .marker import MicrohapIndex
-from .thresholds import ThresholdIndex
-from . import profile
-from . import api
-from . import cli
-from . import happer
+def data_file(path):
+    return files("microhapulator") / "happer" / "tests" / "data" / path

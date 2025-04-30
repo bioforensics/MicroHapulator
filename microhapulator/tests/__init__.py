@@ -11,11 +11,8 @@
 # -------------------------------------------------------------------------------------------------
 
 
-import os
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 
 def data_file(path):
-    pathparts = path.split("/")
-    relpath = os.path.join("tests", "data", *pathparts)
-    return resource_filename("microhapulator", relpath)
+    return str(files("microhapulator") / "tests" / "data" / path)
