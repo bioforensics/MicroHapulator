@@ -211,7 +211,9 @@ rule apply_filters:
     params:
         static=f"--static {config['thresh_static']}",
         dynamic=f"--dynamic {config['thresh_dynamic']}",
-        threshfile="" if config["thresh_file"] == "" else f"--config {config['thresh_file']}",
+        threshfile=(
+            "" if config["thresh_file"] in ("", None) else f"--config {config['thresh_file']}"
+        ),
     shell:
         "mhpl8r filter {input} --out {output} {params.static} {params.dynamic} {params.threshfile}"
 
@@ -270,7 +272,7 @@ rule plot_haplotype_calls:
         result = TypingResult(fromfile=input.result)
         mhapi.plot_haplotype_calls(
             result,
-            "analysis/{}/03typing/callplots".format(wildcards.sample),
+            f"analysis/{wildcards.sample}/03typing/callplots",
             sample=wildcards.sample,
         )
 

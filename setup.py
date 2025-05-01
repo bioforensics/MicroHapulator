@@ -55,7 +55,7 @@ setup(
         "pulp==2.3.1",
         "scipy>=1.7",
         "seaborn>=0.13.2",
-        "snakemake>=7.15.2,<8.0",
+        "snakemake>=8",
         "termgraph>=0.5",
         "tqdm>=4.0",
     ],
