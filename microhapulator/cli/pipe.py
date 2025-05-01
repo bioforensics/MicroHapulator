@@ -18,7 +18,9 @@ from microhapulator.marker import MicrohapIndex
 from os import cpu_count, symlink
 from pathlib import Path
 from shutil import copy
-from snakemake import snakemake
+from snakemake.api import SnakemakeApi as smk_api
+from snakemake.exceptions import WorkflowError
+from snakemake.settings import types as smk_types
 import sys
 
 
@@ -29,10 +31,10 @@ def main(args):
     config = dict(
         samples=samples,
         readfiles=workingfiles,
-        mhrefr=Path(args.markerrefr).resolve(),
-        mhdefn=Path(args.markerdefn).resolve(),
-        hg38path=Path(args.hg38).resolve(),
-        hg38index=Path(args.hg38idx).resolve(),
+        mhrefr=str(Path(args.markerrefr).resolve()),
+        mhdefn=str(Path(args.markerdefn).resolve()),
+        hg38path=str(Path(args.hg38).resolve()),
+        hg38index=str(Path(args.hg38idx).resolve()),
         thresh_static=args.static,
         thresh_dynamic=args.dynamic,
         thresh_file=args.config,
@@ -43,17 +45,26 @@ def main(args):
         thresh_gap_alert=args.gap_alert,
         hspace=args.hspace,
     )
-    snakefile = files("microhapulator") / "workflows" / "analysis.smk"
-    success = snakemake(
-        snakefile,
-        cores=args.threads,
-        printshellcmds=True,
-        dryrun=args.dryrun,
-        config=config,
-        workdir=args.workdir,
-    )
-    if not success:
+    try:
+        run_snakemake(config, args.workdir, cores=args.threads, dryrun=args.dryrun)
+        return 0
+    except WorkflowError:
         return 1
+
+
+def run_snakemake(config, workdir, cores=1, dryrun=False):
+    outcfg = smk_types.OutputSettings(printshellcmds=True)
+    with smk_api(outcfg) as smk:
+        workflow = smk.workflow(
+            config_settings=smk_types.ConfigSettings(config=config),
+            storage_settings=smk_types.StorageSettings(),
+            resource_settings=smk_types.ResourceSettings(cores=cores),
+            snakefile=files("microhapulator") / "workflows" / "analysis.smk",
+            workdir=Path(workdir),
+        )
+        dag = workflow.dag(smk_types.DAGSettings(targets=["report"]))
+        mode = "dryrun" if dryrun else "local"
+        dag.execute_workflow(executor=mode)
 
 
 def validate_panel_config(markerseqs, markerdefn):
