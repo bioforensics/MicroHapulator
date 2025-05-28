@@ -28,7 +28,8 @@ summary_aux_files = (expand("analysis/{sample}/flash.log", sample=config["sample
 
 rule fastqc:
     input:
-        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        r1="seq/{sample}_R1.fastq.gz",
+        r2="seq/{sample}_R2.fastq.gz",
     output:
         r1="analysis/{sample}/01preprocessing/fastqc/R1-fastqc.html",
         r2="analysis/{sample}/01preprocessing/fastqc/R2-fastqc.html",
@@ -61,7 +62,8 @@ rule multiqc:
 
 rule filter_ambiguous:
     input:
-        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        r1="seq/{sample}_R1.fastq.gz",
+        r2="seq/{sample}_R2.fastq.gz",
     output:
         filtered_r1="analysis/{sample}/01preprocessing/{sample}-ambig-filtered-R1.fastq.gz",
         filtered_r2="analysis/{sample}/01preprocessing/{sample}-ambig-filtered-R2.fastq.gz",
@@ -125,22 +127,17 @@ rule filter_length:
 
 rule calculate_read_lengths:
     input:
-        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
-        rules.merge.output.mergedfq,
+        r1="seq/{sample}_R1.fastq.gz",
+        r2="seq/{sample}_R2.fastq.gz",
+        rm=rules.merge.output.mergedfq,
     output:
         l1="analysis/{sample}/01preprocessing/{sample}-r1-read-lengths.json",
         l2="analysis/{sample}/01preprocessing/{sample}-r2-read-lengths.json",
         merged="analysis/{sample}/01preprocessing/{sample}-merged-read-lengths.json",
     run:
-        mhapi.calculate_read_lengths(
-            input[0],
-            output.l1,
-        )
-        mhapi.calculate_read_lengths(
-            input[1],
-            output.l2,
-        )
-        mhapi.calculate_read_lengths(input[2], output.merged)
+        mhapi.calculate_read_lengths(input.r1, output.l1)
+        mhapi.calculate_read_lengths(input.r2, output.l2)
+        mhapi.calculate_read_lengths(input.rm, output.merged)
 
 
 rule plot_read_length_distributions:

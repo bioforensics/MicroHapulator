@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Implemented Python 3.12 support by integrating happer package and increasing minimum version of MicroHapDB dependency (#193).
 - Updated working directory organization to provide additional structure (#194).
 - Snakemake is now invoked using its new Python API, requiring a minimum version of 8.0 and Python 3.11+ (#195).
+- FASTQ intake is now handled by a dedicated package ezfastq, which was based on MicroHapulator code (#196).
 
 ### Fixed
 - Bug with handling marker vs. locus identifiers when running `mhpl8r seq` (#190).

@@ -13,24 +13,10 @@
 from glob import glob
 import microhapulator
 import microhapulator.api as mhapi
-from microhapulator.cli.pipe import validate_sample_input_files
 from microhapulator.profile import SimulatedProfile, TypingResult
 from microhapulator.tests import data_file
 import pandas as pd
 import pytest
-
-
-def test_validate_sample_input_files():
-    assert validate_sample_input_files(1, "S1", reads_are_paired=False) is True
-    assert validate_sample_input_files(2, "S2", reads_are_paired=True) is True
-    with pytest.raises(ValueError, match=r"expected 2 in paired-end mode"):
-        validate_sample_input_files(1, "S3", reads_are_paired=True)
-    with pytest.raises(ValueError, match=r"expected 1 in single-end mode"):
-        validate_sample_input_files(2, "S4", reads_are_paired=False)
-    with pytest.raises(FileNotFoundError):
-        validate_sample_input_files(0, "S5")
-    with pytest.raises(ValueError, match=r"expected 2 in paired-end mode"):
-        validate_sample_input_files(4, "S6", reads_are_paired=True)
 
 
 def test_pipe_missing_files(tmp_path):
