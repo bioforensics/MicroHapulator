@@ -23,7 +23,7 @@ summary_aux_files = list()
 
 rule fastqc:
     input:
-        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        fastq="seq/{sample}.fastq.gz",
     output:
         html="analysis/{sample}/01preprocessing/fastqc/report.html",
     params:
@@ -49,7 +49,7 @@ rule multiqc:
 
 rule filter_ambiguous:
     input:
-        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        fastq="seq/{sample}.fastq.gz",
     output:
         filtered_fq="analysis/{sample}/01preprocessing/{sample}-ambig-filtered.fastq.gz",
         counts="analysis/{sample}/01preprocessing/{sample}-ambig-read-counts.txt",
@@ -84,14 +84,11 @@ rule filter_length:
 
 rule calculate_read_lengths:
     input:
-        lambda wildcards: sorted([fq for fq in config["readfiles"] if wildcards.sample in fq]),
+        fastq="seq/{sample}.fastq.gz",
     output:
         json="analysis/{sample}/01preprocessing/{sample}-read-lengths.json",
     run:
-        mhapi.calculate_read_lengths(
-            input[0],
-            output.json,
-        )
+        mhapi.calculate_read_lengths(input.fastq, output.json)
 
 
 rule plot_read_length_distributions:

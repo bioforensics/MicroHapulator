@@ -12,12 +12,12 @@
 
 
 from argparse import SUPPRESS
-from collections import defaultdict
+import ezfastq
+from ezfastq.pair import PairMode
 from importlib.resources import files
 from microhapulator.marker import MicrohapIndex
-from os import cpu_count, symlink
+from os import cpu_count
 from pathlib import Path
-from shutil import copy
 from snakemake.api import SnakemakeApi as smk_api
 from snakemake.exceptions import WorkflowError
 from snakemake.settings import types as smk_types
@@ -26,11 +26,10 @@ import sys
 
 def main(args):
     validate_panel_config(args.markerrefr, args.markerdefn)
-    samples, filenames = get_input_files(args.samples, args.seqpath, args.reads_are_paired)
-    workingfiles = link_or_copy_input(filenames, args.workdir, docopy=args.copy_input)
+    pair_mode = PairMode.PairedEnd if args.reads_are_paired else PairMode.SingleEnd
+    ezfastq.api.copy(args.samples, args.seqpath, pair_mode=pair_mode, workdir=Path(args.workdir))
     config = dict(
-        samples=samples,
-        readfiles=workingfiles,
+        samples=args.samples,
         mhrefr=str(Path(args.markerrefr).resolve()),
         mhdefn=str(Path(args.markerdefn).resolve()),
         hg38path=str(Path(args.hg38).resolve()),
@@ -71,106 +70,6 @@ def validate_panel_config(markerseqs, markerdefn):
     print("[MicroHapulator] validating panel configuration", file=sys.stderr)
     index = MicrohapIndex.from_files(markerdefn, markerseqs)
     index.validate()
-
-
-def get_input_files(sample_names, seqpath, reads_are_paired=True, suffixes=None):
-    """Find input files for each sample
-
-    This function traverses `seqpath` and any of its sub-directories for FASTQ files. Any FASTQ
-    file matching one of the sample names is stored in a dictionary with that sample name. Then the
-    function checks each sample to test whether the number of files found matches the number of
-    expected files. Files for samples that pass this test are stored in a list to be passed to
-    Snakemake. (I would prefer to pass the data as a dictionary, but Snakemake complains when the
-    config object is a nested dictionary. So instead we'll reconstruct the dictionary from this
-    list in the Snakefile.)
-    """
-    if suffixes is None:
-        suffixes = (".fastq", ".fastq.gz", ".fq", ".fq.gz")
-    sample_names = check_sample_names(sample_names)
-    files = defaultdict(list)
-    for filepath in traverse(seqpath):
-        if not filepath.name.endswith(suffixes):
-            continue
-        for sample in sample_names:
-            if sample in filepath.name:
-                files[sample].append(filepath)
-    final_file_list = list()
-    for sample in sample_names:
-        filelist = files[sample]
-        filelist_ok = validate_sample_input_files(len(filelist), sample, reads_are_paired)
-        if filelist_ok:
-            final_file_list.extend(filelist)
-    unique_file_names = set([filepath.name for filepath in final_file_list])
-    if len(unique_file_names) != len(final_file_list):
-        raise ValueError("duplicate FASTQ file names found; refusing to proceed")
-    return sample_names, final_file_list
-
-
-def check_sample_names(samples):
-    """Parse sample names and perform sanity checks
-
-    Input is expected to be a list of strings corresponding to sample names. This function ensures
-    that there are no duplicate sample names and no sample names that are substrings of other
-    sample names.
-
-    If the list contains only a single string and that string corresponds to a valid file path, it
-    is assumed to be a file containing a list of sample names, one per line.
-    """
-    if len(samples) == 1 and Path(samples[0]).is_file():
-        with open(samples[0], "r") as fh:
-            samples = fh.read().strip().split("\n")
-    samples = list(sorted(samples))
-    for s1 in samples:
-        for s2 in samples:
-            if s1 == s2:
-                continue
-            if s1 in s2:
-                message = f"cannot correctly process a sample name that is a substring of another sample name: {s1} vs. {s2}"
-                raise ValueError(message)
-    return samples
-
-
-def traverse(dirpath):
-    dirpath = Path(dirpath)
-    if not dirpath.is_dir():
-        return
-    for subpath in dirpath.iterdir():
-        if subpath.is_dir():
-            yield from traverse(subpath)
-        else:
-            yield subpath
-
-
-def validate_sample_input_files(numfiles, sample, reads_are_paired=True):
-    if numfiles == 0:
-        raise FileNotFoundError(f"sample {sample}: found 0 FASTQ files")
-    if reads_are_paired:
-        exp_num_fastq_files = 2
-        mode = "paired"
-    else:
-        exp_num_fastq_files = 1
-        mode = "single"
-    if numfiles != exp_num_fastq_files:
-        message = (
-            f"sample {sample}: found {numfiles} FASTQ files"
-            f", expected {exp_num_fastq_files} in {mode}-end mode"
-        )
-        raise ValueError(message)
-    return True
-
-
-def link_or_copy_input(filenames, workdir, docopy=False):
-    seqdir = Path(workdir) / "seq"
-    seqdir.mkdir(parents=True, exist_ok=True)
-    workingfiles = list()
-    for filepath in filenames:
-        workingpath = seqdir / filepath.name
-        workingfiles.append(Path("seq") / workingpath.name)
-        if workingpath.is_file():
-            continue
-        createfunc = copy if docopy else symlink
-        createfunc(filepath.resolve(), workingpath)
-    return [str(wf) for wf in workingfiles]
 
 
 def subparser(subparsers):
@@ -257,11 +156,6 @@ def subparser(subparsers):
         dest="reads_are_paired",
         action="store_false",
         help="accept single-end reads only; by default, only paired-end reads are accepted",
-    )
-    cli.add_argument(
-        "--copy-input",
-        action="store_true",
-        help="copy input files to working directory; by default, input files are symlinked",
     )
     cli.add_argument(
         "--hg38",

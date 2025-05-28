@@ -44,6 +44,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "biopython",
+        "ezfastq",
         "insilicoseq>=1.5.4,<2.0",
         "jsonschema>=4.0",
         "matplotlib>=3.0",
