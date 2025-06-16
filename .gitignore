@@ -18,3 +18,7 @@ microhapulator/data/hg38.fasta.gz*
 .snakemake/
 .vscode/
 microhapulator/data/hg38.mmi
+
+# pixi environments
+.pixi
+*.egg-info

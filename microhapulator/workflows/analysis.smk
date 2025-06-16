@@ -10,11 +10,11 @@
 # Development Center.
 # -------------------------------------------------------------------------------------------------
 
+from importlib.resources import files
 from microhapulator import api as mhapi
 from microhapulator.pipe import OverviewReporter, DetailReporter
 from microhapulator.profile import TypingResult
 from microhapulator.thresholds import ThresholdIndex
-from pkg_resources import resource_filename
 import shutil
 
 
@@ -55,12 +55,12 @@ rule report:
         expand("analysis/{sample}/03typing/{sample}-typing-rate.tsv", sample=config["samples"]),
         expand("analysis/{sample}/03typing/{sample}-discard-rate.tsv", sample=config["samples"]),
         expand("analysis/{sample}/03typing/{sample}-gapped-rate.tsv", sample=config["samples"]),
-        resource_filename("microhapulator", "data/template.html"),
-        resource_filename("microhapulator", "data/marker_details_template.html"),
-        resource_filename("microhapulator", "data/third-party/bootstrap.min.css"),
-        resource_filename("microhapulator", "data/third-party/fancyTable.js"),
-        resource_filename("microhapulator", "data/third-party/jquery-ui.min.js"),
-        resource_filename("microhapulator", "data/third-party/jquery.min.js"),
+        files("microhapulator") / "data" / "template.html",
+        files("microhapulator") / "data" / "marker_details_template.html",
+        files("microhapulator") / "data" / "third-party" / "bootstrap.min.css",
+        files("microhapulator") / "data" / "third-party" / "fancyTable.js",
+        files("microhapulator") / "data" / "third-party" / "jquery-ui.min.js",
+        files("microhapulator") / "data" / "third-party" / "jquery.min.js",
     output:
         main="report/report.html",
         detail="report/marker-detail-report.html",
@@ -82,7 +82,7 @@ rule report:
         reporter = DetailReporter(config["samples"])
         with open(output.detail, "w") as fh:
             print(reporter.render(), file=fh, end="")
-        tpdir = resource_filename("microhapulator", "data/third-party/")
+        tpdir = files("microhapulator") / "data" / "third-party"
         shell("mkdir -p report/img/")
         shell("cp -r {tpdir} report/assets")
         for sample in config["samples"]:
