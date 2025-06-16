@@ -71,16 +71,16 @@ sphinx = "*"
 sphinx-argparse = "*"
 
 [tool.pixi.feature.test.tasks]
-docs = "sphinx-build -b html docs/ docs/_build/"
-hooks = "echo 'set -eo pipefail\npixi run style\npixi run docs' > .git/hooks/pre-commit && chmod 755 .git/hooks/pre-commit"
-format_py = "black --line-length=99 microhapulator/*.py microhapulator/*/*.py microhapulator/*/*/*.py"
-format_smk = "snakefmt --line-length=99 microhapulator/workflows/*.smk"
-format = { depends-on = ["format_py", "format_smk"] }
-style_py = "black --line-length=99 --check microhapulator/*.py microhapulator/*/*.py microhapulator/*/*/*.py"
-style_smk = "snakefmt --line-length=99 --check microhapulator/workflows/*.smk"
-style = { depends-on = ["style_py", "style_smk"] }
-test = "pytest --cov=microhapulator --doctest-modules --pyargs microhapulator"
-test4 = "pytest --cov=microhapulator --doctest-modules --pyargs microhapulator -n 4"
+docs = { cmd = "sphinx-build -b html docs/ docs/_build/", description = "Build documentation" }
+hooks = { cmd = "echo 'set -eo pipefail\npixi run style\npixi run docs' > .git/hooks/pre-commit && chmod 755 .git/hooks/pre-commit", description = "Install development hooks"}
+_format_py = "black --line-length=99 microhapulator/*.py microhapulator/*/*.py microhapulator/*/*/*.py"
+_format_smk = "snakefmt --line-length=99 microhapulator/workflows/*.smk"
+format = { depends-on = ["_format_py", "_format_smk"], description = "Autoformat Python and Snakemake code" }
+_style_py = "black --line-length=99 --check microhapulator/*.py microhapulator/*/*.py microhapulator/*/*/*.py"
+_style_smk = "snakefmt --line-length=99 --check microhapulator/workflows/*.smk"
+style = { depends-on = ["_style_py", "_style_smk"], description = "Check Python and Snakemake code style" }
+test = { cmd = "pytest --cov=microhapulator --doctest-modules --pyargs microhapulator", description = "Run automated test suite" }
+test4 = { cmd = "pytest --cov=microhapulator --doctest-modules --pyargs microhapulator -n 4", description = "Run automated test suite with 4 parallel jobs" }
 
 [tool.pixi.environments]
 test = ["test"]

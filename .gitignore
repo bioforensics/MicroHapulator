@@ -3,7 +3,6 @@ __pycache__/
 .pytest_cache/
 .*.swp
 *.swo
-microhapulator.egg-info/
 hg38.fasta
 hg38.fasta.fai
 .coverage.*
@@ -18,7 +17,5 @@ microhapulator/data/hg38.fasta.gz*
 .snakemake/
 .vscode/
 microhapulator/data/hg38.mmi
-
-# pixi environments
 .pixi
 *.egg-info
