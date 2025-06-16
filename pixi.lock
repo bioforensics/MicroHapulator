@@ -3018,7 +3018,7 @@ packages:
 - pypi: ./
   name: microhapulator
   version: 0.8.4
-  sha256: d7a5c54dcfda0a23a413ac80a80f52a200fcbd2f30b69d76f2bab89c452a74c2
+  sha256: eeaafffe3dcfdd89f47dfcf545fff65b6b1944f5e17e58e72526e390cc056743
   requires_python: '>=3.11,<3.14'
   editable: true
 - conda: https://conda.anaconda.org/bioconda/linux-64/minimap2-2.30-h577a1d6_0.tar.bz2
