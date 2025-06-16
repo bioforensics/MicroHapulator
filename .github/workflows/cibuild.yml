@@ -24,20 +24,12 @@ jobs:
         cache: true
     - name: Install
       run: |
-        curl -fsSL https://pixi.sh/install.sh | sh
-        source $HOME/.bashrc
-        which pixi
         pixi install
         pixi install -e test
         pixi run mhpl8r getrefr
     - name: Test with pytest
       run: |
-        # Move the source code so the tests run on the *installed* code (which is where the
-        # reference genome index is placed) rather than the source code
-        mv microhapulator mhpl8r_src
         pixi run test
-        # Move the code back for style check
-        mv mhpl8r_src microhapulator
     - name: Style and documentation check
       run: |
         pixi run style
