@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Updated working directory organization to provide additional structure (#194).
 - Snakemake is now invoked using its new Python API, requiring a minimum version of 8.0 and Python 3.11+ (#195).
 - FASTQ intake is now handled by a dedicated package ezfastq, which was based on MicroHapulator code (#196).
+- Switched from conda to pixi for project and dependency management (#197).
 
 ### Fixed
 - Bug with handling marker vs. locus identifiers when running `mhpl8r seq` (#190).

@@ -6,7 +6,7 @@ The documentation for MicroHapulator's [command line interface](cli.md) and [Pyt
 
 ## Automated test suite
 
-- Invoke test suite with `make test`
+- Invoke test suite with `pixi run test`
 - Most tests reside in `microhapulator/tests/test_*.py`
 - Some tests (doctests) reside in docstrings in module implementations in `microhapulator/*.py`
 

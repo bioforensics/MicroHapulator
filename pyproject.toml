@@ -1,0 +1,86 @@
+[project]
+name = "microhapulator"
+version = "0.8.4"
+description = "Empirical haplotype calling, analysis, and basic forensic interpretation of microhaplotypes from NGS data"
+authors = [{name = "Daniel Standage", email = "daniel.standage@st.dhs.gov"}]
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+
+[project.scripts]
+mhpl8r = "microhapulator.cli:main"
+happer = "microhapulator.happer.__main__:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [
+    "microhapulator",
+    "microhapulator.cli",
+    "microhapulator.happer",
+    "microhapulator.pipe",
+    "microhapulator.tests",
+]
+
+[tools.setuptools.package-data]
+"microhapulator" = [
+    "microhapulator/data/*",
+    "microhapulator/tests/data/*",
+    "microhapulator/tests/data/*/*",
+    "microhapulator/workflows/*",
+]
+
+[tool.pixi.project]
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64", "osx-64"]
+
+[tool.pixi.dependencies]
+fastqc = "*"
+htslib = "*"
+flash = "*"
+minimap2 = "*"
+samtools = "*"
+
+[tool.pixi.pypi-dependencies]
+biopython = "*"
+ezfastq = "*"
+insilicoseq = ">=1.5.4,<2.0"
+jsonschema = ">=4.0"
+matplotlib = ">=3.0"
+microhapdb = ">=0.12"
+microhapulator = { path = ".", editable = true }
+multiqc = ">=1.14"
+nbformat = ">=5.0,<5.6"
+numpy = ">=1.19"
+pandas = ">1.0"
+scipy = ">=1.7"
+seaborn = ">=0.13.2"
+snakemake = ">=8"
+termgraph = ">=0.5"
+tqdm = ">=4.0"
+
+[tool.pixi.feature.test.dependencies]
+black = "<25.0.0,>=24.1.1"
+myst-parser = "*"
+pytest = ">=6.0"
+pytest-cov = "*"
+pytest-xdist = "*"
+snakefmt = ">=0.10.0"
+sphinx = "*"
+sphinx-argparse = "*"
+
+[tool.pixi.feature.test.tasks]
+docs = { cmd = "sphinx-build -b html docs/ docs/_build/", description = "Build documentation" }
+hooks = { cmd = "echo 'set -eo pipefail\npixi run style\npixi run docs' > .git/hooks/pre-commit && chmod 755 .git/hooks/pre-commit", description = "Install development hooks"}
+_format_py = "black --line-length=99 microhapulator/*.py microhapulator/*/*.py microhapulator/*/*/*.py"
+_format_smk = "snakefmt --line-length=99 microhapulator/workflows/*.smk"
+format = { depends-on = ["_format_py", "_format_smk"], description = "Autoformat Python and Snakemake code" }
+_style_py = "black --line-length=99 --check microhapulator/*.py microhapulator/*/*.py microhapulator/*/*/*.py"
+_style_smk = "snakefmt --line-length=99 --check microhapulator/workflows/*.smk"
+style = { depends-on = ["_style_py", "_style_smk"], description = "Check Python and Snakemake code style" }
+test = { cmd = "pytest --cov=microhapulator --doctest-modules --pyargs microhapulator", description = "Run automated test suite" }
+test4 = { cmd = "pytest --cov=microhapulator --doctest-modules --pyargs microhapulator -n 4", description = "Run automated test suite with 4 parallel jobs" }
+
+[tool.pixi.environments]
+test = ["test"]
